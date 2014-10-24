@@ -1,0 +1,137 @@
+Version 1.4.1
+
+- Fixed platform compilation issues
+- Fixed typos in labels
+- Removed docs and left a link to online docs
+- Added Unity version and target platform to result files
+- Other bugfixes
+
+Version 1.4
+
+(integration tests)
+- Platform runner will send the results back to the editor via TCP now
+- Added naming convention for running tests in batch mode
+- It's possible to cancel the run in the editor in between the tests now
+- Added message filtering for integration tests results
+- Added check for RegisterLogCallback in case something else overrides it
+- Error messages will now fail integration tests
+- Fixed dynamic integration tests not being properly reset
+- Fixed platform runner for BlackBerry platform
+
+(assertion component)
+- fixed the component editor
+
+(common)
+- Made settings to be saved per project
+- Fixed resolving icons when there are more UnityTestTools folders in the project
+- Fixed process return code when running in batch mode
+
+Version 1.3.2
+
+- Fixed integration tests performance issues
+
+Version 1.3.1
+
+- Updated Japanese docs
+
+Version 1.3
+
+Fixes:
+(unit tests)
+- nUnit will no longer change the Environment.CurrentDirectory when running tests
+- fixed issues with asserting GameObject == null 
+(integration tests)
+- fix the issue with passing or failing test in first frame
+- fixed bug where ignored tests were still run in ITF
+(assertion component)
+- fixed resolving properties to include derived types 
+
+Improvements:
+(unit tests)
+- refactored result renderer
+- reenabled Random attribute
+- added Category filter
+- NSubstitute updated to version 1.7.2
+- result now will be dimmed after recompilation
+- running tests in background will now work without having the window focused
+- all assemblies in the project referencing 'nunit.framework' will now be included in the test list
+(integration tests)
+- updated platform exclusion mechanism
+- refactored result renderer
+- the runner should work even if the runner window is not focused
+- added possibility to create integration tests from code
+- the runner will now always run in background (if the window is not focused)
+(assertion component)
+- added API for creating assertions from code
+- added new example
+(common)
+- GUI improvements
+- you no longer need to change the path to icons when moving the tools to another directory
+- made test details/results resizeable and scrollable
+- added character escape for generated result XML
+
+Version 1.2.1
+- Fixed Unit Test Batch runner
+
+Version 1.2
+Fixes:
+- Windows Store related compilation issues
+- other
+Improvements:
+(unit tests)
+- unit test runner can run in background now without having the runner window open
+- unit test batch runner can take a result file path as a parameter
+- changed undo system for unit test runner and UnityUnitTest base class
+- execution time in now visible in test details
+- fixed a bug with tests that inherit from a base test class
+(integration tests)
+- added hierarchical structure for integration tests
+- added Player runner to automate running integration tests on platforms
+- Integration tests batch runner can take a result directory as a parameter
+- Integration tests batch runner can run tests on platforms
+- results are rendered in a player
+(assertion component)
+- changed default failure messages
+- it's possible to override failure action on comparer failure
+- added code stripper for assertions.
+- vast performance improvement
+- fixed bugs
+Other:
+- "Hide in hierarchy" option was removed from integration test runner
+- "Focus on selection" option was removed from integration test runner
+- "Hide test runner" option was removed from integration test runner
+- result files for unit tests and integration tests are now not generated when running tests from the editor
+- UI improvements
+- removed UnityScript and Boo examples
+- WP8 compatibility fixes
+
+Version 1.1.1
+Other:
+- Documentation in Japanese was added
+
+Version 1.1
+Fixes:
+- fixed display error that happened when unit test class inherited from another TestFixture class
+- fixed false positive result when "Succeed on assertions" was checked and no assertions were present in the test
+- fixed XmlResultWriter to be generate XML file compatible with XSD scheme
+- XmlResultWriter result writer was rewritten to remove XML libraries dependency
+- Fixed an issue with a check that should be executed once after a specified frame in OnUpdate.
+- added missing file UnityUnitTest.cs
+Improvements:
+- Added Japanese translation of the documentation
+- ErrorPause value will be reverted to previous state after test run finishes
+- Assertion Component will not copy reference to a GameObject if the GameObject is the same as the component is attached to. Instead, it will set the reference to the new GameObject.
+- Integration tests batch runner can now run multiple scenes
+- Unit test runner will now include tests written in UnityScript and Boo
+- Unit tests will not run automatically if the compilation failes
+- Added scene auto-save option to the Unit Test Runner 
+Other:
+- changed icons
+- restructured project files
+- moved XmlResultWriter to Common folder
+- added UnityScript and Boo unit tests examples
+- added more unit tests examples
+- Test runners visual adjustments
+
+Version 1.0
+- Initial release

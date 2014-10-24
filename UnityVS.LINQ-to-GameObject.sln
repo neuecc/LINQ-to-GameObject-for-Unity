@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityVS.LINQ-to-GameObject.CSharp.Editor", "UnityVS.LINQ-to-GameObject.CSharp.Editor.csproj", "{5F5EB0FB-1676-D6CE-9F97-4A4BEADED2C9}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityVS.LINQ-to-GameObject.CSharp", "UnityVS.LINQ-to-GameObject.CSharp.csproj", "{B8628AF2-0A55-281B-D305-1398FC2E6018}"
 EndProject
 Global
@@ -9,6 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5F5EB0FB-1676-D6CE-9F97-4A4BEADED2C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F5EB0FB-1676-D6CE-9F97-4A4BEADED2C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F5EB0FB-1676-D6CE-9F97-4A4BEADED2C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F5EB0FB-1676-D6CE-9F97-4A4BEADED2C9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B8628AF2-0A55-281B-D305-1398FC2E6018}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B8628AF2-0A55-281B-D305-1398FC2E6018}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8628AF2-0A55-281B-D305-1398FC2E6018}.Release|Any CPU.ActiveCfg = Release|Any CPU
