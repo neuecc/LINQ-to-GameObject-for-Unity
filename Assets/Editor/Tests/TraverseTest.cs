@@ -30,6 +30,11 @@ namespace UnityTest
             Origin.Child("Group").ChildrenAndSelf("Group")
                 .Select(x => x.name)
                 .IsCollection("Group", "Group");
+
+            var c2 = Origin.Parent().Child("C2");
+            c2.IsNotNull();
+            c2.activeInHierarchy.IsFalse();
+            c2.name.Is("C2");
         }
 
         [Test]
