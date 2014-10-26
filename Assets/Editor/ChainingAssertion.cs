@@ -434,7 +434,7 @@ namespace NUnit.Framework
             var properties = left.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(x => x.GetGetMethod(false) != null);
             var members = fields.Cast<MemberInfo>().Concat(properties.Cast<MemberInfo>());
 
-            foreach (var mi in fields.Cast<MemberInfo>().Concat(properties.Cast<MemberInfo>()))
+            foreach (var mi in members)
             {
                 var concatNames = names.Concat(new[] { (string)mi.Name });
                 object lv = null;

@@ -8,10 +8,9 @@ namespace Unity.Linq
 {
     // Inspired from LINQ to XML.
     // Reference: http://msdn.microsoft.com/en-us/library/system.xml.linq.xelement.aspx
-    // (element -> GameObject / elements -> GameObjects / node -> hierarchy / XName -> name)
     public static partial class GameObjectExtensions
     {
-        // Traverse Game Objects, based on Axis(Parent, Children, Ancestors/Descendants, ObjectsBeforeSelf/ObjectsBeforeAfter)
+        // Traverse Game Objects, based on Axis(Parent, Child, Children, Ancestors/Descendants, ObjectsBeforeSelf/ObjectsBeforeAfter)
 
         /// <summary>Gets the parent GameObject of this GameObject. If this GameObject has no parent, returns null.</summary>
         public static GameObject Parent(this GameObject origin)
@@ -24,21 +23,36 @@ namespace Unity.Linq
             return parentTransform.gameObject;
         }
 
+        /// <summary>Gets the first child GameObject with the specified name. If there is no GameObject with the speficided name, returns null.</summary>
+        public static GameObject Child(this GameObject origin, string name)
+        {
+            if (origin == null) return null;
+
+            var child = origin.transform.FindChild(name);
+            if (child == null) return null;
+            return child.gameObject;
+        }
+
+        /// <summary>Returns a collection of the child GameObjects.</summary>
         public static IEnumerable<GameObject> Children(this GameObject origin)
         {
             return ChildrenCore(origin, nameFilter: null, withSelf: false);
         }
 
+        /// <summary>Returns a filtered collection of the child GameObjects. Only GameObjects that have a matching name are included in the collection.</summary>
         public static IEnumerable<GameObject> Children(this GameObject origin, string name)
         {
             return ChildrenCore(origin, nameFilter: name, withSelf: false);
         }
 
+
+        /// <summary>Returns a collection of GameObjects that contain this GameObject, and the child GameObjects.</summary>
         public static IEnumerable<GameObject> ChildrenAndSelf(this GameObject origin)
         {
             return ChildrenCore(origin, nameFilter: null, withSelf: true);
         }
 
+        /// <summary>Returns a filtered collection of GameObjects that contain this GameObject, and the child GameObjects. Only GameObjects that have a matching name are included in the collection.</summary>
         public static IEnumerable<GameObject> ChildrenAndSelf(this GameObject origin, string name)
         {
             return ChildrenCore(origin, nameFilter: name, withSelf: true);
@@ -67,19 +81,19 @@ namespace Unity.Linq
             return AncestorsCore(origin, nameFilter: null, withSelf: false);
         }
 
-        /// <summary>Returns a filtered collection of the ancestor elements of this node. Only elements that have a matching XName are included in the collection.</summary>
+        /// <summary>Returns a filtered collection of the ancestor GameObjects of this hierarchy. Only GameObjects that have a matching name are included in the collection.</summary>
         public static IEnumerable<GameObject> Ancestors(this GameObject origin, string name)
         {
             return AncestorsCore(origin, nameFilter: null, withSelf: false);
         }
 
-        /// <summary>Returns a collection of elements that contain this element, and the ancestors of this element.</summary>
+        /// <summary>Returns a collection of GameObjects that contain this element, and the ancestors of this GameObject.</summary>
         public static IEnumerable<GameObject> AncestorsAndSelf(this GameObject origin)
         {
             return AncestorsCore(origin, nameFilter: null, withSelf: true);
         }
 
-        /// <summary>Returns a filtered collection of elements that contain this element, and the ancestors of this element. Only elements that have a matching XName are included in the collection.</summary>
+        /// <summary>Returns a filtered collection of GameObjects that contain this element, and the ancestors of this GameObject. Only GameObjects that have a matching name are included in the collection.</summary>
         public static IEnumerable<GameObject> AncestorsAndSelf(this GameObject origin, string name)
         {
             return AncestorsCore(origin, nameFilter: name, withSelf: true);
@@ -104,25 +118,26 @@ namespace Unity.Linq
             }
         }
 
-        /// <summary>Returns a collection of the descendant elements for this document or element, in document order.</summary>
+        /// <summary>Returns a collection of the descendant GameObjects.</summary>
         public static IEnumerable<GameObject> Descendants(this GameObject origin)
         {
             return DescendantsCore(origin, nameFilter: null, withSelf: false);
         }
 
-        /// <summary>Returns a collection of the descendant elements for this document or element, in document order. Only elements that have a matching XName are included in the collection.</summary>
+        /// <summary>Returns a filtered collection of the descendant GameObjects. Only GameObjects that have a matching name are included in the collection.</summary>
         public static IEnumerable<GameObject> Descendants(this GameObject origin, string name)
         {
             return DescendantsCore(origin, nameFilter: name, withSelf: false);
         }
 
-        /// <summary>Returns a collection of elements that contain this element, and all descendant elements of this element, in document order.</summary>
+
+        /// <summary>Returns a collection of GameObjects that contain this GameObject, and all descendant GameObjects of this GameObject.</summary>
         public static IEnumerable<GameObject> DescendantsAndSelf(this GameObject origin)
         {
             return DescendantsCore(origin, nameFilter: null, withSelf: true);
         }
 
-        /// <summary>Returns a filtered collection of elements that contain this element, and all descendant elements of this element, in document order. Only elements that have a matching XName are included in the collection.</summary>
+        /// <summary>Returns a filtered collection of GameObjects that contain this GameObject, and all descendant GameObjects of this GameObject. Only GameObjects that have a matching name are included in the collection.</summary>       
         public static IEnumerable<GameObject> DescendantsAndSelf(this GameObject origin, string name)
         {
             return DescendantsCore(origin, nameFilter: name, withSelf: true);
@@ -148,21 +163,25 @@ namespace Unity.Linq
             }
         }
 
+        /// <summary>Returns a collection of the sibling GameObjects before this hierarchy.</summary>
         public static IEnumerable<GameObject> ObjectsBeforeSelf(this GameObject origin)
         {
             return ObjectsBeforeSelfCore(origin, nameFilter: null, withSelf: false);
         }
 
+        /// <summary>Returns a filtered collection of the sibling GameObjects before this hierarchy. Only GameObjects that have a matching name are included in the collection.</summary>       
         public static IEnumerable<GameObject> ObjectsBeforeSelf(this GameObject origin, string name)
         {
             return ObjectsBeforeSelfCore(origin, nameFilter: name, withSelf: false);
         }
 
+        /// <summary>Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects before this hierarchy.</summary>
         public static IEnumerable<GameObject> ObjectsBeforeSelfAndSelf(this GameObject origin)
         {
             return ObjectsBeforeSelfCore(origin, nameFilter: null, withSelf: true);
         }
 
+        /// <summary>Returns a filtered collection of GameObjects that contain this GameObject, and the sibling GameObjects before this hierarchy. Only GameObjects that have a matching name are included in the collection.</summary>       
         public static IEnumerable<GameObject> ObjectsBeforeSelfAndSelf(this GameObject origin, string name)
         {
             return ObjectsBeforeSelfCore(origin, nameFilter: name, withSelf: true);
@@ -177,11 +196,15 @@ namespace Unity.Linq
 
             foreach (Transform item in parent.transform)
             {
-                if (item == origin) goto RETURN_SELF;
+                var go = item.gameObject;
+                if (go == origin)
+                {
+                    goto RETURN_SELF;
+                }
 
                 if (nameFilter == null || item.name == nameFilter)
                 {
-                    yield return item.gameObject;
+                    yield return go;
                 }
             }
 
@@ -192,21 +215,25 @@ namespace Unity.Linq
             }
         }
 
+        /// <summary>Returns a collection of the sibling GameObjects after this hierarchy.</summary>
         public static IEnumerable<GameObject> ObjectsAfterSelf(this GameObject origin)
         {
             return ObjectsAfterSelfCore(origin, nameFilter: null, withSelf: false);
         }
 
+        /// <summary>Returns a filtered collection of the sibling GameObjects after this hierarchy. Only GameObjects that have a matching name are included in the collection.</summary>       
         public static IEnumerable<GameObject> ObjectsAfterSelf(this GameObject origin, string name)
         {
             return ObjectsAfterSelfCore(origin, nameFilter: name, withSelf: false);
         }
 
+        /// <summary>Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects after this hierarchy.</summary>
         public static IEnumerable<GameObject> ObjectsAfterSelfAndSelf(this GameObject origin)
         {
             return ObjectsAfterSelfCore(origin, nameFilter: null, withSelf: true);
         }
 
+        /// <summary>Returns a filtered collection of GameObjects that contain this GameObject, and the sibling GameObjects after this hierarchy. Only GameObjects that have a matching name are included in the collection.</summary>       
         public static IEnumerable<GameObject> ObjectsAfterSelfAndSelf(this GameObject origin, string name)
         {
             return ObjectsAfterSelfCore(origin, nameFilter: name, withSelf: true);
