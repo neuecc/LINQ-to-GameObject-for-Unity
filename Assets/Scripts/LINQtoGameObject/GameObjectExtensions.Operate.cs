@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace Unity.Linq
@@ -37,6 +35,7 @@ namespace Unity.Linq
             if (childOriginal == null) throw new ArgumentNullException("childOriginal");
 
             var child = UnityEngine.Object.Instantiate(childOriginal) as GameObject;
+            // Unity 4.6, we can use SetParent but before that can't therefore use set localPosition/Rotation/Scale.
             child.transform.parent = parent.transform;
             child.layer = parent.layer;
 

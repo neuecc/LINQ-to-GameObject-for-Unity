@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Unity.Linq
@@ -17,7 +16,7 @@ namespace Unity.Linq
         /// <para>See: http://msdn.microsoft.com/en-us/library/bb387019.aspx</para>
         /// </summary>
         public GameObjectBuilder(GameObject original, params GameObjectBuilder[] children)
-            : this(original, children.AsEnumerable())
+            : this(original, (IEnumerable<GameObjectBuilder>)children)
         {
 
         }
