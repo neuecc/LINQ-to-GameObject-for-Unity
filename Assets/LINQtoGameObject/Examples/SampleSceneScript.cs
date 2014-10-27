@@ -2,7 +2,8 @@
 using System.Collections;
 using Unity.Linq; // using LINQ to GameObject
 
-public class MainScene : MonoBehaviour
+// This script attached to Root.
+public class SampleSceneScript : MonoBehaviour
 {
     void OnGUI()
     {
