@@ -125,7 +125,7 @@ DoNothing|Position/Scale/Rotation as is.
 
 `IEnumerable<GameObject>` Extensions.
 
-Value|Description
+Method|Description
 -------|-----------
 Ancestors|Returns a collection of GameObjects that contains the ancestors of every GameObject in the source collection.
 AncestorsAndSelf|Returns a collection of GameObjects that contains every GameObject in the source collection, and the ancestors of every GameObject in the source collection.
