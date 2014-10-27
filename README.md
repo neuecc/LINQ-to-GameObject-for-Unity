@@ -24,13 +24,19 @@ You can chain query(LINQ to Objects) and use some specified methods(Destroy, OfC
 // destroy all filtered(tag == "foobar") objects
 root.Descendants().Where(x => x.tag == "foobar").Destroy();
 
+// destroy all cloned objects
+origin.transform.root.gameObject
+    .Descendants()
+    .Where(x => x.name.EndsWith("(Clone)"))
+    .Destroy();
+
 // get FooScript under self childer objects and self
-var fooScripts = root.ChildrenAndSelf().OfComponent<FooScript>();
+var fooScripts = root.ChildrenAndSelf().OfComponent<FooScript>(); 
 ```
 
 How to use
 ---
-Import LINQ to GameObject from Unity Asset Store(currenly under reviewing!) or copy [Assets/Scripts/LINQtoGameObject](https://github.com/neuecc/LINQ-to-GameObject-for-Unity/tree/master/Assets/Scripts/LINQtoGameObject).
+Import LINQ to GameObject from Unity Asset Store(currenly under reviewing!) or copy [Assets/LINQtoGameObject/Scripts/LINQtoGameObject](https://github.com/neuecc/LINQ-to-GameObject-for-Unity/tree/master/Assets/LINQtoGameObject/Scripts).
 
 All methods are extension of GameObject, using `Unity.Linq` then you can use all extension methods.
 
@@ -125,10 +131,10 @@ Instantiate|Instantiate tree objects.
 
 Author Info
 ---
-Yoshifumi Kawai(a.k.a. neuecc) is software developer in Japan.
-He is Director/CTO at Grani, Inc.
-Grani is top social game developer in Japan. 
-He awarded Microsoft MVP for Visual C# since 2011.
+Yoshifumi Kawai(a.k.a. neuecc) is software developer in Japan.  
+He is Director/CTO at Grani, Inc.  
+Grani is top social game developer in Japan.   
+He awarded Microsoft MVP for Visual C# since 2011.  
 He is known by creator of [linq.js](http://linqjs.codeplex.com/)(LINQ to Objects for JavaScript) and [UniRx](https://github.com/neuecc/UniRx)(Reactive Extensions for Unity)
 
 Blog: http://neue.cc/ (JPN)  

@@ -25,6 +25,12 @@ You can chain query(LINQ to Objects) and use some specified methods(Destroy, OfC
 // destroy all filtered(tag == "foobar") objects
 root.Descendants().Where(x => x.tag == "foobar").Destroy();
 
+// destroy all cloned objects
+origin.transform.root.gameObject
+    .Descendants()
+    .Where(x => x.name.EndsWith("(Clone)"))
+    .Destroy();
+
 // get FooScript under self childer objects and self
 var fooScripts = root.ChildrenAndSelf().OfComponent<FooScript>();
 ```
