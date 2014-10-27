@@ -34,6 +34,16 @@ public class SampleSceneScript : MonoBehaviour
             }
         }
 
+        if (GUILayout.Button("name filter overload"))
+        {
+            Debug.Log("name filter overload");
+            var filtered = origin.Descendants("Group");
+            foreach (var item in filtered)
+            {
+                Debug.Log(item.name);
+            }
+        }
+
         if (GUILayout.Button("OfComponent"))
         {
             Debug.Log("------OfComponent");

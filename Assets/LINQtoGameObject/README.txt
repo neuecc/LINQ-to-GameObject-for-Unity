@@ -86,7 +86,7 @@ More info, see [Functional Construction (LINQ to XML)](http://msdn.microsoft.com
 
 Reference
 ---
-All traverse methods can find inactive object. If not found return type is `GameObject` methods return null, return type is `IEnumerable<GameObject>` methods return empty sequence.
+All traverse methods can find inactive object. If not found return type is `GameObject` methods return null, return type is `IEnumerable<GameObject>` methods return empty sequence. All collection methods have `string name` overload that returns filtered collection that have a matching name are included in the collection.
 
 Method | Description 
 -------| -----------
@@ -121,6 +121,19 @@ KeepOriginal|Set to same as Original. This is default of Add methods.
 FollowParent|Set to same as Parent.
 Origin|Set to Position = zero, Scale = one, Rotation = identity.
 DoNothing|Position/Scale/Rotation as is.        
+
+`IEnumerable<GameObject>` Extensions.
+
+Value|Description
+-------|-----------
+Ancestors|Returns a collection of GameObjects that contains the ancestors of every GameObject in the source collection.
+AncestorsAndSelf|Returns a collection of GameObjects that contains every GameObject in the source collection, and the ancestors of every GameObject in the source collection.
+Descendants|Returns a collection of GameObjects that contains the descendant GameObjects of every GameObject in the source collection.
+DescendantsAndSelf|Returns a collection of GameObjects that contains every GameObject in the source collection, and the descendent GameObjects of every GameObject in the source collection.
+Children|Returns a filtered collection of the child GameObjects of every GameObject in the source collection. Only GameObjects that have a matching name are included in the collection.
+ChildrenAndSelf|Returns a collection of GameObjects that contains every GameObject in the source collection, and the child GameObjects of every GameObject in the source collection.
+Destroy|Destroy every GameObject in the source collection safety(check null, deactive/detouch before destroy).
+OfComponent|Returns a collection of specified component in the source collection.
 
 GameObjectBuilder.
 
