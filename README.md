@@ -55,10 +55,10 @@ var cube = Resources.Load("Prefabs/PrefabCube") as GameObject;
 
 // add do attach parent, set same layer and fix localPosition/Scale/Rotation.
 // added child is cloned and returns child object.
-var clone = origin.Add(cube);
+var clone = root.Add(cube);
 
 // choose sibling position and allow append multiple objects.
-var clones = origin.AddAfterSelf(new[] { cube, cube, cube });  
+var clones = root.AddAfterSelf(new[] { cube, cube, cube });  
 
 // destroy do check null and deactive/detouch before destroy. It's more safety.
 root.Destroy();
