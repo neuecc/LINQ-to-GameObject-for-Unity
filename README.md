@@ -11,11 +11,11 @@ The concept of LINQ to GameObject is axis on tree.
 Every traverse method returns `IEnumerable<GameObject>` and deferred exectuion. For example
 
 ```csharp
-origin.Ancestors()   // Container, Root
-origin.Children()    // Sphere_A, Sphere_B, Group, Sphere_A, Sphere_B
-origin.Descendants() // Sphere_A, Sphere_B, Group, P1, Group, Sphere_B, P2, Sphere_A, Sphere_B
-origin.ObjectsBeforeSelf() // C1, C2
-origin.ObjectsAfterSelf()  // C3, C4
+origin.Ancestors();   // Container, Root
+origin.Children();    // Sphere_A, Sphere_B, Group, Sphere_A, Sphere_B
+origin.Descendants(); // Sphere_A, Sphere_B, Group, P1, Group, Sphere_B, P2, Sphere_A, Sphere_B
+origin.ObjectsBeforeSelf(); // C1, C2
+origin.ObjectsAfterSelf();  // C3, C4
 ```
 
 You can chain query(LINQ to Objects) and use some specified methods(Destroy, OfComponent and others).
