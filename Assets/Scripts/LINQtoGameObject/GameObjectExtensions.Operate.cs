@@ -9,14 +9,14 @@ namespace Unity.Linq
     /// </summary>
     public enum TransformCloneType
     {
-        /// <summary>Position/Scale/Rotation as is.</summary>
-        DoNothing,
-        /// <summary>Set to Position = zero, Scale = one, Rotation = identity.</summary>
-        Origin,
-        /// <summary>Set to same as Original.</summary>
+        /// <summary>Set to same as Original. This is default of Add methods.</summary>
         KeepOriginal,
         /// <summary>Set to same as Parent.</summary>
-        FollowParent
+        FollowParent,
+        /// <summary>Set to Position = zero, Scale = one, Rotation = identity.</summary>
+        Origin,
+        /// <summary>Position/Scale/Rotation as is.</summary>
+        DoNothing
     }
 
     public static partial class GameObjectExtensions
