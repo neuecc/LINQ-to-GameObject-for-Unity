@@ -122,7 +122,7 @@ FollowParent|Set to same as Parent.
 Origin|Set to Position = zero, Scale = one, Rotation = identity.
 DoNothing|Position/Scale/Rotation as is.        
 
-`IEnumerable<GameObject>` Extensions.
+`IEnumerable<GameObject>` Extensions. If multiple GameObjects in the source collection have the same GameObject will be included multiple times in the result collection. To avoid this, use the `Distinct`(LINQ to Objects) method.
 
 Method|Description
 -------|-----------
