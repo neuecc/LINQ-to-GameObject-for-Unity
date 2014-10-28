@@ -53,6 +53,10 @@ public class SampleSceneScript : MonoBehaviour
             {
                 Debug.Log("Sphere:" + item.name + " Radius:" + item.radius);
             }
+
+            origin.Descendants()
+                .Where(x => x.tag == "foobar")
+                .OfComponent<BoxCollider2D>();
         }
 
         if (GUILayout.Button("LINQ"))
