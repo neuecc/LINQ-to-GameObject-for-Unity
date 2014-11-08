@@ -36,7 +36,7 @@ var fooScripts = root.ChildrenAndSelf().OfComponent<FooScript>();
 
 How to use
 ---
-Import LINQ to GameObject from Unity Asset Store(currenly under reviewing!) or copy [Assets/LINQtoGameObject/Scripts/LINQtoGameObject](https://github.com/neuecc/LINQ-to-GameObject-for-Unity/tree/master/Assets/LINQtoGameObject/Scripts).
+Import LINQ to GameObject from Unity Asset Store - [http://u3d.as/content/neuecc/linq-to-game-object](http://u3d.as/content/neuecc/linq-to-game-object) or copy [Assets/LINQtoGameObject/Scripts/LINQtoGameObject](https://github.com/neuecc/LINQ-to-GameObject-for-Unity/tree/master/Assets/LINQtoGameObject/Scripts).
 
 All methods are extension of GameObject, using `Unity.Linq` then you can use all extension methods.
 
