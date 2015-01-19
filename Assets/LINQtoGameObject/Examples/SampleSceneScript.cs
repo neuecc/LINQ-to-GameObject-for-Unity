@@ -80,8 +80,17 @@ public class SampleSceneScript : MonoBehaviour
             // Note, Cloned object around origin but original object is placed top of hierarchy.
             Resources.FindObjectsOfTypeAll<GameObject>()
                 .Cast<GameObject>()
-                .Where(x => x.Parent() == null && x.name != "Main Camera" && x.name != "Root" && x.name != "" && x.name != "HandlesGO")
+                .Where(x => x.Parent() == null && !x.name.Contains("Camera") && x.name != "Root" && x.name != "" && x.name != "HandlesGO" && !x.name.StartsWith("Scene") && !x.name.Contains("Light") && !x.name.Contains("Materials"))
+                .Select(x => { Debug.Log(x.name); return x; })
                 .Destroy();
+        }
+
+        if (GUILayout.Button("MoveTo"))
+        {
+            origin.MoveToLast(new[] { new GameObject("lastChild1(Original)"), new GameObject("lastChild2(Original)"), new GameObject("lastChild3(Original)") });
+            origin.MoveToFirst(new[] { new GameObject("firstChild1(Original)"), new GameObject("firstChild2(Original)"), new GameObject("firstChild3(Original)") });
+            origin.MoveToBeforeSelf(new[] { new GameObject("beforeSelf1(Original)"), new GameObject("beforeSelf2(Original)"), new GameObject("beforeSelf3(Original)") });
+            origin.MoveToAfterSelf(new[] { new GameObject("afterSelf1(Original)"), new GameObject("afterSelf2(Original)"), new GameObject("afterSelf3(Original)") });
         }
 
         if (GUILayout.Button("Destroy"))
@@ -89,7 +98,8 @@ public class SampleSceneScript : MonoBehaviour
             // Destroy Cloned Object. Press button after Add Button.
             origin.transform.root.gameObject
                 .Descendants()
-                .Where(x => x.name.EndsWith("(Clone)"))
+                .Where(x => x.name.EndsWith("(Clone)") || x.name.EndsWith("(Original)"))
+                .Select(x => { Debug.Log(x.name); return x; })
                 .Destroy();
         }
     }

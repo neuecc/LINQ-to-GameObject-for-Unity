@@ -64,6 +64,7 @@ var clones = root.AddAfterSelf(new[] { cube, cube, cube });
 root.Destroy();
 ```
 
+Add method's child is cloned. If you want to move only child, you can use(`MoveToLast`, `MoveToFirst`, `MoveToBeforeSelf`, `MoveToAfterSelf`) instead of Add.  
 Operate methods are extension methods of GameObject, too. You need `using Unity.Linq`.
 
 Functional Construction
@@ -121,7 +122,24 @@ Value|Description
 KeepOriginal|Set to same as Original. This is default of Add methods.
 FollowParent|Set to same as Parent.
 Origin|Set to Position = zero, Scale = one, Rotation = identity.
-DoNothing|Position/Scale/Rotation as is.        
+DoNothing|Position/Scale/Rotation as is.
+
+MoveTo methods similar with Add but don't clone target.
+
+Method | Description 
+-------| -----------
+MoveToLast|Move the GameObject as children of this GameObject. 
+MoveToFirst|Move the GameObject as the first children of this GameObject. 
+MoveToBeforeSelf|Move the GameObject before this GameObject. 
+MoveToAfterSelf|Move the GameObject after this GameObject. 
+
+There are `TransformMoveType` that used MoveTo methods.
+
+Value|Description
+-------| -----------
+FollowParent|Set to same as Parent.
+Origin|Set to Position = zero, Scale = one, Rotation = identity.
+DoNothing|Position/Scale/Rotation as is. This is default of MoveTo methods.          
 
 `IEnumerable<GameObject>` Extensions. If multiple GameObjects in the source collection have the same GameObject will be included multiple times in the result collection. To avoid this, use the `Distinct`(LINQ to Objects) method.
 

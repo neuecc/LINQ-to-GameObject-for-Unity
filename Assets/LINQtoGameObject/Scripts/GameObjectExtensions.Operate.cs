@@ -19,8 +19,23 @@ namespace Unity.Linq
         DoNothing
     }
 
+    /// <summary>
+    /// Set type of moved child GameObject's localPosition/Scale/Rotation.
+    /// </summary>
+    public enum TransformMoveType
+    {
+        /// <summary>Set to same as Parent.</summary>
+        FollowParent,
+        /// <summary>Set to Position = zero, Scale = one, Rotation = identity.</summary>
+        Origin,
+        /// <summary>Position/Scale/Rotation as is.</summary>
+        DoNothing
+    }
+
     public static partial class GameObjectExtensions
     {
+        #region Add
+
         /// <summary>
         /// <para>Adds the GameObject as children of this GameObject. Target is cloned.</para>
         /// </summary>
@@ -140,7 +155,7 @@ namespace Unity.Linq
         public static GameObject AddBeforeSelf(this GameObject parent, GameObject childOriginal, TransformCloneType cloneType = TransformCloneType.KeepOriginal, bool? setActive = null, string specifiedName = null)
         {
             var root = parent.Parent();
-            if (root == null) throw new InvalidOperationException("The parent is null");
+            if (root == null) throw new InvalidOperationException("The parent root is null");
 
             var sibilingIndex = parent.transform.GetSiblingIndex();
 
@@ -160,7 +175,7 @@ namespace Unity.Linq
         public static List<GameObject> AddBeforeSelf(this GameObject parent, IEnumerable<GameObject> childOriginals, TransformCloneType cloneType = TransformCloneType.KeepOriginal, bool? setActive = null, string specifiedName = null)
         {
             var root = parent.Parent();
-            if (root == null) throw new InvalidOperationException("The parent is null");
+            if (root == null) throw new InvalidOperationException("The parent root is null");
 
             var sibilingIndex = parent.transform.GetSiblingIndex();
             var child = Add(root, childOriginals, cloneType, setActive, specifiedName);
@@ -183,7 +198,7 @@ namespace Unity.Linq
         public static GameObject AddAfterSelf(this GameObject parent, GameObject childOriginal, TransformCloneType cloneType = TransformCloneType.KeepOriginal, bool? setActive = null, string specifiedName = null)
         {
             var root = parent.Parent();
-            if (root == null) throw new InvalidOperationException("The parent is null");
+            if (root == null) throw new InvalidOperationException("The parent root is null");
 
             var sibilingIndex = parent.transform.GetSiblingIndex() + 1;
             var child = Add(root, childOriginal, cloneType, setActive, specifiedName);
@@ -202,7 +217,7 @@ namespace Unity.Linq
         public static List<GameObject> AddAfterSelf(this GameObject parent, IEnumerable<GameObject> childOriginals, TransformCloneType cloneType = TransformCloneType.KeepOriginal, bool? setActive = null, string specifiedName = null)
         {
             var root = parent.Parent();
-            if (root == null) throw new InvalidOperationException("The parent is null");
+            if (root == null) throw new InvalidOperationException("The parent root is null");
 
             var sibilingIndex = parent.transform.GetSiblingIndex() + 1;
             var child = Add(root, childOriginals, cloneType, setActive, specifiedName);
@@ -213,6 +228,187 @@ namespace Unity.Linq
 
             return child;
         }
+
+        #endregion
+
+        #region Move
+
+        /// <summary>
+        /// <para>Move the GameObject as children of this GameObject.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
+        /// <param name="child">Target.</param>
+        /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>      
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        public static GameObject MoveToLast(this GameObject parent, GameObject child, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        {
+            if (parent == null) throw new ArgumentNullException("parent");
+            if (child == null) throw new ArgumentNullException("child");
+
+            // Unity 4.6, we can use SetParent but before that can't therefore use set localPosition/Rotation/Scale.
+            child.transform.parent = parent.transform;
+            child.layer = parent.layer;
+
+            switch (moveType)
+            {
+                case TransformMoveType.FollowParent:
+                    child.transform.localPosition = parent.transform.localPosition;
+                    child.transform.localScale = parent.transform.localScale;
+                    child.transform.localRotation = parent.transform.localRotation;
+                    break;
+                case TransformMoveType.Origin:
+                    child.transform.localPosition = Vector3.zero;
+                    child.transform.localScale = Vector3.one;
+                    child.transform.localRotation = Quaternion.identity;
+                    break;
+                case TransformMoveType.DoNothing:
+                default:
+                    break;
+            }
+
+            if (setActive != null)
+            {
+                child.SetActive(setActive.Value);
+            }
+
+            return child;
+        }
+
+        /// <summary>
+        /// <para>Move the GameObject as children of this GameObject.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
+        /// <param name="childs">Target.</param>
+        /// <param name="moveType">Choose set type of moved child GameObject's localPosition/Scale/Rotation.</param>
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        public static List<GameObject> MoveToLast(this GameObject parent, IEnumerable<GameObject> childs, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        {
+            if (parent == null) throw new ArgumentNullException("parent");
+            if (childs == null) throw new ArgumentNullException("childs");
+
+            var list = new List<GameObject>();
+            foreach (var childOriginal in childs)
+            {
+                var child = MoveToLast(parent, childOriginal, moveType);
+                list.Add(child);
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// <para>Move the GameObject as the first children of this GameObject.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
+        /// <param name="child">Target.</param>
+        /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>      
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        public static GameObject MoveToFirst(this GameObject parent, GameObject child, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        {
+            MoveToLast(parent, child, moveType, setActive);
+            child.transform.SetAsFirstSibling();
+            return child;
+        }
+
+        /// <summary>
+        /// <para>Move the GameObject as the first children of this GameObject.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
+        /// <param name="childs">Target.</param>
+        /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>       
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        public static List<GameObject> MoveToFirst(this GameObject parent, IEnumerable<GameObject> childs, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        {
+            var child = MoveToLast(parent, childs, moveType, setActive);
+            for (int i = child.Count - 1; i >= 0; i--)
+            {
+                child[i].transform.SetAsFirstSibling();
+            }
+            return child;
+        }
+
+        /// <summary>
+        /// <para>Move the GameObject before this GameObject.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
+        /// <param name="child">Target.</param>
+        /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>      
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        public static GameObject MoveToBeforeSelf(this GameObject parent, GameObject child, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        {
+            var root = parent.Parent();
+            if (root == null) throw new InvalidOperationException("The parent root is null");
+
+            var sibilingIndex = parent.transform.GetSiblingIndex();
+
+            MoveToLast(root, child, moveType, setActive);
+            child.transform.SetSiblingIndex(sibilingIndex);
+            return child;
+        }
+
+        /// <summary>
+        /// <para>Move the GameObject before GameObject.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
+        /// <param name="childs">Target.</param>
+        /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>       
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        public static List<GameObject> MoveToBeforeSelf(this GameObject parent, IEnumerable<GameObject> childs, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        {
+            var root = parent.Parent();
+            if (root == null) throw new InvalidOperationException("The parent root is null");
+
+            var sibilingIndex = parent.transform.GetSiblingIndex();
+            var child = MoveToLast(root, childs, moveType, setActive);
+            for (int i = child.Count - 1; i >= 0; i--)
+            {
+                child[i].transform.SetSiblingIndex(sibilingIndex);
+            }
+
+            return child;
+        }
+
+        /// <summary>
+        /// <para>Move the GameObject after this GameObject.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
+        /// <param name="child">Target.</param>
+        /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>      
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        public static GameObject MoveToAfterSelf(this GameObject parent, GameObject child, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        {
+            var root = parent.Parent();
+            if (root == null) throw new InvalidOperationException("The parent root is null");
+
+            var sibilingIndex = parent.transform.GetSiblingIndex() + 1;
+            MoveToLast(root, child, moveType, setActive);
+            child.transform.SetSiblingIndex(sibilingIndex);
+            return child;
+        }
+
+        /// <summary>
+        /// <para>Move the GameObject after this GameObject.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
+        /// <param name="childs">Target.</param>
+        /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>       
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        public static List<GameObject> MoveToAfterSelf(this GameObject parent, IEnumerable<GameObject> childs, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        {
+            var root = parent.Parent();
+            if (root == null) throw new InvalidOperationException("The parent root is null");
+
+            var sibilingIndex = parent.transform.GetSiblingIndex() + 1;
+            var child = MoveToLast(root, childs, moveType, setActive);
+            for (int i = child.Count - 1; i >= 0; i--)
+            {
+                child[i].transform.SetSiblingIndex(sibilingIndex);
+            }
+
+            return child;
+        }
+
+        #endregion
 
         /// <summary>Destroy this GameObject safety(check null, deactive/detouch before destroy).</summary>
         /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
