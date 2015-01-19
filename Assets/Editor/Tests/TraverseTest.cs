@@ -85,40 +85,40 @@ namespace UnityTest
         }
 
         [Test]
-        public void ObjectsBeforeSelf()
+        public void BeforeSelf()
         {
-            Origin.ObjectsBeforeSelf().Select(x => x.name)
+            Origin.BeforeSelf().Select(x => x.name)
                 .IsCollection("C1", "C2");
 
-            Origin.ObjectsBeforeSelf("C2").Select(x => x.name)
+            Origin.BeforeSelf("C2").Select(x => x.name)
                 .IsCollection("C2");
 
-            Origin.ObjectsBeforeSelfAndSelf().Select(x => x.name)
+            Origin.BeforeSelfAndSelf().Select(x => x.name)
                 .IsCollection("C1", "C2", "Origin");
 
-            Origin.Child("Sphere_B").ObjectsBeforeSelfAndSelf().Select(x => x.name)
+            Origin.Child("Sphere_B").BeforeSelfAndSelf().Select(x => x.name)
                 .IsCollection("Sphere_A", "Sphere_B");
 
-            Origin.Children("Sphere_B").Last().ObjectsBeforeSelfAndSelf("Sphere_B").Select(x => x.name)
+            Origin.Children("Sphere_B").Last().BeforeSelfAndSelf("Sphere_B").Select(x => x.name)
                 .IsCollection("Sphere_B", "Sphere_B");
         }
 
         [Test]
-        public void ObjectsAfterSelf()
+        public void AfterSelf()
         {
-            Origin.ObjectsAfterSelf().Select(x => x.name)
+            Origin.AfterSelf().Select(x => x.name)
                 .IsCollection("C3", "C4");
             
-            Origin.ObjectsAfterSelf("C3").Select(x => x.name)
+            Origin.AfterSelf("C3").Select(x => x.name)
                 .IsCollection("C3");
 
-            Origin.ObjectsAfterSelfAndSelf().Select(x => x.name)
+            Origin.AfterSelfAndSelf().Select(x => x.name)
                 .IsCollection("Origin", "C3", "C4");
 
-            Origin.Child("Sphere_B").ObjectsAfterSelfAndSelf().Select(x => x.name)
+            Origin.Child("Sphere_B").AfterSelfAndSelf().Select(x => x.name)
                 .IsCollection("Sphere_B", "Group", "Sphere_A", "Sphere_B");
 
-            Origin.Child("Sphere_B").ObjectsAfterSelfAndSelf("Sphere_B").Select(x => x.name)
+            Origin.Child("Sphere_B").AfterSelfAndSelf("Sphere_B").Select(x => x.name)
                 .IsCollection("Sphere_B", "Sphere_B");
         }
     }

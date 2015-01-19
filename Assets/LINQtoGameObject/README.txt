@@ -15,8 +15,8 @@ Every traverse method returns `IEnumerable<GameObject>` and deferred exectuion. 
 origin.Ancestors();   // Container, Root
 origin.Children();    // Sphere_A, Sphere_B, Group, Sphere_A, Sphere_B
 origin.Descendants(); // Sphere_A, Sphere_B, Group, P1, Group, Sphere_B, P2, Sphere_A, Sphere_B
-origin.ObjectsBeforeSelf(); // C1, C2
-origin.ObjectsAfterSelf();  // C3, C4
+origin.BeforeSelf(); // C1, C2
+origin.AfterSelf();  // C3, C4
 ```
 
 You can chain query(LINQ to Objects) and use some specified methods(Destroy, OfComponent and others).
@@ -98,10 +98,10 @@ Ancestors|Returns a collection of the ancestor GameObjects of this GameObject.
 AncestorsAndSelf|Returns a collection of GameObjects that contain this element, and the ancestors of this GameObject.
 Descendants|Returns a collection of the descendant GameObjects.
 DescendantsAndSelf|Returns a collection of GameObjects that contain this GameObject, and all descendant GameObjects of this GameObject.
-ObjectsBeforeSelf|Returns a collection of the sibling GameObjects before this GameObject.
-ObjectsBeforeSelfAndSelf|Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects before this GameObject.
-ObjectsAfterSelf|Returns a collection of the sibling GameObjects after this GameObject.
-ObjectsAfterSelfAndSelf|Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects after this GameObject.
+BeforeSelf|Returns a collection of the sibling GameObjects before this GameObject.
+BeforeSelfAndSelf|Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects before this GameObject.
+AfterSelf|Returns a collection of the sibling GameObjects after this GameObject.
+AfterSelfAndSelf|Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects after this GameObject.
 
 Operate methods have three optional parameter. `cloneType` configure cloned child GameObject's localPosition/Scale/Rotation. `setActive` configure activates/deactivates child GameObject. If null, doesn't set specified value. `specifiedName` configure set name of child GameObject. If null, doesn't set specified value.
 
