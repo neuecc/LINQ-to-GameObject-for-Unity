@@ -2,6 +2,7 @@ LINQ to GameObject
 ===
 LINQ to GameObject is GameObject extensions for Unity that allows traverse hierarchy like LINQ to XML.  
 Project Home: https://github.com/neuecc/LINQ-to-GameObject-for-Unity
+Unity Forums support thread: http://forum.unity3d.com/threads/linq-to-gameobject.292611/
 
 Axis
 ---
