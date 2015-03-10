@@ -17,20 +17,19 @@ namespace UnityTest
 
         protected internal override void DrawLine(Rect rect, GUIContent label, bool isSelected, RenderingOptions options)
         {
-            EditorGUILayout.BeginHorizontal();
-            rect.x += 10;
+            if(Event.current.type != EventType.repaint)
+				return;
 
-            EditorGUI.LabelField(rect, label, isSelected ? Styles.selectedLabel : Styles.label);
+			Styles.testName.Draw (rect, label, false, false, false, isSelected);
 
             if (m_Result.IsTimeout)
             {
-                var timeoutRect = new Rect(rect);
-                timeoutRect.x = timeoutRect.x + timeoutRect.width;
-                timeoutRect.width = 24;
-                EditorGUI.LabelField(timeoutRect, s_GUITimeoutIcon);
-                GUILayout.FlexibleSpace();
+				float min, max;
+				Styles.testName.CalcMinMaxWidth(label, out min, out max);
+				var timeoutRect = new Rect(rect);
+				timeoutRect.x += min - 12;
+				Styles.testName.Draw(timeoutRect, s_GUITimeoutIcon, false, false, false, isSelected);
             }
-            EditorGUILayout.EndHorizontal();
         }
 
         protected internal override TestResult.ResultType GetResult()

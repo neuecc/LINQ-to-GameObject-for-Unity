@@ -1,3 +1,35 @@
+Version 1.5
+
+- Unity 5 related compatibility changes
+
+Version 1.4.4
+
+- Minimal supported Unity version is now 4.3
+- UI changes
+- code refactoring
+
+Version 1.4.3
+
+- Remove reference to Resources.LoadAssetAtPath from runtime code
+
+Version 1.4.2
+
+(assertion component)
+- fixed string comparer bug that prevented updating the value
+
+(unit tests)
+- unit test runner will log to stdout now
+- fixes issues with opening tests in IDEs
+
+(integration tests)
+- transform component is now visible for integration tests components
+- added better support for mac's keyboard
+- fixed 'succeed on assertion' for code generated assertion
+
+(other)
+- minor bugfixes
+- general improvments
+
 Version 1.4.1
 
 - Fixed platform compilation issues

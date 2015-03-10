@@ -61,7 +61,8 @@ namespace UnityTest.IntegrationTests
                 catch (SocketException e)
                 {
                     Debug.LogException(e);
-                    EditorApplication.Exit(Batch.returnCodeRunError);
+					if (InternalEditorUtility.inBatchMode)
+                    	EditorApplication.Exit(Batch.returnCodeRunError);
                 }
             }
 
@@ -95,7 +96,7 @@ namespace UnityTest.IntegrationTests
 
             if (configuration.sendResultsOverNetwork)
                 NetworkResultsReceiver.StartReceiver(configuration);
-            else
+			else if (InternalEditorUtility.inBatchMode)
                 EditorApplication.Exit(Batch.returnCodeTestsOk);
         }
 

@@ -136,18 +136,18 @@ namespace UnityTest
 
         private void DrawMenuPanel()
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Group by", GUILayout.MaxWidth(60));
-            m_GroupBy = (GroupByType)EditorGUILayout.EnumPopup(m_GroupBy, GUILayout.MaxWidth(150));
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+            EditorGUILayout.LabelField("Group by:", Styles.toolbarLabel, GUILayout.MaxWidth(60));
+            m_GroupBy = (GroupByType)EditorGUILayout.EnumPopup(m_GroupBy, EditorStyles.toolbarPopup, GUILayout.MaxWidth(150));
 
             GUILayout.FlexibleSpace();
 
-            m_ShowType = (ShowType)EditorGUILayout.EnumPopup(m_ShowType, GUILayout.MaxWidth(100));
+            m_ShowType = (ShowType)EditorGUILayout.EnumPopup(m_ShowType, EditorStyles.toolbarPopup, GUILayout.MaxWidth(100));
 
-            EditorGUILayout.LabelField("Filter by", GUILayout.MaxWidth(50));
-            m_FilterType = (FilterType)EditorGUILayout.EnumPopup(m_FilterType, GUILayout.MaxWidth(100));
-            m_FilterText = EditorGUILayout.TextField(m_FilterText, GUILayout.MaxWidth(100));
-            if (GUILayout.Button("Clear", GUILayout.ExpandWidth(false)))
+            EditorGUILayout.LabelField("Filter by:", Styles.toolbarLabel, GUILayout.MaxWidth(50));
+            m_FilterType = (FilterType)EditorGUILayout.EnumPopup(m_FilterType, EditorStyles.toolbarPopup, GUILayout.MaxWidth(100));
+            m_FilterText = GUILayout.TextField(m_FilterText, "ToolbarSeachTextField", GUILayout.MaxWidth(100));
+            if (GUILayout.Button(GUIContent.none, string.IsNullOrEmpty(m_FilterText) ? "ToolbarSeachCancelButtonEmpty" : "ToolbarSeachCancelButton", GUILayout.ExpandWidth(false)))
                 m_FilterText = "";
             EditorGUILayout.EndHorizontal();
         }

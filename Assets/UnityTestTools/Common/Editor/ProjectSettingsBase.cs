@@ -12,7 +12,7 @@ namespace UnityTest
         private static readonly string k_SettingsPath = Path.Combine("UnityTestTools", "Common");
         const string k_SettingsFolder = "Settings";
 
-        public void Save()
+        public virtual void Save()
         {
             EditorUtility.SetDirty(this);
         }

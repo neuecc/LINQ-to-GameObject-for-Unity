@@ -42,8 +42,11 @@ namespace UnityTest
                 var member = fullCallStack[i];
                 result = GetValueFromMember(result, member);
                 tempCallstack.Add(member);
-                if (result == null) return null;
-                if (!IsValueType(result.GetType()))
+				if (result == null) return null;
+				var type = result.GetType();
+
+				//String is not a value type but we don't want to cache it
+				if (!IsValueType(type) && type != typeof(System.String))
                 {
                     tempCallstack.Clear();
                     m_CallingObjectRef = result;

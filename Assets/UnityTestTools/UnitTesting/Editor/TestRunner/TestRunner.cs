@@ -12,6 +12,7 @@ namespace UnityTest
         private void UpdateTestInfo(ITestResult result)
         {
             FindTestResult(result.Id).Update(result, false);
+            m_FilterSettings.UpdateCounters(m_ResultList.Cast<ITestResult>());
         }
 
         private UnitTestResult FindTestResult(string resultId)
@@ -28,7 +29,7 @@ namespace UnityTest
         private void RunTests()
         {
             var filter = new TestFilter();
-            var categories = GetSelectedCategories();
+            var categories = m_FilterSettings.GetSelectedCategories();
             if (categories != null && categories.Length > 0)
                 filter.categories = categories;
             RunTests(filter);

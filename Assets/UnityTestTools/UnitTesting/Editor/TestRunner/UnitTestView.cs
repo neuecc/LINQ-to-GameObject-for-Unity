@@ -7,16 +7,17 @@ using UnityEngine;
 namespace UnityTest
 {
     [Serializable]
-    public partial class UnitTestView : EditorWindow
+    public partial class UnitTestView : EditorWindow, IHasCustomMenu
     {
         private static UnitTestView s_Instance;
         private static readonly IUnitTestEngine k_TestEngine = new NUnitTestEngine();
 
         [SerializeField] private List<UnitTestResult> m_ResultList = new List<UnitTestResult>();
-        [SerializeField] private string[] m_AvailableCategories;
         [SerializeField] private List<string> m_FoldMarkers = new List<string>();
         [SerializeField] private List<UnitTestRendererLine> m_SelectedLines = new List<UnitTestRendererLine>();
         UnitTestRendererLine m_TestLines;
+        
+        private TestFilterSettings m_FilterSettings;
 
         #region runner steering vars
         private Vector2 m_TestListScroll, m_TestInfoScroll;
@@ -27,31 +28,26 @@ namespace UnityTest
         private UnitTestsRunnerSettings m_Settings;
 
         #region GUI Contents
-        private readonly GUIContent m_GUIRunSelectedTestsIcon = new GUIContent(Icons.RunImg, "Run selected tests");
-        private readonly GUIContent m_GUIRunAllTestsIcon = new GUIContent(Icons.RunAllImg, "Run all tests");
-        private readonly GUIContent m_GUIRerunFailedTestsIcon = new GUIContent(Icons.RunFailedImg, "Rerun failed tests");
-        private readonly GUIContent m_GUIOptionButton = new GUIContent("Options", Icons.GearImg);
-        private readonly GUIContent m_GUIHideButton = new GUIContent("Hide", Icons.GearImg);
+        private readonly GUIContent m_GUIRunSelectedTestsIcon = new GUIContent("Run Selected", "Run selected tests");
+        private readonly GUIContent m_GUIRunAllTestsIcon = new GUIContent("Run All", "Run all tests");
+        private readonly GUIContent m_GUIRerunFailedTestsIcon = new GUIContent("Rerun Failed", "Rerun failed tests");
         private readonly GUIContent m_GUIRunOnRecompile = new GUIContent("Run on recompile", "Run all tests after recompilation");
         private readonly GUIContent m_GUIShowDetailsBelowTests = new GUIContent("Show details below tests", "Show run details below test list");
         private readonly GUIContent m_GUIRunTestsOnNewScene = new GUIContent("Run tests on a new scene", "Run tests on a new scene");
         private readonly GUIContent m_GUIAutoSaveSceneBeforeRun = new GUIContent("Autosave scene", "The runner will automatically save the current scene changes before it starts");
-        private readonly GUIContent m_GUIShowSucceededTests = new GUIContent("Succeeded", Icons.SuccessImg, "Show tests that succeeded");
-        private readonly GUIContent m_GUIShowFailedTests = new GUIContent("Failed", Icons.FailImg, "Show tests that failed");
-        private readonly GUIContent m_GUIShowIgnoredTests = new GUIContent("Ignored", Icons.IgnoreImg, "Show tests that are ignored");
-        private readonly GUIContent m_GUIShowNotRunTests = new GUIContent("Not Run", Icons.UnknownImg, "Show tests that didn't run");
         #endregion
 
         public UnitTestView()
         {
-            title = "Unit Tests Runner";
             m_ResultList.Clear();
         }
 
         public void OnEnable()
         {
+            title = "Unit Tests";
             s_Instance = this;
             m_Settings = ProjectSettingsBase.Load<UnitTestsRunnerSettings>();
+            m_FilterSettings = new TestFilterSettings("UnityTest.UnitTestView");
             RefreshTests();
             EnableBackgroundRunner(m_Settings.runOnRecompilation);
         }
@@ -61,57 +57,34 @@ namespace UnityTest
             s_Instance = null;
             EnableBackgroundRunner(false);
         }
-
-        public void Awake()
-        {
-            RefreshTests();
-        }
-
+        
         public void OnGUI()
         {
-            GUILayout.Space(10);
             EditorGUILayout.BeginVertical();
 
-            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-            var layoutOptions = new[] { GUILayout.Width(32), GUILayout.Height(24) };
-            if (GUILayout.Button(m_GUIRunAllTestsIcon, Styles.buttonLeft, layoutOptions))
+            if (GUILayout.Button(m_GUIRunAllTestsIcon, EditorStyles.toolbarButton))
             {
                 RunTests();
                 GUIUtility.ExitGUI();
             }
-            if (GUILayout.Button(m_GUIRunSelectedTestsIcon, Styles.buttonMid, layoutOptions))
+            EditorGUI.BeginDisabledGroup(!m_TestLines.IsAnySelected);
+            if (GUILayout.Button(m_GUIRunSelectedTestsIcon, EditorStyles.toolbarButton))
             {
                 m_TestLines.RunSelectedTests();
             }
-            if (GUILayout.Button(m_GUIRerunFailedTestsIcon, Styles.buttonRight, layoutOptions))
+            EditorGUI.EndDisabledGroup();
+            if (GUILayout.Button(m_GUIRerunFailedTestsIcon, EditorStyles.toolbarButton))
             {
                 m_TestLines.RunTests(m_ResultList.Where(result => result.IsFailure || result.IsError).Select(l => l.FullName).ToArray());
             }
 
             GUILayout.FlexibleSpace();
+            
+            m_FilterSettings.OnGUI ();
 
-            if (GUILayout.Button(m_Settings.optionsFoldout ? m_GUIHideButton : m_GUIOptionButton, GUILayout.Height(24), GUILayout.Width(80)))
-            {
-                m_Settings.optionsFoldout = !m_Settings.optionsFoldout;
-            }
             EditorGUILayout.EndHorizontal();
-
-            if (m_Settings.optionsFoldout) DrawOptions();
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Filter:", GUILayout.Width(35));
-            m_Settings.testFilter = EditorGUILayout.TextField(m_Settings.testFilter, EditorStyles.textField);
-
-            if (m_AvailableCategories != null && m_AvailableCategories.Length > 0)
-                m_Settings.categoriesMask = EditorGUILayout.MaskField(m_Settings.categoriesMask, m_AvailableCategories, GUILayout.MaxWidth(90));
-
-            if (GUILayout.Button(m_Settings.filtersFoldout ? "Hide" : "Advanced", GUILayout.Width(80), GUILayout.Height(15)))
-                m_Settings.filtersFoldout = !m_Settings.filtersFoldout;
-            EditorGUILayout.EndHorizontal();
-
-            if (m_Settings.filtersFoldout)
-                DrawFilters();
 
             if (m_Settings.horizontalSplit)
                 EditorGUILayout.BeginVertical();
@@ -129,18 +102,6 @@ namespace UnityTest
             EditorGUILayout.EndVertical();
         }
 
-        private string[] GetSelectedCategories()
-        {
-            var selectedCategories = new List<string>();
-            foreach (var availableCategory in m_AvailableCategories)
-            {
-                var idx = Array.FindIndex(m_AvailableCategories, a => a == availableCategory);
-                var mask = 1 << idx;
-                if ((m_Settings.categoriesMask & mask) != 0) selectedCategories.Add(availableCategory);
-            }
-            return selectedCategories.ToArray();
-        }
-
         private void RenderTestList()
         {
             EditorGUILayout.BeginVertical(Styles.testList);
@@ -149,15 +110,7 @@ namespace UnityTest
                                                                GUILayout.MaxWidth(2000));
             if (m_TestLines != null)
             {
-                var options = new RenderingOptions();
-                options.showSucceeded = m_Settings.showSucceeded;
-                options.showFailed = m_Settings.showFailed;
-                options.showIgnored = m_Settings.showIgnored;
-                options.showNotRunned = m_Settings.showNotRun;
-                options.nameFilter = m_Settings.testFilter;
-                options.categories = GetSelectedCategories();
-
-                if (m_TestLines.Render(options)) Repaint();
+                if (m_TestLines.Render(m_FilterSettings.BuildRenderingOptions())) Repaint();
             }
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
@@ -215,44 +168,28 @@ namespace UnityTest
 
             EditorGUILayout.EndScrollView();
         }
-
-        private void DrawFilters()
+        
+        private void ToggleRunOnRecompilation()
         {
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.BeginHorizontal();
-            m_Settings.showSucceeded = GUILayout.Toggle(m_Settings.showSucceeded, m_GUIShowSucceededTests, GUI.skin.FindStyle(GUI.skin.button.name + "left"), GUILayout.ExpandWidth(true));
-            m_Settings.showFailed = GUILayout.Toggle(m_Settings.showFailed, m_GUIShowFailedTests, GUI.skin.FindStyle(GUI.skin.button.name + "mid"));
-            m_Settings.showIgnored = GUILayout.Toggle(m_Settings.showIgnored, m_GUIShowIgnoredTests, GUI.skin.FindStyle(GUI.skin.button.name + "mid"));
-            m_Settings.showNotRun = GUILayout.Toggle(m_Settings.showNotRun, m_GUIShowNotRunTests, GUI.skin.FindStyle(GUI.skin.button.name + "right"), GUILayout.ExpandWidth(true));
-            EditorGUILayout.EndHorizontal();
-            if (EditorGUI.EndChangeCheck()) m_Settings.Save();
+            m_Settings.runOnRecompilation = !m_Settings.runOnRecompilation;
+            EnableBackgroundRunner(m_Settings.runOnRecompilation);
         }
-
-        private void DrawOptions()
+        
+        public void AddItemsToMenu (GenericMenu menu)
         {
-            EditorGUI.BeginChangeCheck();
-
-            EditorGUI.BeginChangeCheck();
-            m_Settings.runOnRecompilation = EditorGUILayout.Toggle(m_GUIRunOnRecompile, m_Settings.runOnRecompilation);
-            if (EditorGUI.EndChangeCheck()) EnableBackgroundRunner(m_Settings.runOnRecompilation);
-
-            m_Settings.runTestOnANewScene = EditorGUILayout.Toggle(m_GUIRunTestsOnNewScene, m_Settings.runTestOnANewScene);
-            EditorGUI.BeginDisabledGroup(!m_Settings.runTestOnANewScene);
-            m_Settings.autoSaveSceneBeforeRun = EditorGUILayout.Toggle(m_GUIAutoSaveSceneBeforeRun, m_Settings.autoSaveSceneBeforeRun);
-            EditorGUI.EndDisabledGroup();
-            m_Settings.horizontalSplit = EditorGUILayout.Toggle(m_GUIShowDetailsBelowTests, m_Settings.horizontalSplit);
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                m_Settings.Save();
-            }
-            EditorGUILayout.Space();
+            menu.AddItem(m_GUIRunOnRecompile, m_Settings.runOnRecompilation, ToggleRunOnRecompilation);
+            menu.AddItem(m_GUIRunTestsOnNewScene, m_Settings.runTestOnANewScene, m_Settings.ToggleRunTestOnANewScene);
+            if(!m_Settings.runTestOnANewScene)
+                menu.AddDisabledItem(m_GUIAutoSaveSceneBeforeRun);
+            else
+                menu.AddItem(m_GUIAutoSaveSceneBeforeRun, m_Settings.autoSaveSceneBeforeRun, m_Settings.ToggleAutoSaveSceneBeforeRun);
+            menu.AddItem(m_GUIShowDetailsBelowTests, m_Settings.horizontalSplit, m_Settings.ToggleHorizontalSplit);
         }
 
         private void RefreshTests()
         {
             UnitTestResult[] newResults;
-            m_TestLines = k_TestEngine.GetTests(out newResults, out m_AvailableCategories);
+            m_TestLines = k_TestEngine.GetTests(out newResults, out m_FilterSettings.AvailableCategories);
 
             foreach (var newResult in newResults)
             {
@@ -267,6 +204,8 @@ namespace UnityTest
             TestLine.GetUnitTestResult = FindTestResult;
 
             m_ResultList = new List<UnitTestResult>(newResults);
+            
+            m_FilterSettings.UpdateCounters(m_ResultList.Cast<ITestResult>());
 
             Repaint();
         }

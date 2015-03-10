@@ -15,6 +15,8 @@ namespace UnityTest
         protected static GUIContent s_GUIOpenInEditor = new GUIContent("Open in editor");
         private readonly string m_ResultId;
         private readonly IList<string> m_Categories;
+        
+        private GUIContent m_Content;
 
         public TestLine(TestMethod test, string resultId) : base(test)
         {
@@ -29,6 +31,7 @@ namespace UnityTest
                 foreach (string category in test.Parent.Parent.Categories)
                     c.Add(category);
             m_Categories = c; 
+            m_Content = new GUIContent(m_RenderedName, null, m_FullName);
         }
 
         public UnitTestResult result
@@ -53,16 +56,16 @@ namespace UnityTest
                        : Icons.UnknownImg;
             if (m_Test.RunState == RunState.Ignored)
                 icon = GuiHelper.GetIconForResult(TestResultState.Ignored);
+                
+            m_Content.image = icon;
 
-            var guiContent = new GUIContent(m_RenderedName, icon, m_FullName);
-
-            GUILayout.Space(10);
-            var rect = GUILayoutUtility.GetRect(guiContent, EditorStyles.label, GUILayout.ExpandWidth(true) /*, GUILayout.MaxHeight (18)*/);
+            var rect = GUILayoutUtility.GetRect(m_Content, Styles.testName, GUILayout.ExpandWidth(true));
 
             OnLeftMouseButtonClick(rect);
             OnContextClick(rect);
 
-            EditorGUI.LabelField(rect, guiContent, isSelected ? Styles.selectedLabel : Styles.label);
+            if(Event.current.type == EventType.repaint)
+                Styles.testName.Draw(rect, m_Content, false, false, false, isSelected);
 
             if (result.Outdated) GUI.color = tempColor;
         }
@@ -78,11 +81,11 @@ namespace UnityTest
                 return false;
             if (options.categories != null && options.categories.Length > 0 && !options.categories.Any(c => m_Categories.Contains(c)))
                 return false;
-            if (!options.showIgnored && (m_Test.RunState == RunState.Ignored || m_Test.RunState == RunState.Skipped))
+            if (!options.showIgnored && (m_Test.RunState == RunState.Ignored || (result.Executed && m_Test.RunState == RunState.Skipped)))
                 return false;
-            if (!options.showFailed && (result.IsFailure || result.IsError || result.IsInconclusive))
+            if (!options.showFailed && result.Executed && (result.IsFailure || result.IsError || result.IsInconclusive))
                 return false;
-            if (!options.showNotRunned && !result.Executed)
+            if (!options.showNotRunned && !result.Executed && !result.IsIgnored)
                 return false;
             if (!options.showSucceeded && result.IsSuccess)
                 return false;
@@ -95,19 +98,21 @@ namespace UnityTest
             var text = tempTest.Name;
             if (tempTest.Executed)
                 text += " (" + tempTest.Duration.ToString("##0.###") + "s)";
-            if (!tempTest.IsSuccess)
+            text += "\n";
+            if (!string.IsNullOrEmpty(tempTest.Message))
             {
-                text += "\n";
-                if (!string.IsNullOrEmpty(tempTest.Message))
-                {
-                    text += "---\n";
-                    text += tempTest.Message.Trim();
-                }
-                if (!string.IsNullOrEmpty(tempTest.StackTrace))
-                {
-                    var stackTrace = StackTraceFilter.Filter(tempTest.StackTrace).Trim();
-                    text += "\n---EXCEPTION---\n" + stackTrace;
-                }
+                text += "---\n";
+                text += tempTest.Message.Trim();
+            }
+            if (!string.IsNullOrEmpty(tempTest.Logs))
+            {
+                text += "---Logs---\n";
+                text += tempTest.Logs.Trim();
+            }
+            if (!tempTest.IsSuccess && !string.IsNullOrEmpty(tempTest.StackTrace))
+            {
+                var stackTrace = StackTraceFilter.Filter(tempTest.StackTrace).Trim();
+                text += "\n---EXCEPTION---\n" + stackTrace;
             }
             return text.Trim();
         }

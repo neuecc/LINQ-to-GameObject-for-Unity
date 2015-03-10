@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using NUnit.Core;
 using NUnit.Core.Filters;
 using UnityEditor;
@@ -43,7 +44,8 @@ namespace UnityTest
 
         private UnitTestRendererLine[] ParseTestList(Test test, List<UnitTestResult> results, HashSet<string> categories)
         {
-            foreach (string category in test.Categories) categories.Add(category);
+            foreach (string category in test.Categories)
+                categories.Add(category);
 
             if (test is TestMethod)
             {
@@ -104,9 +106,11 @@ namespace UnityTest
             var libs = new List<Assembly>();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if (assembly.GetReferencedAssemblies().All(a => a.Name != "nunit.framework")) continue;
+                if (assembly.GetReferencedAssemblies().All(a => a.Name != "nunit.framework"))
+                    continue;
                 if (assembly.Location.Replace('\\', '/').StartsWith(Application.dataPath)
-                    || k_WhitelistedAssemblies.Contains(assembly.GetName().Name)) libs.Add(assembly);
+                    || k_WhitelistedAssemblies.Contains(assembly.GetName().Name))
+                    libs.Add(assembly);
             }
             return libs.ToArray();
         }
@@ -128,6 +132,10 @@ namespace UnityTest
                 eventListener = new NullListener();
             else
                 eventListener = new TestRunnerEventListener(testRunnerEventListener);
+
+            TestExecutionContext.CurrentContext.Out = new EventListenerTextWriter(eventListener, TestOutputType.Out);
+            TestExecutionContext.CurrentContext.Error = new EventListenerTextWriter(eventListener, TestOutputType.Error);
+
             suite.Run(eventListener, GetFilter(filter));
         }
 
@@ -143,10 +151,11 @@ namespace UnityTest
                 nUnitFilter.Add(new OrFilter(filter.objects.Where(o => o is TestName).Select(o => new NameFilter(o as TestName)).ToArray()));
             return nUnitFilter;
         }
-
+    
         public class TestRunnerEventListener : EventListener
         {
             private readonly ITestRunnerCallback m_TestRunnerEventListener;
+            private StringBuilder m_testLog;
 
             public TestRunnerEventListener(ITestRunnerCallback testRunnerEventListener)
             {
@@ -170,12 +179,14 @@ namespace UnityTest
 
             public void TestStarted(TestName testName)
             {
+                m_testLog = new StringBuilder();
                 m_TestRunnerEventListener.TestStarted(testName.FullName);
             }
 
             public void TestFinished(NUnit.Core.TestResult result)
             {
-                m_TestRunnerEventListener.TestFinished(result.UnitTestResult());
+                m_TestRunnerEventListener.TestFinished(result.UnitTestResult(m_testLog.ToString()));
+                m_testLog = null;
             }
 
             public void SuiteStarted(TestName testName)
@@ -192,6 +203,8 @@ namespace UnityTest
 
             public void TestOutput(TestOutput testOutput)
             {
+                if (m_testLog != null)
+                    m_testLog.AppendLine(testOutput.Text);
             }
         }
     }

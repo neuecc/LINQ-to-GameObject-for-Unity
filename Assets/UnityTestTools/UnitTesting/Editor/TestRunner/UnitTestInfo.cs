@@ -22,6 +22,7 @@ namespace UnityTest
         public string[] Categories { get; private set; }
         public string AssemblyPath { get; private set; }
         public string Id { get; private set; }
+        public bool IsIgnored { get; private set; }
 
         public UnitTestInfo(TestMethod testMethod)
         {
@@ -40,6 +41,8 @@ namespace UnityTest
             Categories = testMethod.Categories.Cast<string>().ToArray();
 
             AssemblyPath = GetAssemblyPath(testMethod);
+            
+            IsIgnored = (testMethod.RunState == RunState.Ignored);
         }
 
         private string GetAssemblyPath(TestMethod testMethod)

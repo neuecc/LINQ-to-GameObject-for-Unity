@@ -122,7 +122,9 @@ namespace UnityTest
 
         private static void OpenInEditorInternal(string filename, int line)
         {
-            InternalEditorUtility.OpenFileAtLineExternal(filename, line);
+			string assetPath = filename.Substring(Application.dataPath.Length - "Assets/".Length + 1);
+			var scriptAsset = AssetDatabase.LoadMainAssetAtPath(assetPath);
+			AssetDatabase.OpenAsset(scriptAsset, line);
         }
 
         public static bool GetConsoleErrorPause()

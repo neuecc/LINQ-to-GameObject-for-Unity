@@ -17,13 +17,9 @@ namespace UnityTest
 
         protected internal override void DrawLine(Rect rect, GUIContent label, bool isSelected, RenderingOptions options)
         {
-            EditorGUILayout.BeginHorizontal();
-
             EditorGUI.BeginChangeCheck();
             var isClassFolded = !EditorGUI.Foldout(rect, !Folded, label, isSelected ? Styles.selectedFoldout : Styles.foldout);
             if (EditorGUI.EndChangeCheck()) Folded = isClassFolded;
-
-            EditorGUILayout.EndHorizontal();
         }
 
         private bool Folded

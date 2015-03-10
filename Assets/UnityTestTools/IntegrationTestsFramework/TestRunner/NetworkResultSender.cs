@@ -55,7 +55,7 @@ namespace UnityTest
                         return false;
                     }
 
-                    var bf = new BinaryFormatter();
+                    var bf = new DTOFormatter();
                     bf.Serialize(tcpClient.GetStream(), dto);
                     tcpClient.GetStream().Close();
                     tcpClient.Close();

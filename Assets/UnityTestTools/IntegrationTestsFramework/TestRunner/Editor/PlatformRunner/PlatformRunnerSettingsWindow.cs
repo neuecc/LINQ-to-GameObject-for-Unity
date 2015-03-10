@@ -62,7 +62,7 @@ namespace UnityTest.IntegrationTests
                 {
                     if (Event.current.type == EventType.mouseDown && Event.current.button == 0)
                     {
-                        if (!Event.current.control)
+						if (!Event.current.control && !Event.current.command)
                             m_SelectedScenes.Clear();
                         if (!m_SelectedScenes.Contains(scenePath))
                             m_SelectedScenes.Add(scenePath);

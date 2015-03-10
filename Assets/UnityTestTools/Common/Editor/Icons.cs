@@ -16,15 +16,10 @@ namespace UnityTest
 
         public static readonly Texture2D FailImg;
         public static readonly Texture2D IgnoreImg;
-        public static readonly Texture2D RunImg;
-        public static readonly Texture2D RunFailedImg;
-        public static readonly Texture2D RunAllImg;
         public static readonly Texture2D SuccessImg;
         public static readonly Texture2D UnknownImg;
         public static readonly Texture2D InconclusiveImg;
         public static readonly Texture2D StopwatchImg;
-        public static readonly Texture2D PlusImg;
-        public static readonly Texture2D GearImg;
 
         public static readonly GUIContent GUIUnknownImg;
         public static readonly GUIContent GUIInconclusiveImg;
@@ -46,23 +41,6 @@ namespace UnityTest
             UnknownImg = LoadTexture("normal.png");
             InconclusiveImg = LoadTexture("inconclusive.png");
             StopwatchImg = LoadTexture("stopwatch.png");
-
-            if (EditorGUIUtility.isProSkin)
-            {
-                RunAllImg = LoadTexture("play-darktheme.png");
-                RunImg = LoadTexture("play_selected-darktheme.png");
-                RunFailedImg = LoadTexture("rerun-darktheme.png");
-                PlusImg = LoadTexture("create-darktheme.png");
-                GearImg = LoadTexture("options-darktheme.png");
-            }
-            else
-            {
-                RunAllImg = LoadTexture("play-lighttheme.png");
-                RunImg = LoadTexture("play_selected-lighttheme.png");
-                RunFailedImg = LoadTexture("rerun-lighttheme.png");
-                PlusImg = LoadTexture("create-lighttheme.png");
-                GearImg = LoadTexture("options-lighttheme.png");
-            }
 
             GUIUnknownImg = new GUIContent(UnknownImg);
             GUIInconclusiveImg = new GUIContent(InconclusiveImg);

@@ -46,7 +46,7 @@ namespace UnityTest
                 m_LastMessageReceived = DateTime.Now;
                 using (var stream = client.GetStream())
                 {
-                    var bf = new BinaryFormatter();
+                    var bf = new DTOFormatter();
                     dto = (ResultDTO)bf.Deserialize(stream);
                     stream.Close();
                 }

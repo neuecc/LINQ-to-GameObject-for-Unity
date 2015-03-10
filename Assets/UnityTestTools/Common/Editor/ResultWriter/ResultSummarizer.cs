@@ -25,7 +25,7 @@ namespace UnityTest
 
         private TimeSpan m_Duration;
 
-        public ResultSummarizer(ITestResult[] results)
+        public ResultSummarizer(IEnumerable<ITestResult> results)
         {
             foreach (var result in results)
                 Summarize(result);
@@ -125,7 +125,19 @@ namespace UnityTest
         {
             m_Duration += TimeSpan.FromSeconds(result.Duration);
             m_ResultCount++;
-
+            
+            if(!result.Executed)
+            {
+                if(result.IsIgnored)
+                {
+                    m_IgnoreCount++;
+                    return;
+                }
+                
+                m_SkipCount++;
+                return;
+            }
+            
             switch (result.ResultState)
             {
                 case TestResultState.Success:

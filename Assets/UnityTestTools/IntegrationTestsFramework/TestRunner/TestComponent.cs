@@ -258,7 +258,6 @@ namespace UnityTest
         {
             var go = new GameObject(name);
             go.AddComponent<TestComponent>();
-            go.transform.hideFlags |= HideFlags.HideInInspector;
             return go;
         }
 

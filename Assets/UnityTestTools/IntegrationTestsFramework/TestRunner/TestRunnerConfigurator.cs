@@ -107,18 +107,26 @@ namespace UnityTest
                 return new List<String>{IPAddress.Loopback.ToString()};
 
             var ipList = new List<UnicastIPAddressInformation>();
+			var allIpsList = new List<UnicastIPAddressInformation>();
 
             foreach (var netInterface in NetworkInterface.GetAllNetworkInterfaces())
             {
                 if (netInterface.NetworkInterfaceType != NetworkInterfaceType.Wireless80211 &&
                     netInterface.NetworkInterfaceType != NetworkInterfaceType.Ethernet)
                     continue;
+
+				var ipAdresses = netInterface.GetIPProperties().UnicastAddresses
+					.Where(a => a.Address.AddressFamily == AddressFamily.InterNetwork);
+				allIpsList.AddRange(ipAdresses);
+
                 if (netInterface.OperationalStatus != OperationalStatus.Up) continue;
 
-                var ipAdresses = netInterface.GetIPProperties().UnicastAddresses
-                                 .Where(a => a.Address.AddressFamily == AddressFamily.InterNetwork);
-                ipList.AddRange(ipAdresses);
+				ipList.AddRange(ipAdresses);
             }
+
+			//On Mac 10.10 all interfaces return OperationalStatus.Unknown, thus this workaround
+			if(!ipList.Any()) return allIpsList.Select(i => i.Address.ToString()).ToList();
+
             // sort ip list by their masks to predict which ip belongs to lan network
             ipList.Sort((ip1, ip2) =>
                         {
