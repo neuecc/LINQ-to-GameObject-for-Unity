@@ -50,31 +50,45 @@ namespace Unity.Linq
             if (childOriginal == null) throw new ArgumentNullException("childOriginal");
 
             var child = UnityEngine.Object.Instantiate(childOriginal) as GameObject;
-            // Unity 4.6, we can use SetParent but before that can't therefore use set localPosition/Rotation/Scale.
-            child.transform.parent = parent.transform;
-            child.layer = parent.layer;
-
-            switch (cloneType)
+            // for uGUI, should use SetParent(parent, false)
+            var childTransform = child.transform;
+#if !(UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5)
+            var rectTransform = childTransform as RectTransform;
+            if (rectTransform != null)
             {
-                case TransformCloneType.FollowParent:
-                    child.transform.localPosition = parent.transform.localPosition;
-                    child.transform.localScale = parent.transform.localScale;
-                    child.transform.localRotation = parent.transform.localRotation;
-                    break;
-                case TransformCloneType.Origin:
-                    child.transform.localPosition = Vector3.zero;
-                    child.transform.localScale = Vector3.one;
-                    child.transform.localRotation = Quaternion.identity;
-                    break;
-                case TransformCloneType.KeepOriginal:
-                    child.transform.localPosition = childOriginal.transform.localPosition;
-                    child.transform.localScale = childOriginal.transform.localScale;
-                    child.transform.localRotation = childOriginal.transform.localRotation;
-                    break;
-                case TransformCloneType.DoNothing:
-                default:
-                    break;
+                rectTransform.SetParent(parent.transform, worldPositionStays: false);
             }
+            else
+            {
+#endif
+                var parentTransform = parent.transform;
+                childTransform.parent = parentTransform;
+                switch (cloneType)
+                {
+                    case TransformCloneType.FollowParent:
+                        childTransform.localPosition = parentTransform.localPosition;
+                        childTransform.localScale = parentTransform.localScale;
+                        childTransform.localRotation = parentTransform.localRotation;
+                        break;
+                    case TransformCloneType.Origin:
+                        childTransform.localPosition = Vector3.zero;
+                        childTransform.localScale = Vector3.one;
+                        childTransform.localRotation = Quaternion.identity;
+                        break;
+                    case TransformCloneType.KeepOriginal:
+                        var childOriginalTransform = childOriginal.transform;
+                        childTransform.localPosition = childOriginalTransform.localPosition;
+                        childTransform.localScale = childOriginalTransform.localScale;
+                        childTransform.localRotation = childOriginalTransform.localRotation;
+                        break;
+                    case TransformCloneType.DoNothing:
+                    default:
+                        break;
+                }
+#if !(UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5)
+            }
+#endif
+            child.layer = parent.layer;
 
             if (setActive != null)
             {
@@ -245,26 +259,39 @@ namespace Unity.Linq
             if (parent == null) throw new ArgumentNullException("parent");
             if (child == null) throw new ArgumentNullException("child");
 
-            // Unity 4.6, we can use SetParent but before that can't therefore use set localPosition/Rotation/Scale.
-            child.transform.parent = parent.transform;
-            child.layer = parent.layer;
-
-            switch (moveType)
+            // for uGUI, should use SetParent(parent, false)
+            var childTransform = child.transform;
+#if !(UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5)
+            var rectTransform = childTransform as RectTransform;
+            if (rectTransform != null)
             {
-                case TransformMoveType.FollowParent:
-                    child.transform.localPosition = parent.transform.localPosition;
-                    child.transform.localScale = parent.transform.localScale;
-                    child.transform.localRotation = parent.transform.localRotation;
-                    break;
-                case TransformMoveType.Origin:
-                    child.transform.localPosition = Vector3.zero;
-                    child.transform.localScale = Vector3.one;
-                    child.transform.localRotation = Quaternion.identity;
-                    break;
-                case TransformMoveType.DoNothing:
-                default:
-                    break;
+                rectTransform.SetParent(parent.transform, worldPositionStays: false);
             }
+            else
+            {
+#endif
+                var parentTransform = parent.transform;
+                childTransform.parent = parentTransform;
+                switch (moveType)
+                {
+                    case TransformMoveType.FollowParent:
+                        childTransform.localPosition = parentTransform.localPosition;
+                        childTransform.localScale = parentTransform.localScale;
+                        childTransform.localRotation = parentTransform.localRotation;
+                        break;
+                    case TransformMoveType.Origin:
+                        childTransform.localPosition = Vector3.zero;
+                        childTransform.localScale = Vector3.one;
+                        childTransform.localRotation = Quaternion.identity;
+                        break;
+                    case TransformMoveType.DoNothing:
+                    default:
+                        break;
+                }
+#if !(UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5)
+            }
+#endif
+            child.layer = parent.layer;
 
             if (setActive != null)
             {
