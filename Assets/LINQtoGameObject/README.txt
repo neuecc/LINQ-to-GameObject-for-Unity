@@ -1,8 +1,10 @@
 LINQ to GameObject
 ===
-LINQ to GameObject is GameObject extensions for Unity that allows traverse hierarchy like LINQ to XML.  
+LINQ to GameObject is GameObject extensions for Unity that allows traverse hierarchy and append GameObject like LINQ to XML.  
 Project Home: https://github.com/neuecc/LINQ-to-GameObject-for-Unity
 Unity Forums support thread: http://forum.unity3d.com/threads/linq-to-gameobject.292611/
+
+LINQ to GameObject supports Unity 4 and 5 + uGUI's `RectTransform`.
 
 Axis
 ---
@@ -117,6 +119,8 @@ Destroy|Destroy this GameObject safety(check null, deactive/detouch before destr
 
 There are `TransformCloneType` that used Add methods.
 
+> If target is `RectTransform` always use `SetParent(parent, false)` and ignores `TransformCloneType`
+
 Value|Description
 -------| -----------
 KeepOriginal|Set to same as Original. This is default of Add methods.
@@ -134,6 +138,8 @@ MoveToBeforeSelf|Move the GameObject before this GameObject.
 MoveToAfterSelf|Move the GameObject after this GameObject. 
 
 There are `TransformMoveType` that used MoveTo methods.
+
+> If target is `RectTransform` always use `SetParent(parent, false)` and ignores `TransformMoveType`
 
 Value|Description
 -------| -----------
