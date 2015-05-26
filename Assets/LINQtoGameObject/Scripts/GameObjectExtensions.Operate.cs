@@ -445,6 +445,11 @@ namespace Unity.Linq
 
             self.SetActive(false); // deactive before destroy
             self.transform.parent = null; // detouch hierarchy before destroy
+#if !(UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5)
+            self.transform.SetParent(null);
+#else
+            self.transform.parent = null;
+#endif
 
             if (useDestroyImmediate)
             {
