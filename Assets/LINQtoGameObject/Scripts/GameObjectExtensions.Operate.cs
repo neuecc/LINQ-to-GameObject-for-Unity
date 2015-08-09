@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace Unity.Linq
 {
@@ -106,6 +107,19 @@ namespace Unity.Linq
         /// <para>Adds the GameObject as children of this GameObject. Target is cloned.</para>
         /// </summary>
         /// <param name="parent">Parent GameObject.</param>
+        /// <param name="childOriginal">Clone Target.</param>
+        /// <param name="cloneType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        /// <param name="specifiedName">Set name of child GameObject. If null, doesn't set specified value.</param>
+        public static T AddWithComponent<T>(this GameObject parent, T childOriginal, TransformCloneType cloneType = TransformCloneType.KeepOriginal, bool? setActive = null, string specifiedName = null) where T : UnityEngine.MonoBehaviour
+        {
+            return Add(parent, childOriginal.gameObject, cloneType, setActive, specifiedName).GetComponent<T>();
+        }
+
+        /// <summary>
+        /// <para>Adds the GameObject as children of this GameObject. Target is cloned.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
         /// <param name="childOriginals">Clone Target.</param>
         /// <param name="cloneType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>
         /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
@@ -123,6 +137,19 @@ namespace Unity.Linq
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// <para>Adds the GameObject as children of this GameObject. Target is cloned.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
+        /// <param name="childOriginals">Clone Target.</param>
+        /// <param name="cloneType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        /// <param name="specifiedName">Set name of child GameObject. If null, doesn't set specified value.</param>
+        public static IEnumerable<T> AddWithComponent<T>(this GameObject parent, IEnumerable<T> childOriginals, TransformCloneType cloneType = TransformCloneType.KeepOriginal, bool? setActive = null, string specifiedName = null) where T : Component{
+            return Add(parent, childOriginals.Select(c => c.gameObject), cloneType, setActive, specifiedName)
+                    .Select(c => c.GetComponent<T>());
         }
 
         /// <summary>
@@ -144,6 +171,19 @@ namespace Unity.Linq
         /// <para>Adds the GameObject as the first children of this GameObject. Target is cloned.</para>
         /// </summary>
         /// <param name="parent">Parent GameObject.</param>
+        /// <param name="childOriginal">Clone Target.</param>
+        /// <param name="cloneType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>      
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        /// <param name="specifiedName">Set name of child GameObject. If null, doesn't set specified value.</param>
+        public static T AddFirstWithComponent<T>(this GameObject parent, T childOriginal, TransformCloneType cloneType = TransformCloneType.KeepOriginal, bool? setActive = null, string specifiedName = null) where T : Component
+        {
+            return AddFirst(parent, childOriginal.gameObject, cloneType, setActive, specifiedName).GetComponent<T>();
+        }
+
+        /// <summary>
+        /// <para>Adds the GameObject as the first children of this GameObject. Target is cloned.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
         /// <param name="childOriginals">Clone Target.</param>
         /// <param name="cloneType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>       
         /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
@@ -156,6 +196,19 @@ namespace Unity.Linq
                 child[i].transform.SetAsFirstSibling();
             }
             return child;
+        }
+
+        /// <summary>
+        /// <para>Adds the GameObject as the first children of this GameObject. Target is cloned.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
+        /// <param name="childOriginals">Clone Target.</param>
+        /// <param name="cloneType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>       
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        /// <param name="specifiedName">Set name of child GameObject. If null, doesn't set specified value.</param>
+        public static IEnumerable<T> AddFirstWithComponent<T>(this GameObject parent, IEnumerable<T> childOriginals, TransformCloneType cloneType = TransformCloneType.KeepOriginal, bool? setActive = null, string specifiedName = null) where T : Component{
+            return AddFirst(parent, childOriginals.Select(c => c.gameObject), cloneType, setActive, specifiedName)
+                    .Select(c => c.GetComponent<T>());
         }
 
         /// <summary>
@@ -182,6 +235,19 @@ namespace Unity.Linq
         /// <para>Adds the GameObject before this GameObject. Target is cloned.</para>
         /// </summary>
         /// <param name="parent">Parent GameObject.</param>
+        /// <param name="childOriginal">Clone Target.</param>
+        /// <param name="cloneType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>     
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        /// <param name="specifiedName">Set name of child GameObject. If null, doesn't set specified value.</param>
+        public static T AddBeforeSelfWithComponent<T>(this GameObject parent, T childOriginal, TransformCloneType cloneType = TransformCloneType.KeepOriginal, bool? setActive = null, string specifiedName = null) where T : Component
+        {
+            return AddBeforeSelf(parent, childOriginal.gameObject, cloneType, setActive, specifiedName).GetComponent<T>();
+        }
+
+        /// <summary>
+        /// <para>Adds the GameObject before this GameObject. Target is cloned.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
         /// <param name="childOriginals">Clone Target.</param>
         /// <param name="cloneType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>     
         /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
@@ -199,6 +265,19 @@ namespace Unity.Linq
             }
 
             return child;
+        }
+
+        /// <summary>
+        /// <para>Adds the GameObject before this GameObject. Target is cloned.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
+        /// <param name="childOriginals">Clone Target.</param>
+        /// <param name="cloneType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>     
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        /// <param name="specifiedName">Set name of child GameObject. If null, doesn't set specified value.</param>
+        public static IEnumerable<T> AddBeforeSelfWithComponent<T>(this GameObject parent, IEnumerable<T> childOriginals, TransformCloneType cloneType = TransformCloneType.KeepOriginal, bool? setActive = null, string specifiedName = null) where T : Component{
+            return AddBeforeSelf(parent, childOriginals.Select(c => c.gameObject), cloneType, setActive, specifiedName)
+                    .Select(c => c.GetComponent<T>());
         }
 
         /// <summary>
@@ -224,6 +303,19 @@ namespace Unity.Linq
         /// <para>Adds the GameObject after this GameObject. Target is cloned.</para>
         /// </summary>
         /// <param name="parent">Parent GameObject.</param>
+        /// <param name="childOriginal">Clone Target.</param>
+        /// <param name="cloneType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>     
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        /// <param name="specifiedName">Set name of child GameObject. If null, doesn't set specified value.</param>
+        public static T AddAfterSelfWithComponent<T>(this GameObject parent, T childOriginal, TransformCloneType cloneType = TransformCloneType.KeepOriginal, bool? setActive = null, string specifiedName = null) where T : Component
+        {
+            return AddAfterSelf(parent, childOriginal.gameObject, cloneType, setActive, specifiedName).GetComponent<T>();
+        }
+
+        /// <summary>
+        /// <para>Adds the GameObject after this GameObject. Target is cloned.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
         /// <param name="childOriginals">Clone Target.</param>
         /// <param name="cloneType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>     
         /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
@@ -241,6 +333,19 @@ namespace Unity.Linq
             }
 
             return child;
+        }
+
+        /// <summary>
+        /// <para>Adds the GameObject after this GameObject. Target is cloned.</para>
+        /// </summary>
+        /// <param name="parent">Parent GameObject.</param>
+        /// <param name="childOriginals">Clone Target.</param>
+        /// <param name="cloneType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>     
+        /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
+        /// <param name="specifiedName">Set name of child GameObject. If null, doesn't set specified value.</param>
+        public static IEnumerable<T> AddAfterSelfWithComponent<T>(this GameObject parent, IEnumerable<T> childOriginals, TransformCloneType cloneType = TransformCloneType.KeepOriginal, bool? setActive = null, string specifiedName = null) where T : Component{
+            return AddAfterSelf(parent, childOriginals.Select(c => c.gameObject), cloneType, setActive, specifiedName)
+                    .Select(c => c.GetComponent<T>());
         }
 
         #endregion
