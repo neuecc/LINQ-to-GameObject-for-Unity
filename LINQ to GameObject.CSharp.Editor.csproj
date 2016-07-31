@@ -109,6 +109,12 @@
     <Reference Include="UnityEditor.iOS.Extensions.Common">
       <HintPath>Library\UnityAssemblies\UnityEditor.iOS.Extensions.Common.dll</HintPath>
     </Reference>
+    <Reference Include="AssetStoreToolsExtra">
+      <HintPath>Assets\AssetStoreTools\Editor\AssetStoreToolsExtra.dll</HintPath>
+    </Reference>
+    <Reference Include="AssetStoreTools">
+      <HintPath>Assets\AssetStoreTools\Editor\AssetStoreTools.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="LINQ to GameObject.CSharp.csproj">
