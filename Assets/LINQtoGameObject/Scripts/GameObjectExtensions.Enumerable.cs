@@ -149,13 +149,13 @@ namespace Unity.Linq
             }
         }
 
-        /// <summary>Destroy every GameObject in the source collection safety(check null, deactive/detouch before destroy).</summary>
+        /// <summary>Destroy every GameObject in the source collection safety(check null).</summary>
         /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
         public static void Destroy(this IEnumerable<GameObject> source, bool useDestroyImmediate = false)
         {
-            foreach (var item in new List<GameObject>(source)) // snapshot, avoid halloween problem http://en.wikipedia.org/wiki/Halloween_Problem
+            foreach (var item in source)
             {
-                item.Destroy(useDestroyImmediate);
+                item.Destroy(useDestroyImmediate, false); // doesn't detouch.
             }
         }
 

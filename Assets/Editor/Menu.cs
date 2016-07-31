@@ -50,10 +50,10 @@ namespace Assets.Editor
             }
             else
             {
-                go.Add(new[] { new GameObject("lastChild1"), new GameObject("lastChild2"), new GameObject("lastChild3") });
-                go.AddFirst(new[] { new GameObject("firstChild1"), new GameObject("firstChild2"), new GameObject("firstChild3") });
-                go.AddBeforeSelf(new[] { new GameObject("beforeSelf1"), new GameObject("beforeSelf2"), new GameObject("beforeSelf3") });
-                go.AddAfterSelf(new[] { new GameObject("afterSelf1"), new GameObject("afterSelf2"), new GameObject("afterSelf3") });
+                go.AddRange(new[] { new GameObject("lastChild1"), new GameObject("lastChild2"), new GameObject("lastChild3") });
+                go.AddFirstRange(new[] { new GameObject("firstChild1"), new GameObject("firstChild2"), new GameObject("firstChild3") });
+                go.AddBeforeSelfRange(new[] { new GameObject("beforeSelf1"), new GameObject("beforeSelf2"), new GameObject("beforeSelf3") });
+                go.AddAfterSelfRange(new[] { new GameObject("afterSelf1"), new GameObject("afterSelf2"), new GameObject("afterSelf3") });
             }
         }
     }

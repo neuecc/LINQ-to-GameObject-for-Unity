@@ -6,6 +6,8 @@ using Unity.Linq; // using LINQ to GameObject
 // This script attached to Root.
 public class SampleSceneScript : MonoBehaviour
 {
+    SampleSceneScript hoge;
+
     void OnGUI()
     {
         var origin = GameObject.Find("Origin");
@@ -20,7 +22,7 @@ public class SampleSceneScript : MonoBehaviour
         if (GUILayout.Button("Child"))
         {
             Debug.Log("------Child");
-            var child = origin.Child("Sphere_B");
+            var child = origin.Child("Sphere_B"); // can find deactive object
             Debug.Log(child.name);
         }
 
@@ -72,10 +74,10 @@ public class SampleSceneScript : MonoBehaviour
 
         if (GUILayout.Button("Add"))
         {
-            origin.Add(new[] { new GameObject("lastChild1"), new GameObject("lastChild2"), new GameObject("lastChild3") });
-            origin.AddFirst(new[] { new GameObject("firstChild1"), new GameObject("firstChild2"), new GameObject("firstChild3") });
-            origin.AddBeforeSelf(new[] { new GameObject("beforeSelf1"), new GameObject("beforeSelf2"), new GameObject("beforeSelf3") });
-            origin.AddAfterSelf(new[] { new GameObject("afterSelf1"), new GameObject("afterSelf2"), new GameObject("afterSelf3") });
+            origin.AddRange(new[] { new GameObject("lastChild1"), new GameObject("lastChild2"), new GameObject("lastChild3") });
+            origin.AddFirstRange(new[] { new GameObject("firstChild1"), new GameObject("firstChild2"), new GameObject("firstChild3") });
+            origin.AddBeforeSelfRange(new[] { new GameObject("beforeSelf1"), new GameObject("beforeSelf2"), new GameObject("beforeSelf3") });
+            origin.AddAfterSelfRange(new[] { new GameObject("afterSelf1"), new GameObject("afterSelf2"), new GameObject("afterSelf3") });
 
             // Note, Cloned object around origin but original object is placed top of hierarchy.
             Resources.FindObjectsOfTypeAll<GameObject>()
