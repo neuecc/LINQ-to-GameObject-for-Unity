@@ -144,6 +144,34 @@ namespace Unity.Linq
             if (childOriginals == null) throw new ArgumentNullException("childOriginals");
 
             var list = new List<T>();
+
+            // iteration optimize
+            {
+                var array = childOriginals as T[];
+                if (array != null)
+                {
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        var child = Add(parent, array[i], cloneType, setActive, specifiedName, setLayer);
+                        list.Add(child);
+                    }
+                    return list;
+                }
+            }
+
+            {
+                var iterList = childOriginals as List<T>;
+                if (iterList != null)
+                {
+                    for (int i = 0; i < iterList.Count; i++)
+                    {
+                        var child = Add(parent, iterList[i], cloneType, setActive, specifiedName, setLayer);
+                        list.Add(child);
+                    }
+                    return list;
+                }
+            }
+
             foreach (var childOriginal in childOriginals)
             {
                 var child = Add(parent, childOriginal, cloneType, setActive, specifiedName, setLayer);
@@ -304,19 +332,24 @@ namespace Unity.Linq
         #region Move
 
         /// <summary>
-        /// <para>Move the GameObject as children of this GameObject.</para>
+        /// <para>Move the GameObject/Component as children of this GameObject.</para>
         /// </summary>
         /// <param name="parent">Parent GameObject.</param>
         /// <param name="child">Target.</param>
         /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>      
         /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
-        public static GameObject MoveToLast(this GameObject parent, GameObject child, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        /// <param name="setLayer">Set layer of child GameObject same with parent.</param>
+        public static T MoveToLast<T>(this GameObject parent, T child, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null, bool setLayer = false)
+            where T : UnityEngine.Object
         {
             if (parent == null) throw new ArgumentNullException("parent");
             if (child == null) throw new ArgumentNullException("child");
 
+            var childGameObject = GetGameObject(child);
+            if (child == null) return child;
+
             // for uGUI, should use SetParent(parent, false)
-            var childTransform = child.transform;
+            var childTransform = childGameObject.transform;
 #if !(UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5)
             var rectTransform = childTransform as RectTransform;
             if (rectTransform != null)
@@ -347,32 +380,65 @@ namespace Unity.Linq
 #if !(UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5)
             }
 #endif
-            child.layer = parent.layer;
+            if (setLayer)
+            {
+                childGameObject.layer = parent.layer;
+            }
 
             if (setActive != null)
             {
-                child.SetActive(setActive.Value);
+                childGameObject.SetActive(setActive.Value);
             }
 
             return child;
         }
 
         /// <summary>
-        /// <para>Move the GameObject as children of this GameObject.</para>
+        /// <para>Move the GameObject/Component as children of this GameObject.</para>
         /// </summary>
         /// <param name="parent">Parent GameObject.</param>
         /// <param name="childs">Target.</param>
         /// <param name="moveType">Choose set type of moved child GameObject's localPosition/Scale/Rotation.</param>
         /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
-        public static List<GameObject> MoveToLast(this GameObject parent, IEnumerable<GameObject> childs, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        /// <param name="setLayer">Set layer of child GameObject same with parent.</param>
+        public static List<T> MoveToLastRange<T>(this GameObject parent, IEnumerable<T> childs, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null, bool setLayer = false)
+            where T : UnityEngine.Object
         {
             if (parent == null) throw new ArgumentNullException("parent");
             if (childs == null) throw new ArgumentNullException("childs");
 
-            var list = new List<GameObject>();
+            var list = new List<T>();
+
+            // iteration optimize
+            {
+                var array = childs as T[];
+                if (array != null)
+                {
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        var child = MoveToLast(parent, array[i], moveType, setActive, setLayer);
+                        list.Add(child);
+                    }
+                    return list;
+                }
+            }
+
+            {
+                var iterList = childs as List<T>;
+                if (iterList != null)
+                {
+                    for (int i = 0; i < iterList.Count; i++)
+                    {
+                        var child = MoveToLast(parent, iterList[i], moveType, setActive, setLayer);
+                        list.Add(child);
+                    }
+                    return list;
+                }
+            }
+
             foreach (var childOriginal in childs)
             {
-                var child = MoveToLast(parent, childOriginal, moveType);
+                var child = MoveToLast(parent, childOriginal, moveType, setActive, setLayer);
                 list.Add(child);
             }
 
@@ -380,112 +446,142 @@ namespace Unity.Linq
         }
 
         /// <summary>
-        /// <para>Move the GameObject as the first children of this GameObject.</para>
+        /// <para>Move the GameObject/Component as the first children of this GameObject.</para>
         /// </summary>
         /// <param name="parent">Parent GameObject.</param>
         /// <param name="child">Target.</param>
         /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>      
         /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
-        public static GameObject MoveToFirst(this GameObject parent, GameObject child, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        /// <param name="setLayer">Set layer of child GameObject same with parent.</param>
+        public static T MoveToFirst<T>(this GameObject parent, T child, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null, bool setLayer = false)
+            where T : UnityEngine.Object
         {
-            MoveToLast(parent, child, moveType, setActive);
-            child.transform.SetAsFirstSibling();
+            MoveToLast(parent, child, moveType, setActive, setLayer);
+            var go = GetGameObject(child);
+            if (go == null) return child;
+
+            go.transform.SetAsFirstSibling();
             return child;
         }
 
         /// <summary>
-        /// <para>Move the GameObject as the first children of this GameObject.</para>
+        /// <para>Move the GameObject/Component as the first children of this GameObject.</para>
         /// </summary>
         /// <param name="parent">Parent GameObject.</param>
         /// <param name="childs">Target.</param>
         /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>       
         /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
-        public static List<GameObject> MoveToFirst(this GameObject parent, IEnumerable<GameObject> childs, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        /// <param name="setLayer">Set layer of child GameObject same with parent.</param>
+        public static List<T> MoveToFirstRange<T>(this GameObject parent, IEnumerable<T> childs, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null, bool setLayer = false)
+            where T : UnityEngine.Object
         {
-            var child = MoveToLast(parent, childs, moveType, setActive);
+            var child = MoveToLastRange(parent, childs, moveType, setActive, setLayer);
             for (int i = child.Count - 1; i >= 0; i--)
             {
-                child[i].transform.SetAsFirstSibling();
+                var go = GetGameObject(child[i]);
+                if (go == null) continue;
+
+                go.transform.SetAsFirstSibling();
             }
             return child;
         }
 
         /// <summary>
-        /// <para>Move the GameObject before this GameObject.</para>
+        /// <para>Move the GameObject/Component before this GameObject.</para>
         /// </summary>
         /// <param name="parent">Parent GameObject.</param>
         /// <param name="child">Target.</param>
         /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>      
         /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
-        public static GameObject MoveToBeforeSelf(this GameObject parent, GameObject child, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        /// <param name="setLayer">Set layer of child GameObject same with parent.</param>
+        public static T MoveToBeforeSelf<T>(this GameObject parent, T child, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null, bool setLayer = false)
+            where T : UnityEngine.Object
         {
             var root = parent.Parent();
             if (root == null) throw new InvalidOperationException("The parent root is null");
 
             var sibilingIndex = parent.transform.GetSiblingIndex();
 
-            MoveToLast(root, child, moveType, setActive);
-            child.transform.SetSiblingIndex(sibilingIndex);
+            MoveToLast(root, child, moveType, setActive, setLayer);
+            var go = GetGameObject(child);
+            if (go == null) return child;
+
+            go.transform.SetSiblingIndex(sibilingIndex);
             return child;
         }
 
         /// <summary>
-        /// <para>Move the GameObject before GameObject.</para>
+        /// <para>Move the GameObject/Component before GameObject.</para>
         /// </summary>
         /// <param name="parent">Parent GameObject.</param>
         /// <param name="childs">Target.</param>
         /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>       
         /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
-        public static List<GameObject> MoveToBeforeSelf(this GameObject parent, IEnumerable<GameObject> childs, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        /// <param name="setLayer">Set layer of child GameObject same with parent.</param>
+        public static List<T> MoveToBeforeSelfRange<T>(this GameObject parent, IEnumerable<T> childs, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null, bool setLayer = false)
+            where T : UnityEngine.Object
         {
             var root = parent.Parent();
             if (root == null) throw new InvalidOperationException("The parent root is null");
 
             var sibilingIndex = parent.transform.GetSiblingIndex();
-            var child = MoveToLast(root, childs, moveType, setActive);
+            var child = MoveToLastRange(root, childs, moveType, setActive, setLayer);
             for (int i = child.Count - 1; i >= 0; i--)
             {
-                child[i].transform.SetSiblingIndex(sibilingIndex);
+                var go = GetGameObject(child[i]);
+                if (go == null) continue;
+
+                go.transform.SetSiblingIndex(sibilingIndex);
             }
 
             return child;
         }
 
         /// <summary>
-        /// <para>Move the GameObject after this GameObject.</para>
+        /// <para>Move the GameObject/Component after this GameObject.</para>
         /// </summary>
         /// <param name="parent">Parent GameObject.</param>
         /// <param name="child">Target.</param>
         /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>      
         /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
-        public static GameObject MoveToAfterSelf(this GameObject parent, GameObject child, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        /// <param name="setLayer">Set layer of child GameObject same with parent.</param>
+        public static T MoveToAfterSelf<T>(this GameObject parent, T child, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null, bool setLayer = false)
+            where T : UnityEngine.Object
         {
             var root = parent.Parent();
             if (root == null) throw new InvalidOperationException("The parent root is null");
 
             var sibilingIndex = parent.transform.GetSiblingIndex() + 1;
-            MoveToLast(root, child, moveType, setActive);
-            child.transform.SetSiblingIndex(sibilingIndex);
+            MoveToLast(root, child, moveType, setActive, setLayer);
+            var go = GetGameObject(child);
+            if (go == null) return child;
+
+            go.transform.SetSiblingIndex(sibilingIndex);
             return child;
         }
 
         /// <summary>
-        /// <para>Move the GameObject after this GameObject.</para>
+        /// <para>Move the GameObject/Component after this GameObject.</para>
         /// </summary>
         /// <param name="parent">Parent GameObject.</param>
         /// <param name="childs">Target.</param>
         /// <param name="moveType">Choose set type of cloned child GameObject's localPosition/Scale/Rotation.</param>       
         /// <param name="setActive">Set activates/deactivates child GameObject. If null, doesn't set specified value.</param>
-        public static List<GameObject> MoveToAfterSelf(this GameObject parent, IEnumerable<GameObject> childs, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null)
+        /// <param name="setLayer">Set layer of child GameObject same with parent.</param>
+        public static List<T> MoveToAfterSelfRange<T>(this GameObject parent, IEnumerable<T> childs, TransformMoveType moveType = TransformMoveType.DoNothing, bool? setActive = null, bool setLayer = false)
+            where T : UnityEngine.Object
         {
             var root = parent.Parent();
             if (root == null) throw new InvalidOperationException("The parent root is null");
 
             var sibilingIndex = parent.transform.GetSiblingIndex() + 1;
-            var child = MoveToLast(root, childs, moveType, setActive);
+            var child = MoveToLastRange(root, childs, moveType, setActive, setLayer);
             for (int i = child.Count - 1; i >= 0; i--)
             {
-                child[i].transform.SetSiblingIndex(sibilingIndex);
+                var go = GetGameObject(child[i]);
+                if (go == null) continue;
+
+                go.transform.SetSiblingIndex(sibilingIndex);
             }
 
             return child;
