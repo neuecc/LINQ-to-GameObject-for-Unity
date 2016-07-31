@@ -20,7 +20,7 @@ origin.BeforeSelf(); // C1, C2
 origin.AfterSelf();  // C3, C4
 ```
 
-You can chain query(LINQ to Objects) and use some specified methods(Destroy, OfComponent and others).
+You can chain query(LINQ to Objects) and use some specified methods(`Destroy`, `OfComponent` and others).
 
 ```csharp
 // destroy all filtered(tag == "foobar") objects
@@ -49,7 +49,9 @@ using Unity.Linq;
 
 Operate
 ---
-LINQ to GameObject have several operate methods, append child(`Add`, `AddFirst`, `AddBeforeSelf`, `AddAfterSelf`) and destroy object(`Destroy`).
+LINQ to GameObject have several operate methods, append child(`Add`, `AddFirst`, `AddBeforeSelf`, `AddAfterSelf`), append multiple objects(`AddRange`, `AddFirstRange`, `AddBeforeSelfRange`, `AddAfterSelfRange`) and destroy object(`Destroy`).
+
+![image](https://cloud.githubusercontent.com/assets/46207/17275579/e5f4d4ba-5747-11e6-900f-30193a4ef7b4.png)
 
 ```csharp
 var root = GameObject.Find("root"); 
@@ -60,37 +62,19 @@ var cube = Resources.Load("Prefabs/PrefabCube") as GameObject;
 var clone = root.Add(cube);
 
 // choose sibling position and allow append multiple objects.
-var clones = root.AddAfterSelf(new[] { cube, cube, cube });  
+var clones = root.AddAfterSelfRange(new[] { cube, cube, cube });  
 
-// destroy do check null and deactive/detouch before destroy. It's more safety.
+// destroy do check null.
 root.Destroy();
 ```
 
-Add method's child is cloned. If you want to move only child, you can use(`MoveToLast`, `MoveToFirst`, `MoveToBeforeSelf`, `MoveToAfterSelf`) instead of Add.  
-Operate methods are extension methods of GameObject, too. You need `using Unity.Linq`.
+Add method's child is cloned. It is useful for instantiate prefab scenario. If you want to move only child, you can use(`MoveToLast`, `MoveToFirst`, `MoveToBeforeSelf`, `MoveToAfterSelf`) and (`MoveToLastRange`, `MoveToFirstRange`, `MoveToBeforeSelfRange`, `MoveToAfterSelfRange`) instead of Add.
 
-Functional Construction
+All operate methods are extension methods of GameObject, too. You need `using Unity.Linq`.
+
+Reference : Traverse
 ---
-GameObjectBuilder construct tree use functional construction pattern.
-
-```csharp
-var cube = Resources.Load("Prefabs/PrefabCube") as GameObject;
-
-var tree = 
-    new GameObjectBuilder(cube,
-        new GameObjectBuilder(cube),
-        new GameObjectBuilder(cube,
-            new GameObjectBuilder(cube)),
-        new GameObjectBuilder(cube));
-
-var root = tree.Instantiate();
-```
-
-More info, see [Functional Construction (LINQ to XML)](http://msdn.microsoft.com/en-us/library/bb387019.aspx).
-
-Reference
----
-All traverse methods can find inactive object. If not found return type is `GameObject` methods return null, return type is `IEnumerable<GameObject>` methods return empty sequence. All collection methods have `string name` overload that returns filtered collection that have a matching name are included in the collection.
+All traverse methods can find inactive object. If not found, return type is `GameObject` methods return null, return type is `IEnumerable<GameObject>` methods return empty sequence. All collection methods have `string name` overload that returns filtered collection that have a matching name are included in the collection.
 
 Method | Description 
 -------| -----------
@@ -107,15 +91,21 @@ BeforeSelfAndSelf|Returns a collection of GameObjects that contain this GameObje
 AfterSelf|Returns a collection of the sibling GameObjects after this GameObject.
 AfterSelfAndSelf|Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects after this GameObject.
 
-Operate methods have three optional parameter. `cloneType` configure cloned child GameObject's localPosition/Scale/Rotation. `setActive` configure activates/deactivates child GameObject. If null, doesn't set specified value. `specifiedName` configure set name of child GameObject. If null, doesn't set specified value.
+Reference : Operate
+---
+Operate methods have four optional parameter. `cloneType` configure cloned child GameObject's localPosition/Scale/Rotation, default copies original local transform. `setActive` configure activates/deactivates child GameObject. If null, doesn't set specified value. `specifiedName` configure set name of child GameObject. If null, doesn't set specified value. `setLayer` configure set child GameObject's layer same with parent, default doesn't set layer.
 
 Method | Description 
 -------| -----------
-Add|Adds the GameObject as children of this GameObject. Target is cloned.
-AddFirst|Adds the GameObject as the first children of this GameObject. Target is cloned.
-AddBeforeSelf|Adds the GameObject before this GameObject. Target is cloned.
-AddAfterSelf|Adds the GameObject after this GameObject. Target is cloned.
-Destroy|Destroy this GameObject safety(check null, deactive/detouch before destroy).
+Add|Adds the GameObject/Component as children of this GameObject. Target is cloned.
+AddRange|Adds the GameObject/Component as children of this GameObject. Target is cloned.
+AddFirst|Adds the GameObject/Component as the first children of this GameObject. Target is cloned.
+AddFirstRange|Adds the GameObject/Component as the first children of this GameObject. Target is cloned.
+AddBeforeSelf|Adds the GameObject/Component before this GameObject. Target is cloned.
+AddBeforeSelfRange|Adds the GameObject/Component before this GameObject. Target is cloned.
+AddAfterSelf|Adds the GameObject/Component after this GameObject. Target is cloned.
+AddAfterSelfRange|Adds the GameObject/Component after this GameObject. Target is cloned.
+Destroy|Destroy this GameObject safety(check null).
 
 There are `TransformCloneType` that used Add methods.
 
@@ -132,10 +122,14 @@ MoveTo methods similar with Add but don't clone target.
 
 Method | Description 
 -------| -----------
-MoveToLast|Move the GameObject as children of this GameObject. 
-MoveToFirst|Move the GameObject as the first children of this GameObject. 
-MoveToBeforeSelf|Move the GameObject before this GameObject. 
-MoveToAfterSelf|Move the GameObject after this GameObject. 
+MoveToLast|Move the GameObject/Component as children of this GameObject. 
+MoveToLastRange|Move the GameObject/Component as children of this GameObject. 
+MoveToFirst|Move the GameObject/Component as the first children of this GameObject. 
+MoveToFirstRange|Move the GameObject/Component as the first children of this GameObject. 
+MoveToBeforeSelf|Move the GameObject/Component before this GameObject. 
+MoveToBeforeSelfRange|Move the GameObject/Component before this GameObject. 
+MoveToAfterSelf|Move the GameObject/Component after this GameObject. 
+MoveToAfterSelfRange|Move the GameObject/Component after this GameObject. 
 
 There are `TransformMoveType` that used MoveTo methods.
 
@@ -159,12 +153,6 @@ Children|Returns a filtered collection of the child GameObjects of every GameObj
 ChildrenAndSelf|Returns a collection of GameObjects that contains every GameObject in the source collection, and the child GameObjects of every GameObject in the source collection.
 Destroy|Destroy every GameObject in the source collection safety(check null, deactive/detouch before destroy).
 OfComponent|Returns a collection of specified component in the source collection.
-
-GameObjectBuilder.
-
-Method | Description 
--------| -----------
-Instantiate|Instantiate tree objects.
 
 Author Info
 ---
