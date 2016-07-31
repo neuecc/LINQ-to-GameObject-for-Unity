@@ -2,7 +2,7 @@ LINQ to GameObject
 ===
 LINQ to GameObject is GameObject extensions for Unity that allows traverse hierarchy and append GameObject like LINQ to XML. You can install from [Unity Asset Store - LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object) as FREE. Unity Forums support thread, ask me any questions - [http://forum.unity3d.com/threads/linq-to-gameobject.292611/](http://forum.unity3d.com/threads/linq-to-gameobject.292611/)
 
-LINQ to GameObject supports Unity 4 and 5 + uGUI's `RectTransform`.
+LINQ to GameObject supports Unity 5 and uGUI's `RectTransform`.
 
 Axis
 ---
