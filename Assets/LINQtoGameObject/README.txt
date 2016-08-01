@@ -151,7 +151,7 @@ Descendants|Returns a collection of GameObjects that contains the descendant Gam
 DescendantsAndSelf|Returns a collection of GameObjects that contains every GameObject in the source collection, and the descendent GameObjects of every GameObject in the source collection.
 Children|Returns a filtered collection of the child GameObjects of every GameObject in the source collection. Only GameObjects that have a matching name are included in the collection.
 ChildrenAndSelf|Returns a collection of GameObjects that contains every GameObject in the source collection, and the child GameObjects of every GameObject in the source collection.
-Destroy|Destroy every GameObject in the source collection safety(check null, deactive/detouch before destroy).
+Destroy|Destroy every GameObject in the source collection safety(check null).
 OfComponent|Returns a collection of specified component in the source collection.
 
 Author Info

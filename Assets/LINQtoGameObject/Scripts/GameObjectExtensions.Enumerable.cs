@@ -155,7 +155,7 @@ namespace Unity.Linq
         {
             foreach (var item in source)
             {
-                item.Destroy(useDestroyImmediate, false); // doesn't detouch.
+                item.Destroy(useDestroyImmediate, false); // doesn't detach.
             }
         }
 

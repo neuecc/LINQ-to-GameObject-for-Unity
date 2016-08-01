@@ -596,12 +596,12 @@ namespace Unity.Linq
 
         /// <summary>Destroy this GameObject safety(check null).</summary>
         /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
-        /// <param name="detouchParent">set to parent = null.</param>
-        public static void Destroy(this GameObject self, bool useDestroyImmediate = false, bool detouchParent = false)
+        /// <param name="detachParent">set to parent = null.</param>
+        public static void Destroy(this GameObject self, bool useDestroyImmediate = false, bool detachParent = false)
         {
             if (self == null) return;
 
-            if (detouchParent)
+            if (detachParent)
             {
 #if !(UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5)
                 self.transform.SetParent(null);
