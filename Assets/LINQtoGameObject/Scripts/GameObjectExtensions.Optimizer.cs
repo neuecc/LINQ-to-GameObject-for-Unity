@@ -40,8 +40,11 @@ namespace Unity.Linq
         public static int ToArrayNonAlloc(this ChildrenEnumerable source, ref GameObject[] array)
         {
             var index = 0;
-            foreach (var item in source)
+
+            var e = source.GetEnumerator(); // does not need to call Dispose.
+            while (e.MoveNext())
             {
+                var item = e.Current;
                 if (array.Length == index)
                 {
                     var newSize = (index == 0) ? 4 : index * 2;
@@ -56,8 +59,10 @@ namespace Unity.Linq
         public static int ToArrayNonAlloc(this ChildrenEnumerable source, Func<GameObject, bool> filter, ref GameObject[] array)
         {
             var index = 0;
-            foreach (var item in source)
+            var e = source.GetEnumerator(); // does not need to call Dispose.
+            while (e.MoveNext())
             {
+                var item = e.Current;
                 if (!filter(item)) continue;
 
                 if (array.Length == index)
@@ -74,8 +79,10 @@ namespace Unity.Linq
         public static int ToArrayNonAlloc<T>(this ChildrenEnumerable source, Func<GameObject, T> selector, ref T[] array)
         {
             var index = 0;
-            foreach (var item in source)
+            var e = source.GetEnumerator(); // does not need to call Dispose.
+            while (e.MoveNext())
             {
+                var item = e.Current;
                 if (array.Length == index)
                 {
                     var newSize = (index == 0) ? 4 : index * 2;
@@ -90,8 +97,10 @@ namespace Unity.Linq
         public static int ToArrayNonAlloc<T>(this ChildrenEnumerable source, Func<GameObject, bool> filter, Func<GameObject, T> selector, ref T[] array)
         {
             var index = 0;
-            foreach (var item in source)
+            var e = source.GetEnumerator(); // does not need to call Dispose.
+            while (e.MoveNext())
             {
+                var item = e.Current;
                 if (!filter(item)) continue;
 
                 if (array.Length == index)
@@ -108,8 +117,10 @@ namespace Unity.Linq
         public static int ToArrayNonAlloc<TState, T>(this ChildrenEnumerable source, Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector, ref T[] array)
         {
             var index = 0;
-            foreach (var item in source)
+            var e = source.GetEnumerator(); // does not need to call Dispose.
+            while (e.MoveNext())
             {
+                var item = e.Current;
                 var state = let(item);
 
                 if (!filter(state)) continue;
