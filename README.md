@@ -162,7 +162,7 @@ If you can use native methods(such as GetComponentsInChildren), it is always fas
 
 Tips for gc reduction, you can define ToList extension like `void GetComponentsInChildren<T>(List<T> results)` and reuse `List<T>`.
 
-```
+```csharp
 public static class EnumerableExtensions
 {
     public static void ToList<T>(this IEnumerable<T> source, List<T> list)
