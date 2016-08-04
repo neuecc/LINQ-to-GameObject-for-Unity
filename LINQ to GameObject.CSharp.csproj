@@ -81,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\LINQtoGameObject\README.txt" />
+    <Compile Include="Assets\LINQtoGameObject\Scripts\GameObjectExtensions.Optimizer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

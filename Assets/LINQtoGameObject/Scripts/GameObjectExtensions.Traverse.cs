@@ -1,8 +1,105 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Unity.Linq
 {
+    public struct ChildrenEnumerable : IEnumerable<GameObject>
+    {
+        readonly GameObject origin;
+        readonly Transform originTransform;
+        readonly string nameFilter;
+        readonly bool withSelf;
+
+        public ChildrenEnumerable(GameObject origin, string nameFilter, bool withSelf)
+        {
+            this.origin = origin;
+            this.originTransform = origin.transform;
+            this.nameFilter = nameFilter;
+            this.withSelf = withSelf;
+        }
+
+        public Enumerator GetEnumerator()
+        {
+            // check GameObject is destroyed only on GetEnumerator timing
+            return (origin == null)
+                ? new Enumerator(origin, originTransform, nameFilter, withSelf, true)
+                : new Enumerator(origin, originTransform, nameFilter, withSelf, false);
+        }
+
+        IEnumerator<GameObject> IEnumerable<GameObject>.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public struct Enumerator : IEnumerator<GameObject>
+        {
+            readonly string nameFilter;
+            readonly int childCount; // childCount is fixed when GetEnumerator is called.
+            readonly GameObject origin;
+            readonly Transform originTransform;
+            bool withSelf;
+            bool empty;
+            int currentIndex;
+            GameObject current;
+
+            public Enumerator(GameObject origin, Transform originTransform, string nameFilter, bool withSelf, bool empty)
+            {
+                this.origin = origin;
+                this.originTransform = originTransform;
+                this.nameFilter = nameFilter;
+                this.withSelf = withSelf;
+                this.childCount = originTransform.childCount;
+                this.currentIndex = -1;
+                this.empty = empty;
+                this.current = null;
+            }
+
+            public bool MoveNext()
+            {
+                if (empty) return false;
+
+                if (withSelf && (nameFilter == null || originTransform.name == nameFilter))
+                {
+                    current = origin.gameObject;
+                    withSelf = false;
+                    return true;
+                }
+
+                currentIndex++;
+                while (currentIndex < childCount)
+                {
+                    var child = originTransform.GetChild(currentIndex);
+
+                    if (nameFilter == null || child.name == nameFilter)
+                    {
+                        current = child.gameObject;
+                        return true;
+                    }
+                    else
+                    {
+                        currentIndex++;
+                    }
+                }
+
+                return false;
+            }
+
+            public GameObject Current { get { return current; } }
+            object IEnumerator.Current { get { return current; } }
+            public void Dispose() { }
+            public void Reset() { throw new NotSupportedException(); }
+        }
+    }
+
+
+
     // Inspired from LINQ to XML.
     // Reference: http://msdn.microsoft.com/en-us/library/system.xml.linq.xelement.aspx
     public static partial class GameObjectExtensions
@@ -24,52 +121,34 @@ namespace Unity.Linq
         public static GameObject Child(this GameObject origin, string name)
         {
             if (origin == null) return null;
-            
+
             var child = origin.transform.FindChild(name);
             if (child == null) return null;
             return child.gameObject;
         }
 
         /// <summary>Returns a collection of the child GameObjects.</summary>
-        public static IEnumerable<GameObject> Children(this GameObject origin)
+        public static ChildrenEnumerable Children(this GameObject origin)
         {
-            return ChildrenCore(origin, nameFilter: null, withSelf: false);
+            return new ChildrenEnumerable(origin, null, false);
         }
 
         /// <summary>Returns a filtered collection of the child GameObjects. Only GameObjects that have a matching name are included in the collection.</summary>
-        public static IEnumerable<GameObject> Children(this GameObject origin, string name)
+        public static ChildrenEnumerable Children(this GameObject origin, string name)
         {
-            return ChildrenCore(origin, nameFilter: name, withSelf: false);
+            return new ChildrenEnumerable(origin, name, false);
         }
 
-
         /// <summary>Returns a collection of GameObjects that contain this GameObject, and the child GameObjects.</summary>
-        public static IEnumerable<GameObject> ChildrenAndSelf(this GameObject origin)
+        public static ChildrenEnumerable ChildrenAndSelf(this GameObject origin)
         {
-            return ChildrenCore(origin, nameFilter: null, withSelf: true);
+            return new ChildrenEnumerable(origin, null, true);
         }
 
         /// <summary>Returns a filtered collection of GameObjects that contain this GameObject, and the child GameObjects. Only GameObjects that have a matching name are included in the collection.</summary>
-        public static IEnumerable<GameObject> ChildrenAndSelf(this GameObject origin, string name)
+        public static ChildrenEnumerable ChildrenAndSelf(this GameObject origin, string name)
         {
-            return ChildrenCore(origin, nameFilter: name, withSelf: true);
-        }
-
-        static IEnumerable<GameObject> ChildrenCore(this GameObject origin, string nameFilter, bool withSelf)
-        {
-            if (origin == null) yield break;
-            if (withSelf && (nameFilter == null || origin.name == nameFilter))
-            {
-                yield return origin;
-            }
-
-            foreach (Transform child in origin.transform)
-            {
-                if (nameFilter == null || child.name == nameFilter)
-                {
-                    yield return child.gameObject;
-                }
-            }
+            return new ChildrenEnumerable(origin, name, true);
         }
 
         /// <summary>Returns a collection of the ancestor GameObjects of this GameObject.</summary>
@@ -148,8 +227,11 @@ namespace Unity.Linq
                 yield return origin;
             }
 
-            foreach (Transform item in origin.transform)
+            var originTransform = origin.transform;
+            var childCount = originTransform.childCount;
+            for (int i = 0; i < childCount; i++)
             {
+                var item = originTransform.GetChild(i);
                 foreach (var child in DescendantsCore(item.gameObject, nameFilter, withSelf: true))
                 {
                     if (nameFilter == null || child.name == nameFilter)
@@ -191,8 +273,12 @@ namespace Unity.Linq
             var parent = origin.transform.parent;
             if (parent == null) goto RETURN_SELF;
 
-            foreach (Transform item in parent.transform)
+            var parentTransform = parent.transform;
+            var childCount = parentTransform.childCount;
+            for (int i = 0; i < childCount; i++)
             {
+                var item = parentTransform.GetChild(i);
+
                 var go = item.gameObject;
                 if (go == origin)
                 {
@@ -205,7 +291,7 @@ namespace Unity.Linq
                 }
             }
 
-        RETURN_SELF:
+            RETURN_SELF:
             if (withSelf && (nameFilter == null || origin.name == nameFilter))
             {
                 yield return origin;
