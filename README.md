@@ -156,6 +156,26 @@ ChildrenAndSelf|Returns a collection of GameObjects that contains every GameObje
 Destroy|Destroy every GameObject in the source collection safety(check null).
 OfComponent|Returns a collection of specified component in the source collection.
 
+Performance Tips
+---
+If you can use native methods(such as GetComponentsInChildren), it is always fast than LINQ traverse(because LINQ traverse is simple for-loop, no native magics). So you can substitude native methods, use it. If you needs complex query, use LINQ.
+
+Tips for gc reduction, you can define ToList extension like `void GetComponentsInChildren<T>(List<T> results)` and reuse `List<T>`.
+
+```
+public static class EnumerableExtensions
+{
+    public static void ToList<T>(this IEnumerable<T> source, List<T> list)
+    {
+        list.Clear();
+        foreach (var item in source)
+        {
+            list.Add(item);
+        }
+    }
+}
+```
+
 Author Info
 ---
 Yoshifumi Kawai(a.k.a. neuecc) is software developer in Japan.  
