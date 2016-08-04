@@ -138,6 +138,15 @@ namespace Unity.Linq
 
         // TODO:ToList...
 
+
+
+        
+
+        public static void OfComponentNonAlloc<T>(this ChildrenEnumerable source, ref T[] array)
+        {
+            source.ToArrayNonAlloc(x => x.GetComponent<T>(), x => x != null, x => x, ref array);
+        }
+
         // TODO:Other XxxEnumerable...
     }
 }

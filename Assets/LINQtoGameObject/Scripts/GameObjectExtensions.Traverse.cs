@@ -20,12 +20,18 @@ namespace Unity.Linq
             this.withSelf = withSelf;
         }
 
+        public OfComponentEnumerable<T> OfComponent<T>()
+            where T : Component
+        {
+            return new OfComponentEnumerable<T>(this);
+        }
+
         public Enumerator GetEnumerator()
         {
             // check GameObject is destroyed only on GetEnumerator timing
             return (origin == null)
-                ? new Enumerator(origin, originTransform, nameFilter, withSelf, true)
-                : new Enumerator(origin, originTransform, nameFilter, withSelf, false);
+                ? new Enumerator(origin, originTransform, nameFilter, withSelf, false)
+                : new Enumerator(origin, originTransform, nameFilter, withSelf, true);
         }
 
         IEnumerator<GameObject> IEnumerable<GameObject>.GetEnumerator()
@@ -44,26 +50,27 @@ namespace Unity.Linq
             readonly int childCount; // childCount is fixed when GetEnumerator is called.
             readonly GameObject origin;
             readonly Transform originTransform;
+            readonly bool canRun;
+
             bool withSelf;
-            bool empty;
             int currentIndex;
             GameObject current;
 
-            public Enumerator(GameObject origin, Transform originTransform, string nameFilter, bool withSelf, bool empty)
+            public Enumerator(GameObject origin, Transform originTransform, string nameFilter, bool withSelf, bool canRun)
             {
                 this.origin = origin;
                 this.originTransform = originTransform;
                 this.nameFilter = nameFilter;
                 this.withSelf = withSelf;
-                this.childCount = originTransform.childCount;
+                this.childCount = canRun ? originTransform.childCount : 0;
                 this.currentIndex = -1;
-                this.empty = empty;
+                this.canRun = canRun;
                 this.current = null;
             }
 
             public bool MoveNext()
             {
-                if (empty) return false;
+                if (!canRun) return false;
 
                 if (withSelf && (nameFilter == null || originTransform.name == nameFilter))
                 {
@@ -96,9 +103,65 @@ namespace Unity.Linq
             public void Dispose() { }
             public void Reset() { throw new NotSupportedException(); }
         }
+
+        public struct OfComponentEnumerable<T> : IEnumerator<T>, IEnumerable<T>
+            where T:Component
+        {
+            readonly ChildrenEnumerable parent;
+            Enumerator enumerator;
+            T current;
+            bool running;
+
+            public OfComponentEnumerable(ChildrenEnumerable parent)
+            {
+                this.parent = parent;
+                this.enumerator = default(Enumerator);
+                this.current = default(T);
+                this.running = false;
+            }
+
+            public bool MoveNext()
+            {
+                if (!running)
+                {
+                    enumerator = parent.GetEnumerator();
+                    running = true;
+                }
+
+                while (enumerator.MoveNext())
+                {
+                    var component = enumerator.Current.GetComponent<T>();
+                    if (component != null)
+                    {
+                        current = component;
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            public T Current { get { return current; } }
+            object IEnumerator.Current { get { return current; } }
+            public void Dispose() { }
+            public void Reset() { throw new NotSupportedException(); }
+
+            public OfComponentEnumerable<T> GetEnumerator()
+            {
+                return this;
+            }
+
+            IEnumerator<T> IEnumerable<T>.GetEnumerator()
+            {
+                return this;
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return this;
+            }
+        }
     }
-
-
 
     // Inspired from LINQ to XML.
     // Reference: http://msdn.microsoft.com/en-us/library/system.xml.linq.xelement.aspx
