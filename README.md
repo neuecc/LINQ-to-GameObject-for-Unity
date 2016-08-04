@@ -165,7 +165,23 @@ Tips for gc reduction, you can define ToList extension like `void GetComponentsI
 ```csharp
 public static class EnumerableExtensions
 {
-    public static void ToList<T>(this IEnumerable<T> source, List<T> list)
+    public static int ToArrayNonAlloc<T>(this IEnumerable<T> source, ref T[] array)
+    {
+        var index = 0;
+        foreach (var item in source)
+        {
+            if (array.Length == index)
+            {
+                var newSize = (index == 0) ? 4 : index * 2;
+                Array.Resize(ref array, newSize);
+            }
+            array[index++] = item;
+        }
+
+        return index;
+    }
+
+    public static void ToListNonAlloc<T>(this IEnumerable<T> source, ref List<T> list)
     {
         list.Clear();
         foreach (var item in source)
