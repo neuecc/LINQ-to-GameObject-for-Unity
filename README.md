@@ -160,7 +160,7 @@ Performance Tips
 ---
 If you can use native methods(such as GetComponentsInChildren), it is always fast than LINQ traverse(because LINQ traverse is simple for-loop, no native magics). So you can substitude native methods, use it. If you needs complex query, use LINQ.
 
-Tips for gc reduction, you can define ToList extension like `void GetComponentsInChildren<T>(List<T> results)` and reuse `List<T>`.
+Tips for gc reduction, you can define NonAlloc extension like `Physics.RaycastNonAlloc` or `void GetComponentsInChildren<T>(List<T> results)` and reuse `List<T>`.
 
 ```csharp
 public static class EnumerableExtensions
