@@ -18,36 +18,12 @@ namespace Unity.Linq
             }
         }
 
-        /// <summary>Returns a filtered collection of GameObjects that contains the ancestors of every GameObject in the source collection. Only GameObjects that have a matching name are included in the collection.</summary>
-        public static IEnumerable<GameObject> Ancestors(this IEnumerable<GameObject> source, string name)
-        {
-            foreach (var item in source)
-            {
-                foreach (var item2 in item.Ancestors(name))
-                {
-                    yield return item2;
-                }
-            }
-        }
-
         /// <summary>Returns a collection of GameObjects that contains every GameObject in the source collection, and the ancestors of every GameObject in the source collection.</summary>
         public static IEnumerable<GameObject> AncestorsAndSelf(this IEnumerable<GameObject> source)
         {
             foreach (var item in source)
             {
                 foreach (var item2 in item.AncestorsAndSelf())
-                {
-                    yield return item2;
-                }
-            }
-        }
-
-        /// <summary>Returns a collection of GameObjects that contains every GameObject in the source collection, and the ancestors of every GameObject in the source collection. Only GameObjects that have a matching name are included in the collection.</summary>
-        public static IEnumerable<GameObject> AncestorsAndSelf(this IEnumerable<GameObject> source, string name)
-        {
-            foreach (var item in source)
-            {
-                foreach (var item2 in item.AncestorsAndSelf(name))
                 {
                     yield return item2;
                 }
@@ -114,36 +90,12 @@ namespace Unity.Linq
             }
         }
 
-        /// <summary>Returns a filtered collection of the child GameObjects of every GameObject in the source collection. Only GameObjects that have a matching name are included in the collection.</summary>
-        public static IEnumerable<GameObject> Children(this IEnumerable<GameObject> source, string name)
-        {
-            foreach (var item in source)
-            {
-                foreach (var item2 in item.Children(name))
-                {
-                    yield return item2;
-                }
-            }
-        }
-
         /// <summary>Returns a collection of GameObjects that contains every GameObject in the source collection, and the child GameObjects of every GameObject in the source collection.</summary>
         public static IEnumerable<GameObject> ChildrenAndSelf(this IEnumerable<GameObject> source)
         {
             foreach (var item in source)
             {
                 foreach (var item2 in item.ChildrenAndSelf())
-                {
-                    yield return item2;
-                }
-            }
-        }
-
-        /// <summary>Returns a filtered collection of GameObjects that contains every GameObject in the source collection, and the child GameObjects of every GameObject in the source collection. Only GameObjects that have a matching name are included in the collection.</summary>
-        public static IEnumerable<GameObject> ChildrenAndSelf(this IEnumerable<GameObject> source, string name)
-        {
-            foreach (var item in source)
-            {
-                foreach (var item2 in item.ChildrenAndSelf(name))
                 {
                     yield return item2;
                 }
@@ -172,6 +124,22 @@ namespace Unity.Linq
                     yield return component;
                 }
             }
+        }
+
+        public static int ToArrayNonAlloc<T>(this IEnumerable<T> source, ref T[] array)
+        {
+            var index = 0;
+            foreach (var item in source)
+            {
+                if (array.Length == index)
+                {
+                    var newSize = (index == 0) ? 4 : index * 2;
+                    Array.Resize(ref array, newSize);
+                }
+                array[index++] = item;
+            }
+
+            return index;
         }
     }
 }
