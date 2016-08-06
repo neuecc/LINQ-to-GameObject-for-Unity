@@ -11,9 +11,10 @@ namespace Unity.Linq
         {
             foreach (var item in source)
             {
-                foreach (var item2 in item.Ancestors())
+                var e = item.Ancestors().GetEnumerator();
+                while (e.MoveNext())
                 {
-                    yield return item2;
+                    yield return e.Current;
                 }
             }
         }
@@ -23,9 +24,10 @@ namespace Unity.Linq
         {
             foreach (var item in source)
             {
-                foreach (var item2 in item.AncestorsAndSelf())
+                var e = item.AncestorsAndSelf().GetEnumerator();
+                while (e.MoveNext())
                 {
-                    yield return item2;
+                    yield return e.Current;
                 }
             }
         }
@@ -35,9 +37,10 @@ namespace Unity.Linq
         {
             foreach (var item in source)
             {
-                foreach (var item2 in item.Descendants())
+                var e = item.Descendants().GetEnumerator();
+                while (e.MoveNext())
                 {
-                    yield return item2;
+                    yield return e.Current;
                 }
             }
         }
@@ -47,9 +50,10 @@ namespace Unity.Linq
         {
             foreach (var item in source)
             {
-                foreach (var item2 in item.DescendantsAndSelf())
+                var e = item.DescendantsAndSelf().GetEnumerator();
+                while (e.MoveNext())
                 {
-                    yield return item2;
+                    yield return e.Current;
                 }
             }
         }
@@ -59,9 +63,10 @@ namespace Unity.Linq
         {
             foreach (var item in source)
             {
-                foreach (var item2 in item.Children())
+                var e = item.Children().GetEnumerator();
+                while (e.MoveNext())
                 {
-                    yield return item2;
+                    yield return e.Current;
                 }
             }
         }
@@ -71,9 +76,10 @@ namespace Unity.Linq
         {
             foreach (var item in source)
             {
-                foreach (var item2 in item.ChildrenAndSelf())
+                var e = item.ChildrenAndSelf().GetEnumerator();
+                while (e.MoveNext())
                 {
-                    yield return item2;
+                    yield return e.Current;
                 }
             }
         }
@@ -102,6 +108,7 @@ namespace Unity.Linq
             }
         }
 
+        /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
         public static int ToArrayNonAlloc<T>(this IEnumerable<T> source, ref T[] array)
         {
             var index = 0;

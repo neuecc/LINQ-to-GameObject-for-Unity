@@ -92,10 +92,15 @@ namespace UnityTest
         [Test]
         public void BeforeSelf()
         {
+            foreach (var item in Origin.BeforeSelf())
+            {
+                UnityEngine.Debug.Log(item);
+            }
+
             Origin.BeforeSelf().Select(x => x.name)
                 .IsCollection("C1", "C2");
 
-            Origin.BeforeSelf("C2").Select(x => x.name)
+            Origin.BeforeSelf().Where(x => x.name == "C2").Select(x => x.name)
                 .IsCollection("C2");
 
             Origin.BeforeSelfAndSelf().Select(x => x.name)
@@ -104,7 +109,7 @@ namespace UnityTest
             Origin.Child("Sphere_B").BeforeSelfAndSelf().Select(x => x.name)
                 .IsCollection("Sphere_A", "Sphere_B");
 
-            Origin.Children().Where(x => x.name == "Sphere_B").Last().BeforeSelfAndSelf("Sphere_B").Select(x => x.name)
+            Origin.Children().Where(x => x.name == "Sphere_B").Last().BeforeSelfAndSelf().Where(x => x.name == "Sphere_B").Select(x => x.name)
                 .IsCollection("Sphere_B", "Sphere_B");
         }
 
@@ -114,7 +119,7 @@ namespace UnityTest
             Origin.AfterSelf().Select(x => x.name)
                 .IsCollection("C3", "C4");
 
-            Origin.AfterSelf("C3").Select(x => x.name)
+            Origin.AfterSelf().Where(x => x.name == "C3").Select(x => x.name)
                 .IsCollection("C3");
 
             Origin.AfterSelfAndSelf().Select(x => x.name)
@@ -123,7 +128,7 @@ namespace UnityTest
             Origin.Child("Sphere_B").AfterSelfAndSelf().Select(x => x.name)
                 .IsCollection("Sphere_B", "Group", "Sphere_A", "Sphere_B");
 
-            Origin.Child("Sphere_B").AfterSelfAndSelf("Sphere_B").Select(x => x.name)
+            Origin.Child("Sphere_B").AfterSelfAndSelf().Where(x => x.name == "Sphere_B").Select(x => x.name)
                 .IsCollection("Sphere_B", "Sphere_B");
         }
     }

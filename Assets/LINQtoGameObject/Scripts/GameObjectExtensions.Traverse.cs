@@ -68,415 +68,70 @@ namespace Unity.Linq
             return new DescendantsEnumerable(origin, true);
         }
 
-        public static IEnumerable<GameObject> DescendantsCore(this GameObject origin, string nameFilter, bool withSelf)
-        {
-            if (origin == null) yield break;
-            if (withSelf && (nameFilter == null || origin.name == nameFilter))
-            {
-                yield return origin;
-            }
-
-            foreach (Transform item in origin.transform)
-            {
-                foreach (var child in DescendantsCore(item.gameObject, nameFilter, withSelf: true))
-                {
-                    if (nameFilter == null || child.name == nameFilter)
-                    {
-                        yield return child.gameObject;
-                    }
-                }
-            }
-        }
-
         /// <summary>Returns a collection of the sibling GameObjects before this GameObject.</summary>
-        public static IEnumerable<GameObject> BeforeSelf(this GameObject origin)
+        public static BeforeSelfEnumerable BeforeSelf(this GameObject origin)
         {
-            return BeforeSelfCore(origin, nameFilter: null, withSelf: false);
-        }
-
-        /// <summary>Returns a filtered collection of the sibling GameObjects before this GameObject. Only GameObjects that have a matching name are included in the collection.</summary>       
-        public static IEnumerable<GameObject> BeforeSelf(this GameObject origin, string name)
-        {
-            return BeforeSelfCore(origin, nameFilter: name, withSelf: false);
+            return new BeforeSelfEnumerable(origin, false);
         }
 
         /// <summary>Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects before this GameObject.</summary>
-        public static IEnumerable<GameObject> BeforeSelfAndSelf(this GameObject origin)
+        public static BeforeSelfEnumerable BeforeSelfAndSelf(this GameObject origin)
         {
-            return BeforeSelfCore(origin, nameFilter: null, withSelf: true);
-        }
-
-        /// <summary>Returns a filtered collection of GameObjects that contain this GameObject, and the sibling GameObjects before this GameObject. Only GameObjects that have a matching name are included in the collection.</summary>       
-        public static IEnumerable<GameObject> BeforeSelfAndSelf(this GameObject origin, string name)
-        {
-            return BeforeSelfCore(origin, nameFilter: name, withSelf: true);
-        }
-
-        static IEnumerable<GameObject> BeforeSelfCore(this GameObject origin, string nameFilter, bool withSelf)
-        {
-            if (origin == null) yield break;
-
-            var parent = origin.transform.parent;
-            if (parent == null) goto RETURN_SELF;
-
-            var parentTransform = parent.transform;
-            var childCount = parentTransform.childCount;
-            for (int i = 0; i < childCount; i++)
-            {
-                var item = parentTransform.GetChild(i);
-
-                var go = item.gameObject;
-                if (go == origin)
-                {
-                    goto RETURN_SELF;
-                }
-
-                if (nameFilter == null || item.name == nameFilter)
-                {
-                    yield return go;
-                }
-            }
-
-            RETURN_SELF:
-            if (withSelf && (nameFilter == null || origin.name == nameFilter))
-            {
-                yield return origin;
-            }
+            return new BeforeSelfEnumerable(origin, true);
         }
 
         /// <summary>Returns a collection of the sibling GameObjects after this GameObject.</summary>
-        public static IEnumerable<GameObject> AfterSelf(this GameObject origin)
+        public static AfterSelfEnumerable AfterSelf(this GameObject origin)
         {
-            return AfterSelfCore(origin, nameFilter: null, withSelf: false);
-        }
-
-        /// <summary>Returns a filtered collection of the sibling GameObjects after this GameObject. Only GameObjects that have a matching name are included in the collection.</summary>       
-        public static IEnumerable<GameObject> AfterSelf(this GameObject origin, string name)
-        {
-            return AfterSelfCore(origin, nameFilter: name, withSelf: false);
+            return new AfterSelfEnumerable(origin, false);
         }
 
         /// <summary>Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects after this GameObject.</summary>
-        public static IEnumerable<GameObject> AfterSelfAndSelf(this GameObject origin)
+        public static AfterSelfEnumerable AfterSelfAndSelf(this GameObject origin)
         {
-            return AfterSelfCore(origin, nameFilter: null, withSelf: true);
+            return new AfterSelfEnumerable(origin, true);
         }
 
-        /// <summary>Returns a filtered collection of GameObjects that contain this GameObject, and the sibling GameObjects after this GameObject. Only GameObjects that have a matching name are included in the collection.</summary>       
-        public static IEnumerable<GameObject> AfterSelfAndSelf(this GameObject origin, string name)
-        {
-            return AfterSelfCore(origin, nameFilter: name, withSelf: true);
-        }
+        // Implements hand struct enumerator.
 
-        static IEnumerable<GameObject> AfterSelfCore(this GameObject origin, string nameFilter, bool withSelf)
+        public struct ChildrenEnumerable : IEnumerable<GameObject>
         {
-            if (origin == null) yield break;
-            if (withSelf && (nameFilter == null || origin.name == nameFilter))
+            readonly GameObject origin;
+            readonly bool withSelf;
+
+            public ChildrenEnumerable(GameObject origin, bool withSelf)
             {
-                yield return origin;
-            }
-
-            var parent = origin.transform.parent;
-            if (parent == null) yield break;
-
-            var index = origin.transform.GetSiblingIndex() + 1;
-            var parentTransform = parent.transform;
-            var count = parentTransform.childCount;
-
-            while (index < count)
-            {
-                var target = parentTransform.GetChild(index).gameObject;
-                if (nameFilter == null || target.name == nameFilter)
-                {
-                    yield return target;
-                }
-
-                index++;
-            }
-        }
-    }
-
-    // Implements hand struct enumerator.
-
-    public struct ChildrenEnumerable : IEnumerable<GameObject>
-    {
-        readonly GameObject origin;
-        readonly bool withSelf;
-
-        public ChildrenEnumerable(GameObject origin, bool withSelf)
-        {
-            this.origin = origin;
-            this.withSelf = withSelf;
-        }
-
-        public OfComponentEnumerable<T> OfComponent<T>()
-            where T : Component
-        {
-            return new OfComponentEnumerable<T>(this);
-        }
-
-        public Enumerator GetEnumerator()
-        {
-            // check GameObject is destroyed only on GetEnumerator timing
-            return (origin == null)
-                ? new Enumerator(null, withSelf, false)
-                : new Enumerator(origin.transform, withSelf, true);
-        }
-
-        IEnumerator<GameObject> IEnumerable<GameObject>.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        #region LINQ
-
-        public int ToArrayNonAlloc(ref GameObject[] array)
-        {
-            var index = 0;
-
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = item;
-            }
-
-            return index;
-        }
-
-        public int ToArrayNonAlloc(Func<GameObject, bool> filter, ref GameObject[] array)
-        {
-            var index = 0;
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                if (!filter(item)) continue;
-
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = item;
-            }
-
-            return index;
-        }
-
-        public int ToArrayNonAlloc<T>(Func<GameObject, T> selector, ref T[] array)
-        {
-            var index = 0;
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = selector(item);
-            }
-
-            return index;
-        }
-
-        public int ToArrayNonAlloc<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector, ref T[] array)
-        {
-            var index = 0;
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                if (!filter(item)) continue;
-
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = selector(item);
-            }
-
-            return index;
-        }
-
-        public int ToArrayNonAlloc<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector, ref T[] array)
-        {
-            var index = 0;
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                var state = let(item);
-
-                if (!filter(state)) continue;
-
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = selector(state);
-            }
-
-            return index;
-        }
-
-        public GameObject[] ToArray()
-        {
-            var array = new GameObject[4];
-            var len = ToArrayNonAlloc(ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public GameObject[] ToArray(Func<GameObject, bool> filter)
-        {
-            var array = new GameObject[4];
-            var len = ToArrayNonAlloc(filter, ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public T[] ToArray<T>(Func<GameObject, T> selector)
-        {
-            var array = new T[4];
-            var len = ToArrayNonAlloc<T>(selector, ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public T[] ToArray<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector)
-        {
-            var array = new T[4];
-            var len = ToArrayNonAlloc(filter, selector, ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public T[] ToArray<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)
-        {
-            var array = new T[4];
-            var len = ToArrayNonAlloc(let, filter, selector, ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public GameObject First()
-        {
-            var e = this.GetEnumerator();
-            if (e.MoveNext())
-            {
-                return e.Current;
-            }
-            else
-            {
-                throw new InvalidOperationException("sequence is empty.");
-            }
-        }
-
-        public GameObject FirstOrDefault()
-        {
-            var e = this.GetEnumerator();
-            return (e.MoveNext())
-                ? e.Current
-                : null;
-        }
-
-        #endregion
-
-        public struct Enumerator : IEnumerator<GameObject>
-        {
-            readonly int childCount; // childCount is fixed when GetEnumerator is called.
-
-            readonly Transform originTransform;
-            readonly bool canRun;
-
-            bool withSelf;
-            int currentIndex;
-            GameObject current;
-
-            public Enumerator(Transform originTransform, bool withSelf, bool canRun)
-            {
-                this.originTransform = originTransform;
+                this.origin = origin;
                 this.withSelf = withSelf;
-                this.childCount = canRun ? originTransform.childCount : 0;
-                this.currentIndex = -1;
-                this.canRun = canRun;
-                this.current = null;
             }
 
-            public bool MoveNext()
+            /// <summary>Returns a collection of specified component in the source collection.</summary>
+            public OfComponentEnumerable<T> OfComponent<T>()
+                where T : Component
             {
-                if (!canRun) return false;
+                return new OfComponentEnumerable<T>(ref this);
+            }
 
-                if (withSelf)
+            /// <summary>Destroy every GameObject in the source collection safety(check null).</summary>
+            /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
+            public void Destroy(bool useDestroyImmediate = false)
+            {
+                var e = GetEnumerator();
+                while (e.MoveNext())
                 {
-                    current = originTransform.gameObject;
-                    withSelf = false;
-                    return true;
+                    e.Current.Destroy(useDestroyImmediate, false);
                 }
-
-                currentIndex++;
-                if (currentIndex < childCount)
-                {
-                    var child = originTransform.GetChild(currentIndex);
-                    current = child.gameObject;
-                    return true;
-                }
-
-                return false;
             }
 
-            public GameObject Current { get { return current; } }
-            object IEnumerator.Current { get { return current; } }
-            public void Dispose() { }
-            public void Reset() { throw new NotSupportedException(); }
-        }
-
-        public struct OfComponentEnumerable<T> : IEnumerable<T>
-            where T : Component
-        {
-            readonly ChildrenEnumerable parent;
-
-            public OfComponentEnumerable(ChildrenEnumerable parent)
+            public Enumerator GetEnumerator()
             {
-                this.parent = parent;
+                // check GameObject is destroyed only on GetEnumerator timing
+                return (origin == null)
+                    ? new Enumerator(null, withSelf, false)
+                    : new Enumerator(origin.transform, withSelf, true);
             }
 
-            public OfComponentEnumerator<T> GetEnumerator()
-            {
-                return new OfComponentEnumerator<T>(parent);
-            }
-
-            IEnumerator<T> IEnumerable<T>.GetEnumerator()
+            IEnumerator<GameObject> IEnumerable<GameObject>.GetEnumerator()
             {
                 return GetEnumerator();
             }
@@ -488,7 +143,166 @@ namespace Unity.Linq
 
             #region LINQ
 
-            public T First()
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc(ref GameObject[] array)
+            {
+                var index = 0;
+
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = item;
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc(Func<GameObject, bool> filter, ref GameObject[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (!filter(item)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = item;
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<T>(Func<GameObject, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(item);
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (!filter(item)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(item);
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    var state = let(item);
+
+                    if (!filter(state)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(state);
+                }
+
+                return index;
+            }
+
+            public GameObject[] ToArray()
+            {
+                var array = new GameObject[4];
+                var len = ToArrayNonAlloc(ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public GameObject[] ToArray(Func<GameObject, bool> filter)
+            {
+                var array = new GameObject[4];
+                var len = ToArrayNonAlloc(filter, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<T>(Func<GameObject, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc<T>(selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc(filter, selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc(let, filter, selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public GameObject First()
             {
                 var e = this.GetEnumerator();
                 if (e.MoveNext())
@@ -501,7 +315,7 @@ namespace Unity.Linq
                 }
             }
 
-            public T FirstOrDefault()
+            public GameObject FirstOrDefault()
             {
                 var e = this.GetEnumerator();
                 return (e.MoveNext())
@@ -509,762 +323,209 @@ namespace Unity.Linq
                     : null;
             }
 
-            public T[] ToArray()
-            {
-                var array = new T[4];
-                var len = ToArrayNonAlloc(ref array);
-                if (array.Length != len)
-                {
-                    Array.Resize(ref array, len);
-                }
-                return array;
-            }
-
-            public int ToArrayNonAlloc(ref T[] array)
-            {
-                var index = 0;
-                var e = this.GetEnumerator();
-                while (e.MoveNext())
-                {
-                    if (array.Length == index)
-                    {
-                        var newSize = (index == 0) ? 4 : index * 2;
-                        Array.Resize(ref array, newSize);
-                    }
-                    array[index++] = e.Current;
-                }
-
-                return index;
-            }
-
             #endregion
-        }
 
-        public struct OfComponentEnumerator<T> : IEnumerator<T>
-            where T : Component
-        {
-            readonly ChildrenEnumerable parent;
-            Enumerator enumerator;
-            T current;
-            bool running;
-
-            public OfComponentEnumerator(ChildrenEnumerable parent)
+            public struct Enumerator : IEnumerator<GameObject>
             {
-                this.parent = parent;
-                this.enumerator = default(Enumerator);
-                this.current = default(T);
-                this.running = false;
-            }
+                readonly int childCount; // childCount is fixed when GetEnumerator is called.
 
-            public bool MoveNext()
-            {
-                if (!running)
+                readonly Transform originTransform;
+                readonly bool canRun;
+
+                bool withSelf;
+                int currentIndex;
+                GameObject current;
+
+                public Enumerator(Transform originTransform, bool withSelf, bool canRun)
                 {
-                    enumerator = parent.GetEnumerator();
-                    running = true;
+                    this.originTransform = originTransform;
+                    this.withSelf = withSelf;
+                    this.childCount = canRun ? originTransform.childCount : 0;
+                    this.currentIndex = -1;
+                    this.canRun = canRun;
+                    this.current = null;
                 }
 
-                while (enumerator.MoveNext())
+                public bool MoveNext()
                 {
-                    var component = enumerator.Current.GetComponent<T>();
-                    if (component != null)
+                    if (!canRun) return false;
+
+                    if (withSelf)
                     {
-                        current = component;
+                        current = originTransform.gameObject;
+                        withSelf = false;
                         return true;
                     }
-                }
 
-                return false;
-            }
-
-            public T Current { get { return current; } }
-            object IEnumerator.Current { get { return current; } }
-            public void Dispose() { }
-            public void Reset() { throw new NotSupportedException(); }
-        }
-    }
-
-    public struct AncestorsEnumerable : IEnumerable<GameObject>
-    {
-        readonly GameObject origin;
-        readonly bool withSelf;
-
-        public AncestorsEnumerable(GameObject origin, bool withSelf)
-        {
-            this.origin = origin;
-            this.withSelf = withSelf;
-        }
-
-        public OfComponentEnumerable<T> OfComponent<T>()
-            where T : Component
-        {
-            return new OfComponentEnumerable<T>(this);
-        }
-
-        public Enumerator GetEnumerator()
-        {
-            // check GameObject is destroyed only on GetEnumerator timing
-            return (origin == null)
-                ? new Enumerator(null, null, withSelf, false)
-                : new Enumerator(origin, origin.transform, withSelf, true);
-        }
-
-        IEnumerator<GameObject> IEnumerable<GameObject>.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        #region LINQ
-
-        public int ToArrayNonAlloc(ref GameObject[] array)
-        {
-            var index = 0;
-
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = item;
-            }
-
-            return index;
-        }
-
-        public int ToArrayNonAlloc(Func<GameObject, bool> filter, ref GameObject[] array)
-        {
-            var index = 0;
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                if (!filter(item)) continue;
-
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = item;
-            }
-
-            return index;
-        }
-
-        public int ToArrayNonAlloc<T>(Func<GameObject, T> selector, ref T[] array)
-        {
-            var index = 0;
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = selector(item);
-            }
-
-            return index;
-        }
-
-        public int ToArrayNonAlloc<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector, ref T[] array)
-        {
-            var index = 0;
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                if (!filter(item)) continue;
-
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = selector(item);
-            }
-
-            return index;
-        }
-
-        public int ToArrayNonAlloc<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector, ref T[] array)
-        {
-            var index = 0;
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                var state = let(item);
-
-                if (!filter(state)) continue;
-
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = selector(state);
-            }
-
-            return index;
-        }
-
-        public GameObject[] ToArray()
-        {
-            var array = new GameObject[4];
-            var len = ToArrayNonAlloc(ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public GameObject[] ToArray(Func<GameObject, bool> filter)
-        {
-            var array = new GameObject[4];
-            var len = ToArrayNonAlloc(filter, ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public T[] ToArray<T>(Func<GameObject, T> selector)
-        {
-            var array = new T[4];
-            var len = ToArrayNonAlloc<T>(selector, ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public T[] ToArray<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector)
-        {
-            var array = new T[4];
-            var len = ToArrayNonAlloc(filter, selector, ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public T[] ToArray<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)
-        {
-            var array = new T[4];
-            var len = ToArrayNonAlloc(let, filter, selector, ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public GameObject First()
-        {
-            var e = this.GetEnumerator();
-            if (e.MoveNext())
-            {
-                return e.Current;
-            }
-            else
-            {
-                throw new InvalidOperationException("sequence is empty.");
-            }
-        }
-
-        public GameObject FirstOrDefault()
-        {
-            var e = this.GetEnumerator();
-            return (e.MoveNext())
-                ? e.Current
-                : null;
-        }
-
-        #endregion
-
-        public struct Enumerator : IEnumerator<GameObject>
-        {
-            readonly bool canRun;
-
-            GameObject current;
-            Transform currentTransform;
-            bool withSelf;
-
-            public Enumerator(GameObject origin, Transform originTransform, bool withSelf, bool canRun)
-            {
-                this.current = origin;
-                this.currentTransform = originTransform;
-                this.withSelf = withSelf;
-                this.canRun = canRun;
-                this.current = null;
-            }
-
-            public bool MoveNext()
-            {
-                if (!canRun) return false;
-
-                if (withSelf)
-                {
-                    withSelf = false;
-                    return true;
-                }
-
-                var parentTransform = currentTransform.parent;
-                if (parentTransform != null)
-                {
-                    current = parentTransform.gameObject;
-                    currentTransform = parentTransform;
-                    return true;
-                }
-
-                return false;
-            }
-
-            public GameObject Current { get { return current; } }
-            object IEnumerator.Current { get { return current; } }
-            public void Dispose() { }
-            public void Reset() { throw new NotSupportedException(); }
-        }
-
-        public struct OfComponentEnumerable<T> : IEnumerable<T>
-            where T : Component
-        {
-            readonly AncestorsEnumerable parent;
-
-            public OfComponentEnumerable(AncestorsEnumerable parent)
-            {
-                this.parent = parent;
-            }
-
-            public OfComponentEnumerator<T> GetEnumerator()
-            {
-                return new OfComponentEnumerator<T>(parent);
-            }
-
-            IEnumerator<T> IEnumerable<T>.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
-
-            #region LINQ
-
-            public T First()
-            {
-                var e = this.GetEnumerator();
-                if (e.MoveNext())
-                {
-                    return e.Current;
-                }
-                else
-                {
-                    throw new InvalidOperationException("sequence is empty.");
-                }
-            }
-
-            public T FirstOrDefault()
-            {
-                var e = this.GetEnumerator();
-                return (e.MoveNext())
-                    ? e.Current
-                    : null;
-            }
-
-            public T[] ToArray()
-            {
-                var array = new T[4];
-                var len = ToArrayNonAlloc(ref array);
-                if (array.Length != len)
-                {
-                    Array.Resize(ref array, len);
-                }
-                return array;
-            }
-
-            public int ToArrayNonAlloc(ref T[] array)
-            {
-                var index = 0;
-                var e = this.GetEnumerator();
-                while (e.MoveNext())
-                {
-                    if (array.Length == index)
+                    currentIndex++;
+                    if (currentIndex < childCount)
                     {
-                        var newSize = (index == 0) ? 4 : index * 2;
-                        Array.Resize(ref array, newSize);
-                    }
-                    array[index++] = e.Current;
-                }
-
-                return index;
-            }
-
-            #endregion
-        }
-
-        public struct OfComponentEnumerator<T> : IEnumerator<T>
-            where T : Component
-        {
-            readonly AncestorsEnumerable parent;
-            Enumerator enumerator;
-            T current;
-            bool running;
-
-            public OfComponentEnumerator(AncestorsEnumerable parent)
-            {
-                this.parent = parent;
-                this.enumerator = default(Enumerator);
-                this.current = default(T);
-                this.running = false;
-            }
-
-            public bool MoveNext()
-            {
-                if (!running)
-                {
-                    enumerator = parent.GetEnumerator();
-                    running = true;
-                }
-
-                while (enumerator.MoveNext())
-                {
-                    var component = enumerator.Current.GetComponent<T>();
-                    if (component != null)
-                    {
-                        current = component;
+                        var child = originTransform.GetChild(currentIndex);
+                        current = child.gameObject;
                         return true;
                     }
+
+                    return false;
                 }
 
-                return false;
+                public GameObject Current { get { return current; } }
+                object IEnumerator.Current { get { return current; } }
+                public void Dispose() { }
+                public void Reset() { throw new NotSupportedException(); }
             }
 
-            public T Current { get { return current; } }
-            object IEnumerator.Current { get { return current; } }
-            public void Dispose() { }
-            public void Reset() { throw new NotSupportedException(); }
-        }
-    }
-
-    public struct DescendantsEnumerable : IEnumerable<GameObject>
-    {
-        readonly GameObject origin;
-        readonly bool withSelf;
-
-        public DescendantsEnumerable(GameObject origin, bool withSelf)
-        {
-            this.origin = origin;
-            this.withSelf = withSelf;
-        }
-
-        public OfComponentEnumerable<T> OfComponent<T>()
-            where T : Component
-        {
-            return new OfComponentEnumerable<T>(this);
-        }
-
-        public Enumerator GetEnumerator()
-        {
-            // check GameObject is destroyed only on GetEnumerator timing
-            return (origin == null)
-                ? new Enumerator(null, withSelf, false, null)
-                : new Enumerator(origin.transform, withSelf, true, new Stack<Enumerator>());
-        }
-
-        IEnumerator<GameObject> IEnumerable<GameObject>.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        #region LINQ
-
-        public int ToArrayNonAlloc(ref GameObject[] array)
-        {
-            var index = 0;
-
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
+            public struct OfComponentEnumerable<T> : IEnumerable<T>
+                where T : Component
             {
-                var item = e.Current;
-                if (array.Length == index)
+                ChildrenEnumerable parent;
+
+                public OfComponentEnumerable(ref ChildrenEnumerable parent)
                 {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = item;
-            }
-
-            return index;
-        }
-
-        public int ToArrayNonAlloc(Func<GameObject, bool> filter, ref GameObject[] array)
-        {
-            var index = 0;
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                if (!filter(item)) continue;
-
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = item;
-            }
-
-            return index;
-        }
-
-        public int ToArrayNonAlloc<T>(Func<GameObject, T> selector, ref T[] array)
-        {
-            var index = 0;
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = selector(item);
-            }
-
-            return index;
-        }
-
-        public int ToArrayNonAlloc<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector, ref T[] array)
-        {
-            var index = 0;
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                if (!filter(item)) continue;
-
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = selector(item);
-            }
-
-            return index;
-        }
-
-        public int ToArrayNonAlloc<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector, ref T[] array)
-        {
-            var index = 0;
-            var e = this.GetEnumerator(); // does not need to call Dispose.
-            while (e.MoveNext())
-            {
-                var item = e.Current;
-                var state = let(item);
-
-                if (!filter(state)) continue;
-
-                if (array.Length == index)
-                {
-                    var newSize = (index == 0) ? 4 : index * 2;
-                    Array.Resize(ref array, newSize);
-                }
-                array[index++] = selector(state);
-            }
-
-            return index;
-        }
-
-        public GameObject[] ToArray()
-        {
-            var array = new GameObject[4];
-            var len = ToArrayNonAlloc(ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public GameObject[] ToArray(Func<GameObject, bool> filter)
-        {
-            var array = new GameObject[4];
-            var len = ToArrayNonAlloc(filter, ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public T[] ToArray<T>(Func<GameObject, T> selector)
-        {
-            var array = new T[4];
-            var len = ToArrayNonAlloc<T>(selector, ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public T[] ToArray<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector)
-        {
-            var array = new T[4];
-            var len = ToArrayNonAlloc(filter, selector, ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public T[] ToArray<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)
-        {
-            var array = new T[4];
-            var len = ToArrayNonAlloc(let, filter, selector, ref array);
-            if (array.Length != len)
-            {
-                Array.Resize(ref array, len);
-            }
-            return array;
-        }
-
-        public GameObject First()
-        {
-            var e = this.GetEnumerator();
-            if (e.MoveNext())
-            {
-                return e.Current;
-            }
-            else
-            {
-                throw new InvalidOperationException("sequence is empty.");
-            }
-        }
-
-        public GameObject FirstOrDefault()
-        {
-            var e = this.GetEnumerator();
-            return (e.MoveNext())
-                ? e.Current
-                : null;
-        }
-
-        #endregion
-
-        public struct Enumerator : IEnumerator<GameObject>
-        {
-            readonly int childCount; // childCount is fixed when GetEnumerator is called.
-
-            readonly Transform originTransform;
-            readonly bool canRun;
-
-            bool withSelf;
-            int currentIndex;
-            GameObject current;
-            object sharedStack; // Stack<Enumerator>
-
-            public Enumerator(Transform originTransform, bool withSelf, bool canRun, Stack<Enumerator> sharedStack)
-            {
-                this.originTransform = originTransform;
-                this.withSelf = withSelf;
-                this.childCount = canRun ? originTransform.childCount : 0;
-                this.currentIndex = -1;
-                this.canRun = canRun;
-                this.current = null;
-                this.sharedStack = sharedStack;
-            }
-
-            public bool MoveNext()
-            {
-                RECURSIVE:
-                if (!canRun) return false;
-
-                if (withSelf)
-                {
-                    current = originTransform.gameObject;
-                    withSelf = false;
-                    return true;
+                    this.parent = parent;
                 }
 
-                var stack = (Stack<Enumerator>)sharedStack;
-                if (stack.Count != 0)
+                public OfComponentEnumerator<T> GetEnumerator()
                 {
-                    var e = stack.Pop();
+                    return new OfComponentEnumerator<T>(ref this.parent);
+                }
+
+                IEnumerator<T> IEnumerable<T>.GetEnumerator()
+                {
+                    return GetEnumerator();
+                }
+
+                IEnumerator IEnumerable.GetEnumerator()
+                {
+                    return GetEnumerator();
+                }
+
+                #region LINQ
+
+                public T First()
+                {
+                    var e = this.GetEnumerator();
                     if (e.MoveNext())
                     {
-                        current = e.Current;
-                        stack.Push(e);
-                        return true;
+                        return e.Current;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("sequence is empty.");
                     }
                 }
 
-                currentIndex++;
-                if (currentIndex < childCount)
+                public T FirstOrDefault()
                 {
-                    var item = originTransform.GetChild(currentIndex);
-                    var childEnumerator = new Enumerator(item, true, true, stack);
-                    stack.Push(childEnumerator);
-                    goto RECURSIVE;
+                    var e = this.GetEnumerator();
+                    return (e.MoveNext())
+                        ? e.Current
+                        : null;
                 }
 
-                return false;
+                public T[] ToArray()
+                {
+                    var array = new T[4];
+                    var len = ToArrayNonAlloc(ref array);
+                    if (array.Length != len)
+                    {
+                        Array.Resize(ref array, len);
+                    }
+                    return array;
+                }
+
+                /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+                public int ToArrayNonAlloc(ref T[] array)
+                {
+                    var index = 0;
+                    var e = this.GetEnumerator();
+                    while (e.MoveNext())
+                    {
+                        if (array.Length == index)
+                        {
+                            var newSize = (index == 0) ? 4 : index * 2;
+                            Array.Resize(ref array, newSize);
+                        }
+                        array[index++] = e.Current;
+                    }
+
+                    return index;
+                }
+
+                #endregion
             }
 
-            public GameObject Current { get { return current; } }
-            object IEnumerator.Current { get { return current; } }
-            public void Dispose() { }
-            public void Reset() { throw new NotSupportedException(); }
+            public struct OfComponentEnumerator<T> : IEnumerator<T>
+                where T : Component
+            {
+                Enumerator enumerator; // enumerator is mutable
+                T current;
+
+                public OfComponentEnumerator(ref ChildrenEnumerable parent)
+                {
+                    this.enumerator = parent.GetEnumerator();
+                    this.current = default(T);
+                }
+
+                public bool MoveNext()
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        var component = enumerator.Current.GetComponent<T>();
+                        if (component != null)
+                        {
+                            current = component;
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                public T Current { get { return current; } }
+                object IEnumerator.Current { get { return current; } }
+                public void Dispose() { }
+                public void Reset() { throw new NotSupportedException(); }
+            }
         }
 
-        struct Enumerator2
+        public struct AncestorsEnumerable : IEnumerable<GameObject>
         {
+            readonly GameObject origin;
+            readonly bool withSelf;
 
-        }
-
-        public struct OfComponentEnumerable<T> : IEnumerable<T>
-            where T : Component
-        {
-            readonly DescendantsEnumerable parent;
-
-            public OfComponentEnumerable(DescendantsEnumerable parent)
+            public AncestorsEnumerable(GameObject origin, bool withSelf)
             {
-                this.parent = parent;
+                this.origin = origin;
+                this.withSelf = withSelf;
             }
 
-            public OfComponentEnumerator<T> GetEnumerator()
+            /// <summary>Returns a collection of specified component in the source collection.</summary>
+            public OfComponentEnumerable<T> OfComponent<T>()
+                where T : Component
             {
-                return new OfComponentEnumerator<T>(parent);
+                return new OfComponentEnumerable<T>(ref this);
             }
 
-            IEnumerator<T> IEnumerable<T>.GetEnumerator()
+            /// <summary>Destroy every GameObject in the source collection safety(check null).</summary>
+            /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
+            public void Destroy(bool useDestroyImmediate = false)
+            {
+                var e = GetEnumerator();
+                while (e.MoveNext())
+                {
+                    e.Current.Destroy(useDestroyImmediate, false);
+                }
+            }
+
+            public Enumerator GetEnumerator()
+            {
+                // check GameObject is destroyed only on GetEnumerator timing
+                return (origin == null)
+                    ? new Enumerator(null, null, withSelf, false)
+                    : new Enumerator(origin, origin.transform, withSelf, true);
+            }
+
+            IEnumerator<GameObject> IEnumerable<GameObject>.GetEnumerator()
             {
                 return GetEnumerator();
             }
@@ -1276,7 +537,166 @@ namespace Unity.Linq
 
             #region LINQ
 
-            public T First()
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc(ref GameObject[] array)
+            {
+                var index = 0;
+
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = item;
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc(Func<GameObject, bool> filter, ref GameObject[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (!filter(item)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = item;
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<T>(Func<GameObject, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(item);
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (!filter(item)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(item);
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    var state = let(item);
+
+                    if (!filter(state)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(state);
+                }
+
+                return index;
+            }
+
+            public GameObject[] ToArray()
+            {
+                var array = new GameObject[4];
+                var len = ToArrayNonAlloc(ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public GameObject[] ToArray(Func<GameObject, bool> filter)
+            {
+                var array = new GameObject[4];
+                var len = ToArrayNonAlloc(filter, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<T>(Func<GameObject, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc<T>(selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc(filter, selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc(let, filter, selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public GameObject First()
             {
                 var e = this.GetEnumerator();
                 if (e.MoveNext())
@@ -1289,7 +709,7 @@ namespace Unity.Linq
                 }
             }
 
-            public T FirstOrDefault()
+            public GameObject FirstOrDefault()
             {
                 var e = this.GetEnumerator();
                 return (e.MoveNext())
@@ -1297,9 +717,328 @@ namespace Unity.Linq
                     : null;
             }
 
-            public T[] ToArray()
+            #endregion
+
+            public struct Enumerator : IEnumerator<GameObject>
             {
-                var array = new T[4];
+                readonly bool canRun;
+
+                GameObject current;
+                Transform currentTransform;
+                bool withSelf;
+
+                public Enumerator(GameObject origin, Transform originTransform, bool withSelf, bool canRun)
+                {
+                    this.current = origin;
+                    this.currentTransform = originTransform;
+                    this.withSelf = withSelf;
+                    this.canRun = canRun;
+                }
+
+                public bool MoveNext()
+                {
+                    if (!canRun) return false;
+
+                    if (withSelf)
+                    {
+                        // withSelf, use origin and originTransform
+                        withSelf = false;
+                        return true;
+                    }
+
+                    var parentTransform = currentTransform.parent;
+                    if (parentTransform != null)
+                    {
+                        current = parentTransform.gameObject;
+                        currentTransform = parentTransform;
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                public GameObject Current { get { return current; } }
+                object IEnumerator.Current { get { return current; } }
+                public void Dispose() { }
+                public void Reset() { throw new NotSupportedException(); }
+            }
+
+            public struct OfComponentEnumerable<T> : IEnumerable<T>
+                where T : Component
+            {
+                AncestorsEnumerable parent;
+
+                public OfComponentEnumerable(ref AncestorsEnumerable parent)
+                {
+                    this.parent = parent;
+                }
+
+                public OfComponentEnumerator<T> GetEnumerator()
+                {
+                    return new OfComponentEnumerator<T>(ref parent);
+                }
+
+                IEnumerator<T> IEnumerable<T>.GetEnumerator()
+                {
+                    return GetEnumerator();
+                }
+
+                IEnumerator IEnumerable.GetEnumerator()
+                {
+                    return GetEnumerator();
+                }
+
+                #region LINQ
+
+                public T First()
+                {
+                    var e = this.GetEnumerator();
+                    if (e.MoveNext())
+                    {
+                        return e.Current;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("sequence is empty.");
+                    }
+                }
+
+                public T FirstOrDefault()
+                {
+                    var e = this.GetEnumerator();
+                    return (e.MoveNext())
+                        ? e.Current
+                        : null;
+                }
+
+                public T[] ToArray()
+                {
+                    // Optimize for use native method!
+                    if (parent.withSelf)
+                    {
+                        return parent.origin.GetComponentsInParent<T>(true);
+                    }
+
+                    var array = new T[4];
+                    var len = ToArrayNonAlloc(ref array);
+                    if (array.Length != len)
+                    {
+                        Array.Resize(ref array, len);
+                    }
+                    return array;
+                }
+
+                /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+                public int ToArrayNonAlloc(ref T[] array)
+                {
+                    var index = 0;
+                    var e = this.GetEnumerator();
+                    while (e.MoveNext())
+                    {
+                        if (array.Length == index)
+                        {
+                            var newSize = (index == 0) ? 4 : index * 2;
+                            Array.Resize(ref array, newSize);
+                        }
+                        array[index++] = e.Current;
+                    }
+
+                    return index;
+                }
+
+                #endregion
+            }
+
+            public struct OfComponentEnumerator<T> : IEnumerator<T>
+                where T : Component
+            {
+                Enumerator enumerator; // enumerator is mutable
+                T current;
+
+                public OfComponentEnumerator(ref AncestorsEnumerable parent)
+                {
+                    this.enumerator = parent.GetEnumerator();
+                    this.current = default(T);
+                }
+
+                public bool MoveNext()
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        var component = enumerator.Current.GetComponent<T>();
+                        if (component != null)
+                        {
+                            current = component;
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                public T Current { get { return current; } }
+                object IEnumerator.Current { get { return current; } }
+                public void Dispose() { }
+                public void Reset() { throw new NotSupportedException(); }
+            }
+        }
+
+        public struct DescendantsEnumerable : IEnumerable<GameObject>
+        {
+            readonly GameObject origin;
+            readonly bool withSelf;
+
+            public DescendantsEnumerable(GameObject origin, bool withSelf)
+            {
+                this.origin = origin;
+                this.withSelf = withSelf;
+            }
+
+            /// <summary>Returns a collection of specified component in the source collection.</summary>
+            public OfComponentEnumerable<T> OfComponent<T>()
+                where T : Component
+            {
+                return new OfComponentEnumerable<T>(ref this);
+            }
+
+            /// <summary>Destroy every GameObject in the source collection safety(check null).</summary>
+            /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
+            public void Destroy(bool useDestroyImmediate = false)
+            {
+                var e = GetEnumerator();
+                while (e.MoveNext())
+                {
+                    e.Current.Destroy(useDestroyImmediate, false);
+                }
+            }
+
+            public Enumerator GetEnumerator()
+            {
+                // check GameObject is destroyed only on GetEnumerator timing
+                return (origin == null)
+                    ? new Enumerator(null, withSelf, false, null)
+                    : new Enumerator(origin.transform, withSelf, true, new InternalUnsafeRefStack());
+            }
+
+            IEnumerator<GameObject> IEnumerable<GameObject>.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            #region LINQ
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc(ref GameObject[] array)
+            {
+                var index = 0;
+
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = item;
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc(Func<GameObject, bool> filter, ref GameObject[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (!filter(item)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = item;
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<T>(Func<GameObject, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(item);
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (!filter(item)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(item);
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    var state = let(item);
+
+                    if (!filter(state)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(state);
+                }
+
+                return index;
+            }
+
+            public GameObject[] ToArray()
+            {
+                var array = new GameObject[4];
                 var len = ToArrayNonAlloc(ref array);
                 if (array.Length != len)
                 {
@@ -1308,67 +1047,1079 @@ namespace Unity.Linq
                 return array;
             }
 
-            public int ToArrayNonAlloc(ref T[] array)
+            public GameObject[] ToArray(Func<GameObject, bool> filter)
             {
-                var index = 0;
+                var array = new GameObject[4];
+                var len = ToArrayNonAlloc(filter, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<T>(Func<GameObject, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc<T>(selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc(filter, selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc(let, filter, selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public GameObject First()
+            {
                 var e = this.GetEnumerator();
+                if (e.MoveNext())
+                {
+                    return e.Current;
+                }
+                else
+                {
+                    throw new InvalidOperationException("sequence is empty.");
+                }
+            }
+
+            public GameObject FirstOrDefault()
+            {
+                var e = this.GetEnumerator();
+                return (e.MoveNext())
+                    ? e.Current
+                    : null;
+            }
+
+            #endregion
+
+            public class InternalUnsafeRefStack
+            {
+                public int size = 0;
+                public Enumerator[] array; // Pop = this.array[--size];
+
+                public InternalUnsafeRefStack()
+                {
+                    array = new GameObjectExtensions.DescendantsEnumerable.Enumerator[6];
+                }
+
+                public void Push(ref Enumerator e)
+                {
+                    if (size == array.Length)
+                    {
+                        Array.Resize(ref array, array.Length * 2);
+                    }
+                    array[size++] = e;
+                }
+            }
+
+            public struct Enumerator : IEnumerator<GameObject>
+            {
+                readonly int childCount; // childCount is fixed when GetEnumerator is called.
+
+                readonly Transform originTransform;
+                readonly bool canRun;
+
+                bool withSelf;
+                int currentIndex;
+                GameObject current;
+                InternalUnsafeRefStack sharedStack;
+
+                public Enumerator(Transform originTransform, bool withSelf, bool canRun, InternalUnsafeRefStack sharedStack)
+                {
+                    this.originTransform = originTransform;
+                    this.withSelf = withSelf;
+                    this.childCount = canRun ? originTransform.childCount : 0;
+                    this.currentIndex = -1;
+                    this.canRun = canRun;
+                    this.current = null;
+                    this.sharedStack = sharedStack;
+                }
+
+                public bool MoveNext()
+                {
+                    RECURSIVE:
+                    if (!canRun) return false;
+
+                    if (withSelf)
+                    {
+                        current = originTransform.gameObject;
+                        withSelf = false;
+                        return true;
+                    }
+
+                    if (sharedStack.size != 0)
+                    {
+                        var e = sharedStack.array[--sharedStack.size]; // Pop
+                        if (e.MoveNext())
+                        {
+                            current = e.Current;
+                            sharedStack.Push(ref e);
+                            return true;
+                        }
+                    }
+
+                    currentIndex++;
+                    if (currentIndex < childCount)
+                    {
+                        var item = originTransform.GetChild(currentIndex);
+                        var childEnumerator = new Enumerator(item, true, true, sharedStack);
+                        sharedStack.Push(ref childEnumerator);
+                        goto RECURSIVE;
+                    }
+
+                    return false;
+                }
+
+                public GameObject Current { get { return current; } }
+                object IEnumerator.Current { get { return current; } }
+                public void Dispose() { }
+                public void Reset() { throw new NotSupportedException(); }
+            }
+
+            struct Enumerator2
+            {
+
+            }
+
+            public struct OfComponentEnumerable<T> : IEnumerable<T>
+                where T : Component
+            {
+                DescendantsEnumerable parent;
+
+                public OfComponentEnumerable(ref DescendantsEnumerable parent)
+                {
+                    this.parent = parent;
+                }
+
+                public OfComponentEnumerator<T> GetEnumerator()
+                {
+                    return new OfComponentEnumerator<T>(ref parent);
+                }
+
+                IEnumerator<T> IEnumerable<T>.GetEnumerator()
+                {
+                    return GetEnumerator();
+                }
+
+                IEnumerator IEnumerable.GetEnumerator()
+                {
+                    return GetEnumerator();
+                }
+
+                #region LINQ
+
+                public T First()
+                {
+                    var e = this.GetEnumerator();
+                    if (e.MoveNext())
+                    {
+                        return e.Current;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("sequence is empty.");
+                    }
+                }
+
+                public T FirstOrDefault()
+                {
+                    var e = this.GetEnumerator();
+                    return (e.MoveNext())
+                        ? e.Current
+                        : null;
+                }
+
+                public T[] ToArray()
+                {
+                    // Optimize for use native method!
+                    if (parent.withSelf)
+                    {
+                        return parent.origin.GetComponentsInChildren<T>(true);
+                    }
+
+                    var array = new T[4];
+                    var len = ToArrayNonAlloc(ref array);
+                    if (array.Length != len)
+                    {
+                        Array.Resize(ref array, len);
+                    }
+                    return array;
+                }
+
+                /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+                public int ToArrayNonAlloc(ref T[] array)
+                {
+                    var index = 0;
+                    var e = this.GetEnumerator();
+                    while (e.MoveNext())
+                    {
+                        if (array.Length == index)
+                        {
+                            var newSize = (index == 0) ? 4 : index * 2;
+                            Array.Resize(ref array, newSize);
+                        }
+                        array[index++] = e.Current;
+                    }
+
+                    return index;
+                }
+
+                #endregion
+            }
+
+            public struct OfComponentEnumerator<T> : IEnumerator<T>
+                where T : Component
+            {
+                Enumerator enumerator; // enumerator is mutable
+                T current;
+
+                public OfComponentEnumerator(ref DescendantsEnumerable parent)
+                {
+                    this.enumerator = parent.GetEnumerator();
+                    this.current = default(T);
+                }
+
+                public bool MoveNext()
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        var component = enumerator.Current.GetComponent<T>();
+                        if (component != null)
+                        {
+                            current = component;
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                public T Current { get { return current; } }
+                object IEnumerator.Current { get { return current; } }
+                public void Dispose() { }
+                public void Reset() { throw new NotSupportedException(); }
+            }
+        }
+
+        public struct BeforeSelfEnumerable : IEnumerable<GameObject>
+        {
+            readonly GameObject origin;
+            readonly bool withSelf;
+
+            public BeforeSelfEnumerable(GameObject origin, bool withSelf)
+            {
+                this.origin = origin;
+                this.withSelf = withSelf;
+            }
+
+            /// <summary>Returns a collection of specified component in the source collection.</summary>
+            public OfComponentEnumerable<T> OfComponent<T>()
+                where T : Component
+            {
+                return new OfComponentEnumerable<T>(ref this);
+            }
+
+            /// <summary>Destroy every GameObject in the source collection safety(check null).</summary>
+            /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
+            public void Destroy(bool useDestroyImmediate = false)
+            {
+                var e = GetEnumerator();
                 while (e.MoveNext())
                 {
+                    e.Current.Destroy(useDestroyImmediate, false);
+                }
+            }
+
+            public Enumerator GetEnumerator()
+            {
+                // check GameObject is destroyed only on GetEnumerator timing
+                return (origin == null)
+                    ? new Enumerator(null, withSelf, false)
+                    : new Enumerator(origin.transform, withSelf, true);
+            }
+
+            IEnumerator<GameObject> IEnumerable<GameObject>.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            #region LINQ
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc(ref GameObject[] array)
+            {
+                var index = 0;
+
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
                     if (array.Length == index)
                     {
                         var newSize = (index == 0) ? 4 : index * 2;
                         Array.Resize(ref array, newSize);
                     }
-                    array[index++] = e.Current;
+                    array[index++] = item;
                 }
 
                 return index;
             }
 
-            #endregion
-        }
-
-        public struct OfComponentEnumerator<T> : IEnumerator<T>
-            where T : Component
-        {
-            readonly DescendantsEnumerable parent;
-            Enumerator enumerator;
-            T current;
-            bool running;
-
-            public OfComponentEnumerator(DescendantsEnumerable parent)
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc(Func<GameObject, bool> filter, ref GameObject[] array)
             {
-                this.parent = parent;
-                this.enumerator = default(Enumerator);
-                this.current = default(T);
-                this.running = false;
-            }
-
-            public bool MoveNext()
-            {
-                if (!running)
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
                 {
-                    enumerator = parent.GetEnumerator();
-                    running = true;
+                    var item = e.Current;
+                    if (!filter(item)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = item;
                 }
 
-                while (enumerator.MoveNext())
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<T>(Func<GameObject, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
                 {
-                    var component = enumerator.Current.GetComponent<T>();
-                    if (component != null)
+                    var item = e.Current;
+                    if (array.Length == index)
                     {
-                        current = component;
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(item);
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (!filter(item)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(item);
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    var state = let(item);
+
+                    if (!filter(state)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(state);
+                }
+
+                return index;
+            }
+
+            public GameObject[] ToArray()
+            {
+                var array = new GameObject[4];
+                var len = ToArrayNonAlloc(ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public GameObject[] ToArray(Func<GameObject, bool> filter)
+            {
+                var array = new GameObject[4];
+                var len = ToArrayNonAlloc(filter, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<T>(Func<GameObject, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc<T>(selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc(filter, selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc(let, filter, selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public GameObject First()
+            {
+                var e = this.GetEnumerator();
+                if (e.MoveNext())
+                {
+                    return e.Current;
+                }
+                else
+                {
+                    throw new InvalidOperationException("sequence is empty.");
+                }
+            }
+
+            public GameObject FirstOrDefault()
+            {
+                var e = this.GetEnumerator();
+                return (e.MoveNext())
+                    ? e.Current
+                    : null;
+            }
+
+            #endregion
+
+            public struct Enumerator : IEnumerator<GameObject>
+            {
+                readonly int childCount; // childCount is fixed when GetEnumerator is called.
+                readonly Transform originTransform;
+                bool canRun;
+
+                bool withSelf;
+                int currentIndex;
+                GameObject current;
+                Transform parent;
+
+                public Enumerator(Transform originTransform, bool withSelf, bool canRun)
+                {
+                    this.originTransform = originTransform;
+                    this.withSelf = withSelf;
+                    this.currentIndex = -1;
+                    this.canRun = canRun;
+                    this.current = null;
+                    this.parent = originTransform.parent;
+                    this.childCount = (parent != null) ? parent.childCount : 0;
+                }
+
+                public bool MoveNext()
+                {
+                    if (!canRun) return false;
+
+                    if (parent == null) goto RETURN_SELF;
+
+                    currentIndex++;
+                    if (currentIndex < childCount)
+                    {
+                        var item = parent.GetChild(currentIndex);
+
+                        if (item == originTransform)
+                        {
+                            goto RETURN_SELF;
+                        }
+
+                        current = item.gameObject;
                         return true;
+                    }
+
+                    RETURN_SELF:
+                    if (withSelf)
+                    {
+                        current = originTransform.gameObject;
+                        withSelf = false;
+                        canRun = false; // reached self, run complete.
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                public GameObject Current { get { return current; } }
+                object IEnumerator.Current { get { return current; } }
+                public void Dispose() { }
+                public void Reset() { throw new NotSupportedException(); }
+            }
+
+            public struct OfComponentEnumerable<T> : IEnumerable<T>
+                where T : Component
+            {
+                BeforeSelfEnumerable parent;
+
+                public OfComponentEnumerable(ref BeforeSelfEnumerable parent)
+                {
+                    this.parent = parent;
+                }
+
+                public OfComponentEnumerator<T> GetEnumerator()
+                {
+                    return new OfComponentEnumerator<T>(ref parent);
+                }
+
+                IEnumerator<T> IEnumerable<T>.GetEnumerator()
+                {
+                    return GetEnumerator();
+                }
+
+                IEnumerator IEnumerable.GetEnumerator()
+                {
+                    return GetEnumerator();
+                }
+
+                #region LINQ
+
+                public T First()
+                {
+                    var e = this.GetEnumerator();
+                    if (e.MoveNext())
+                    {
+                        return e.Current;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("sequence is empty.");
                     }
                 }
 
-                return false;
+                public T FirstOrDefault()
+                {
+                    var e = this.GetEnumerator();
+                    return (e.MoveNext())
+                        ? e.Current
+                        : null;
+                }
+
+                public T[] ToArray()
+                {
+                    var array = new T[4];
+                    var len = ToArrayNonAlloc(ref array);
+                    if (array.Length != len)
+                    {
+                        Array.Resize(ref array, len);
+                    }
+                    return array;
+                }
+
+                /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+                public int ToArrayNonAlloc(ref T[] array)
+                {
+                    var index = 0;
+                    var e = this.GetEnumerator();
+                    while (e.MoveNext())
+                    {
+                        if (array.Length == index)
+                        {
+                            var newSize = (index == 0) ? 4 : index * 2;
+                            Array.Resize(ref array, newSize);
+                        }
+                        array[index++] = e.Current;
+                    }
+
+                    return index;
+                }
+
+                #endregion
             }
 
-            public T Current { get { return current; } }
-            object IEnumerator.Current { get { return current; } }
-            public void Dispose() { }
-            public void Reset() { throw new NotSupportedException(); }
+            public struct OfComponentEnumerator<T> : IEnumerator<T>
+                where T : Component
+            {
+                Enumerator enumerator; // enumerator is mutable
+                T current;
+
+                public OfComponentEnumerator(ref BeforeSelfEnumerable parent)
+                {
+                    this.enumerator = parent.GetEnumerator();
+                    this.current = default(T);
+                }
+
+                public bool MoveNext()
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        var component = enumerator.Current.GetComponent<T>();
+                        if (component != null)
+                        {
+                            current = component;
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                public T Current { get { return current; } }
+                object IEnumerator.Current { get { return current; } }
+                public void Dispose() { }
+                public void Reset() { throw new NotSupportedException(); }
+            }
+        }
+
+        public struct AfterSelfEnumerable : IEnumerable<GameObject>
+        {
+            readonly GameObject origin;
+            readonly bool withSelf;
+
+            public AfterSelfEnumerable(GameObject origin, bool withSelf)
+            {
+                this.origin = origin;
+                this.withSelf = withSelf;
+            }
+
+            /// <summary>Returns a collection of specified component in the source collection.</summary>
+            public OfComponentEnumerable<T> OfComponent<T>()
+                where T : Component
+            {
+                return new OfComponentEnumerable<T>(ref this);
+            }
+
+            /// <summary>Destroy every GameObject in the source collection safety(check null).</summary>
+            /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
+            public void Destroy(bool useDestroyImmediate = false)
+            {
+                var e = GetEnumerator();
+                while (e.MoveNext())
+                {
+                    e.Current.Destroy(useDestroyImmediate, false);
+                }
+            }
+
+            public Enumerator GetEnumerator()
+            {
+                // check GameObject is destroyed only on GetEnumerator timing
+                return (origin == null)
+                    ? new Enumerator(null, withSelf, false)
+                    : new Enumerator(origin.transform, withSelf, true);
+            }
+
+            IEnumerator<GameObject> IEnumerable<GameObject>.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            #region LINQ
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc(ref GameObject[] array)
+            {
+                var index = 0;
+
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = item;
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc(Func<GameObject, bool> filter, ref GameObject[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (!filter(item)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = item;
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<T>(Func<GameObject, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(item);
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (!filter(item)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(item);
+                }
+
+                return index;
+            }
+
+            /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+            public int ToArrayNonAlloc<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector, ref T[] array)
+            {
+                var index = 0;
+                var e = this.GetEnumerator(); // does not need to call Dispose.
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    var state = let(item);
+
+                    if (!filter(state)) continue;
+
+                    if (array.Length == index)
+                    {
+                        var newSize = (index == 0) ? 4 : index * 2;
+                        Array.Resize(ref array, newSize);
+                    }
+                    array[index++] = selector(state);
+                }
+
+                return index;
+            }
+
+            public GameObject[] ToArray()
+            {
+                var array = new GameObject[4];
+                var len = ToArrayNonAlloc(ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public GameObject[] ToArray(Func<GameObject, bool> filter)
+            {
+                var array = new GameObject[4];
+                var len = ToArrayNonAlloc(filter, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<T>(Func<GameObject, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc<T>(selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc(filter, selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public T[] ToArray<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)
+            {
+                var array = new T[4];
+                var len = ToArrayNonAlloc(let, filter, selector, ref array);
+                if (array.Length != len)
+                {
+                    Array.Resize(ref array, len);
+                }
+                return array;
+            }
+
+            public GameObject First()
+            {
+                var e = this.GetEnumerator();
+                if (e.MoveNext())
+                {
+                    return e.Current;
+                }
+                else
+                {
+                    throw new InvalidOperationException("sequence is empty.");
+                }
+            }
+
+            public GameObject FirstOrDefault()
+            {
+                var e = this.GetEnumerator();
+                return (e.MoveNext())
+                    ? e.Current
+                    : null;
+            }
+
+            #endregion
+
+            public struct Enumerator : IEnumerator<GameObject>
+            {
+                readonly int childCount; // childCount is fixed when GetEnumerator is called.
+                readonly Transform originTransform;
+                readonly bool canRun;
+
+                bool withSelf;
+                int currentIndex;
+                GameObject current;
+                Transform parent;
+
+                public Enumerator(Transform originTransform, bool withSelf, bool canRun)
+                {
+                    this.originTransform = originTransform;
+                    this.withSelf = withSelf;
+                    this.currentIndex = (originTransform != null) ? originTransform.GetSiblingIndex() + 1 : 0;
+                    this.canRun = canRun;
+                    this.current = null;
+                    this.parent = originTransform.parent;
+                    this.childCount = (parent != null) ? parent.childCount : 0;
+                }
+
+                public bool MoveNext()
+                {
+                    if (!canRun) return false;
+
+                    if (withSelf)
+                    {
+                        current = originTransform.gameObject;
+                        withSelf = false;
+                        return true;
+                    }
+
+                    if (currentIndex < childCount)
+                    {
+                        current = parent.GetChild(currentIndex).gameObject;
+                        currentIndex++;
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                public GameObject Current { get { return current; } }
+                object IEnumerator.Current { get { return current; } }
+                public void Dispose() { }
+                public void Reset() { throw new NotSupportedException(); }
+            }
+
+            public struct OfComponentEnumerable<T> : IEnumerable<T>
+                where T : Component
+            {
+                AfterSelfEnumerable parent;
+
+                public OfComponentEnumerable(ref AfterSelfEnumerable parent)
+                {
+                    this.parent = parent;
+                }
+
+                public OfComponentEnumerator<T> GetEnumerator()
+                {
+                    return new OfComponentEnumerator<T>(ref this.parent);
+                }
+
+                IEnumerator<T> IEnumerable<T>.GetEnumerator()
+                {
+                    return GetEnumerator();
+                }
+
+                IEnumerator IEnumerable.GetEnumerator()
+                {
+                    return GetEnumerator();
+                }
+
+                #region LINQ
+
+                public T First()
+                {
+                    var e = this.GetEnumerator();
+                    if (e.MoveNext())
+                    {
+                        return e.Current;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("sequence is empty.");
+                    }
+                }
+
+                public T FirstOrDefault()
+                {
+                    var e = this.GetEnumerator();
+                    return (e.MoveNext())
+                        ? e.Current
+                        : null;
+                }
+
+                public T[] ToArray()
+                {
+                    var array = new T[4];
+                    var len = ToArrayNonAlloc(ref array);
+                    if (array.Length != len)
+                    {
+                        Array.Resize(ref array, len);
+                    }
+                    return array;
+                }
+
+                /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
+                public int ToArrayNonAlloc(ref T[] array)
+                {
+                    var index = 0;
+                    var e = this.GetEnumerator();
+                    while (e.MoveNext())
+                    {
+                        if (array.Length == index)
+                        {
+                            var newSize = (index == 0) ? 4 : index * 2;
+                            Array.Resize(ref array, newSize);
+                        }
+                        array[index++] = e.Current;
+                    }
+
+                    return index;
+                }
+
+                #endregion
+            }
+
+            public struct OfComponentEnumerator<T> : IEnumerator<T>
+                where T : Component
+            {
+                Enumerator enumerator; // enumerator is mutable
+                T current;
+
+                public OfComponentEnumerator(ref AfterSelfEnumerable parent)
+                {
+                    this.enumerator = parent.GetEnumerator();
+                    this.current = default(T);
+                }
+
+                public bool MoveNext()
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        var component = enumerator.Current.GetComponent<T>();
+                        if (component != null)
+                        {
+                            current = component;
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                public T Current { get { return current; } }
+                object IEnumerator.Current { get { return current; } }
+                public void Dispose() { }
+                public void Reset() { throw new NotSupportedException(); }
+            }
         }
     }
 }

@@ -74,7 +74,7 @@ All operate methods are extension methods of GameObject, too. You need `using Un
 
 Reference : Traverse
 ---
-All traverse methods can find inactive object. If not found, return type is `GameObject` methods return null, return type is `IEnumerable<GameObject>` methods return empty sequence. All collection methods have `string name` overload that returns filtered collection that have a matching name are included in the collection.
+All traverse methods can find inactive object. If not found, return type is `GameObject` methods return null, return type is `IEnumerable<GameObject>` methods return empty sequence.
 
 Method | Description 
 -------| -----------
@@ -158,40 +158,32 @@ OfComponent|Returns a collection of specified component in the source collection
 
 Performance Tips
 ---
-If you can use native methods(such as GetComponentsInChildren), it is always fast than LINQ traverse(because LINQ traverse is simple for-loop, no native magics). So you can substitude native methods, use it. If you needs complex query, use LINQ.
+If you can use native methods(such as GetComponentsInChildren), it is always fast than LINQ traverse(because LINQ traverse can not have native magics). So you can substitude native methods, use it. If you needs other query, use LINQ.
 
-Tips for gc reduction, you can define NonAlloc extension like `Physics.RaycastNonAlloc` or `void GetComponentsInChildren<T>(List<T> results)` and reuse `List<T>`.
+LINQ to GameObject is optimized heavily. Traverse methods returns hand optimized struct enumerator so it can avoid garbage when enumerate.
+
+> Unity compiler has bugs so can not avoid IDisposable boxing cost. But Unity 5.5 will upgrade compiler and beats the bugs...
+
+Some LINQ methods are optimized. `First`, `FirstOrDefault`, `ToArray` path through the optimized path.
+
+LINQ to GameObject also provides `ToArrayNonAlloc`. It is like `Physics.RaycastNonAlloc` or `void GetComponentsInChildren<T>(List<T> results)` and reuse `List<T>`. You can reuse array for no garbage.
 
 ```csharp
-public static class EnumerableExtensions
+GameObject[] array = new GameObject[0];
+
+// travese on every update but no allocate memory
+void Update()
 {
-    public static int ToArrayNonAlloc<T>(this IEnumerable<T> source, ref T[] array)
+    var size = origin.Children().ToArrayNonAlloc(ref array);
+    for (int i = 0; i < size; i++)
     {
-        var index = 0;
-        foreach (var item in source)
-        {
-            if (array.Length == index)
-            {
-                var newSize = (index == 0) ? 4 : index * 2;
-                Array.Resize(ref array, newSize);
-            }
-            array[index++] = item;
-        }
-
-        return index;
-    }
-
-    public static void ToListNonAlloc<T>(this IEnumerable<T> source, ref List<T> list)
-    {
-        list.Clear();
-        foreach (var item in source)
-        {
-            list.Add(item);
-        }
+        var element = array[i];
     }
 }
 ```
 
+`ToArray` and `ToArrayNonAlloc` have five overloads. `()`, `(Func<GameObject, T> selector)`, `(Func<GameObject, bool> filter)`, `(Func<GameObject, bool> filter, Func<GameObject, T> selector)`, `(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)` for Optimize `Where().Select().ToArray()` pattern.
+ 
 Author Info
 ---
 Yoshifumi Kawai(a.k.a. neuecc) is software developer in Japan.  
