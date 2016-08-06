@@ -42,7 +42,7 @@ namespace Unity.Linq.Sample
             if (GUILayout.Button("name filter overload"))
             {
                 Debug.Log("name filter overload");
-                var filtered = origin.Descendants("Group");
+                var filtered = origin.Descendants().Where(x=>x.name== "Group");
                 foreach (var item in filtered)
                 {
                     Debug.Log(item.name);

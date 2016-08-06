@@ -42,36 +42,12 @@ namespace Unity.Linq
             }
         }
 
-        /// <summary>Returns a filtered collection of GameObjects that contains the descendant GameObjects of every GameObject in the source collection. Only GameObjects that have a matching name are included in the collection.</summary>
-        public static IEnumerable<GameObject> Descendants(this IEnumerable<GameObject> source, string name)
-        {
-            foreach (var item in source)
-            {
-                foreach (var item2 in item.Descendants(name))
-                {
-                    yield return item2;
-                }
-            }
-        }
-
         /// <summary>Returns a collection of GameObjects that contains every GameObject in the source collection, and the descendent GameObjects of every GameObject in the source collection.</summary>
         public static IEnumerable<GameObject> DescendantsAndSelf(this IEnumerable<GameObject> source)
         {
             foreach (var item in source)
             {
                 foreach (var item2 in item.DescendantsAndSelf())
-                {
-                    yield return item2;
-                }
-            }
-        }
-
-        /// <summary>Returns a collection of GameObjects that contains every GameObject in the source collection, and the descendent GameObjects of every GameObject in the source collection. Only GameObjects that have a matching name are included in the collection.</summary>
-        public static IEnumerable<GameObject> DescendantsAndSelf(this IEnumerable<GameObject> source, string name)
-        {
-            foreach (var item in source)
-            {
-                foreach (var item2 in item.DescendantsAndSelf(name))
                 {
                     yield return item2;
                 }

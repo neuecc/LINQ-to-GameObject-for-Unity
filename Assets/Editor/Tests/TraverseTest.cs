@@ -27,7 +27,8 @@ namespace UnityTest
         [Test]
         public void Child()
         {
-            Origin.Child("Group").ChildrenAndSelf("Group")
+            Origin.Child("Group").ChildrenAndSelf()
+                .Where(x => x.name == "Group")
                 .Select(x => x.name)
                 .IsCollection("Group", "Group");
 
@@ -43,13 +44,17 @@ namespace UnityTest
             Origin.Children().Select(x => x.name)
                 .IsCollection("Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
 
-            Origin.Children("Sphere_B").Select(x => x.name)
+            Origin.Children()
+                .Where(x => x.name == "Sphere_B")
+                .Select(x => x.name)
                 .IsCollection("Sphere_B", "Sphere_B");
 
             Origin.ChildrenAndSelf().Select(x => x.name)
                 .IsCollection("Origin", "Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
 
-            Origin.ChildrenAndSelf("Sphere_A").Select(x => x.name)
+            Origin.ChildrenAndSelf()
+                .Where(x => x.name == "Sphere_A")
+                .Select(x => x.name)
                 .IsCollection("Sphere_A", "Sphere_A");
         }
 
@@ -62,7 +67,7 @@ namespace UnityTest
             group.Ancestors().Select(x => x.name).IsCollection("Origin", "Container", "Root");
             group.AncestorsAndSelf().Select(x => x.name).IsCollection("Group", "Origin", "Container", "Root");
 
-            group.Child("Group").AncestorsAndSelf("Group").Select(x => x.name).IsCollection("Group", "Group");
+            group.Child("Group").AncestorsAndSelf().Where(x => x.name == "Group").Select(x => x.name).IsCollection("Group", "Group");
         }
 
         [Test]
@@ -71,16 +76,16 @@ namespace UnityTest
             Origin.Descendants().Select(x => x.name)
                 .IsCollection("Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
 
-            Origin.Descendants("Sphere_B").Select(x => x.name).IsCollection("Sphere_B", "Sphere_B", "Sphere_B");
+            Origin.Descendants().Where(x => x.name == "Sphere_B").Select(x => x.name).IsCollection("Sphere_B", "Sphere_B", "Sphere_B");
 
             Origin.DescendantsAndSelf().Select(x => x.name)
                 .IsCollection("Origin", "Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
 
 
-            Origin.DescendantsAndSelf("Sphere_B").Select(x => x.name)
+            Origin.DescendantsAndSelf().Where(x => x.name == "Sphere_B").Select(x => x.name)
                 .IsCollection("Sphere_B", "Sphere_B", "Sphere_B");
 
-            Origin.Child("Group").DescendantsAndSelf("Group").Select(x => x.name)
+            Origin.Child("Group").DescendantsAndSelf().Where(x => x.name == "Group").Select(x => x.name)
                 .IsCollection("Group", "Group");
         }
 
@@ -99,7 +104,7 @@ namespace UnityTest
             Origin.Child("Sphere_B").BeforeSelfAndSelf().Select(x => x.name)
                 .IsCollection("Sphere_A", "Sphere_B");
 
-            Origin.Children("Sphere_B").Last().BeforeSelfAndSelf("Sphere_B").Select(x => x.name)
+            Origin.Children().Where(x => x.name == "Sphere_B").Last().BeforeSelfAndSelf("Sphere_B").Select(x => x.name)
                 .IsCollection("Sphere_B", "Sphere_B");
         }
 
@@ -108,7 +113,7 @@ namespace UnityTest
         {
             Origin.AfterSelf().Select(x => x.name)
                 .IsCollection("C3", "C4");
-            
+
             Origin.AfterSelf("C3").Select(x => x.name)
                 .IsCollection("C3");
 
