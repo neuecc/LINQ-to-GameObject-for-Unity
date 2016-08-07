@@ -36,7 +36,7 @@ origin.transform.root.gameObject
 var fooScripts = root.ChildrenAndSelf().OfComponent<FooScript>(); 
 ```
 
-> Note:LINQ to GameObject is optimized for iteration, returns struct enumerable and struct enumerator instead of `IEnumerable<GameObject>`. More details, see the [Peformance Tips](https://github.com/neuecc/LINQ-to-GameObject-for-Unity/tree/perf_improve#performance-tips) section.
+> Note:LINQ to GameObject is optimized for iteration, returns struct enumerable and struct enumerator instead of `IEnumerable<GameObject>`. More details, see the [Peformance Tips](https://github.com/neuecc/LINQ-to-GameObject-for-Unity#performance-tips) section.
 
 How to use
 ---
