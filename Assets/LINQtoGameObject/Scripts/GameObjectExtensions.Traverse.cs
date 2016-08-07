@@ -123,6 +123,21 @@ namespace Unity.Linq
                 }
             }
 
+            /// <summary>Destroy every GameObject in the source collection safety(check null).</summary>
+            /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
+            public void Destroy(Func<GameObject, bool> predicate, bool useDestroyImmediate = false)
+            {
+                var e = GetEnumerator();
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (predicate(item))
+                    {
+                        item.Destroy(useDestroyImmediate, false);
+                    }
+                }
+            }
+
             public Enumerator GetEnumerator()
             {
                 // check GameObject is destroyed only on GetEnumerator timing
@@ -514,6 +529,21 @@ namespace Unity.Linq
                 while (e.MoveNext())
                 {
                     e.Current.Destroy(useDestroyImmediate, false);
+                }
+            }
+
+            /// <summary>Destroy every GameObject in the source collection safety(check null).</summary>
+            /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
+            public void Destroy(Func<GameObject, bool> predicate, bool useDestroyImmediate = false)
+            {
+                var e = GetEnumerator();
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (predicate(item))
+                    {
+                        item.Destroy(useDestroyImmediate, false);
+                    }
                 }
             }
 
@@ -912,6 +942,21 @@ namespace Unity.Linq
                 }
             }
 
+            /// <summary>Destroy every GameObject in the source collection safety(check null).</summary>
+            /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
+            public void Destroy(Func<GameObject, bool> predicate, bool useDestroyImmediate = false)
+            {
+                var e = GetEnumerator();
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (predicate(item))
+                    {
+                        item.Destroy(useDestroyImmediate, false);
+                    }
+                }
+            }
+
             public Enumerator GetEnumerator()
             {
                 // check GameObject is destroyed only on GetEnumerator timing
@@ -1198,11 +1243,6 @@ namespace Unity.Linq
                 public void Reset() { throw new NotSupportedException(); }
             }
 
-            struct Enumerator2
-            {
-
-            }
-
             public struct OfComponentEnumerable<T> : IEnumerable<T>
                 where T : Component
             {
@@ -1349,6 +1389,21 @@ namespace Unity.Linq
                 while (e.MoveNext())
                 {
                     e.Current.Destroy(useDestroyImmediate, false);
+                }
+            }
+
+            /// <summary>Destroy every GameObject in the source collection safety(check null).</summary>
+            /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
+            public void Destroy(Func<GameObject, bool> predicate, bool useDestroyImmediate = false)
+            {
+                var e = GetEnumerator();
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (predicate(item))
+                    {
+                        item.Destroy(useDestroyImmediate, false);
+                    }
                 }
             }
 
@@ -1586,7 +1641,7 @@ namespace Unity.Linq
                     if (currentIndex < childCount)
                     {
                         var item = parent.GetChild(currentIndex);
-
+                        
                         if (item == originTransform)
                         {
                             goto RETURN_SELF;
@@ -1754,6 +1809,21 @@ namespace Unity.Linq
                 while (e.MoveNext())
                 {
                     e.Current.Destroy(useDestroyImmediate, false);
+                }
+            }
+
+            /// <summary>Destroy every GameObject in the source collection safety(check null).</summary>
+            /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
+            public void Destroy(Func<GameObject, bool> predicate, bool useDestroyImmediate = false)
+            {
+                var e = GetEnumerator();
+                while (e.MoveNext())
+                {
+                    var item = e.Current;
+                    if (predicate(item))
+                    {
+                        item.Destroy(useDestroyImmediate, false);
+                    }
                 }
             }
 
