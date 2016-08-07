@@ -36,6 +36,8 @@ origin.transform.root.gameObject
 var fooScripts = root.ChildrenAndSelf().OfComponent<FooScript>(); 
 ```
 
+> Note:LINQ to GameObject is optimized for iteration, returns struct enumerable and struct enumerator instead of `IEnumerable<GameObject>`. More details, see the [Peformance Tips](https://github.com/neuecc/LINQ-to-GameObject-for-Unity/tree/perf_improve#performance-tips) section.
+
 How to use
 ---
 Import LINQ to GameObject from Unity Asset Store - [http://u3d.as/content/neuecc/linq-to-game-object](http://u3d.as/content/neuecc/linq-to-game-object).
@@ -74,7 +76,7 @@ All operate methods are extension methods of GameObject, too. You need `using Un
 
 Reference : Traverse
 ---
-All traverse methods can find inactive object. If not found, return type is `GameObject` methods return null, return type is `IEnumerable<GameObject>` methods return empty sequence. All collection methods have `string name` overload that returns filtered collection that have a matching name are included in the collection.
+All traverse methods can find inactive object. If not found, return type is `GameObject` methods return null, return type is `IEnumerable<GameObject>` methods return empty sequence.
 
 Method | Description 
 -------| -----------
@@ -141,6 +143,8 @@ FollowParent|Set to same as Parent.
 Origin|Set to Position = zero, Scale = one, Rotation = identity.
 DoNothing|Position/Scale/Rotation as is. This is default of MoveTo methods.          
 
+Reference : Extensions
+---
 `IEnumerable<GameObject>` Extensions. If multiple GameObjects in the source collection have the same GameObject will be included multiple times in the result collection. To avoid this, use the `Distinct`(LINQ to Objects) method.
 
 Method|Description
@@ -154,6 +158,34 @@ ChildrenAndSelf|Returns a collection of GameObjects that contains every GameObje
 Destroy|Destroy every GameObject in the source collection safety(check null).
 OfComponent|Returns a collection of specified component in the source collection.
 
+Performance Tips
+---
+If you can use native methods(such as GetComponentsInChildren), it is always fast than LINQ traverse(because LINQ traverse can not have native magics). So you can substitude native methods, use it. If you needs other query, use LINQ.
+
+LINQ to GameObject is optimized heavily. Traverse methods returns hand optimized struct enumerator so it can avoid garbage when enumerate.
+
+> Unity compiler has bugs so can not avoid IDisposable boxing cost. But Unity 5.5 will upgrade compiler and beats the bugs...
+
+Some LINQ methods are optimized. `First`, `FirstOrDefault`, `ToArray` path through the optimized path.
+
+LINQ to GameObject also provides `ToArrayNonAlloc`. It is like `Physics.RaycastNonAlloc` or `void GetComponentsInChildren<T>(List<T> results)` and reuse `List<T>`. You can reuse array for no garbage.
+
+```csharp
+GameObject[] array = new GameObject[0];
+
+// travese on every update but no allocate memory
+void Update()
+{
+    var size = origin.Children().ToArrayNonAlloc(ref array);
+    for (int i = 0; i < size; i++)
+    {
+        var element = array[i];
+    }
+}
+```
+
+`ToArray` and `ToArrayNonAlloc` have five overloads. `()`, `(Func<GameObject, T> selector)`, `(Func<GameObject, bool> filter)`, `(Func<GameObject, bool> filter, Func<GameObject, T> selector)`, `(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)` for Optimize `Where().Select().ToArray()` pattern.
+ 
 Author Info
 ---
 Yoshifumi Kawai(a.k.a. neuecc) is software developer in Japan.  

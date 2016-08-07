@@ -3,13 +3,13 @@ using System.Linq;
 
 using Unity.Linq; // using LINQ to GameObject
 
-// This script attached to Root.
+// This script is attached to Root.
 
 namespace Unity.Linq.Sample
 {
     public class SampleSceneScript : MonoBehaviour
     {
-        SampleSceneScript hoge;
+        GameObject[] array = new GameObject[0];
 
         void OnGUI()
         {
@@ -29,23 +29,109 @@ namespace Unity.Linq.Sample
                 Debug.Log(child.name);
             }
 
-            if (GUILayout.Button("Descendants"))
+            using (new GUILayout.HorizontalScope())
             {
-                Debug.Log("------Descendants");
-                var descendants = origin.Descendants();
-                foreach (var item in descendants)
+                if (GUILayout.Button("Ancestors"))
                 {
-                    Debug.Log(item.name);
+                    Debug.Log("------Ancestors");
+                    foreach (var item in origin.Ancestors())
+                    {
+                        Debug.Log(item.name);
+                    }
+                }
+
+                if (GUILayout.Button("AncestorsAndSelf"))
+                {
+                    Debug.Log("------AncestorsAndSelf");
+                    foreach (var item in origin.AncestorsAndSelf())
+                    {
+                        Debug.Log(item.name);
+                    }
                 }
             }
 
-            if (GUILayout.Button("name filter overload"))
+            using (new GUILayout.HorizontalScope())
             {
-                Debug.Log("name filter overload");
-                var filtered = origin.Descendants("Group");
-                foreach (var item in filtered)
+                if (GUILayout.Button("Children"))
                 {
-                    Debug.Log(item.name);
+                    Debug.Log("------Children");
+                    foreach (var item in origin.Children())
+                    {
+                        Debug.Log(item.name);
+                    }
+                }
+
+                if (GUILayout.Button("ChildrenAndSelf"))
+                {
+                    Debug.Log("------ChildrenAndSelf");
+                    foreach (var item in origin.ChildrenAndSelf())
+                    {
+                        Debug.Log(item.name);
+                    }
+                }
+            }
+
+
+            using (new GUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("Descendants"))
+                {
+                    Debug.Log("------Descendants");
+                    foreach (var item in origin.Descendants())
+                    {
+                        Debug.Log(item.name);
+                    }
+                }
+
+                if (GUILayout.Button("DescendantsAndSelf"))
+                {
+                    Debug.Log("------DescendantsAndSelf");
+                    foreach (var item in origin.DescendantsAndSelf())
+                    {
+                        Debug.Log(item.name);
+                    }
+                }
+            }
+
+            using (new GUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("BeforeSelf"))
+                {
+                    Debug.Log("------BeforeSelf");
+                    foreach (var item in origin.BeforeSelf())
+                    {
+                        Debug.Log(item.name);
+                    }
+                }
+
+                if (GUILayout.Button("BeforeSelfAndSelf"))
+                {
+                    Debug.Log("------BeforeSelfAndSelf");
+                    foreach (var item in origin.BeforeSelfAndSelf())
+                    {
+                        Debug.Log(item.name);
+                    }
+                }
+            }
+
+            using (new GUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("AfterSelf"))
+                {
+                    Debug.Log("------AfterSelf");
+                    foreach (var item in origin.AfterSelf())
+                    {
+                        Debug.Log(item.name);
+                    }
+                }
+
+                if (GUILayout.Button("AfterSelf"))
+                {
+                    Debug.Log("------AfterSelfAndSelf");
+                    foreach (var item in origin.AfterSelfAndSelf())
+                    {
+                        Debug.Log(item.name);
+                    }
                 }
             }
 
@@ -58,10 +144,6 @@ namespace Unity.Linq.Sample
                 {
                     Debug.Log("Sphere:" + item.name + " Radius:" + item.radius);
                 }
-
-                origin.Descendants()
-                    .Where(x => x.tag == "foobar")
-                    .OfComponent<BoxCollider2D>();
             }
 
             if (GUILayout.Button("LINQ"))
@@ -126,6 +208,31 @@ namespace Unity.Linq.Sample
                     .Descendants()
                     .Where(x => x.name.EndsWith("(Clone)") || x.name.EndsWith("(Original)"))
                     .Destroy();
+            }
+
+            using (new GUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("ToArrayNonAlloc"))
+                {
+                    Debug.Log("------ToArrayNonAlloc");
+                    var size = origin.Children().ToArrayNonAlloc(ref array);
+                    for (int i = 0; i < size; i++)
+                    {
+                        Debug.Log(array[i].name);
+                    }
+                }
+
+                if (GUILayout.Button("ToArrayNonAlloc(with filter)"))
+                {
+                    Debug.Log("------ToArrayNonAllocWithFilter");
+                    // ToArray and ToArrayNonAlloc has five overloads
+                    // (), (selector), (filter), (filter, selector), (let, filter, selector)
+                    var size = origin.Children().ToArrayNonAlloc(x => x.name.EndsWith("B"), ref array);
+                    for (int i = 0; i < size; i++)
+                    {
+                        Debug.Log(array[i].name);
+                    }
+                }
             }
         }
     }
