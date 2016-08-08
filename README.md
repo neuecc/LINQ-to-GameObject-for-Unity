@@ -160,8 +160,6 @@ OfComponent|Returns a collection of specified component in the source collection
 
 Performance Tips
 ---
-If you can use native methods(such as GetComponentsInChildren), it is always fast than LINQ traverse(because LINQ traverse can not have native magics). So you can substitude native methods, use it. If you needs other query, use LINQ.
-
 LINQ to GameObject is optimized heavily. Traverse methods returns hand optimized struct enumerator so it can avoid garbage when enumerate.
 
 > Unity compiler has bugs so can not avoid IDisposable boxing cost. But Unity 5.5 will upgrade compiler and beats the bugs...
@@ -185,6 +183,8 @@ void Update()
 ```
 
 `ToArray` and `ToArrayNonAlloc` have five overloads. `()`, `(Func<GameObject, T> selector)`, `(Func<GameObject, bool> filter)`, `(Func<GameObject, bool> filter, Func<GameObject, T> selector)`, `(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)` for Optimize `Where().Select().ToArray()` pattern.
+
+If you use simple iteration or `ToArrayNonAlloc`, LINQ to GameObject guarantees no gc allocate and performance is very fast. If you use `DescendantsAndSelf().OfComponent<T>()`, it may possible to substitude `GetComponentsInChildren<T>` that is always fast than LINQ traverse(because LINQ traverse can not have native magics). So you can substitude native methods, use it. If you needs other query, use LINQ.
  
 Author Info
 ---
