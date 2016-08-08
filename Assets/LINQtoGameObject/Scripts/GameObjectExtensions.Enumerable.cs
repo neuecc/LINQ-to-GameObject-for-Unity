@@ -100,13 +100,33 @@ namespace Unity.Linq
         {
             foreach (var item in source)
             {
+#if UNITY_EDITOR
+                var cache = ComponentCache<T>.Instance;
+                item.GetComponents<T>(cache);
+                if (cache.Count != 0)
+                {
+                    var component = cache[0];
+                    cache.Clear();
+                    yield return component;
+                }
+#else
+                        
                 var component = item.GetComponent<T>();
                 if (component != null)
                 {
                     yield return component;
                 }
+#endif
             }
         }
+
+
+#if UNITY_EDITOR
+        class ComponentCache<T>
+        {
+            public static readonly List<T> Instance = new List<T>(); // for no allocate on UNITY_EDITOR
+        }
+#endif
 
         /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
         public static int ToArrayNonAlloc<T>(this IEnumerable<T> source, ref T[] array)

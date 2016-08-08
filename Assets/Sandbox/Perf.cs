@@ -3,11 +3,13 @@ using System.Linq;
 using Unity.Linq;
 using System.Collections;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class Perf : MonoBehaviour
 {
     public Button linq;
     public Button native;
+    public Button legacy;
 
     public GameObject root;
 
@@ -15,55 +17,82 @@ public class Perf : MonoBehaviour
     {
         linq.onClick.AddListener(() =>
         {
-
+            //var l1 = new List<string>();
+            //var l2 = new List<string>();
 
             {
                 var count = 0;
                 var sw = System.Diagnostics.Stopwatch.StartNew();
-                Profiler.BeginSample("AfterSelf New");
-                var e = root.AfterSelf().OfComponent<Transform>().GetEnumerator();
+
+                Profiler.BeginSample("Perf:LINQ");
+                
+                var e = root.DescendantsAndSelf().OfComponent<Text>().GetEnumerator();
                 while (e.MoveNext())
                 {
                     count++;
-                    UnityEngine.Debug.Log(e.Current.name);
+                    // this.GetComponent(
+                    //var _ = e.Current.GetComponent<Perf>();
+                    //l1.Add(e.Current.name);
+                }
+                
+                
+                Profiler.EndSample();
+                sw.Stop();
+
+                Debug.Log("LINQ:" + count + ":" + sw.Elapsed.TotalMilliseconds + "ms");
+            }
+            {
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+
+                Profiler.BeginSample("Perf:Native");
+                var e = root.GetComponentsInChildren<Text>(true);
+                Profiler.EndSample();
+
+                sw.Stop();
+
+                Debug.Log("Native:" + e.Length + ":" + sw.Elapsed.TotalMilliseconds + "ms");
+            }
+            {
+                var count = 0;
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+                Profiler.BeginSample("Perf:Legacy");
+                var e = LegacyDescendants(root, true).OfComponent<Text>().GetEnumerator();
+                while (e.MoveNext())
+                {
+                    count++;
+
+                    //l2.Add(e.Current.name);
                 }
                 Profiler.EndSample();
                 sw.Stop();
-                Debug.Log("New:" + count + ":" + sw.Elapsed.TotalMilliseconds + "ms");
 
+                Debug.Log("Legacy:" + count + ":" + sw.Elapsed.TotalMilliseconds + "ms");
             }
-
-            //{
-            //    var count = 0;
-            //    var sw = System.Diagnostics.Stopwatch.StartNew();
-            //    Profiler.BeginSample("AncestorsAndSelf Native");
-            //    var e = root.GetComponentsInParent<Transform>(true);
-            //    count = e.Length;
-            //    Profiler.EndSample();
-
-            //    sw.Stop();
-            //    Debug.Log("Native:" + count + ":" + sw.Elapsed.TotalMilliseconds + "ms");
-
-            //    foreach (var item in e)
-            //    {
-            //        UnityEngine.Debug.Log(item.name);
-            //    }
-            //}
-
-
-            //var _= root.DescendantsAndSelf().ToArray();
-
-            //Debug.Log(_.Length + ":" + sw.Elapsed.TotalMilliseconds + "ms");
         });
 
         native.onClick.AddListener(() =>
         {
-            //var sw = System.Diagnostics.Stopwatch.StartNew();
-            //var _ = root.GetComponentsInChildren<Text>();
-
-            // var _ = root.DescendantsCore(null, true).ToArray();
-            //sw.Stop();
-            //Debug.Log(_.Length + ":" + sw.Elapsed.TotalMilliseconds + "ms");
         });
+
+        legacy.onClick.AddListener(() =>
+        {
+        });
+    }
+
+    static IEnumerable<GameObject> LegacyDescendants(GameObject origin, bool withSelf)
+    {
+        if (origin == null) yield break;
+        if (withSelf)
+        {
+            yield return origin;
+        }
+
+        foreach (Transform item in origin.transform)
+        {
+            foreach (var child in LegacyDescendants(item.gameObject, withSelf: true))
+            {
+                yield return child.gameObject;
+            }
+        }
     }
 }

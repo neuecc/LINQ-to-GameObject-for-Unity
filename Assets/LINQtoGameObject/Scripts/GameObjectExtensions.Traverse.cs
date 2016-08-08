@@ -351,7 +351,7 @@ namespace Unity.Linq
                 int currentIndex;
                 GameObject current;
 
-                public Enumerator(Transform originTransform, bool withSelf, bool canRun)
+                internal Enumerator(Transform originTransform, bool withSelf, bool canRun)
                 {
                     this.originTransform = originTransform;
                     this.withSelf = withSelf;
@@ -475,6 +475,10 @@ namespace Unity.Linq
                 Enumerator enumerator; // enumerator is mutable
                 T current;
 
+#if UNITY_EDITOR
+                static List<T> componentCache = new List<T>(); // for no allocate on UNITY_EDITOR
+#endif
+
                 public OfComponentEnumerator(ref ChildrenEnumerable parent)
                 {
                     this.enumerator = parent.GetEnumerator();
@@ -485,12 +489,23 @@ namespace Unity.Linq
                 {
                     while (enumerator.MoveNext())
                     {
+#if UNITY_EDITOR
+                        enumerator.Current.GetComponents<T>(componentCache);
+                        if (componentCache.Count != 0)
+                        {
+                            current = componentCache[0];
+                            componentCache.Clear();
+                            return true;
+                        }
+#else
+                        
                         var component = enumerator.Current.GetComponent<T>();
                         if (component != null)
                         {
                             current = component;
                             return true;
                         }
+#endif
                     }
 
                     return false;
@@ -757,7 +772,7 @@ namespace Unity.Linq
                 Transform currentTransform;
                 bool withSelf;
 
-                public Enumerator(GameObject origin, Transform originTransform, bool withSelf, bool canRun)
+                internal Enumerator(GameObject origin, Transform originTransform, bool withSelf, bool canRun)
                 {
                     this.current = origin;
                     this.currentTransform = originTransform;
@@ -843,12 +858,6 @@ namespace Unity.Linq
 
                 public T[] ToArray()
                 {
-                    // Optimize for use native method!
-                    if (parent.withSelf)
-                    {
-                        return parent.origin.GetComponentsInParent<T>(true);
-                    }
-
                     var array = new T[4];
                     var len = ToArrayNonAlloc(ref array);
                     if (array.Length != len)
@@ -885,6 +894,10 @@ namespace Unity.Linq
                 Enumerator enumerator; // enumerator is mutable
                 T current;
 
+#if UNITY_EDITOR
+                static List<T> componentCache = new List<T>(); // for no allocate on UNITY_EDITOR
+#endif
+
                 public OfComponentEnumerator(ref AncestorsEnumerable parent)
                 {
                     this.enumerator = parent.GetEnumerator();
@@ -895,12 +908,23 @@ namespace Unity.Linq
                 {
                     while (enumerator.MoveNext())
                     {
+#if UNITY_EDITOR
+                        enumerator.Current.GetComponents<T>(componentCache);
+                        if (componentCache.Count != 0)
+                        {
+                            current = componentCache[0];
+                            componentCache.Clear();
+                            return true;
+                        }
+#else
+                        
                         var component = enumerator.Current.GetComponent<T>();
                         if (component != null)
                         {
                             current = component;
                             return true;
                         }
+#endif
                     }
 
                     return false;
@@ -960,9 +984,23 @@ namespace Unity.Linq
             public Enumerator GetEnumerator()
             {
                 // check GameObject is destroyed only on GetEnumerator timing
-                return (origin == null)
-                    ? new Enumerator(null, withSelf, false, null)
-                    : new Enumerator(origin.transform, withSelf, true, new InternalUnsafeRefStack());
+                if (origin == null)
+                {
+                    return new Enumerator(null, withSelf, false, null);
+                }
+
+                InternalUnsafeRefStack refStack;
+                if (InternalUnsafeRefStack.RefStackPool.Count != 0)
+                {
+                    refStack = InternalUnsafeRefStack.RefStackPool.Dequeue();
+                    refStack.Reset();
+                }
+                else
+                {
+                    refStack = new InternalUnsafeRefStack(6);
+                }
+
+                return new Enumerator(origin.transform, withSelf, true, refStack);
             }
 
             IEnumerator<GameObject> IEnumerable<GameObject>.GetEnumerator()
@@ -1139,34 +1177,50 @@ namespace Unity.Linq
             public GameObject First()
             {
                 var e = this.GetEnumerator();
-                if (e.MoveNext())
+                try
                 {
-                    return e.Current;
+                    if (e.MoveNext())
+                    {
+                        return e.Current;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("sequence is empty.");
+                    }
                 }
-                else
+                finally
                 {
-                    throw new InvalidOperationException("sequence is empty.");
+                    e.Dispose();
                 }
             }
 
             public GameObject FirstOrDefault()
             {
                 var e = this.GetEnumerator();
-                return (e.MoveNext())
-                    ? e.Current
-                    : null;
+                try
+                {
+                    return (e.MoveNext())
+                        ? e.Current
+                        : null;
+                }
+                finally
+                {
+                    e.Dispose();
+                }
             }
 
             #endregion
 
-            public class InternalUnsafeRefStack
+            internal class InternalUnsafeRefStack
             {
+                public static Queue<InternalUnsafeRefStack> RefStackPool = new Queue<InternalUnsafeRefStack>();
+
                 public int size = 0;
                 public Enumerator[] array; // Pop = this.array[--size];
 
-                public InternalUnsafeRefStack()
+                public InternalUnsafeRefStack(int initialStackDepth)
                 {
-                    array = new GameObjectExtensions.DescendantsEnumerable.Enumerator[6];
+                    array = new GameObjectExtensions.DescendantsEnumerable.Enumerator[initialStackDepth];
                 }
 
                 public void Push(ref Enumerator e)
@@ -1177,6 +1231,11 @@ namespace Unity.Linq
                     }
                     array[size++] = e;
                 }
+
+                public void Reset()
+                {
+                    size = 0;
+                }
             }
 
             public struct Enumerator : IEnumerator<GameObject>
@@ -1184,14 +1243,14 @@ namespace Unity.Linq
                 readonly int childCount; // childCount is fixed when GetEnumerator is called.
 
                 readonly Transform originTransform;
-                readonly bool canRun;
+                bool canRun;
 
                 bool withSelf;
                 int currentIndex;
                 GameObject current;
                 InternalUnsafeRefStack sharedStack;
 
-                public Enumerator(Transform originTransform, bool withSelf, bool canRun, InternalUnsafeRefStack sharedStack)
+                internal Enumerator(Transform originTransform, bool withSelf, bool canRun, InternalUnsafeRefStack sharedStack)
                 {
                     this.originTransform = originTransform;
                     this.withSelf = withSelf;
@@ -1204,25 +1263,36 @@ namespace Unity.Linq
 
                 public bool MoveNext()
                 {
-                    RECURSIVE:
                     if (!canRun) return false;
 
+                    while (sharedStack.size != 0)
+                    {
+                        if (sharedStack.array[sharedStack.size - 1].MoveNextCore(true, out current))
+                        {
+                            return true;
+                        }
+                    }
+
+                    if (MoveNextCore(false, out current))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        // reuse
+                        canRun = false;
+                        InternalUnsafeRefStack.RefStackPool.Enqueue(sharedStack);
+                        return false;
+                    }
+                }
+
+                bool MoveNextCore(bool peek, out GameObject current)
+                {
                     if (withSelf)
                     {
                         current = originTransform.gameObject;
                         withSelf = false;
                         return true;
-                    }
-
-                    if (sharedStack.size != 0)
-                    {
-                        var e = sharedStack.array[--sharedStack.size]; // Pop
-                        if (e.MoveNext())
-                        {
-                            current = e.Current;
-                            sharedStack.Push(ref e);
-                            return true;
-                        }
                     }
 
                     currentIndex++;
@@ -1231,15 +1301,32 @@ namespace Unity.Linq
                         var item = originTransform.GetChild(currentIndex);
                         var childEnumerator = new Enumerator(item, true, true, sharedStack);
                         sharedStack.Push(ref childEnumerator);
-                        goto RECURSIVE;
+                        return sharedStack.array[sharedStack.size - 1].MoveNextCore(true, out current);
+                    }
+                    else
+                    {
+                        if (peek)
+                        {
+                            sharedStack.size--; // Pop
+                        }
                     }
 
+                    current = null;
                     return false;
                 }
 
                 public GameObject Current { get { return current; } }
                 object IEnumerator.Current { get { return current; } }
-                public void Dispose() { }
+
+                public void Dispose()
+                {
+                    if (canRun)
+                    {
+                        canRun = false;
+                        InternalUnsafeRefStack.RefStackPool.Enqueue(sharedStack);
+                    }
+                }
+
                 public void Reset() { throw new NotSupportedException(); }
             }
 
@@ -1273,32 +1360,40 @@ namespace Unity.Linq
                 public T First()
                 {
                     var e = this.GetEnumerator();
-                    if (e.MoveNext())
+                    try
                     {
-                        return e.Current;
+                        if (e.MoveNext())
+                        {
+                            return e.Current;
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("sequence is empty.");
+                        }
                     }
-                    else
+                    finally
                     {
-                        throw new InvalidOperationException("sequence is empty.");
+                        e.Dispose();
                     }
                 }
 
                 public T FirstOrDefault()
                 {
                     var e = this.GetEnumerator();
-                    return (e.MoveNext())
-                        ? e.Current
-                        : null;
+                    try
+                    {
+                        return (e.MoveNext())
+                            ? e.Current
+                            : null;
+                    }
+                    finally
+                    {
+                        e.Dispose();
+                    }
                 }
 
                 public T[] ToArray()
                 {
-                    // Optimize for use native method!
-                    if (parent.withSelf)
-                    {
-                        return parent.origin.GetComponentsInChildren<T>(true);
-                    }
-
                     var array = new T[4];
                     var len = ToArrayNonAlloc(ref array);
                     if (array.Length != len)
@@ -1335,6 +1430,10 @@ namespace Unity.Linq
                 Enumerator enumerator; // enumerator is mutable
                 T current;
 
+#if UNITY_EDITOR
+                static List<T> componentCache = new List<T>(); // for no allocate on UNITY_EDITOR
+#endif
+
                 public OfComponentEnumerator(ref DescendantsEnumerable parent)
                 {
                     this.enumerator = parent.GetEnumerator();
@@ -1345,12 +1444,23 @@ namespace Unity.Linq
                 {
                     while (enumerator.MoveNext())
                     {
+#if UNITY_EDITOR
+                        enumerator.Current.GetComponents<T>(componentCache);
+                        if (componentCache.Count != 0)
+                        {
+                            current = componentCache[0];
+                            componentCache.Clear();
+                            return true;
+                        }
+#else
+                        
                         var component = enumerator.Current.GetComponent<T>();
                         if (component != null)
                         {
                             current = component;
                             return true;
                         }
+#endif
                     }
 
                     return false;
@@ -1358,7 +1468,12 @@ namespace Unity.Linq
 
                 public T Current { get { return current; } }
                 object IEnumerator.Current { get { return current; } }
-                public void Dispose() { }
+
+                public void Dispose()
+                {
+                    enumerator.Dispose();
+                }
+
                 public void Reset() { throw new NotSupportedException(); }
             }
         }
@@ -1620,7 +1735,7 @@ namespace Unity.Linq
                 GameObject current;
                 Transform parent;
 
-                public Enumerator(Transform originTransform, bool withSelf, bool canRun)
+                internal Enumerator(Transform originTransform, bool withSelf, bool canRun)
                 {
                     this.originTransform = originTransform;
                     this.withSelf = withSelf;
@@ -1641,7 +1756,7 @@ namespace Unity.Linq
                     if (currentIndex < childCount)
                     {
                         var item = parent.GetChild(currentIndex);
-                        
+
                         if (item == originTransform)
                         {
                             goto RETURN_SELF;
@@ -1755,6 +1870,10 @@ namespace Unity.Linq
                 Enumerator enumerator; // enumerator is mutable
                 T current;
 
+#if UNITY_EDITOR
+                static List<T> componentCache = new List<T>(); // for no allocate on UNITY_EDITOR
+#endif
+
                 public OfComponentEnumerator(ref BeforeSelfEnumerable parent)
                 {
                     this.enumerator = parent.GetEnumerator();
@@ -1765,12 +1884,23 @@ namespace Unity.Linq
                 {
                     while (enumerator.MoveNext())
                     {
+#if UNITY_EDITOR
+                        enumerator.Current.GetComponents<T>(componentCache);
+                        if (componentCache.Count != 0)
+                        {
+                            current = componentCache[0];
+                            componentCache.Clear();
+                            return true;
+                        }
+#else
+                        
                         var component = enumerator.Current.GetComponent<T>();
                         if (component != null)
                         {
                             current = component;
                             return true;
                         }
+#endif
                     }
 
                     return false;
@@ -2040,7 +2170,7 @@ namespace Unity.Linq
                 GameObject current;
                 Transform parent;
 
-                public Enumerator(Transform originTransform, bool withSelf, bool canRun)
+                internal Enumerator(Transform originTransform, bool withSelf, bool canRun)
                 {
                     this.originTransform = originTransform;
                     this.withSelf = withSelf;
@@ -2164,6 +2294,10 @@ namespace Unity.Linq
                 Enumerator enumerator; // enumerator is mutable
                 T current;
 
+#if UNITY_EDITOR
+                static List<T> componentCache = new List<T>(); // for no allocate on UNITY_EDITOR
+#endif
+
                 public OfComponentEnumerator(ref AfterSelfEnumerable parent)
                 {
                     this.enumerator = parent.GetEnumerator();
@@ -2174,12 +2308,23 @@ namespace Unity.Linq
                 {
                     while (enumerator.MoveNext())
                     {
+#if UNITY_EDITOR
+                        enumerator.Current.GetComponents<T>(componentCache);
+                        if (componentCache.Count != 0)
+                        {
+                            current = componentCache[0];
+                            componentCache.Clear();
+                            return true;
+                        }
+#else
+                        
                         var component = enumerator.Current.GetComponent<T>();
                         if (component != null)
                         {
                             current = component;
                             return true;
                         }
+#endif
                     }
 
                     return false;
