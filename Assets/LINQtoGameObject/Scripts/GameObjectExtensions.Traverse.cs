@@ -1015,22 +1015,104 @@ namespace Unity.Linq
 
             #region LINQ
 
+            void ResizeArray<T>(ref int index, ref T[] array)
+            {
+                if (array.Length == index)
+                {
+                    var newSize = (index == 0) ? 4 : index * 2;
+                    Array.Resize(ref array, newSize);
+                }
+            }
+
+            void DescendantsCore(ref Transform transform, ref int index, ref GameObject[] array)
+            {
+                var childCount = transform.childCount;
+                for (int i = 0; i < childCount; i++)
+                {
+                    var child = transform.GetChild(i);
+
+                    ResizeArray(ref index, ref array);
+                    array[index++] = child.gameObject;
+                    DescendantsCore(ref child, ref index, ref array);
+                }
+            }
+
+            void DescendantsCore(ref Func<GameObject, bool> filter, ref Transform transform, ref int index, ref GameObject[] array)
+            {
+                var childCount = transform.childCount;
+                for (int i = 0; i < childCount; i++)
+                {
+                    var child = transform.GetChild(i);
+
+                    var childGameObject = child.gameObject;
+                    if (filter(childGameObject))
+                    {
+                        ResizeArray(ref index, ref array);
+                        array[index++] = childGameObject;
+                    }
+                    DescendantsCore(ref filter, ref child, ref index, ref array);
+                }
+            }
+
+            void DescendantsCore<T>(ref Func<GameObject, T> selector, ref Transform transform, ref int index, ref T[] array)
+            {
+                var childCount = transform.childCount;
+                for (int i = 0; i < childCount; i++)
+                {
+                    var child = transform.GetChild(i);
+
+                    ResizeArray(ref index, ref array);
+                    array[index++] = selector(child.gameObject);
+                    DescendantsCore(ref selector, ref child, ref index, ref array);
+                }
+            }
+
+            void DescendantsCore<T>(ref Func<GameObject, bool> filter, ref Func<GameObject, T> selector, ref Transform transform, ref int index, ref T[] array)
+            {
+                var childCount = transform.childCount;
+                for (int i = 0; i < childCount; i++)
+                {
+                    var child = transform.GetChild(i);
+
+                    var childGameObject = child.gameObject;
+                    if (filter(childGameObject))
+                    {
+                        ResizeArray(ref index, ref array);
+                        array[index++] = selector(childGameObject);
+                    }
+                    DescendantsCore(ref filter, ref selector, ref child, ref index, ref array);
+                }
+            }
+
+            void DescendantsCore<TState, T>(ref Func<GameObject, TState> let, ref Func<TState, bool> filter, ref Func<TState, T> selector, ref Transform transform, ref int index, ref T[] array)
+            {
+                var childCount = transform.childCount;
+                for (int i = 0; i < childCount; i++)
+                {
+                    var child = transform.GetChild(i);
+
+                    var state = let(child.gameObject);
+                    if (filter(state))
+                    {
+                        ResizeArray(ref index, ref array);
+                        array[index++] = selector(state);
+                    }
+                    DescendantsCore(ref let, ref filter, ref selector, ref child, ref index, ref array);
+                }
+            }
+
             /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
             public int ToArrayNonAlloc(ref GameObject[] array)
             {
                 var index = 0;
-
-                var e = this.GetEnumerator(); // does not need to call Dispose.
-                while (e.MoveNext())
+                if (withSelf)
                 {
-                    var item = e.Current;
-                    if (array.Length == index)
-                    {
-                        var newSize = (index == 0) ? 4 : index * 2;
-                        Array.Resize(ref array, newSize);
-                    }
-                    array[index++] = item;
+                    ResizeArray(ref index, ref array);
+                    array[index++] = origin;
                 }
+
+                var originTransform = origin.transform;
+                DescendantsCore(ref originTransform, ref index, ref array);
 
                 return index;
             }
@@ -1039,19 +1121,13 @@ namespace Unity.Linq
             public int ToArrayNonAlloc(Func<GameObject, bool> filter, ref GameObject[] array)
             {
                 var index = 0;
-                var e = this.GetEnumerator(); // does not need to call Dispose.
-                while (e.MoveNext())
+                if (withSelf && filter(origin))
                 {
-                    var item = e.Current;
-                    if (!filter(item)) continue;
-
-                    if (array.Length == index)
-                    {
-                        var newSize = (index == 0) ? 4 : index * 2;
-                        Array.Resize(ref array, newSize);
-                    }
-                    array[index++] = item;
+                    ResizeArray(ref index, ref array);
+                    array[index++] = origin;
                 }
+                var originTransform = origin.transform;
+                DescendantsCore(ref filter, ref originTransform, ref index, ref array);
 
                 return index;
             }
@@ -1060,17 +1136,13 @@ namespace Unity.Linq
             public int ToArrayNonAlloc<T>(Func<GameObject, T> selector, ref T[] array)
             {
                 var index = 0;
-                var e = this.GetEnumerator(); // does not need to call Dispose.
-                while (e.MoveNext())
+                if (withSelf)
                 {
-                    var item = e.Current;
-                    if (array.Length == index)
-                    {
-                        var newSize = (index == 0) ? 4 : index * 2;
-                        Array.Resize(ref array, newSize);
-                    }
-                    array[index++] = selector(item);
+                    ResizeArray(ref index, ref array);
+                    array[index++] = selector(origin);
                 }
+                var originTransform = origin.transform;
+                DescendantsCore(ref selector, ref originTransform, ref index, ref array);
 
                 return index;
             }
@@ -1079,19 +1151,13 @@ namespace Unity.Linq
             public int ToArrayNonAlloc<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector, ref T[] array)
             {
                 var index = 0;
-                var e = this.GetEnumerator(); // does not need to call Dispose.
-                while (e.MoveNext())
+                if (withSelf && filter(origin))
                 {
-                    var item = e.Current;
-                    if (!filter(item)) continue;
-
-                    if (array.Length == index)
-                    {
-                        var newSize = (index == 0) ? 4 : index * 2;
-                        Array.Resize(ref array, newSize);
-                    }
-                    array[index++] = selector(item);
+                    ResizeArray(ref index, ref array);
+                    array[index++] = selector(origin);
                 }
+                var originTransform = origin.transform;
+                DescendantsCore(ref filter, ref selector, ref originTransform, ref index, ref array);
 
                 return index;
             }
@@ -1100,21 +1166,18 @@ namespace Unity.Linq
             public int ToArrayNonAlloc<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector, ref T[] array)
             {
                 var index = 0;
-                var e = this.GetEnumerator(); // does not need to call Dispose.
-                while (e.MoveNext())
+                if (withSelf)
                 {
-                    var item = e.Current;
-                    var state = let(item);
-
-                    if (!filter(state)) continue;
-
-                    if (array.Length == index)
+                    var state = let(origin);
+                    if (filter(state))
                     {
-                        var newSize = (index == 0) ? 4 : index * 2;
-                        Array.Resize(ref array, newSize);
+                        ResizeArray(ref index, ref array);
+                        array[index++] = selector(state);
                     }
-                    array[index++] = selector(state);
                 }
+
+                var originTransform = origin.transform;
+                DescendantsCore(ref let, ref filter, ref selector, ref originTransform, ref index, ref array);
 
                 return index;
             }
@@ -1403,20 +1466,75 @@ namespace Unity.Linq
                     return array;
                 }
 
+#if UNITY_EDITOR
+                static List<T> componentCache = new List<T>(); // for no allocate on UNITY_EDITOR
+#endif
+
+                void OfComponentDescendantsCore(ref Transform transform, ref int index, ref T[] array)
+                {
+                    var childCount = transform.childCount;
+                    for (int i = 0; i < childCount; i++)
+                    {
+                        var child = transform.GetChild(i);
+
+                        T component = default(T);
+#if UNITY_EDITOR
+                        child.GetComponents<T>(componentCache);
+                        if (componentCache.Count != 0)
+                        {
+                            component = componentCache[0];
+                            componentCache.Clear();
+                        }
+#else
+                        component = child.GetComponent<T>();
+#endif
+
+                        if (component != null)
+                        {
+                            if (array.Length == index)
+                            {
+                                var newSize = (index == 0) ? 4 : index * 2;
+                                Array.Resize(ref array, newSize);
+                            }
+
+                            array[index++] = component;
+                        }
+                        OfComponentDescendantsCore(ref child, ref index, ref array);
+                    }
+                }
+
                 /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
                 public int ToArrayNonAlloc(ref T[] array)
                 {
                     var index = 0;
-                    var e = this.GetEnumerator();
-                    while (e.MoveNext())
+                    if (parent.withSelf)
                     {
-                        if (array.Length == index)
+                        T component = default(T);
+#if UNITY_EDITOR
+                        parent.origin.GetComponents<T>(componentCache);
+                        if (componentCache.Count != 0)
                         {
-                            var newSize = (index == 0) ? 4 : index * 2;
-                            Array.Resize(ref array, newSize);
+                            component = componentCache[0];
+                            componentCache.Clear();
                         }
-                        array[index++] = e.Current;
+#else
+                        component = parent.origin.GetComponent<T>();
+#endif
+
+                        if (component != null)
+                        {
+                            if (array.Length == index)
+                            {
+                                var newSize = (index == 0) ? 4 : index * 2;
+                                Array.Resize(ref array, newSize);
+                            }
+
+                            array[index++] = component;
+                        }
                     }
+
+                    var originTransform = parent.origin.transform;
+                    OfComponentDescendantsCore(ref originTransform, ref index, ref array);
 
                     return index;
                 }
