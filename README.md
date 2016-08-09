@@ -1,8 +1,8 @@
 LINQ to GameObject
 ===
-LINQ to GameObject is GameObject extensions for Unity that allows traverse hierarchy and append GameObject like LINQ to XML. You can install from [Unity Asset Store - LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object) as FREE. Unity Forums support thread, ask me any questions - [http://forum.unity3d.com/threads/linq-to-gameobject.292611/](http://forum.unity3d.com/threads/linq-to-gameobject.292611/)
+LINQ to GameObject is GameObject extensions for Unity that allows traverse hierarchy and append GameObject. The design aims both to get the power of LINQ and **performance** of iteration.
 
-LINQ to GameObject supports Unity 5 and uGUI's `RectTransform`.
+You can install from [Unity Asset Store - LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object) as FREE. Unity Forums support thread, ask me any questions - [http://forum.unity3d.com/threads/linq-to-gameobject.292611/](http://forum.unity3d.com/threads/linq-to-gameobject.292611/)
 
 Axis
 ---
@@ -36,7 +36,7 @@ origin.transform.root.gameObject
 var fooScripts = root.ChildrenAndSelf().OfComponent<FooScript>(); 
 ```
 
-> Note:LINQ to GameObject is optimized for iteration, returns struct enumerable and struct enumerator instead of `IEnumerable<GameObject>`. More details, see the [Peformance Tips](https://github.com/neuecc/LINQ-to-GameObject-for-Unity#performance-tips) section.
+> Note: LINQ to GameObject is optimized for iteration, returns struct enumerable and struct enumerator instead of `IEnumerable<GameObject>`. More details, see the [Peformance Tips](https://github.com/neuecc/LINQ-to-GameObject-for-Unity#performance-tips) section.
 
 How to use
 ---
