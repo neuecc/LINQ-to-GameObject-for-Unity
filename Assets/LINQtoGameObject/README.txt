@@ -184,7 +184,11 @@ void Update()
 
 `ToArray` and `ToArrayNonAlloc` have five overloads. `()`, `(Func<GameObject, T> selector)`, `(Func<GameObject, bool> filter)`, `(Func<GameObject, bool> filter, Func<GameObject, T> selector)`, `(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)` for Optimize `Where().Select().ToArray()` pattern.
 
-If you use simple iteration or `ToArrayNonAlloc`, LINQ to GameObject guarantees no gc allocate and performance is very fast. If you use `DescendantsAndSelf().OfComponent<T>()`, it may possible to substitude `GetComponentsInChildren<T>` that is always fast than LINQ traverse(because LINQ traverse can not have native magics). So you can substitude native methods, use it. If you needs other query, use LINQ.
+If you use simple iteration or use `ForEach` or `ToArrayNonAlloc`, LINQ to GameObject guarantees no gc allocate and performance is very fast.
+
+If you use `DescendantsAndSelf().OfComponent<T>()`, it may possible to substitude `GetComponentsInChildren<T>` that is always fast than LINQ traverse(because LINQ traverse can not have native magics). So you can substitude native methods, use it. If you needs other query, use LINQ.
+
+> Descendants(AndSelf) returns single Component on each GameObject, GetComponentsInChildren returns multiple GameObject, behaviour is different. LINQ to GameObject's Descendants is heavily optimized, internal iterator of `ForEach` and `ToArray` is specialize tuned.
  
 Author Info
 ---

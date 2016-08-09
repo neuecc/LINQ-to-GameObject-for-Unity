@@ -131,5 +131,37 @@ namespace UnityTest
             Origin.Child("Sphere_B").AfterSelfAndSelf().Where(x => x.name == "Sphere_B").Select(x => x.name)
                 .IsCollection("Sphere_B", "Sphere_B");
         }
+
+        [Test]
+        public void DescendantsVariation()
+        {
+            {
+                Origin.Descendants().ToArray().Select(x => x.name)
+                    .IsCollection("Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
+
+                Origin.Descendants().ToArray(x => x.name)
+                    .IsCollection("Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
+
+                Origin.Descendants().ToArray(x => x.name == "Sphere_B").Select(x => x.name).IsCollection("Sphere_B", "Sphere_B", "Sphere_B");
+
+                Origin.Descendants().ToArray(x => x.name == "Sphere_B", x => x.name).IsCollection("Sphere_B", "Sphere_B", "Sphere_B");
+
+                Origin.Descendants().ToArray(x => x.name, x => x == "Sphere_B", x => x).IsCollection("Sphere_B", "Sphere_B", "Sphere_B");
+
+
+                var l = new List<string>();
+                Origin.Descendants().ForEach(x => l.Add(x.name));
+                l.IsCollection("Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
+            }
+            {
+                Origin.Descendants().OfComponent<Transform>().ToArray().Select(x => x.name)
+    .IsCollection("Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
+
+
+                var l = new List<string>();
+                Origin.Descendants().OfComponent<Transform>().ForEach(x => l.Add(x.name));
+                l.IsCollection("Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
+            }
+        }
     }
 }

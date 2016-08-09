@@ -25,8 +25,8 @@ public class Perf : MonoBehaviour
                 var sw = System.Diagnostics.Stopwatch.StartNew();
 
                 Profiler.BeginSample("Perf:LINQ");
-                
-                var e = root.DescendantsAndSelf().OfComponent<Text>().GetEnumerator();
+
+                var e = root.DescendantsAndSelf().GetEnumerator();
                 while (e.MoveNext())
                 {
                     count++;
@@ -34,17 +34,32 @@ public class Perf : MonoBehaviour
                     //var _ = e.Current.GetComponent<Perf>();
                     //l1.Add(e.Current.name);
                 }
-                
+
                 Profiler.EndSample();
                 sw.Stop();
 
                 Debug.Log("LINQ:" + count + ":" + sw.Elapsed.TotalMilliseconds + "ms");
             }
+
+            {
+                var count = 0;
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+
+                Profiler.BeginSample("Perf:LINQ2");
+
+                root.DescendantsAndSelf().ForEach(_ => { });
+
+                Profiler.EndSample();
+                sw.Stop();
+
+                Debug.Log("LINQ ForEach:" + count + ":" + sw.Elapsed.TotalMilliseconds + "ms");
+            }
+
             {
                 var sw = System.Diagnostics.Stopwatch.StartNew();
 
                 Profiler.BeginSample("Perf:Native");
-                var e = root.GetComponentsInChildren<Text>(true);
+                var e = root.GetComponentsInChildren<Transform>(true);
                 Profiler.EndSample();
 
                 sw.Stop();
@@ -75,6 +90,17 @@ public class Perf : MonoBehaviour
 
         legacy.onClick.AddListener(() =>
         {
+            var count = 0;
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            Profiler.BeginSample("Perf:Legacy");
+            var e = LegacyDescendants(root, true).OfComponent<Text>().GetEnumerator();
+            while (e.MoveNext())
+            {
+                count++;
+            }
+            Profiler.EndSample();
+            sw.Stop();
+
         });
     }
 
