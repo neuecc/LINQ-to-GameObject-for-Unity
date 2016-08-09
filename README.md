@@ -188,7 +188,7 @@ If you use simple iteration or use `ForEach` or `ToArrayNonAlloc`, LINQ to GameO
 
 If you use `DescendantsAndSelf().OfComponent<T>()`, it may possible to substitude `GetComponentsInChildren<T>` that is always fast than LINQ traverse(because LINQ traverse can not have native magics). So you can substitude native methods, use it. If you needs other query, use LINQ.
 
-> Descendants(AndSelf) returns single Component on each GameObject, GetComponentsInChildren returns multiple GameObject, behaviour is different. LINQ to GameObject's Descendants is heavily optimized, internal iterator of `ForEach` and `ToArray` is specialize tuned.
+> Descendants(AndSelf) returns single Component on each GameObject, GetComponentsInChildren returns multiple Component on each GameObject, so behaviour is different. LINQ to GameObject's Descendants is heavily optimized, internal iterator of `ForEach` and `ToArray` is specialize tuned.
  
 Author Info
 ---
