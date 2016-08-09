@@ -158,6 +158,15 @@ namespace Unity.Linq
 
             #region LINQ
 
+            public void ForEach(Action<GameObject> action)
+            {
+                var e = this.GetEnumerator();
+                while (e.MoveNext())
+                {
+                    action(e.Current);
+                }
+            }
+
             /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
             public int ToArrayNonAlloc(ref GameObject[] array)
             {
@@ -416,6 +425,15 @@ namespace Unity.Linq
 
                 #region LINQ
 
+                public void ForEach(Action<T> action)
+                {
+                    var e = this.GetEnumerator();
+                    while (e.MoveNext())
+                    {
+                        action(e.Current);
+                    }
+                }
+
                 public T First()
                 {
                     var e = this.GetEnumerator();
@@ -581,6 +599,15 @@ namespace Unity.Linq
             }
 
             #region LINQ
+
+            public void ForEach(Action<GameObject> action)
+            {
+                var e = this.GetEnumerator();
+                while (e.MoveNext())
+                {
+                    action(e.Current);
+                }
+            }
 
             /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
             public int ToArrayNonAlloc(ref GameObject[] array)
@@ -835,6 +862,15 @@ namespace Unity.Linq
 
                 #region LINQ
 
+                public void ForEach(Action<T> action)
+                {
+                    var e = this.GetEnumerator();
+                    while (e.MoveNext())
+                    {
+                        action(e.Current);
+                    }
+                }
+
                 public T First()
                 {
                     var e = this.GetEnumerator();
@@ -1024,6 +1060,18 @@ namespace Unity.Linq
                 }
             }
 
+            void DescendantsCore(ref Transform transform, ref Action<GameObject> action)
+            {
+                var childCount = transform.childCount;
+                for (int i = 0; i < childCount; i++)
+                {
+                    var child = transform.GetChild(i);
+
+                    action(child.gameObject);
+                    DescendantsCore(ref child, ref action);
+                }
+            }
+
             void DescendantsCore(ref Transform transform, ref int index, ref GameObject[] array)
             {
                 var childCount = transform.childCount;
@@ -1099,6 +1147,18 @@ namespace Unity.Linq
                     }
                     DescendantsCore(ref let, ref filter, ref selector, ref child, ref index, ref array);
                 }
+            }
+
+            /// <summary>Use internal iterator for performance optimization.</summary>
+            /// <param name="action"></param>
+            public void ForEach(Action<GameObject> action)
+            {
+                if (withSelf)
+                {
+                    action(origin);
+                }
+                var originTransform = origin.transform;
+                DescendantsCore(ref originTransform, ref action);
             }
 
             /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
@@ -1455,6 +1515,34 @@ namespace Unity.Linq
                     }
                 }
 
+                /// <summary>Use internal iterator for performance optimization.</summary>
+                public void ForEach(Action<T> action)
+                {
+                    if (parent.withSelf)
+                    {
+                        T component = default(T);
+#if UNITY_EDITOR
+                        parent.origin.GetComponents<T>(componentCache);
+                        if (componentCache.Count != 0)
+                        {
+                            component = componentCache[0];
+                            componentCache.Clear();
+                        }
+#else
+                        component = parent.origin.GetComponent<T>();
+#endif
+
+                        if (component != null)
+                        {
+                            action(component);
+                        }
+                    }
+
+                    var originTransform = parent.origin.transform;
+                    OfComponentDescendantsCore(ref originTransform, ref action);
+                }
+
+
                 public T[] ToArray()
                 {
                     var array = new T[4];
@@ -1469,6 +1557,33 @@ namespace Unity.Linq
 #if UNITY_EDITOR
                 static List<T> componentCache = new List<T>(); // for no allocate on UNITY_EDITOR
 #endif
+
+                void OfComponentDescendantsCore(ref Transform transform, ref Action<T> action)
+                {
+                    var childCount = transform.childCount;
+                    for (int i = 0; i < childCount; i++)
+                    {
+                        var child = transform.GetChild(i);
+
+                        T component = default(T);
+#if UNITY_EDITOR
+                        child.GetComponents<T>(componentCache);
+                        if (componentCache.Count != 0)
+                        {
+                            component = componentCache[0];
+                            componentCache.Clear();
+                        }
+#else
+                        component = child.GetComponent<T>();
+#endif
+
+                        if (component != null)
+                        {
+                            action(component);
+                        }
+                        OfComponentDescendantsCore(ref child, ref action);
+                    }
+                }
 
                 void OfComponentDescendantsCore(ref Transform transform, ref int index, ref T[] array)
                 {
@@ -1659,6 +1774,15 @@ namespace Unity.Linq
             }
 
             #region LINQ
+
+            public void ForEach(Action<GameObject> action)
+            {
+                var e = this.GetEnumerator();
+                while (e.MoveNext())
+                {
+                    action(e.Current);
+                }
+            }
 
             /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
             public int ToArrayNonAlloc(ref GameObject[] array)
@@ -1929,6 +2053,15 @@ namespace Unity.Linq
 
                 #region LINQ
 
+                public void ForEach(Action<T> action)
+                {
+                    var e = this.GetEnumerator();
+                    while (e.MoveNext())
+                    {
+                        action(e.Current);
+                    }
+                }
+
                 public T First()
                 {
                     var e = this.GetEnumerator();
@@ -2094,6 +2227,15 @@ namespace Unity.Linq
             }
 
             #region LINQ
+
+            public void ForEach(Action<GameObject> action)
+            {
+                var e = this.GetEnumerator();
+                while (e.MoveNext())
+                {
+                    action(e.Current);
+                }
+            }
 
             /// <summary>Store element into the buffer, return number is size. array is automaticaly expanded.</summary>
             public int ToArrayNonAlloc(ref GameObject[] array)
@@ -2352,6 +2494,15 @@ namespace Unity.Linq
                 }
 
                 #region LINQ
+
+                public void ForEach(Action<T> action)
+                {
+                    var e = this.GetEnumerator();
+                    while (e.MoveNext())
+                    {
+                        action(e.Current);
+                    }
+                }
 
                 public T First()
                 {

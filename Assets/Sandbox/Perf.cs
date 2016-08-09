@@ -35,7 +35,6 @@ public class Perf : MonoBehaviour
                     //l1.Add(e.Current.name);
                 }
                 
-                
                 Profiler.EndSample();
                 sw.Stop();
 
