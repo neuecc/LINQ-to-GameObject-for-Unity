@@ -92,11 +92,6 @@ namespace UnityTest
         [Test]
         public void BeforeSelf()
         {
-            foreach (var item in Origin.BeforeSelf())
-            {
-                UnityEngine.Debug.Log(item);
-            }
-
             Origin.BeforeSelf().Select(x => x.name)
                 .IsCollection("C1", "C2");
 
@@ -161,6 +156,72 @@ namespace UnityTest
                 var l = new List<string>();
                 Origin.Descendants().OfComponent<Transform>().ForEach(x => l.Add(x.name));
                 l.IsCollection("Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
+            }
+        }
+
+
+
+        [Test]
+        public void DescendantsDescendIntoChildren()
+        {
+            {
+                Origin.Descendants(_ => true).Select(x => x.name)
+                    .IsCollection("Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
+
+                Origin.DescendantsAndSelf(_ => true).Select(x => x.name)
+                    .IsCollection("Origin", "Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
+
+                Origin.Descendants(_ => false).Select(x => x.name)
+                    .Count().Is(0);
+
+                Origin.DescendantsAndSelf(_ => false).Select(x => x.name)
+                    .IsCollection("Origin");
+
+                Origin.Descendants(x => x.name != "Group").Select(x => x.name)
+                    .IsCollection("Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
+
+                Origin.DescendantsAndSelf(x => x.name != "Group").Select(x => x.name)
+                    .IsCollection("Origin", "Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
+            }
+            {
+                // ToArray optimized path check
+                Origin.Descendants(_ => true).ToArray().Select(x => x.name)
+                    .IsCollection("Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
+
+                Origin.DescendantsAndSelf(_ => true).ToArray().Select(x => x.name)
+                    .IsCollection("Origin", "Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
+
+                Origin.Descendants(_ => false).ToArray().Select(x => x.name)
+                    .Count().Is(0);
+
+                Origin.DescendantsAndSelf(_ => false).ToArray().Select(x => x.name)
+                    .IsCollection("Origin");
+
+                Origin.Descendants(x => x.name != "Group").ToArray().Select(x => x.name)
+                    .IsCollection("Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
+
+                Origin.DescendantsAndSelf(x => x.name != "Group").ToArray().Select(x => x.name)
+                    .IsCollection("Origin", "Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
+            }
+            {
+                // OfComponent Optimized path check
+                Origin.Descendants(_ => true).OfComponent<Transform>().ToArray().Select(x => x.name)
+                    .IsCollection("Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
+
+                Origin.DescendantsAndSelf(_ => true).OfComponent<Transform>().ToArray().Select(x => x.name)
+                    .IsCollection("Origin", "Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B");
+
+                Origin.Descendants(_ => false).OfComponent<Transform>().ToArray().Select(x => x.name)
+                    .Count().Is(0);
+
+                Origin.DescendantsAndSelf(_ => false).OfComponent<Transform>().ToArray().Select(x => x.name)
+                    .IsCollection("Origin");
+
+                Origin.Descendants(x => x.name != "Group").OfComponent<Transform>().ToArray().Select(x => x.name)
+                    .IsCollection("Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
+
+                Origin.DescendantsAndSelf(x => x.name != "Group").OfComponent<Transform>().ToArray().Select(x => x.name)
+                    .IsCollection("Origin", "Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
             }
         }
     }

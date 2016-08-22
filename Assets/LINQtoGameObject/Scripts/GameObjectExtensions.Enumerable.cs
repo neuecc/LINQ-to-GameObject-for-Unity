@@ -33,11 +33,11 @@ namespace Unity.Linq
         }
 
         /// <summary>Returns a collection of GameObjects that contains the descendant GameObjects of every GameObject in the source collection.</summary>
-        public static IEnumerable<GameObject> Descendants(this IEnumerable<GameObject> source)
+        public static IEnumerable<GameObject> Descendants(this IEnumerable<GameObject> source, Func<Transform, bool> descendIntoChildren = null)
         {
             foreach (var item in source)
             {
-                var e = item.Descendants().GetEnumerator();
+                var e = item.Descendants(descendIntoChildren).GetEnumerator();
                 while (e.MoveNext())
                 {
                     yield return e.Current;
@@ -46,11 +46,11 @@ namespace Unity.Linq
         }
 
         /// <summary>Returns a collection of GameObjects that contains every GameObject in the source collection, and the descendent GameObjects of every GameObject in the source collection.</summary>
-        public static IEnumerable<GameObject> DescendantsAndSelf(this IEnumerable<GameObject> source)
+        public static IEnumerable<GameObject> DescendantsAndSelf(this IEnumerable<GameObject> source, Func<Transform, bool> descendIntoChildren = null)
         {
             foreach (var item in source)
             {
-                var e = item.DescendantsAndSelf().GetEnumerator();
+                var e = item.DescendantsAndSelf(descendIntoChildren).GetEnumerator();
                 while (e.MoveNext())
                 {
                     yield return e.Current;

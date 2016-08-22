@@ -71,7 +71,6 @@ namespace Unity.Linq.Sample
                 }
             }
 
-
             using (new GUILayout.HorizontalScope())
             {
                 if (GUILayout.Button("Descendants"))
@@ -87,6 +86,18 @@ namespace Unity.Linq.Sample
                 {
                     Debug.Log("------DescendantsAndSelf");
                     foreach (var item in origin.DescendantsAndSelf())
+                    {
+                        Debug.Log(item.name);
+                    }
+                }
+            }
+
+            using (new GUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("Descendants:DescendIntoChildren"))
+                {
+                    Debug.Log("------Descendants:DescendIntoChildren");
+                    foreach (var item in origin.Descendants(x => x.name != "Group"))
                     {
                         Debug.Log(item.name);
                     }

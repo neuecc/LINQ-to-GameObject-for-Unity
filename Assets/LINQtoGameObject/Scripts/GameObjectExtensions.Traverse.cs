@@ -57,15 +57,15 @@ namespace Unity.Linq
         }
 
         /// <summary>Returns a collection of the descendant GameObjects.</summary>
-        public static DescendantsEnumerable Descendants(this GameObject origin)
+        public static DescendantsEnumerable Descendants(this GameObject origin, Func<Transform, bool> descendIntoChildren = null)
         {
-            return new DescendantsEnumerable(origin, false);
+            return new DescendantsEnumerable(origin, false, descendIntoChildren);
         }
 
         /// <summary>Returns a collection of GameObjects that contain this GameObject, and all descendant GameObjects of this GameObject.</summary>
-        public static DescendantsEnumerable DescendantsAndSelf(this GameObject origin)
+        public static DescendantsEnumerable DescendantsAndSelf(this GameObject origin, Func<Transform, bool> descendIntoChildren = null)
         {
-            return new DescendantsEnumerable(origin, true);
+            return new DescendantsEnumerable(origin, true, descendIntoChildren);
         }
 
         /// <summary>Returns a collection of the sibling GameObjects before this GameObject.</summary>
@@ -975,13 +975,17 @@ namespace Unity.Linq
 
         public struct DescendantsEnumerable : IEnumerable<GameObject>
         {
+            static readonly Func<Transform, bool> alwaysTrue = _ => true;
+
             readonly GameObject origin;
             readonly bool withSelf;
+            readonly Func<Transform, bool> descendIntoChildren;
 
-            public DescendantsEnumerable(GameObject origin, bool withSelf)
+            public DescendantsEnumerable(GameObject origin, bool withSelf, Func<Transform, bool> descendIntoChildren)
             {
                 this.origin = origin;
                 this.withSelf = withSelf;
+                this.descendIntoChildren = descendIntoChildren ?? alwaysTrue;
             }
 
             /// <summary>Returns a collection of specified component in the source collection.</summary>
@@ -1022,7 +1026,7 @@ namespace Unity.Linq
                 // check GameObject is destroyed only on GetEnumerator timing
                 if (origin == null)
                 {
-                    return new Enumerator(null, withSelf, false, null);
+                    return new Enumerator(null, withSelf, false, null, descendIntoChildren);
                 }
 
                 InternalUnsafeRefStack refStack;
@@ -1036,7 +1040,7 @@ namespace Unity.Linq
                     refStack = new InternalUnsafeRefStack(6);
                 }
 
-                return new Enumerator(origin.transform, withSelf, true, refStack);
+                return new Enumerator(origin.transform, withSelf, true, refStack, descendIntoChildren);
             }
 
             IEnumerator<GameObject> IEnumerable<GameObject>.GetEnumerator()
@@ -1062,11 +1066,12 @@ namespace Unity.Linq
 
             void DescendantsCore(ref Transform transform, ref Action<GameObject> action)
             {
+                if (!descendIntoChildren(transform)) return;
+
                 var childCount = transform.childCount;
                 for (int i = 0; i < childCount; i++)
                 {
                     var child = transform.GetChild(i);
-
                     action(child.gameObject);
                     DescendantsCore(ref child, ref action);
                 }
@@ -1074,11 +1079,12 @@ namespace Unity.Linq
 
             void DescendantsCore(ref Transform transform, ref int index, ref GameObject[] array)
             {
+                if (!descendIntoChildren(transform)) return;
+
                 var childCount = transform.childCount;
                 for (int i = 0; i < childCount; i++)
                 {
                     var child = transform.GetChild(i);
-
                     ResizeArray(ref index, ref array);
                     array[index++] = child.gameObject;
                     DescendantsCore(ref child, ref index, ref array);
@@ -1087,11 +1093,12 @@ namespace Unity.Linq
 
             void DescendantsCore(ref Func<GameObject, bool> filter, ref Transform transform, ref int index, ref GameObject[] array)
             {
+                if (!descendIntoChildren(transform)) return;
+
                 var childCount = transform.childCount;
                 for (int i = 0; i < childCount; i++)
                 {
                     var child = transform.GetChild(i);
-
                     var childGameObject = child.gameObject;
                     if (filter(childGameObject))
                     {
@@ -1104,11 +1111,12 @@ namespace Unity.Linq
 
             void DescendantsCore<T>(ref Func<GameObject, T> selector, ref Transform transform, ref int index, ref T[] array)
             {
+                if (!descendIntoChildren(transform)) return;
+
                 var childCount = transform.childCount;
                 for (int i = 0; i < childCount; i++)
                 {
                     var child = transform.GetChild(i);
-
                     ResizeArray(ref index, ref array);
                     array[index++] = selector(child.gameObject);
                     DescendantsCore(ref selector, ref child, ref index, ref array);
@@ -1117,11 +1125,12 @@ namespace Unity.Linq
 
             void DescendantsCore<T>(ref Func<GameObject, bool> filter, ref Func<GameObject, T> selector, ref Transform transform, ref int index, ref T[] array)
             {
+                if (!descendIntoChildren(transform)) return;
+
                 var childCount = transform.childCount;
                 for (int i = 0; i < childCount; i++)
                 {
                     var child = transform.GetChild(i);
-
                     var childGameObject = child.gameObject;
                     if (filter(childGameObject))
                     {
@@ -1134,11 +1143,12 @@ namespace Unity.Linq
 
             void DescendantsCore<TState, T>(ref Func<GameObject, TState> let, ref Func<TState, bool> filter, ref Func<TState, T> selector, ref Transform transform, ref int index, ref T[] array)
             {
+                if (!descendIntoChildren(transform)) return;
+
                 var childCount = transform.childCount;
                 for (int i = 0; i < childCount; i++)
                 {
                     var child = transform.GetChild(i);
-
                     var state = let(child.gameObject);
                     if (filter(state))
                     {
@@ -1372,8 +1382,9 @@ namespace Unity.Linq
                 int currentIndex;
                 GameObject current;
                 InternalUnsafeRefStack sharedStack;
+                Func<Transform, bool> descendIntoChildren;
 
-                internal Enumerator(Transform originTransform, bool withSelf, bool canRun, InternalUnsafeRefStack sharedStack)
+                internal Enumerator(Transform originTransform, bool withSelf, bool canRun, InternalUnsafeRefStack sharedStack, Func<Transform, bool> descendIntoChildren)
                 {
                     this.originTransform = originTransform;
                     this.withSelf = withSelf;
@@ -1382,6 +1393,7 @@ namespace Unity.Linq
                     this.canRun = canRun;
                     this.current = null;
                     this.sharedStack = sharedStack;
+                    this.descendIntoChildren = descendIntoChildren;
                 }
 
                 public bool MoveNext()
@@ -1394,6 +1406,14 @@ namespace Unity.Linq
                         {
                             return true;
                         }
+                    }
+
+                    if (!withSelf && !descendIntoChildren(originTransform))
+                    {
+                        // reuse
+                        canRun = false;
+                        InternalUnsafeRefStack.RefStackPool.Enqueue(sharedStack);
+                        return false;
                     }
 
                     if (MoveNextCore(false, out current))
@@ -1418,20 +1438,26 @@ namespace Unity.Linq
                         return true;
                     }
 
-                    currentIndex++;
+                    ++currentIndex;
                     if (currentIndex < childCount)
                     {
                         var item = originTransform.GetChild(currentIndex);
-                        var childEnumerator = new Enumerator(item, true, true, sharedStack);
-                        sharedStack.Push(ref childEnumerator);
-                        return sharedStack.array[sharedStack.size - 1].MoveNextCore(true, out current);
-                    }
-                    else
-                    {
-                        if (peek)
+                        if (descendIntoChildren(item))
                         {
-                            sharedStack.size--; // Pop
+                            var childEnumerator = new Enumerator(item, true, true, sharedStack, descendIntoChildren);
+                            sharedStack.Push(ref childEnumerator);
+                            return sharedStack.array[sharedStack.size - 1].MoveNextCore(true, out current);
                         }
+                        else
+                        {
+                            current = item.gameObject;
+                            return true;
+                        }
+                    }
+
+                    if (peek)
+                    {
+                        sharedStack.size--; // Pop
                     }
 
                     current = null;
@@ -1560,6 +1586,8 @@ namespace Unity.Linq
 
                 void OfComponentDescendantsCore(ref Transform transform, ref Action<T> action)
                 {
+                    if (!parent.descendIntoChildren(transform)) return;
+
                     var childCount = transform.childCount;
                     for (int i = 0; i < childCount; i++)
                     {
@@ -1587,11 +1615,12 @@ namespace Unity.Linq
 
                 void OfComponentDescendantsCore(ref Transform transform, ref int index, ref T[] array)
                 {
+                    if (!parent.descendIntoChildren(transform)) return;
+
                     var childCount = transform.childCount;
                     for (int i = 0; i < childCount; i++)
                     {
                         var child = transform.GetChild(i);
-
                         T component = default(T);
 #if UNITY_EDITOR
                         child.GetComponents<T>(componentCache);
