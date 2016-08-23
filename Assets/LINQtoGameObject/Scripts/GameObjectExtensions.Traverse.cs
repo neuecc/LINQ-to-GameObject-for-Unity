@@ -114,12 +114,25 @@ namespace Unity.Linq
 
             /// <summary>Destroy every GameObject in the source collection safety(check null).</summary>
             /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
-            public void Destroy(bool useDestroyImmediate = false)
+            /// <param name="detachParent">set to parent = null.</param>
+            public void Destroy(bool useDestroyImmediate = false, bool detachParent = false)
             {
                 var e = GetEnumerator();
                 while (e.MoveNext())
                 {
                     e.Current.Destroy(useDestroyImmediate, false);
+                }
+                if (detachParent)
+                {
+                    origin.transform.DetachChildren();
+                    if (withSelf)
+                    {
+#if !(UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5)
+                        origin.transform.SetParent(null);
+#else
+                        origin.transform.parent = null;
+#endif
+                    }
                 }
             }
 
