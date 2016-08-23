@@ -86,11 +86,24 @@ namespace Unity.Linq
 
         /// <summary>Destroy every GameObject in the source collection safety(check null).</summary>
         /// <param name="useDestroyImmediate">If in EditMode, should be true or pass !Application.isPlaying.</param>
-        public static void Destroy(this IEnumerable<GameObject> source, bool useDestroyImmediate = false)
+        /// <param name="detachParent">set to parent = null.</param>
+        public static void Destroy(this IEnumerable<GameObject> source, bool useDestroyImmediate = false, bool detachParent = false)
         {
-            foreach (var item in source)
+            if (detachParent)
             {
-                item.Destroy(useDestroyImmediate, false); // doesn't detach.
+                var l = new List<GameObject>(source); // avoid halloween problem
+                var e = l.GetEnumerator(); // get struct enumerator for avoid unity's compiler bug(avoid boxing)
+                while (e.MoveNext())
+                {
+                    e.Current.Destroy(useDestroyImmediate, true);
+                }
+            }
+            else
+            {
+                foreach (var item in source)
+                {
+                    item.Destroy(useDestroyImmediate, false); // doesn't detach.
+                }
             }
         }
 
