@@ -41,21 +41,30 @@ namespace UnityTest
         [Test]
         public void Children()
         {
-            Origin.Children().Select(x => x.name)
-                .IsCollection("Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
+            {
+                Origin.Children().Select(x => x.name)
+                    .IsCollection("Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
 
-            Origin.Children()
-                .Where(x => x.name == "Sphere_B")
-                .Select(x => x.name)
-                .IsCollection("Sphere_B", "Sphere_B");
+                Origin.Children()
+                    .Where(x => x.name == "Sphere_B")
+                    .Select(x => x.name)
+                    .IsCollection("Sphere_B", "Sphere_B");
 
-            Origin.ChildrenAndSelf().Select(x => x.name)
-                .IsCollection("Origin", "Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
+                Origin.ChildrenAndSelf().Select(x => x.name)
+                    .IsCollection("Origin", "Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
 
-            Origin.ChildrenAndSelf()
-                .Where(x => x.name == "Sphere_A")
-                .Select(x => x.name)
-                .IsCollection("Sphere_A", "Sphere_A");
+                Origin.ChildrenAndSelf()
+                    .Where(x => x.name == "Sphere_A")
+                    .Select(x => x.name)
+                    .IsCollection("Sphere_A", "Sphere_A");
+            }
+            {
+                Origin.Children().ToArray().Select(x => x.name)
+                    .IsCollection("Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
+
+                Origin.ChildrenAndSelf().ToArray().Select(x => x.name)
+                    .IsCollection("Origin", "Sphere_A", "Sphere_B", "Group", "Sphere_A", "Sphere_B");
+            }
         }
 
         [Test]

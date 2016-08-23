@@ -158,6 +158,11 @@ namespace Unity.Linq
 
             #region LINQ
 
+            int GetChildrenSize()
+            {
+                return origin.transform.childCount + (withSelf ? 1 : 0);
+            }
+
             public void ForEach(Action<GameObject> action)
             {
                 var e = this.GetEnumerator();
@@ -178,7 +183,7 @@ namespace Unity.Linq
                     var item = e.Current;
                     if (array.Length == index)
                     {
-                        var newSize = (index == 0) ? 4 : index * 2;
+                        var newSize = (index == 0) ? GetChildrenSize() : index * 2;
                         Array.Resize(ref array, newSize);
                     }
                     array[index++] = item;
@@ -199,7 +204,7 @@ namespace Unity.Linq
 
                     if (array.Length == index)
                     {
-                        var newSize = (index == 0) ? 4 : index * 2;
+                        var newSize = (index == 0) ? GetChildrenSize() : index * 2;
                         Array.Resize(ref array, newSize);
                     }
                     array[index++] = item;
@@ -218,7 +223,7 @@ namespace Unity.Linq
                     var item = e.Current;
                     if (array.Length == index)
                     {
-                        var newSize = (index == 0) ? 4 : index * 2;
+                        var newSize = (index == 0) ? GetChildrenSize() : index * 2;
                         Array.Resize(ref array, newSize);
                     }
                     array[index++] = selector(item);
@@ -239,7 +244,7 @@ namespace Unity.Linq
 
                     if (array.Length == index)
                     {
-                        var newSize = (index == 0) ? 4 : index * 2;
+                        var newSize = (index == 0) ? GetChildrenSize() : index * 2;
                         Array.Resize(ref array, newSize);
                     }
                     array[index++] = selector(item);
@@ -262,7 +267,7 @@ namespace Unity.Linq
 
                     if (array.Length == index)
                     {
-                        var newSize = (index == 0) ? 4 : index * 2;
+                        var newSize = (index == 0) ? GetChildrenSize() : index * 2;
                         Array.Resize(ref array, newSize);
                     }
                     array[index++] = selector(state);
@@ -273,7 +278,7 @@ namespace Unity.Linq
 
             public GameObject[] ToArray()
             {
-                var array = new GameObject[4];
+                var array = new GameObject[GetChildrenSize()];
                 var len = ToArrayNonAlloc(ref array);
                 if (array.Length != len)
                 {
@@ -284,7 +289,7 @@ namespace Unity.Linq
 
             public GameObject[] ToArray(Func<GameObject, bool> filter)
             {
-                var array = new GameObject[4];
+                var array = new GameObject[GetChildrenSize()];
                 var len = ToArrayNonAlloc(filter, ref array);
                 if (array.Length != len)
                 {
@@ -295,7 +300,7 @@ namespace Unity.Linq
 
             public T[] ToArray<T>(Func<GameObject, T> selector)
             {
-                var array = new T[4];
+                var array = new T[GetChildrenSize()];
                 var len = ToArrayNonAlloc<T>(selector, ref array);
                 if (array.Length != len)
                 {
@@ -306,7 +311,7 @@ namespace Unity.Linq
 
             public T[] ToArray<T>(Func<GameObject, bool> filter, Func<GameObject, T> selector)
             {
-                var array = new T[4];
+                var array = new T[GetChildrenSize()];
                 var len = ToArrayNonAlloc(filter, selector, ref array);
                 if (array.Length != len)
                 {
@@ -317,7 +322,7 @@ namespace Unity.Linq
 
             public T[] ToArray<TState, T>(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)
             {
-                var array = new T[4];
+                var array = new T[GetChildrenSize()];
                 var len = ToArrayNonAlloc(let, filter, selector, ref array);
                 if (array.Length != len)
                 {
@@ -457,7 +462,7 @@ namespace Unity.Linq
 
                 public T[] ToArray()
                 {
-                    var array = new T[4];
+                    var array = new T[parent.GetChildrenSize()];
                     var len = ToArrayNonAlloc(ref array);
                     if (array.Length != len)
                     {
@@ -475,7 +480,7 @@ namespace Unity.Linq
                     {
                         if (array.Length == index)
                         {
-                            var newSize = (index == 0) ? 4 : index * 2;
+                            var newSize = (index == 0) ? parent.GetChildrenSize() : index * 2;
                             Array.Resize(ref array, newSize);
                         }
                         array[index++] = e.Current;
