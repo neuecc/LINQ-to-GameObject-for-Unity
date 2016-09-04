@@ -1,8 +1,8 @@
 LINQ to GameObject
 ===
-LINQ to GameObject is GameObject extensions for Unity that allows traverse hierarchy and append GameObject like LINQ to XML. You can install from [Unity Asset Store - LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object) as FREE. Unity Forums support thread, ask me any questions - [http://forum.unity3d.com/threads/linq-to-gameobject.292611/](http://forum.unity3d.com/threads/linq-to-gameobject.292611/)
+LINQ to GameObject is GameObject extensions for Unity that allows traverse hierarchy and append GameObject. The design aims both to get the power of LINQ and **performance** of iteration.
 
-LINQ to GameObject supports Unity 5 and uGUI's `RectTransform`.
+You can install from [Unity Asset Store - LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object) as FREE. Unity Forums support thread, ask me any questions - [http://forum.unity3d.com/threads/linq-to-gameobject.292611/](http://forum.unity3d.com/threads/linq-to-gameobject.292611/)
 
 Axis
 ---
@@ -36,7 +36,7 @@ origin.transform.root.gameObject
 var fooScripts = root.ChildrenAndSelf().OfComponent<FooScript>(); 
 ```
 
-> Note:LINQ to GameObject is optimized for iteration, returns struct enumerable and struct enumerator instead of `IEnumerable<GameObject>`. More details, see the [Peformance Tips](https://github.com/neuecc/LINQ-to-GameObject-for-Unity#performance-tips) section.
+> Note: LINQ to GameObject is optimized for iteration, returns struct enumerable and struct enumerator instead of `IEnumerable<GameObject>`. More details, see the [Peformance Tips](https://github.com/neuecc/LINQ-to-GameObject-for-Unity#performance-tips) section.
 
 How to use
 ---
@@ -92,6 +92,8 @@ BeforeSelf|Returns a collection of the sibling GameObjects before this GameObjec
 BeforeSelfAndSelf|Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects before this GameObject.
 AfterSelf|Returns a collection of the sibling GameObjects after this GameObject.
 AfterSelfAndSelf|Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects after this GameObject.
+
+`Descendants` has `descendIntoChildren` overload, it stops traverse children when does not match condition.
 
 Reference : Operate
 ---
@@ -162,7 +164,7 @@ Performance Tips
 ---
 LINQ to GameObject is optimized heavily. Traverse methods returns hand optimized struct enumerator so it can avoid garbage when enumerate.
 
-> Unity compiler has bugs so can not avoid IDisposable boxing cost. But Unity 5.5 will upgrade compiler and beats the bugs...
+> Unity compiler has bugs so can not avoid IDisposable boxing cost. But Unity 5.5 upgrade compiler and it was fixed, yeah!
 
 Some LINQ methods are optimized. `First`, `FirstOrDefault`, `ToArray` path through the optimized path.
 
@@ -188,7 +190,7 @@ If you use simple iteration or use `ForEach` or `ToArrayNonAlloc`, LINQ to GameO
 
 If you use `DescendantsAndSelf().OfComponent<T>()`, it may possible to substitude `GetComponentsInChildren<T>` that is always fast than LINQ traverse(because LINQ traverse can not have native magics). So you can substitude native methods, use it. If you needs other query, use LINQ.
 
-> Descendants(AndSelf) returns single Component on each GameObject, GetComponentsInChildren returns multiple GameObject, behaviour is different. LINQ to GameObject's Descendants is heavily optimized, internal iterator of `ForEach` and `ToArray` is specialize tuned.
+> Descendants(AndSelf) returns single Component on each GameObject, GetComponentsInChildren returns multiple Component on each GameObject, so behaviour is different. LINQ to GameObject's Descendants is heavily optimized, internal iterator of `ForEach` and `ToArray` is specialize tuned.
  
 Author Info
 ---

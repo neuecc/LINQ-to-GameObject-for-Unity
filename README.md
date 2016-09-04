@@ -93,6 +93,8 @@ BeforeSelfAndSelf|Returns a collection of GameObjects that contain this GameObje
 AfterSelf|Returns a collection of the sibling GameObjects after this GameObject.
 AfterSelfAndSelf|Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects after this GameObject.
 
+`Descendants` has `descendIntoChildren` overload, it stops traverse children when does not match condition.
+
 Reference : Operate
 ---
 Operate methods have four optional parameter. `cloneType` configure cloned child GameObject's localPosition/Scale/Rotation, default copies original local transform. `setActive` configure activates/deactivates child GameObject. If null, doesn't set specified value. `specifiedName` configure set name of child GameObject. If null, doesn't set specified value. `setLayer` configure set child GameObject's layer same with parent, default doesn't set layer.
@@ -162,7 +164,7 @@ Performance Tips
 ---
 LINQ to GameObject is optimized heavily. Traverse methods returns hand optimized struct enumerator so it can avoid garbage when enumerate.
 
-> Unity compiler has bugs so can not avoid IDisposable boxing cost. But Unity 5.5 will upgrade compiler and beats the bugs...
+> Unity compiler has bugs so can not avoid IDisposable boxing cost. But Unity 5.5 upgrade compiler and it was fixed, yeah!
 
 Some LINQ methods are optimized. `First`, `FirstOrDefault`, `ToArray` path through the optimized path.
 
