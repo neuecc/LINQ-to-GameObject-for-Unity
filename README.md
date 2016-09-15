@@ -200,7 +200,7 @@ Grani is top social game developer in Japan.
 He awarded Microsoft MVP for Visual C# since 2011.  
 He is known by creator of [linq.js](http://linqjs.codeplex.com/)(LINQ to Objects for JavaScript) and [UniRx](https://github.com/neuecc/UniRx)(Reactive Extensions for Unity)
 
-Blog: https://medium.com/@neuecc (ENG) 
+Blog: https://medium.com/@neuecc (ENG)   
 Blog: http://neue.cc/ (JPN)  
 Twitter: https://twitter.com/neuecc (JPN)
 
