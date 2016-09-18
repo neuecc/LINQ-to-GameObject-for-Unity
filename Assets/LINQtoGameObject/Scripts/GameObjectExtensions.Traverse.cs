@@ -9,7 +9,7 @@ namespace Unity.Linq
 
     public static partial class GameObjectExtensions
     {
-        // Traverse Game Objects, based on Axis(Parent, Child, Children, Ancestors/Descendants, BeforeSelf/ObjectsBeforeAfter)
+        // Traverse Game Objects, based on Axis(Parent, Child, Children, Ancestors/Descendants, BeforeSelf/BeforeAfter)
 
         /// <summary>Gets the parent GameObject of this GameObject. If this GameObject has no parent, returns null.</summary>
         public static GameObject Parent(this GameObject origin)
