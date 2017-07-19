@@ -27,7 +27,7 @@ namespace Unity.Linq
         {
             if (origin == null) return null;
 
-            var child = origin.transform.FindChild(name); // transform.find can get inactive object
+            var child = origin.transform.Find(name); // transform.find can get inactive object
             if (child == null) return null;
             return child.gameObject;
         }
