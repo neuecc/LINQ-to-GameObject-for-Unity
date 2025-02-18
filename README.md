@@ -1,5 +1,10 @@
 LINQ to GameObject
 ===
+
+> v3 working now.
+
+-----
+
 LINQ to GameObject is GameObject extensions for Unity that allows traverse hierarchy and append GameObject. The design aims both to get the power of LINQ and **performance** of iteration.
 
 You can install from [Unity Asset Store - LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object) as FREE. Unity Forums support thread, ask me any questions - [http://forum.unity3d.com/threads/linq-to-gameobject.292611/](http://forum.unity3d.com/threads/linq-to-gameobject.292611/)
