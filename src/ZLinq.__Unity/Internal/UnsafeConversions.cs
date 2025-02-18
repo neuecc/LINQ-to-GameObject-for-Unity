@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace Cysharp.Linq.Internal
+namespace ZLinq.Unity.Internal
 {
     // Once C# 11's static abstract members become available, this kind of code will no longer be necessary.
     internal static class UnsafeConversions

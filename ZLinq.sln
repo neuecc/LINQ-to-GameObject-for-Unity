@@ -4,11 +4,13 @@ VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{DDB4EF12-CC4E-5E88-E6FC-71A802F4DE97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LINQ to GameObjects.Tests", "tests\LINQ to GameObjects.Tests\LINQ to GameObjects.Tests.csproj", "{F389F5ED-3C02-41A6-857A-344E5BE5C064}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZLinq.Tests", "tests\ZLinq.Tests\ZLinq.Tests.csproj", "{F389F5ED-3C02-41A6-857A-344E5BE5C064}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F462254E-52F2-4CA2-8518-583E60F81452}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LINQ to GameObjects", "src\LINQ to GameObjects\LINQ to GameObjects.csproj", "{58657F19-047A-45C7-A9F9-776772A6F664}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZLinq", "src\ZLinq\ZLinq.csproj", "{58657F19-047A-45C7-A9F9-776772A6F664}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZLinq.__Unity", "src\ZLinq.__Unity\ZLinq.__Unity.csproj", "{7CC3CED3-98E8-4A1A-98CE-F47AEB3B4548}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +26,10 @@ Global
 		{58657F19-047A-45C7-A9F9-776772A6F664}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58657F19-047A-45C7-A9F9-776772A6F664}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58657F19-047A-45C7-A9F9-776772A6F664}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CC3CED3-98E8-4A1A-98CE-F47AEB3B4548}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CC3CED3-98E8-4A1A-98CE-F47AEB3B4548}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CC3CED3-98E8-4A1A-98CE-F47AEB3B4548}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CC3CED3-98E8-4A1A-98CE-F47AEB3B4548}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -31,6 +37,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F389F5ED-3C02-41A6-857A-344E5BE5C064} = {DDB4EF12-CC4E-5E88-E6FC-71A802F4DE97}
 		{58657F19-047A-45C7-A9F9-776772A6F664} = {F462254E-52F2-4CA2-8518-583E60F81452}
+		{7CC3CED3-98E8-4A1A-98CE-F47AEB3B4548} = {F462254E-52F2-4CA2-8518-583E60F81452}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2FFC585D-0FDF-489B-87D0-AB1122FD8C51}

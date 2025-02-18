@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System;
 
-namespace Cysharp.Linq.Internal
+namespace ZLinq.Internal
 {
     internal ref struct SegmentedArrayBuilder<T>
     {

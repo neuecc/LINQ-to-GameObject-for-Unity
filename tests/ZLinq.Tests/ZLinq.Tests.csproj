@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<RootNamespace>Cysharp.Linq</RootNamespace>
+		<RootNamespace>ZLinq.Tests</RootNamespace>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<TargetFramework>net9.0</TargetFramework>
@@ -19,11 +19,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\LINQ to GameObjects\LINQ to GameObjects.csproj" />
+		<ProjectReference Include="..\..\src\ZLinq.__Unity\ZLinq.__Unity.csproj" />
+		<ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Using Include="Xunit" />
 		<Using Include="Shouldly" />
+		<Using Include="ZLinq" />
 	</ItemGroup>
 </Project>

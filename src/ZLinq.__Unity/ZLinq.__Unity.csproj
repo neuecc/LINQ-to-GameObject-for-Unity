@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<!-- Config for Unity, share by Source-code -->
-		<RootNamespace>Cysharp.Linq</RootNamespace>
+		<RootNamespace>ZLinq.Unity</RootNamespace>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<Nullable>enable</Nullable>
@@ -11,6 +11,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ZLinq\ZLinq.csproj" />
 	</ItemGroup>
 
 </Project>

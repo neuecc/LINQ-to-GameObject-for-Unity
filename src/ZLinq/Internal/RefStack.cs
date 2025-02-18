@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System;
 
-namespace Cysharp.Linq.Internal
+namespace ZLinq.Internal
 {
     // storing struct enumerator, with pooling(stack itself is node)
     internal sealed class RefStack<T>
