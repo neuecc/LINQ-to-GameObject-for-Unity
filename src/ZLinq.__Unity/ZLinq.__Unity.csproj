@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<!-- Config for Unity, share by Source-code -->
-		<RootNamespace>ZLinq.Unity</RootNamespace>
+		<RootNamespace>ZLinq</RootNamespace>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<Nullable>enable</Nullable>
@@ -14,7 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\ZLinq\ZLinq.csproj" />
+		<ProjectReference Include="..\ZLinq\ZLinq.csproj" />
 	</ItemGroup>
 
 </Project>

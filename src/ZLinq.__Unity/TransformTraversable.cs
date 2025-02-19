@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ZLinq.Unity
+namespace ZLinq
 {
     public static class TransformExtensions
     {

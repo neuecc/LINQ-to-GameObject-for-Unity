@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ZLinq.Unity
+namespace ZLinq
 {
     public readonly struct OfComponentTransformEnumerable<TEnumerable, TEnumerator, TComponent>
         : IStructEnumerable<TComponent, OfComponentTransformEnumerable<TEnumerable, TEnumerator, TComponent>.Enumerator>
