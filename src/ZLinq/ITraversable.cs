@@ -1,23 +1,39 @@
 ﻿namespace ZLinq;
 
-public interface ITraversable<T, TTraversable>
-    where TTraversable : ITraversable<T, TTraversable>
+public interface ITraversable<T, TTraversable, TTraverser>
+    where TTraversable : struct, ITraversable<T, TTraversable, TTraverser>
+    where TTraverser : struct, ITraverser<T>
 {
-    T Origin { get; }
-    T GetParent();
-    int GetChildCount();
-    T GetChild(int index);
-    int GetSiblingIndex(int siblingIndex);
+    bool IsNull { get; }
 
-    TTraversable GetNextTraversable(T next); // static...
+    T Origin { get; }
+    bool HasChild { get; }
+    bool TryGetParent(out T parent);
+    bool TryGetChildCount(out int count);
+
+    // TODO:...
+    // int GetSiblingIndex(int siblingIndex);
+
+    TTraverser GetTraverser();
+    TTraversable ConvertToTraversable(T next);
+
 
     // use interface method instead of extension method(for better type inference)
-    ChildrenEnumerable<T, TTraversable> Children();
+    ChildrenEnumerable<T, TTraversable, TTraverser> Children();
 }
 
-public interface ITraversableEnumerable<T, TTraversable, TEnumerator> : IStructEnumerable<T, TEnumerator>
-    where TTraversable : ITraversable<T, TTraversable>
-    where TEnumerator : struct, IStructEnumerator<T>
+public interface ITraverser<T> : IDisposable
 {
-    TTraversable Traversable { get; }
+    bool IsNull { get; }
+    bool TryGetNextChild(out T child);
+
 }
+
+
+// TODO:
+//public interface ITraversableEnumerable<T, TTraversable, TEnumerator> : IStructEnumerable<T, TEnumerator>
+//    where TTraversable : ITraversable<T, TTraversable>
+//    where TEnumerator : struct, IStructEnumerator<T>
+//{
+//    TTraversable Traversable { get; }
+//}

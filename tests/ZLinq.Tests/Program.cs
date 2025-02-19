@@ -34,7 +34,7 @@ public class TestObjects
         var origin = root.transform.GetChild(0).GetChild(2);
 
 
-       // var a = new int[] { 1, 10, 100 }.AsStructEnumerable().Select(x => x * 2);
+        var a = new int[] { 1, 10, 100 }.AsStructEnumerable().Select(x => x * 2);
         //.ToArray2();
         // StructEnumerableExtensions.ToArray2(a);
 

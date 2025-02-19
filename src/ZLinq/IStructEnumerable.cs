@@ -1,14 +1,16 @@
 ﻿namespace ZLinq;
 
 public interface IStructEnumerable<out T, TEnumerator>
-    where TEnumerator : struct, IStructEnumerator<T>
+    where TEnumerator : struct, IStructEnumerator<T> // allows ref struct(.NET 9...)
 {
+    bool IsNull { get; }
     bool TryGetNonEnumeratedCount(out int count);
     TEnumerator GetEnumerator();
 }
 
 public interface IStructEnumerator<out T> : IDisposable
 {
+    bool IsNull { get; }
     bool MoveNext();
     T Current { get; }
 }

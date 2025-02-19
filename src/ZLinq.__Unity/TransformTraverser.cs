@@ -4,7 +4,7 @@ namespace ZLinq.Unity
 {
     // TODO:GameObjectTraversable
 
-    public readonly struct TransformTraversable : ITraversable<Transform, TransformTraversable>
+    public readonly struct TransformTraversable : ITraversable<Transform, TransformTraversable, TransformTraverser>
     {
         readonly Transform transform;
 
@@ -13,37 +13,77 @@ namespace ZLinq.Unity
             this.transform = origin;
         }
 
+        public bool IsNull => transform is null; // don't use `==`.
+
         public Transform Origin => transform;
+        public bool HasChild => transform.childCount != 0;
 
-        public TransformTraversable GetNextTraversable(Transform child)
+        public bool TryGetParent(out Transform parent)
         {
-            return new TransformTraversable(child);
+            var tp = transform.parent;
+            if (tp != null)
+            {
+                parent = tp;
+                return true;
+            }
+
+            parent = default!;
+            return false;
         }
 
-        public Transform GetChild(int index)
+        public bool TryGetChildCount(out int count)
         {
-            return transform.GetChild(index);
+            count = transform.childCount;
+            return true;
         }
 
-        public int GetChildCount()
+        public TransformTraverser GetTraverser()
         {
-            return transform.childCount;
+            return new(transform);
         }
 
-        public Transform GetParent()
+        public TransformTraversable ConvertToTraversable(Transform next)
         {
-            return transform.parent;
+            return new(next);
         }
 
-        public int GetSiblingIndex(int siblingIndex)
-        {
-            return transform.GetSiblingIndex();
-        }
+        // Queries
 
-        public ChildrenEnumerable<Transform, TransformTraversable> Children()
+        public ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser> Children()
         {
             return new(this, withSelf: false);
         }
     }
 
+    public struct TransformTraverser : ITraverser<Transform>
+    {
+        readonly Transform transform;
+        readonly int childCound;
+        int index;
+
+        public bool IsNull => transform is null; // don't use `==`.
+
+        public TransformTraverser(Transform transform)
+        {
+            this.transform = transform;
+            this.childCound = transform.childCount; // get childCount on init.
+            this.index = 0;
+        }
+
+        public void Dispose()
+        {
+        }
+
+        public bool TryGetNextChild(out Transform child)
+        {
+            if (index < childCound)
+            {
+                child = transform.GetChild(index++);
+                return true;
+            }
+
+            child = default!;
+            return false;
+        }
+    }
 }

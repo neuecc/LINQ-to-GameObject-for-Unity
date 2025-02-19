@@ -2,86 +2,89 @@
 
 namespace ZLinq
 {
-    public readonly struct DescendantsEnumerable<T, TTraversable>(TTraversable traversable, bool withSelf) : IStructEnumerable<T, DescendantsEnumerator<T, TTraversable>>
-        where TTraversable : ITraversable<T, TTraversable>
+    public readonly struct DescendantsEnumerable<T, TTraversable, TTraverser>(TTraversable traversable, bool withSelf)
+        : IStructEnumerable<T, DescendantsEnumerable<T, TTraversable, TTraverser>.Enumerator>
+        where TTraversable : struct, ITraversable<T, TTraversable, TTraverser>
+        where TTraverser : struct, ITraverser<T>
     {
+        public bool IsNull => traversable.IsNull;
+
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = 0;
             return false;
         }
 
-        public DescendantsEnumerator<T, TTraversable> GetEnumerator() => new(traversable, withSelf);
-    }
+        public Enumerator GetEnumerator() => new(traversable, withSelf);
 
-    public struct DescendantsEnumerator<T, TTraversable>(TTraversable traversable, bool withSelf) : IStructEnumerator<T>
-        where TTraversable : ITraversable<T, TTraversable>
-    {
-        bool returnSelf = withSelf;
-        T current = default!;
-        RefStack<ChildrenEnumerator<T, TTraversable>>? recursiveStack = null;
-
-        public T Current => current;
-
-        public bool MoveNext()
+        public struct Enumerator(TTraversable traversable, bool withSelf) : IStructEnumerator<T>
         {
-            // IsDisposed
-            if (recursiveStack == RefStack<ChildrenEnumerator<T, TTraversable>>.DisposeSentinel)
-            {
-                return false;
-            }
+            bool returnSelf = withSelf;
+            T current = default!;
+            RefStack<ChildrenEnumerable<T, TTraversable, TTraverser>.Enumerator>? recursiveStack = null;
 
-            if (returnSelf)
-            {
-                current = traversable.Origin;
-                returnSelf = false;
-                return true;
-            }
+            public bool IsNull => traversable.IsNull;
+            public T Current => current;
 
-            // initial setup
-            if (recursiveStack == null)
+            public bool MoveNext()
             {
-                // mutable struct(enumerator) must use from stack ref
-                var children = traversable.Children().GetEnumerator();
-                recursiveStack = RefStack<ChildrenEnumerator<T, TTraversable>>.Rent();
-                recursiveStack.Push(children);
-            }
-
-            // traverse depth first search
-            {
-                ref var enumerator = ref recursiveStack.PeekRefOrNullRef();
-                while (!Unsafe.IsNullRef(ref enumerator))
+                // IsDisposed
+                if (recursiveStack == RefStack<ChildrenEnumerable<T, TTraversable, TTraverser>.Enumerator>.DisposeSentinel)
                 {
-                    while (enumerator.MoveNext())
-                    {
-                        var value = enumerator.Current;
-                        current = value; // set result
-
-                        var subTraversable = traversable.GetNextTraversable(value);
-                        var childCount = subTraversable.GetChildCount();
-                        if (childCount != 0)
-                        {
-                            var children = subTraversable.Children().InternalGetEnumerator(childCount); // avoid duplicate call of childCount
-                            recursiveStack.Push(children);
-                        }
-
-                        return true; // ok.
-                    }
-
-                    recursiveStack.Pop(); // end current iteration, Pop
-                    enumerator = ref recursiveStack.PeekRefOrNullRef(); // Peek Again
+                    return false;
                 }
 
-                return false;
-            }
-        }
+                if (returnSelf)
+                {
+                    current = traversable.Origin;
+                    returnSelf = false;
+                    return true;
+                }
 
-        public void Dispose()
-        {
-            if (recursiveStack != null)
+                // initial setup
+                if (recursiveStack == null)
+                {
+                    // mutable struct(enumerator) must use from stack ref
+                    var children = traversable.Children().GetEnumerator();
+                    recursiveStack = RefStack<ChildrenEnumerable<T, TTraversable, TTraverser>.Enumerator>.Rent();
+                    recursiveStack.Push(children);
+                }
+
+                // traverse depth first search
+                {
+                    ref var enumerator = ref recursiveStack.PeekRefOrNullRef();
+                    while (!Unsafe.IsNullRef(ref enumerator))
+                    {
+                        while (enumerator.MoveNext())
+                        {
+                            var value = enumerator.Current;
+                            current = value; // set result
+
+                            var subTraversable = traversable.ConvertToTraversable(value);
+                            if (subTraversable.HasChild)
+                            {
+                                var children = subTraversable.Children().GetEnumerator();
+                                recursiveStack.Push(children);
+                            }
+
+                            return true; // ok.
+                        }
+
+                        recursiveStack.Pop(); // end current iteration, Pop
+                        enumerator = ref recursiveStack.PeekRefOrNullRef(); // Peek Again
+                    }
+
+                    return false;
+                }
+            }
+
+            public void Dispose()
             {
-                RefStack<ChildrenEnumerator<T, TTraversable>>.Return(recursiveStack);
-                recursiveStack = RefStack<ChildrenEnumerator<T, TTraversable>>.DisposeSentinel;
+                if (recursiveStack != null)
+                {
+                    RefStack<ChildrenEnumerable<T, TTraversable, TTraverser>.Enumerator>.Return(recursiveStack);
+                    recursiveStack = RefStack<ChildrenEnumerable<T, TTraversable, TTraverser>.Enumerator>.DisposeSentinel;
+                }
             }
         }
     }

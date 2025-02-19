@@ -6,10 +6,10 @@
 		<Nullable>enable</Nullable>
 		<LangVersion>13</LangVersion>
 		<!-- Support for Unity -->
-		<TargetFramework>netstandard2.1</TargetFramework>
+		<TargetFrameworks>netstandard2.1;net8.0</TargetFrameworks>
 	</PropertyGroup>
 
-	<ItemGroup>
+	<ItemGroup Condition="$(TargetFramework) == 'netstandard2.1'">
 		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
 	</ItemGroup>
 

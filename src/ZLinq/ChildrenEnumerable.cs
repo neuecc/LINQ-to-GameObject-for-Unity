@@ -1,48 +1,55 @@
 ﻿namespace ZLinq;
 
-public readonly struct ChildrenEnumerable<T, TTraversable>(TTraversable traversable, bool withSelf)
-    : ITraversableEnumerable<T, TTraversable, ChildrenEnumerator<T, TTraversable>>
-    where TTraversable : ITraversable<T, TTraversable>
+public readonly struct ChildrenEnumerable<T, TTraversable, TTraverser>(TTraversable traversable, bool withSelf)
+    : IStructEnumerable<T, ChildrenEnumerable<T, TTraversable, TTraverser>.Enumerator>
+    where TTraversable : struct, ITraversable<T, TTraversable, TTraverser>
+    where TTraverser : struct, ITraverser<T>
 {
-    public TTraversable Traversable => traversable;
+    public bool IsNull => traversable.IsNull;
 
     public bool TryGetNonEnumeratedCount(out int count)
     {
-        count = traversable.GetChildCount() + (withSelf ? 1 : 0);
-        return true;
-    }
-
-    public ChildrenEnumerator<T, TTraversable> GetEnumerator() => new(traversable, withSelf, traversable.GetChildCount());
-    internal ChildrenEnumerator<T, TTraversable> InternalGetEnumerator(int childCount) => new(traversable, withSelf, childCount);
-}
-
-public struct ChildrenEnumerator<T, TTraversable>(TTraversable traversable, bool withSelf, int childCount) : IStructEnumerator<T>
-    where TTraversable : ITraversable<T, TTraversable>
-{
-    bool returnSelf = withSelf;
-    int currentIndex;
-    T current = default!;
-
-    public T Current => current;
-
-    public bool MoveNext()
-    {
-        if (returnSelf)
+        if (traversable.TryGetChildCount(out var childCount))
         {
-            current = traversable.Origin;
-            returnSelf = false;
+            count = childCount + (withSelf ? 1 : 0);
             return true;
         }
 
-        currentIndex++;
-        if (currentIndex < childCount)
-        {
-            current = traversable.GetChild(currentIndex);
-            return true;
-        }
-
+        count = 0;
         return false;
     }
 
-    public void Dispose() { }
+    public Enumerator GetEnumerator() => new(traversable, withSelf);
+
+    public struct Enumerator(TTraversable traversable, bool withSelf) : IStructEnumerator<T>
+    {
+        bool returnSelf = withSelf;
+        T current = default!;
+        TTraverser traverser = default!;
+
+        public bool IsNull => traversable.IsNull;
+        public T Current => current;
+
+        public bool MoveNext()
+        {
+            if (returnSelf)
+            {
+                current = traversable.Origin;
+                returnSelf = false;
+                return true;
+            }
+
+            if (traverser.IsNull)
+            {
+                traverser = traversable.GetTraverser();
+            }
+
+            return traverser.TryGetNextChild(out current);
+        }
+
+        public void Dispose()
+        {
+            traverser.Dispose();
+        }
+    }
 }

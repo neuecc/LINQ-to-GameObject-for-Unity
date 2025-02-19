@@ -14,7 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ZLinq\ZLinq.csproj" />
+	  <ProjectReference Include="..\ZLinq\ZLinq.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ZLinq;
+﻿namespace ZLinq;
 
 partial class StructEnumerableExtensions
 {
@@ -15,54 +11,35 @@ partial class StructEnumerableExtensions
     }
 }
 
-public readonly struct SelectStructEnumerable<T, TEnumerable, TEnumerator, TResult>
+public readonly struct SelectStructEnumerable<T, TEnumerable, TEnumerator, TResult>(TEnumerable source, Func<T, TResult> selector)
     : IStructEnumerable<TResult, SelectStructEnumerable<T, TEnumerable, TEnumerator, TResult>.Enumerator>
     where TEnumerable : struct, IStructEnumerable<T, TEnumerator>
     where TEnumerator : struct, IStructEnumerator<T>
 {
-    readonly TEnumerable source;
-    readonly Func<T, TResult> selector;
-
-    public SelectStructEnumerable(TEnumerable source, Func<T, TResult> selector)
-    {
-        this.source = source;
-        this.selector = selector;
-    }
+    public bool IsNull => source.IsNull;
 
     public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
 
-    public Enumerator GetEnumerator() => new();
+    public Enumerator GetEnumerator() => new(source, selector);
 
-    public struct Enumerator : IStructEnumerator<TResult>
+    public struct Enumerator(TEnumerable source, Func<T, TResult> selector) : IStructEnumerator<TResult>
     {
-        readonly TEnumerable source;
-        readonly Func<T, TResult> selector;
-
-        bool isInit;
         TEnumerator enumerator;
+        TResult current = default!;
 
-        public TResult Current { get; private set; }
-
-        public Enumerator(TEnumerable source, Func<T, TResult> selector) : this()
-        {
-            this.source = source;
-            this.selector = selector;
-            this.isInit = false;
-            this.Current = default!;
-            this.enumerator = default!;
-        }
+        public bool IsNull => enumerator.IsNull;
+        public TResult Current => current;
 
         public bool MoveNext()
         {
-            if (!isInit)
+            if (enumerator.IsNull)
             {
-                isInit = true;
                 this.enumerator = source.GetEnumerator();
             }
 
             if (enumerator.MoveNext())
             {
-                Current = selector(enumerator.Current);
+                current = selector(enumerator.Current);
                 return true;
             }
             return false;
@@ -70,7 +47,7 @@ public readonly struct SelectStructEnumerable<T, TEnumerable, TEnumerator, TResu
 
         public void Dispose()
         {
-            if (isInit)
+            if (!enumerator.IsNull)
             {
                 enumerator.Dispose();
             }

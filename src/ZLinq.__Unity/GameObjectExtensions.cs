@@ -12,20 +12,10 @@ namespace ZLinq // use root namespace(not ZLinq.Unity)
 
 
 
-        public static ChildrenEnumerable<Transform, TransformTraversable> Children(this Transform origin) => origin.AsTraversable().Children();
+        public static ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser> Children(this Transform origin) => origin.AsTraversable().Children();
 
 
 
-        public static void Foo()
-        {
-            Transform ttt = default!;
-
-            foreach (var item in ttt.Children())
-            {
-            }
-
-            // ttt.Children().Ho();
-        }
 
 
         //public static ChildrenEnumerable<GameObject> Children(this GameObject origin) => new(origin.transform, withSelf: false);

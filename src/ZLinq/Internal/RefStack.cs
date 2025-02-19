@@ -4,12 +4,12 @@ using System;
 namespace ZLinq.Internal
 {
     // storing struct enumerator, with pooling(stack itself is node)
-    internal sealed class RefStack<T>
+    internal sealed class RefStack<T> where T : IDisposable
     {
         internal static readonly RefStack<T> DisposeSentinel = new(0);
 
         static RefStack<T>? Last = null;
-        
+
         RefStack<T>? Prev = null; // pooling property
 
         public static RefStack<T> Rent()
@@ -66,6 +66,11 @@ namespace ZLinq.Internal
 
         public void Reset()
         {
+            for (int i = 0; i < size; i++)
+            {
+                array[i].Dispose();
+            }
+
             size = 0;
         }
     }
