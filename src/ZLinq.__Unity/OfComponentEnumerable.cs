@@ -1,64 +1,68 @@
-﻿//using UnityEngine;
-//using ZLinq.Unity.Internal;
+﻿using UnityEngine;
 
-//namespace ZLinq.Unity
-//{
-//    public readonly struct OfComponentEnumerable<T, TEnumerable, TEnumerator, TComponent>
-//        : IStructEnumerable<TComponent, OfComponentEnumerator<T, TEnumerable, TEnumerator, TComponent>>
-//        where T : class // T is Transform or GameObject
-//        where TEnumerable : struct, IStructEnumerable<T, TEnumerator>
-//        where TEnumerator : struct, IStructEnumerator<T>
-//        where TComponent : Component
-//    {
-//        readonly TEnumerable parent;
+namespace ZLinq.Unity
+{
+    public readonly struct OfComponentTransformEnumerable<TEnumerable, TEnumerator, TComponent>
+        : IStructEnumerable<TComponent, OfComponentTransformEnumerable<TEnumerable, TEnumerator, TComponent>.Enumerator>
+        where TEnumerable : struct, IStructEnumerable<Transform, TEnumerator>
+        where TEnumerator : struct, IStructEnumerator<Transform>
+        where TComponent : Component
+    {
+        readonly TEnumerable source;
 
-//        internal OfComponentEnumerable(in TEnumerable parent)
-//        {
-//            this.parent = parent;
-//        }
+        internal OfComponentTransformEnumerable(TEnumerable source)
+        {
+            this.source = source;
+        }
 
-//        public bool TryGetNonEnumeratedCount(out int count)
-//        {
-//            count = 0;
-//            return false;
-//        }
+        public bool IsNull => source.IsNull;
 
-//        public OfComponentEnumerator<T, TEnumerable, TEnumerator, TComponent> GetEnumerator() => new(parent);
-//    }
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            count = 0;
+            return false;
+        }
 
-//    public struct OfComponentEnumerator<T, TEnumerable, TEnumerator, TComponent> : IStructEnumerator<TComponent>
-//        where T : class // T is Transform or GameObject
-//        where TEnumerable : struct, IStructEnumerable<T, TEnumerator>
-//        where TEnumerator : struct, IStructEnumerator<T>
-//        where TComponent : Component
-//    {
-//        TEnumerator enumerator;
-//        TComponent current;
+        public Enumerator GetEnumerator() => new(source);
 
-//        public OfComponentEnumerator(in TEnumerable parent)
-//        {
-//            enumerator = parent.GetEnumerator();
-//            current = default!;
-//        }
+        public struct Enumerator : IStructEnumerator<TComponent>
+        {
+            TEnumerable source;
+            TEnumerator enumerator;
+            TComponent current;
 
-//        public TComponent Current => current;
+            public Enumerator(TEnumerable source)
+            {
+                this.source = source;
+                this.enumerator = default!;
+                this.current = default!;
+            }
 
-//        public bool MoveNext()
-//        {
-//            while (enumerator.MoveNext())
-//            {
-//                var value = enumerator.Current;
-//                var component = UnsafeConversions.GetComponentFrom<T, TComponent>(value);
-//                if (component != null)
-//                {
-//                    current = component;
-//                    return true;
-//                }
-//            }
+            public bool IsNull => source.IsNull;
+            public TComponent Current => current;
 
-//            return false;
-//        }
+            public bool MoveNext()
+            {
+                if (enumerator.IsNull)
+                {
+                    enumerator = source.GetEnumerator();
+                }
 
-//        public void Dispose() => enumerator.Dispose();
-//    }
-//}
+                while (enumerator.MoveNext())
+                {
+                    var value = enumerator.Current;
+                    var component = value.GetComponent<TComponent>();
+                    if (component != null)
+                    {
+                        current = component;
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            public void Dispose() => enumerator.Dispose();
+        }
+    }
+}
