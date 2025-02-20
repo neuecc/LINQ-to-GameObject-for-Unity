@@ -16,9 +16,6 @@ BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(Su
 
 #else
 
-// sandbox
-
-Console.WriteLine("DEBUG");
 
 #endif
 

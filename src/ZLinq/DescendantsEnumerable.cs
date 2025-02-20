@@ -50,7 +50,7 @@
                         var subTraversable = traversable.ConvertToTraversable(value);
                         try
                         {
-                            if (subTraversable.HasChild)
+                            if (!subTraversable.TryGetHasChild(out var hasChild) || hasChild)
                             {
                                 var children = subTraversable.Children<TTraversable, T>();
                                 recursiveStack.Push(children);

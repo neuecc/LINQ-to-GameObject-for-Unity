@@ -17,10 +17,14 @@
             return new(source);
         }
 
+#if NET9_0_OR_GREATER
+
         public static SpanStructEnumerable<T> AsStructEnumerable<T>(this Span<T> source)
         {
             return new(source);
         }
+
+#endif
     }
 }
 
@@ -143,6 +147,8 @@ namespace ZLinq.Linq
         }
     }
 
+#if NET9_0_OR_GREATER
+
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public ref struct SpanStructEnumerable<T>(Span<T> source) : IStructEnumerable<T>
@@ -172,4 +178,6 @@ namespace ZLinq.Linq
         {
         }
     }
+
+#endif
 }

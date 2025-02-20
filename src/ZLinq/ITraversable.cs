@@ -5,13 +5,13 @@ public interface ITraversable<TTraversable, T> : IDisposable
     where TTraversable : struct, ITraversable<TTraversable, T> // self
 {
     T Origin { get; }
-    bool HasChild { get; }
-    TTraversable ConvertToTraversable(T next);
-    bool TryGetParent(out T parent);
-    bool TryGetChildCount(out int count);
-    bool TryGetNextChild(out T child);
-    bool TryGetNextSibling(out T next);
-    bool TryGetPreviousSibling(out T previous);
+    TTraversable ConvertToTraversable(T next); // for Descendants
+    bool TryGetHasChild(out bool hasChild); // optimize use for Descendants
+    bool TryGetChildCount(out int count);   // optimize use for Children
+    bool TryGetParent(out T parent); // for Ancestors
+    bool TryGetNextChild(out T child); // for Children | Descendants
+    bool TryGetNextSibling(out T next); // for AfterSelf
+    bool TryGetPreviousSibling(out T previous); // BeforeSelf
 }
 
 public static class TraversableExtensions

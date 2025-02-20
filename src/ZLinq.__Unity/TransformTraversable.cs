@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace ZLinq
@@ -66,7 +67,6 @@ namespace ZLinq
         }
 
         public Transform Origin => transform;
-        public bool HasChild => transform.childCount != 0;
         public TransformTraversable ConvertToTraversable(Transform next) => new(next);
 
         public bool TryGetParent(out Transform parent)
@@ -85,6 +85,12 @@ namespace ZLinq
         public bool TryGetChildCount(out int count)
         {
             count = transform.childCount;
+            return true;
+        }
+
+        public bool TryGetHasChild(out bool hasChild)
+        {
+            hasChild = transform.childCount != 0;
             return true;
         }
 
