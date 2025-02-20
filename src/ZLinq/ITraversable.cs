@@ -6,8 +6,8 @@ public interface ITraversable<TTraversable, T> : IDisposable
 {
     T Origin { get; }
     TTraversable ConvertToTraversable(T next); // for Descendants
-    bool TryGetHasChild(out bool hasChild); // optimize use for Descendants
-    bool TryGetChildCount(out int count);   // optimize use for Children
+    bool TryGetHasChild(out bool hasChild); // optional: optimize use for Descendants
+    bool TryGetChildCount(out int count);   // optional: optimize use for Children
     bool TryGetParent(out T parent); // for Ancestors
     bool TryGetNextChild(out T child); // for Children | Descendants
     bool TryGetNextSibling(out T next); // for AfterSelf
