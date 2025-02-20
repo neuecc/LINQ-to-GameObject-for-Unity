@@ -16,6 +16,14 @@ BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(Su
 
 #else
 
+var i = 0;
+foreach (var item in typeof(Enumerable).GetMethods().GroupBy(x => x.Name))
+{
+    Console.WriteLine($"- [ ] {item.Key}");
+    i++;
+}
+Console.WriteLine(i);
+
 
 #endif
 

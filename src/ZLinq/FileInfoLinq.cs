@@ -40,7 +40,8 @@ public struct FileSystemInfoTraversable(FileSystemInfo origin) : ITraversable<Fi
 
     public FileSystemInfoTraversable ConvertToTraversable(FileSystemInfo next) => new(next);
 
-    // avoid to call EnumerateFileSystemInfos, TryGetChildCount and TryGetHasChild is false.
+    // TryGetChildCount and TryGetHasChild is optimize path and allows return false.
+    // We should avoid to call EnumerateFileSystemInfos, so return false.
 
     public bool TryGetChildCount(out int count)
     {
@@ -68,24 +69,20 @@ public struct FileSystemInfoTraversable(FileSystemInfo origin) : ITraversable<Fi
 
     public bool TryGetNextChild(out FileSystemInfo child)
     {
-    BEGIN:
-        if (fileSystemInfoEnumerator != null)
+        if (origin is not DirectoryInfo dir)
         {
-            if (fileSystemInfoEnumerator.MoveNext())
-            {
-                child = fileSystemInfoEnumerator.Current;
-                return true;
-            }
-            goto END;
+            child = null!;
+            return false;
         }
 
-        if (origin is DirectoryInfo dir)
+        fileSystemInfoEnumerator ??= dir.EnumerateFileSystemInfos().GetEnumerator();
+
+        if (fileSystemInfoEnumerator.MoveNext())
         {
-            fileSystemInfoEnumerator = dir.EnumerateFileSystemInfos().GetEnumerator();
-            goto BEGIN;
+            child = fileSystemInfoEnumerator.Current;
+            return true;
         }
 
-    END:
         child = null!;
         return false;
     }
