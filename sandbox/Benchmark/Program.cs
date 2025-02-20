@@ -91,13 +91,9 @@ public class IterateBenchmark
     [Benchmark]
     public void SpanLinq()
     {
-        //string[] array =
         var seq = array.AsSpan()
             .Select(x => x * 3)
             .Where(x => x % 2 == 0);
-
-
-        seq.GetEnumerator();
 
         foreach (var item in seq)
         {

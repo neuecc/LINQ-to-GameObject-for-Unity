@@ -1,13 +1,11 @@
 ﻿namespace ZLinq;
 
 [StructLayout(LayoutKind.Auto)]
-public struct BeforeSelfEnumerable<T, TTraversable, TTraverser>(TTraversable traversable, bool withSelf)
+public struct BeforeSelfEnumerable<TTraversable, T>(TTraversable traversable, bool withSelf)
     : IStructEnumerable<T>
-    where TTraversable : struct, ITraversable<T, TTraversable, TTraverser>
-    where TTraverser : struct, ITraverser<T>
+    where TTraversable : struct, ITraversable<TTraversable, T>
 {
     bool iterateCompleted = false;
-    TTraverser traverser = default!;
 
     public bool TryGetNonEnumeratedCount(out int count)
     {
@@ -23,12 +21,7 @@ public struct BeforeSelfEnumerable<T, TTraversable, TTraverser>(TTraversable tra
             return false;
         }
 
-        if (traverser.IsNull)
-        {
-            traverser = traversable.GetTraverser();
-        }
-
-        if (traverser.TryGetPreviousSibling(out current))
+        if (traversable.TryGetPreviousSibling(out current))
         {
             return true;
         }
@@ -48,6 +41,6 @@ public struct BeforeSelfEnumerable<T, TTraversable, TTraverser>(TTraversable tra
 
     public void Dispose()
     {
-        traverser.Dispose();
+        traversable.Dispose();
     }
 }

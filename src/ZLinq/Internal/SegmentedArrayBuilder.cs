@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace ZLinq.Internal;
 
+[StructLayout(LayoutKind.Auto)]
 internal ref struct SegmentedArrayBuilder<T>
 {
     // Array.MaxLength = 2147483591

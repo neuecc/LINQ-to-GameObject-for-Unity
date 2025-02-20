@@ -1,71 +1,63 @@
-﻿using UnityEngine;
+﻿using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace ZLinq
 {
     public static class TransformExtensions
     {
+        // TODO: Func<Transform, bool> descendIntoChildren
+
         public static TransformTraversable AsTraversable(this Transform origin) => new(origin);
 
-        public static ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser> Children(this Transform origin) => origin.AsTraversable().Children();
-        public static ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser> ChildrenAndSelf(this Transform origin) => origin.AsTraversable().ChildrenAndSelf();
-        public static DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser> Descendants(this Transform origin) => origin.AsTraversable().Descendants();
-        public static DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser> DescendantsAndSelf(this Transform origin) => origin.AsTraversable().DescendantsAndSelf();
-        public static AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser> Ancestors(this Transform origin) => origin.AsTraversable().Ancestors();
-        public static AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser> AncestorsAndSelf(this Transform origin) => origin.AsTraversable().AncestorsAndSelf();
-        public static BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser> BeforeSelf(this Transform origin) => origin.AsTraversable().BeforeSelf();
-        public static BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser> BeforeSelfAndSelf(this Transform origin) => origin.AsTraversable().BeforeSelfAndSelf();
-        public static AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser> AfterSelf(this Transform origin) => origin.AsTraversable().AfterSelf();
-        public static AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser> AfterSelfAndSelf(this Transform origin) => origin.AsTraversable().AfterSelfAndSelf();
+        public static ChildrenEnumerable<TransformTraversable, Transform> Children(this Transform origin) => origin.AsTraversable().Children<TransformTraversable, Transform>();
+        public static ChildrenEnumerable<TransformTraversable, Transform> ChildrenAndSelf(this Transform origin) => origin.AsTraversable().ChildrenAndSelf<TransformTraversable, Transform>();
+        public static DescendantsEnumerable<TransformTraversable, Transform> Descendants(this Transform origin) => origin.AsTraversable().Descendants<TransformTraversable, Transform>();
+        public static DescendantsEnumerable<TransformTraversable, Transform> DescendantsAndSelf(this Transform origin) => origin.AsTraversable().DescendantsAndSelf<TransformTraversable, Transform>();
+        public static AncestorsEnumerable<TransformTraversable, Transform> Ancestors(this Transform origin) => origin.AsTraversable().Ancestors<TransformTraversable, Transform>();
+        public static AncestorsEnumerable<TransformTraversable, Transform> AncestorsAndSelf(this Transform origin) => origin.AsTraversable().AncestorsAndSelf<TransformTraversable, Transform>();
+        public static BeforeSelfEnumerable<TransformTraversable, Transform> BeforeSelf(this Transform origin) => origin.AsTraversable().BeforeSelf<TransformTraversable, Transform>();
+        public static BeforeSelfEnumerable<TransformTraversable, Transform> BeforeSelfAndSelf(this Transform origin) => origin.AsTraversable().BeforeSelfAndSelf<TransformTraversable, Transform>();
+        public static AfterSelfEnumerable<TransformTraversable, Transform> AfterSelf(this Transform origin) => origin.AsTraversable().AfterSelf<TransformTraversable, Transform>();
+        public static AfterSelfEnumerable<TransformTraversable, Transform> AfterSelfAndSelf(this Transform origin) => origin.AsTraversable().AfterSelfAndSelf<TransformTraversable, Transform>();
 
-        //public static OfComponentTransformEnumerable<ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser>, ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
-        //    OfComponent<TComponent>(this ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser> source)
-        //    where TComponent : Component
-        //{
-        //    return new(source);
-        //}
+        public static OfComponentTransformEnumerable<ChildrenEnumerable<TransformTraversable, Transform>, Component> OfComponent<TComponent>(this ChildrenEnumerable<TransformTraversable, Transform> source)
+            where TComponent : Component => new(source);
 
-        //public static OfComponentTransformEnumerable<DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser>, DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
-        //    OfComponent<TComponent>(this DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser> source)
-        //    where TComponent : Component
-        //{
-        //    return new(source);
-        //}
+        public static OfComponentTransformEnumerable<DescendantsEnumerable<TransformTraversable, Transform>, Component> OfComponent<TComponent>(this DescendantsEnumerable<TransformTraversable, Transform> source)
+            where TComponent : Component => new(source);
 
-        //public static OfComponentTransformEnumerable<AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser>, AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
-        //    OfComponent<TComponent>(this AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser> source)
-        //    where TComponent : Component
-        //{
-        //    return new(source);
-        //}
+        public static OfComponentTransformEnumerable<AncestorsEnumerable<TransformTraversable, Transform>, Component> OfComponent<TComponent>(this AncestorsEnumerable<TransformTraversable, Transform> source)
+            where TComponent : Component => new(source);
 
-        //public static OfComponentTransformEnumerable<BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser>, BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
-        //    OfComponent<TComponent>(this BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser> source)
-        //    where TComponent : Component
-        //{
-        //    return new(source);
-        //}
+        public static OfComponentTransformEnumerable<BeforeSelfEnumerable<TransformTraversable, Transform>, Component> OfComponent<TComponent>(this BeforeSelfEnumerable<TransformTraversable, Transform> source)
+            where TComponent : Component => new(source);
 
-        //public static OfComponentTransformEnumerable<AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser>, AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
-        //    OfComponent<TComponent>(this AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser> source)
-        //    where TComponent : Component
-        //{
-        //    return new(source);
-        //}
+        public static OfComponentTransformEnumerable<AfterSelfEnumerable<TransformTraversable, Transform>, Component> OfComponent<TComponent>(this AfterSelfEnumerable<TransformTraversable, Transform> source)
+            where TComponent : Component => new(source);
     }
 
-    public readonly struct TransformTraversable : ITraversable<Transform, TransformTraversable, TransformTraverser>
+    [StructLayout(LayoutKind.Auto)]
+    public struct TransformTraversable : ITraversable<TransformTraversable, Transform>
     {
+        static readonly object CalledTryGetNextChild = new object();
+        static readonly object ParentNotFound = new object();
+
         readonly Transform transform;
+        object? initializedState; // CalledTryGetNext or Parent(for sibling operations)
+        int childCount; // self childCount(TryGetNextChild) or parent childCount(TryGetSibling)
+        int index;
 
         public TransformTraversable(Transform origin)
         {
             this.transform = origin;
+            this.initializedState = null;
+            this.childCount = 0;
+            this.index = 0;
         }
-
-        public bool IsNull => transform is null; // don't use `==`.
 
         public Transform Origin => transform;
         public bool HasChild => transform.childCount != 0;
+        public TransformTraversable ConvertToTraversable(Transform next) => new(next);
 
         public bool TryGetParent(out Transform parent)
         {
@@ -84,54 +76,6 @@ namespace ZLinq
         {
             count = transform.childCount;
             return true;
-        }
-
-        public TransformTraverser GetTraverser()
-        {
-            return new(transform);
-        }
-
-        public TransformTraversable ConvertToTraversable(Transform next)
-        {
-            return new(next);
-        }
-
-        // Queries
-
-        public ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser> Children() => new(this, withSelf: false);
-        public ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser> ChildrenAndSelf() => new(this, withSelf: true);
-        public DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser> Descendants() => new(this, withSelf: false);
-        public DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser> DescendantsAndSelf() => new(this, withSelf: true);
-        public AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser> Ancestors() => new(this, withSelf: false);
-        public AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser> AncestorsAndSelf() => new(this, withSelf: true);
-        public BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser> BeforeSelf() => new(this, withSelf: false);
-        public BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser> BeforeSelfAndSelf() => new(this, withSelf: true);
-        public AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser> AfterSelf() => new(this, withSelf: false);
-        public AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser> AfterSelfAndSelf() => new(this, withSelf: true);
-    }
-
-    public struct TransformTraverser : ITraverser<Transform>
-    {
-        static readonly object CalledTryGetNextChild = new object();
-        static readonly object ParentNotFound = new object();
-
-        readonly Transform transform;
-        object? initializedState; // CalledTryGetNext or Parent(for sibling operations)
-        int childCount; // self childCount(TryGetNextChild) or parent childCount(TryGetSibling)
-        int index;
-
-        public bool IsNull => transform is null; // don't use `==`.
-
-        public TransformTraverser(Transform transform)
-        {
-            this.transform = transform;
-            this.initializedState = null;
-            this.childCount = 0;
-            this.index = 0;
-        }
-
-        public void Dispose()
-        {
         }
 
         public bool TryGetNextChild(out Transform child)
@@ -217,6 +161,10 @@ namespace ZLinq
 
             previous = default!;
             return false;
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

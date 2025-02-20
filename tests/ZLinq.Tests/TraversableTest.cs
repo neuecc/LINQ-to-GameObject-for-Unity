@@ -1,9 +1,4 @@
 ﻿using UnityEngine;
-using ZLinq;
-using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace ZLinq.Tests;
 
@@ -46,11 +41,11 @@ public class TraversableTest
 
 internal static class CustomExtensions
 {
-    public static IEnumerable<Transform> AsEnumerable(this ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser>, Transform>();
-    public static IEnumerable<Transform> AsEnumerable(this DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser>, Transform>();
-    public static IEnumerable<Transform> AsEnumerable(this AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser>, Transform>();
-    public static IEnumerable<Transform> AsEnumerable(this BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser>, Transform>();
-    public static IEnumerable<Transform> AsEnumerable(this AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser>, Transform>();
+    public static IEnumerable<Transform> AsEnumerable(this ChildrenEnumerable<TransformTraversable, Transform> source) => source.AsEnumerable<ChildrenEnumerable<TransformTraversable, Transform>, Transform>();
+    public static IEnumerable<Transform> AsEnumerable(this DescendantsEnumerable<TransformTraversable, Transform> source) => source.AsEnumerable<DescendantsEnumerable<TransformTraversable, Transform>, Transform>();
+    public static IEnumerable<Transform> AsEnumerable(this AncestorsEnumerable<TransformTraversable, Transform> source) => source.AsEnumerable<AncestorsEnumerable<TransformTraversable, Transform>, Transform>();
+    public static IEnumerable<Transform> AsEnumerable(this BeforeSelfEnumerable<TransformTraversable, Transform> source) => source.AsEnumerable<BeforeSelfEnumerable<TransformTraversable, Transform>, Transform>();
+    public static IEnumerable<Transform> AsEnumerable(this AfterSelfEnumerable<TransformTraversable, Transform> source) => source.AsEnumerable<AfterSelfEnumerable<TransformTraversable, Transform>, Transform>();
 }
 
 public class NanikaComponent : Component

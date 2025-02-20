@@ -1,41 +1,80 @@
 ﻿namespace ZLinq;
 
-// TODO: integrate ITRaversable and Traverser
-
-public interface ITraversable<T, TTraversable, TTraverser>
-    where TTraversable : struct, ITraversable<T, TTraversable, TTraverser>
-    where TTraverser : struct, ITraverser<T>
+// like IStructEnumerable, ITraversable as enumerable-enumerator so must implement as `struct` to copy state naturally.
+public interface ITraversable<TTraversable, T> : IDisposable
+    where TTraversable : struct, ITraversable<TTraversable, T> // self
 {
-    bool IsNull { get; }
-
     T Origin { get; }
     bool HasChild { get; }
+    TTraversable ConvertToTraversable(T next);
     bool TryGetParent(out T parent);
     bool TryGetChildCount(out int count);
-
-    TTraverser GetTraverser();
-    TTraversable ConvertToTraversable(T next);
-
-    // use interface method instead of extension method(for better type inference)
-
-    ChildrenEnumerable<T, TTraversable, TTraverser> Children();
-    ChildrenEnumerable<T, TTraversable, TTraverser> ChildrenAndSelf();
-
-    // TODO: Func<Transform, bool> descendIntoChildren
-    DescendantsEnumerable<T, TTraversable, TTraverser> Descendants();
-    DescendantsEnumerable<T, TTraversable, TTraverser> DescendantsAndSelf();
-    AncestorsEnumerable<T, TTraversable, TTraverser> Ancestors();
-    AncestorsEnumerable<T, TTraversable, TTraverser> AncestorsAndSelf();
-    BeforeSelfEnumerable<T, TTraversable, TTraverser> BeforeSelf();
-    BeforeSelfEnumerable<T, TTraversable, TTraverser> BeforeSelfAndSelf();
-    AfterSelfEnumerable<T, TTraversable, TTraverser> AfterSelf();
-    AfterSelfEnumerable<T, TTraversable, TTraverser> AfterSelfAndSelf();
-}
-
-public interface ITraverser<T> : IDisposable
-{
-    bool IsNull { get; }
     bool TryGetNextChild(out T child);
     bool TryGetNextSibling(out T next);
     bool TryGetPreviousSibling(out T previous);
+}
+
+public static class TraversableExtensions
+{
+    // TODO: Func<Transform, bool> descendIntoChildren
+
+    public static ChildrenEnumerable<TTraversable, T> Children<TTraversable, T>(this TTraversable traversable)
+        where TTraversable : struct, ITraversable<TTraversable, T>
+    {
+        return new(traversable, withSelf: false);
+    }
+
+    public static ChildrenEnumerable<TTraversable, T> ChildrenAndSelf<TTraversable, T>(this TTraversable traversable)
+        where TTraversable : struct, ITraversable<TTraversable, T>
+    {
+        return new(traversable, withSelf: true);
+    }
+
+    public static DescendantsEnumerable<TTraversable, T> Descendants<TTraversable, T>(this TTraversable traversable)
+        where TTraversable : struct, ITraversable<TTraversable, T>
+    {
+        return new(traversable, withSelf: false);
+    }
+
+    public static DescendantsEnumerable<TTraversable, T> DescendantsAndSelf<TTraversable, T>(this TTraversable traversable)
+        where TTraversable : struct, ITraversable<TTraversable, T>
+    {
+        return new(traversable, withSelf: true);
+    }
+
+    public static AncestorsEnumerable<TTraversable, T> Ancestors<TTraversable, T>(this TTraversable traversable)
+        where TTraversable : struct, ITraversable<TTraversable, T>
+    {
+        return new(traversable, withSelf: false);
+    }
+
+    public static AncestorsEnumerable<TTraversable, T> AncestorsAndSelf<TTraversable, T>(this TTraversable traversable)
+        where TTraversable : struct, ITraversable<TTraversable, T>
+    {
+        return new(traversable, withSelf: true);
+    }
+
+    public static BeforeSelfEnumerable<TTraversable, T> BeforeSelf<TTraversable, T>(this TTraversable traversable)
+        where TTraversable : struct, ITraversable<TTraversable, T>
+    {
+        return new(traversable, withSelf: false);
+    }
+
+    public static BeforeSelfEnumerable<TTraversable, T> BeforeSelfAndSelf<TTraversable, T>(this TTraversable traversable)
+        where TTraversable : struct, ITraversable<TTraversable, T>
+    {
+        return new(traversable, withSelf: true);
+    }
+
+    public static AfterSelfEnumerable<TTraversable, T> AfterSelf<TTraversable, T>(this TTraversable traversable)
+        where TTraversable : struct, ITraversable<TTraversable, T>
+    {
+        return new(traversable, withSelf: false);
+    }
+
+    public static AfterSelfEnumerable<TTraversable, T> AfterSelfAndSelf<TTraversable, T>(this TTraversable traversable)
+        where TTraversable : struct, ITraversable<TTraversable, T>
+    {
+        return new(traversable, withSelf: true);
+    }
 }
