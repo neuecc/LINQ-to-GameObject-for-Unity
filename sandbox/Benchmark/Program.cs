@@ -8,6 +8,7 @@ using ZLinq;
 using ZLinq.Linq;
 using StructLinq;
 using Cathei.LinqGen;
+using SpanLinq;
 
 BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
 
@@ -80,6 +81,23 @@ public class IterateBenchmark
         var seq = array.ToStructEnumerable()
             .Select(x => x * 3, x => x)
             .Where(x => x % 2 == 0, x => x);
+
+        foreach (var item in seq)
+        {
+
+        }
+    }
+
+    [Benchmark]
+    public void SpanLinq()
+    {
+        //string[] array =
+        var seq = array.AsSpan()
+            .Select(x => x * 3)
+            .Where(x => x % 2 == 0);
+
+
+        seq.GetEnumerator();
 
         foreach (var item in seq)
         {

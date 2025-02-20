@@ -8,6 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AndanteSoft.SpanLinq" Version="1.0.1" />
 		<PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
 		<PackageReference Include="LinqAF" Version="3.0.0" />
 		<PackageReference Include="LinqGen" Version="0.3.1" />

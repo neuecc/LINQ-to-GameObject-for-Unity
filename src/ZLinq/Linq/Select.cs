@@ -4,10 +4,9 @@ namespace ZLinq
 {
     partial class StructEnumerableExtensions
     {
-        public static SelectStructEnumerable<T, TEnumerable, TEnumerator, TResult> Select<T, TEnumerable, TEnumerator, TResult>(
+        public static SelectStructEnumerable<TEnumerable, T, TResult> Select<TEnumerable, T, TResult>(
             this TEnumerable source, Func<T, TResult> selector)
-            where TEnumerable : struct, IStructEnumerable<T, TEnumerator>
-            where TEnumerator : struct, IStructEnumerator<T>
+            where TEnumerable : struct, IStructEnumerable<TEnumerable, T>
         {
             return new(source, selector);
         }
@@ -16,47 +15,29 @@ namespace ZLinq
 
 namespace ZLinq.Linq
 {
-    public readonly struct SelectStructEnumerable<T, TEnumerable, TEnumerator, TResult>(TEnumerable source, Func<T, TResult> selector)
-        : IStructEnumerable<TResult, SelectStructEnumerable<T, TEnumerable, TEnumerator, TResult>.Enumerator>
-        where TEnumerable : struct, IStructEnumerable<T, TEnumerator>
-        where TEnumerator : struct, IStructEnumerator<T>
+    public struct SelectStructEnumerable<TEnumerable, T, TResult>(TEnumerable source, Func<T, TResult> selector)
+        : IStructEnumerable<SelectStructEnumerable<TEnumerable, T, TResult>, TResult>
+        where TEnumerable : struct, IStructEnumerable<TEnumerable, T>
     {
         public bool IsNull => source.IsNull;
-
+        public StructEnumerator<SelectStructEnumerable<TEnumerable, T, TResult>, TResult> GetEnumerator() => new(this);
         public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
 
-        public Enumerator GetEnumerator() => new(source, selector);
-
-        public struct Enumerator(TEnumerable source, Func<T, TResult> selector) : IStructEnumerator<TResult>
+        public bool TryGetNext(out TResult value)
         {
-            TEnumerator enumerator;
-            TResult current = default!;
-
-            public bool IsNull => enumerator.IsNull;
-            public TResult Current => current;
-
-            public bool MoveNext()
+            if (source.TryGetNext(out var v))
             {
-                if (enumerator.IsNull)
-                {
-                    this.enumerator = source.GetEnumerator();
-                }
-
-                if (enumerator.MoveNext())
-                {
-                    current = selector(enumerator.Current);
-                    return true;
-                }
-                return false;
+                value = selector(v);
+                return true;
             }
 
-            public void Dispose()
-            {
-                if (!enumerator.IsNull)
-                {
-                    enumerator.Dispose();
-                }
-            }
+            value = default!;
+            return false;
+        }
+
+        public void Dispose()
+        {
+            source.Dispose();
         }
     }
 }
