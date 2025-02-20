@@ -1,6 +1,4 @@
-﻿// TODO: move to other project, "LINQ to FileSystem"
-
-namespace ZLinq;
+﻿namespace ZLinq;
 
 public static class FileSystemInfoExtensions
 {
@@ -97,10 +95,8 @@ public struct FileSystemInfoTraversable(FileSystemInfo origin) : ITraversable<Fi
                 next = fileSystemInfoEnumerator.Current;
                 return true;
             }
-            goto END;
         }
-
-        if (TryGetParent(out var parent) && parent is DirectoryInfo dir)
+        else if (TryGetParent(out var parent) && parent is DirectoryInfo dir)
         {
             var enumerator = fileSystemInfoEnumerator = dir.EnumerateFileSystemInfos().GetEnumerator();
 
@@ -115,7 +111,6 @@ public struct FileSystemInfoTraversable(FileSystemInfo origin) : ITraversable<Fi
             }
         }
 
-    END:
         next = null!;
         return false;
     }
@@ -128,23 +123,19 @@ public struct FileSystemInfoTraversable(FileSystemInfo origin) : ITraversable<Fi
             if (fileSystemInfoEnumerator.MoveNext())
             {
                 previous = fileSystemInfoEnumerator.Current;
-                if (previous.Name == origin.Name)
+                if (previous.Name != origin.Name)
                 {
-                    // find self, stop. 
-                    goto END;
+                    return true;
                 }
-                return true;
+                // else: find self, stop
             }
-            goto END;
         }
-
-        if (TryGetParent(out var parent) && parent is DirectoryInfo dir)
+        else if (TryGetParent(out var parent) && parent is DirectoryInfo dir)
         {
             fileSystemInfoEnumerator = dir.EnumerateFileSystemInfos().GetEnumerator();
             goto BEGIN;
         }
 
-    END:
         previous = null!;
         return false;
     }

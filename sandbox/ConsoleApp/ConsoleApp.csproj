@@ -8,6 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\src\ZLinq.Json\ZLinq.Json.csproj" />
 		<ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
 		<ProjectReference Include="..\..\src\ZLinq.SourceGenerator\ZLinq.SourceGenerator.csproj">
 			<OutputItemType>Analyzer</OutputItemType>
