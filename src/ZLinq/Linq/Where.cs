@@ -4,6 +4,9 @@
     {
         public static WhereStructEnumerable<TEnumerable, T> Where<TEnumerable, T>(this TEnumerable source, Func<T, bool> predicate)
             where TEnumerable : struct, IStructEnumerable<T>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
         {
             return new(source, predicate);
         }
@@ -11,6 +14,9 @@
         public static StructEnumerator<WhereStructEnumerable<TEnumerable, T>, T> GetEnumerator<TEnumerable, T>(
             this WhereStructEnumerable<TEnumerable, T> source)
             where TEnumerable : struct, IStructEnumerable<T>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
         {
             return new(source);
         }
@@ -21,9 +27,19 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct WhereStructEnumerable<TEnumerable, T>(TEnumerable source, Func<T, bool> predicate) : IStructEnumerable<T>
+#if NET9_0_OR_GREATER
+    public ref 
+#else
+    public
+#endif
+    struct WhereStructEnumerable<TEnumerable, T>(TEnumerable source, Func<T, bool> predicate) : IStructEnumerable<T>
         where TEnumerable : struct, IStructEnumerable<T>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
+        TEnumerable source = source;
+
         public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
 
         public bool TryGetNext(out T current)

@@ -16,6 +16,11 @@
         {
             return new(source);
         }
+
+        public static SpanStructEnumerable<T> AsStructEnumerable<T>(this Span<T> source)
+        {
+            return new(source);
+        }
     }
 }
 
@@ -135,6 +140,36 @@ namespace ZLinq.Linq
             {
                 enumerator.Dispose();
             }
+        }
+    }
+
+    [StructLayout(LayoutKind.Auto)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public ref struct SpanStructEnumerable<T>(Span<T> source) : IStructEnumerable<T>
+    {
+        Span<T> source = source;
+        int index;
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            count = source.Length;
+            return false;
+        }
+
+        public bool TryGetNext(out T current)
+        {
+            if (index < source.Length)
+            {
+                current = source[index++];
+                return true;
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

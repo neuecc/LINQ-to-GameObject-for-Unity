@@ -36,6 +36,11 @@ public class TraversableTest
         origin.Descendants().AsEnumerable().Select(x => x.gameObject.name).ShouldBe(["Sphere_A", "Sphere_B", "Group", "P1", "Group", "Sphere_B", "P2", "Sphere_A", "Sphere_B"]);
         origin.BeforeSelf().AsEnumerable().Select(x => x.gameObject.name).ShouldBe(["C1", "C2"]);
         origin.AfterSelf().AsEnumerable().Select(x => x.gameObject.name).ShouldBe(["C3", "C4"]);
+
+
+
+        var array = new int[] { 1, 2, 3 };
+        var span = array.AsSpan();
     }
 }
 

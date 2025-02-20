@@ -1,6 +1,4 @@
-﻿using ZLinq.Linq;
-
-namespace ZLinq;
+﻿namespace ZLinq;
 
 // enumerable is enumerator because it always copied(don't share state)
 // to achives copy-cost for performance and reduce assembly size
@@ -15,9 +13,14 @@ public interface IStructEnumerable<T> : IDisposable
 
 // generic implementation of enumerator
 [StructLayout(LayoutKind.Auto)]
-public struct StructEnumerator<TEnumerable, T>(TEnumerable source) : IDisposable
+public ref struct StructEnumerator<TEnumerable, T>(TEnumerable source) : IDisposable
     where TEnumerable : struct, IStructEnumerable<T>
+#if NET9_0_OR_GREATER
+    , allows ref struct
+#endif
 {
+    TEnumerable source = source;
+
     T current = default!;
 
     public T Current => current;
@@ -29,12 +32,16 @@ public struct StructEnumerator<TEnumerable, T>(TEnumerable source) : IDisposable
 
 public static partial class StructEnumerableExtensions
 {
-    public static StructEnumerator<TEnumerable, T> GetEnumerator<TEnumerable, T>(ref this TEnumerable source)
+    public static StructEnumerator<TEnumerable, T> GetEnumerator<TEnumerable, T>(this TEnumerable source)
         where TEnumerable : struct, IStructEnumerable<T>
+#if NET9_0_OR_GREATER
+    , allows ref struct
+#endif
     {
         return new(source);
     }
 
+    // not allows ref struct, only use directly from ITraversable sequence
     public static IEnumerable<T> AsEnumerable<TEnumerable, T>(this TEnumerable source)
         where TEnumerable : struct, IStructEnumerable<T>
     {
@@ -53,6 +60,9 @@ public static partial class StructEnumerableExtensions
 
     public static T[] ToArray<TEnumerable, T>(this TEnumerable source)
         where TEnumerable : struct, IStructEnumerable<T>
+#if NET9_0_OR_GREATER
+    , allows ref struct
+#endif
     {
         try
         {
@@ -95,6 +105,9 @@ public static partial class StructEnumerableExtensions
 
     public static void CopyToList<TEnumerable, T>(this TEnumerable source, List<T> list)
         where TEnumerable : struct, IStructEnumerable<T>
+#if NET9_0_OR_GREATER
+    , allows ref struct
+#endif
     {
         var i = 0;
         var count = list.Count;

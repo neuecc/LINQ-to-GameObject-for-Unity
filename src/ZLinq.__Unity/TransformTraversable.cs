@@ -20,6 +20,8 @@ namespace ZLinq
         public static AfterSelfEnumerable<TransformTraversable, Transform> AfterSelf(this Transform origin) => origin.AsTraversable().AfterSelf<TransformTraversable, Transform>();
         public static AfterSelfEnumerable<TransformTraversable, Transform> AfterSelfAndSelf(this Transform origin) => origin.AsTraversable().AfterSelfAndSelf<TransformTraversable, Transform>();
 
+        // OfComponent
+
         public static OfComponentTransformEnumerable<ChildrenEnumerable<TransformTraversable, Transform>, Component> OfComponent<TComponent>(this ChildrenEnumerable<TransformTraversable, Transform> source)
             where TComponent : Component => new(source);
 
@@ -34,6 +36,14 @@ namespace ZLinq
 
         public static OfComponentTransformEnumerable<AfterSelfEnumerable<TransformTraversable, Transform>, Component> OfComponent<TComponent>(this AfterSelfEnumerable<TransformTraversable, Transform> source)
             where TComponent : Component => new(source);
+
+        // GetEnumerator
+
+        public static StructEnumerator<ChildrenEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this ChildrenEnumerable<TransformTraversable, Transform> source) => new(source);
+        public static StructEnumerator<DescendantsEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this DescendantsEnumerable<TransformTraversable, Transform> source) => new(source);
+        public static StructEnumerator<AncestorsEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this AncestorsEnumerable<TransformTraversable, Transform> source) => new(source);
+        public static StructEnumerator<BeforeSelfEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this BeforeSelfEnumerable<TransformTraversable, Transform> source) => new(source);
+        public static StructEnumerator<AfterSelfEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this AfterSelfEnumerable<TransformTraversable, Transform> source) => new(source);
     }
 
     [StructLayout(LayoutKind.Auto)]

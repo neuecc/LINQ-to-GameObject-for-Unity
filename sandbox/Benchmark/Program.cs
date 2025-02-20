@@ -4,13 +4,23 @@ using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
-using ZLinq;
-using ZLinq.Linq;
-using StructLinq;
 using Cathei.LinqGen;
 using SpanLinq;
+using StructLinq;
+using ZLinq;
+using ZLinq.Linq;
+
+#if !DEBUG
 
 BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
+
+#else
+
+// sandbox
+
+Console.WriteLine("DEBUG");
+
+#endif
 
 [ShortRunJob]
 [MemoryDiagnoser]
@@ -48,6 +58,19 @@ public class IterateBenchmark
 
         }
     }
+
+    //[Benchmark]
+    //public void ZLinqSpan()
+    //{
+    //    var seq = array.AsSpan().AsStructEnumerable()
+    //        .Select<SpanStructEnumerable<int>, int, int>(x => x * 3)
+    //        .Where<SelectStructEnumerable<SpanStructEnumerable<int>, int, int>, int>(x => x % 2 == 0);
+
+    //    foreach (var item in seq)
+    //    {
+
+    //    }
+    //}
 
     [Benchmark]
     public void LinqGen()
