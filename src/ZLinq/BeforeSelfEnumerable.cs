@@ -1,11 +1,13 @@
 ﻿namespace ZLinq;
 
-public readonly struct BeforeSelfEnumerable<T, TTraversable, TTraverser>(TTraversable traversable, bool withSelf)
-    : IStructEnumerable<T, BeforeSelfEnumerable<T, TTraversable, TTraverser>.Enumerator>
+[StructLayout(LayoutKind.Auto)]
+public struct BeforeSelfEnumerable<T, TTraversable, TTraverser>(TTraversable traversable, bool withSelf)
+    : IStructEnumerable<T>
     where TTraversable : struct, ITraversable<T, TTraversable, TTraverser>
     where TTraverser : struct, ITraverser<T>
 {
-    public bool IsNull => traversable.IsNull;
+    bool iterateCompleted = false;
+    TTraverser traverser = default!;
 
     public bool TryGetNonEnumeratedCount(out int count)
     {
@@ -13,48 +15,39 @@ public readonly struct BeforeSelfEnumerable<T, TTraversable, TTraverser>(TTraver
         return false;
     }
 
-    public Enumerator GetEnumerator() => new(traversable, withSelf);
-
-    public struct Enumerator(TTraversable traversable, bool withSelf) : IStructEnumerator<T>
+    public bool TryGetNext(out T current)
     {
-        bool returnSelf = withSelf;
-        bool iterateCompleted = false;
-        T current = default!;
-        TTraverser traverser = default!;
-
-        public bool IsNull => traversable.IsNull;
-        public T Current => current;
-
-        public bool MoveNext()
+        if (iterateCompleted)
         {
-            if (iterateCompleted) return false;
-
-            if (traverser.IsNull)
-            {
-                traverser = traversable.GetTraverser();
-            }
-
-            if (traverser.TryGetPreviousSibling(out current))
-            {
-                return true;
-            }
-            else
-            {
-                iterateCompleted = true;
-                if (returnSelf)
-                {
-                    current = traversable.Origin;
-                    returnSelf = false;
-                    return true;
-                }
-            }
-
+            Unsafe.SkipInit(out current);
             return false;
         }
 
-        public void Dispose()
+        if (traverser.IsNull)
         {
-            traverser.Dispose();
+            traverser = traversable.GetTraverser();
         }
+
+        if (traverser.TryGetPreviousSibling(out current))
+        {
+            return true;
+        }
+        else
+        {
+            iterateCompleted = true;
+            if (withSelf)
+            {
+                current = traversable.Origin;
+                return true;
+            }
+        }
+
+        Unsafe.SkipInit(out current);
+        return false;
+    }
+
+    public void Dispose()
+    {
+        traverser.Dispose();
     }
 }

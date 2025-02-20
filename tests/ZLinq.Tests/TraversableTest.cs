@@ -46,11 +46,11 @@ public class TraversableTest
 
 internal static class CustomExtensions
 {
-    public static IEnumerable<Transform> AsEnumerable(this ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<Transform, ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser>, ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator>();
-    public static IEnumerable<Transform> AsEnumerable(this DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<Transform, DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser>, DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator>();
-    public static IEnumerable<Transform> AsEnumerable(this AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<Transform, AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser>, AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator>();
-    public static IEnumerable<Transform> AsEnumerable(this BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<Transform, BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser>, BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator>();
-    public static IEnumerable<Transform> AsEnumerable(this AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<Transform, AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser>, AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator>();
+    public static IEnumerable<Transform> AsEnumerable(this ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser>, Transform>();
+    public static IEnumerable<Transform> AsEnumerable(this DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser>, Transform>();
+    public static IEnumerable<Transform> AsEnumerable(this AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser>, Transform>();
+    public static IEnumerable<Transform> AsEnumerable(this BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser>, Transform>();
+    public static IEnumerable<Transform> AsEnumerable(this AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser> source) => source.AsEnumerable<AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser>, Transform>();
 }
 
 public class NanikaComponent : Component

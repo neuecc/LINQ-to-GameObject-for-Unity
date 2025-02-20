@@ -17,40 +17,40 @@ namespace ZLinq
         public static AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser> AfterSelf(this Transform origin) => origin.AsTraversable().AfterSelf();
         public static AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser> AfterSelfAndSelf(this Transform origin) => origin.AsTraversable().AfterSelfAndSelf();
 
-        public static OfComponentTransformEnumerable<ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser>, ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
-            OfComponent<TComponent>(this ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser> source)
-            where TComponent : Component
-        {
-            return new(source);
-        }
+        //public static OfComponentTransformEnumerable<ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser>, ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
+        //    OfComponent<TComponent>(this ChildrenEnumerable<Transform, TransformTraversable, TransformTraverser> source)
+        //    where TComponent : Component
+        //{
+        //    return new(source);
+        //}
 
-        public static OfComponentTransformEnumerable<DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser>, DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
-            OfComponent<TComponent>(this DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser> source)
-            where TComponent : Component
-        {
-            return new(source);
-        }
+        //public static OfComponentTransformEnumerable<DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser>, DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
+        //    OfComponent<TComponent>(this DescendantsEnumerable<Transform, TransformTraversable, TransformTraverser> source)
+        //    where TComponent : Component
+        //{
+        //    return new(source);
+        //}
 
-        public static OfComponentTransformEnumerable<AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser>, AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
-            OfComponent<TComponent>(this AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser> source)
-            where TComponent : Component
-        {
-            return new(source);
-        }
+        //public static OfComponentTransformEnumerable<AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser>, AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
+        //    OfComponent<TComponent>(this AncestorsEnumerable<Transform, TransformTraversable, TransformTraverser> source)
+        //    where TComponent : Component
+        //{
+        //    return new(source);
+        //}
 
-        public static OfComponentTransformEnumerable<BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser>, BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
-            OfComponent<TComponent>(this BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser> source)
-            where TComponent : Component
-        {
-            return new(source);
-        }
+        //public static OfComponentTransformEnumerable<BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser>, BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
+        //    OfComponent<TComponent>(this BeforeSelfEnumerable<Transform, TransformTraversable, TransformTraverser> source)
+        //    where TComponent : Component
+        //{
+        //    return new(source);
+        //}
 
-        public static OfComponentTransformEnumerable<AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser>, AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
-            OfComponent<TComponent>(this AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser> source)
-            where TComponent : Component
-        {
-            return new(source);
-        }
+        //public static OfComponentTransformEnumerable<AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser>, AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser>.Enumerator, TComponent>
+        //    OfComponent<TComponent>(this AfterSelfEnumerable<Transform, TransformTraversable, TransformTraverser> source)
+        //    where TComponent : Component
+        //{
+        //    return new(source);
+        //}
     }
 
     public readonly struct TransformTraversable : ITraversable<Transform, TransformTraversable, TransformTraverser>

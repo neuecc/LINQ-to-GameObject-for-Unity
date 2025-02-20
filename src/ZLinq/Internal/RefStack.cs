@@ -11,6 +11,7 @@ internal sealed class RefStack<T> where T : IDisposable
 
     RefStack<T>? Prev = null; // pooling property
 
+    // TODO: thread-safe
     public static RefStack<T> Rent()
     {
         if (Last == null)

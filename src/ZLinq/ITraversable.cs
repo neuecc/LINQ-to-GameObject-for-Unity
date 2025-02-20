@@ -1,5 +1,7 @@
 ﻿namespace ZLinq;
 
+// TODO: integrate ITRaversable and Traverser
+
 public interface ITraversable<T, TTraversable, TTraverser>
     where TTraversable : struct, ITraversable<T, TTraversable, TTraverser>
     where TTraverser : struct, ITraverser<T>

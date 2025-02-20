@@ -1,6 +1,4 @@
-﻿using ZLinq.Linq;
-
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class StructEnumerableExtensions
     {
@@ -23,15 +21,16 @@ namespace ZLinq
 
 namespace ZLinq.Linq
 {
-    public readonly struct EnumerableStructEnumerable<T>(IEnumerable<T> source) : IStructEnumerable<T, EnumerableStructEnumerable<T>.Enumerator>
+    [StructLayout(LayoutKind.Auto)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public struct EnumerableStructEnumerable<T>(IEnumerable<T> source) : IStructEnumerable<T>
     {
-        public bool IsNull => source == null;
-        public Enumerator GetEnumerator() => new(source);
+        IEnumerator<T>? enumerator = null;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
 #if NET8_0_OR_GREATER
-        return source.TryGetNonEnumeratedCount(out count);
+            return source.TryGetNonEnumeratedCount(out count);
 #else
             if (source is ICollection<T> c)
             {
@@ -48,44 +47,33 @@ namespace ZLinq.Linq
 #endif
         }
 
-        public struct Enumerator(IEnumerable<T> source) : IStructEnumerator<T>
+        public bool TryGetNext(out T current)
         {
-            T current = default!;
-            IEnumerator<T>? enumerator;
-
-            public bool IsNull => source == null;
-            public T Current => current;
-
-            public bool MoveNext()
+            if (enumerator == null)
             {
-                if (enumerator == null)
-                {
-                    enumerator = source.GetEnumerator();
-                }
-
-                if (enumerator.MoveNext())
-                {
-                    current = enumerator.Current;
-                    return true;
-                }
-
-                return false;
+                enumerator = source.GetEnumerator();
             }
 
-            public void Dispose()
+            if (enumerator.MoveNext())
             {
-                if (enumerator != null)
-                {
-                    enumerator.Dispose();
-                }
+                current = enumerator.Current;
+                return true;
             }
+
+            Unsafe.SkipInit(out current);
+            return false;
+        }
+
+        public void Dispose()
+        {
         }
     }
 
-    public readonly struct ArrayStructEnumerable<T>(T[] source) : IStructEnumerable<T, ArrayStructEnumerable<T>.Enumerator>
+    [StructLayout(LayoutKind.Auto)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public struct ArrayStructEnumerable<T>(T[] source) : IStructEnumerable<T>
     {
-        public bool IsNull => source == null;
-        public Enumerator GetEnumerator() => new(source);
+        int index;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -93,34 +81,29 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public struct Enumerator(T[] source) : IStructEnumerator<T>
+        public bool TryGetNext(out T current)
         {
-            T current = default!;
-            int index;
-
-            public bool IsNull => source == null;
-            public T Current => current;
-
-            public bool MoveNext()
+            if (index < source.Length)
             {
-                if (index < source.Length)
-                {
-                    current = source[index++];
-                    return true;
-                }
-                return false;
+                current = source[index++];
+                return true;
             }
 
-            public void Dispose()
-            {
-            }
+            Unsafe.SkipInit(out current);
+            return false;
+        }
+
+        public void Dispose()
+        {
         }
     }
 
-    public readonly struct ListStructEnumerable<T>(List<T> source) : IStructEnumerable<T, ListStructEnumerable<T>.Enumerator>
+    [StructLayout(LayoutKind.Auto)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public struct ListStructEnumerable<T>(List<T> source) : IStructEnumerable<T>
     {
-        public bool IsNull => source == null;
-        public Enumerator GetEnumerator() => new(source);
+        bool isInit = false;
+        List<T>.Enumerator enumerator;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -128,37 +111,29 @@ namespace ZLinq.Linq
             return true;
         }
 
-        public struct Enumerator(List<T> source) : IStructEnumerator<T>
+        public bool TryGetNext(out T current)
         {
-            T current = default!;
-            bool isInit = false;
-            List<T>.Enumerator enumerator;
-
-            public bool IsNull => source == null;
-            public T Current => current;
-
-            public bool MoveNext()
+            if (!isInit)
             {
-                if (!isInit)
-                {
-                    isInit = true;
-                    enumerator = source.GetEnumerator();
-                }
-
-                if (enumerator.MoveNext())
-                {
-                    current = enumerator.Current;
-                    return true;
-                }
-                return false;
+                isInit = true;
+                enumerator = source.GetEnumerator();
             }
 
-            public void Dispose()
+            if (enumerator.MoveNext())
             {
-                if (isInit)
-                {
-                    enumerator.Dispose();
-                }
+                current = enumerator.Current;
+                return true;
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
+        }
+
+        public void Dispose()
+        {
+            if (isInit)
+            {
+                enumerator.Dispose();
             }
         }
     }

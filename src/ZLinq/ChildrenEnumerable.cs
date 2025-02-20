@@ -1,11 +1,12 @@
 ﻿namespace ZLinq;
 
-public readonly struct ChildrenEnumerable<T, TTraversable, TTraverser>(TTraversable traversable, bool withSelf)
-    : IStructEnumerable<T, ChildrenEnumerable<T, TTraversable, TTraverser>.Enumerator>
+[StructLayout(LayoutKind.Auto)]
+public struct ChildrenEnumerable<T, TTraversable, TTraverser>(TTraversable traversable, bool withSelf)
+    : IStructEnumerable<T>
     where TTraversable : struct, ITraversable<T, TTraversable, TTraverser>
     where TTraverser : struct, ITraverser<T>
 {
-    public bool IsNull => traversable.IsNull;
+    TTraverser traverser = default!;
 
     public bool TryGetNonEnumeratedCount(out int count)
     {
@@ -19,37 +20,25 @@ public readonly struct ChildrenEnumerable<T, TTraversable, TTraverser>(TTraversa
         return false;
     }
 
-    public Enumerator GetEnumerator() => new(traversable, withSelf);
-
-    public struct Enumerator(TTraversable traversable, bool withSelf) : IStructEnumerator<T>
+    public bool TryGetNext(out T current)
     {
-        bool returnSelf = withSelf;
-        T current = default!;
-        TTraverser traverser = default!;
-
-        public bool IsNull => traversable.IsNull;
-        public T Current => current;
-
-        public bool MoveNext()
+        if (withSelf)
         {
-            if (returnSelf)
-            {
-                current = traversable.Origin;
-                returnSelf = false;
-                return true;
-            }
-
-            if (traverser.IsNull)
-            {
-                traverser = traversable.GetTraverser();
-            }
-
-            return traverser.TryGetNextChild(out current);
+            current = traversable.Origin;
+            withSelf = false;
+            return true;
         }
 
-        public void Dispose()
+        if (traverser.IsNull)
         {
-            traverser.Dispose();
+            traverser = traversable.GetTraverser();
         }
+
+        return traverser.TryGetNextChild(out current);
+    }
+
+    public void Dispose()
+    {
+        traverser.Dispose();
     }
 }

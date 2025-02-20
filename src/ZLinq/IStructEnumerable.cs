@@ -1,20 +1,22 @@
-﻿namespace ZLinq;
+﻿using ZLinq.Linq;
+
+namespace ZLinq;
 
 // enumerable is enumerator because it always copied(don't share state)
 // to achives copy-cost for performance and reduce assembly size
-public interface IStructEnumerable<TEnumerable, T> : IDisposable
-    where TEnumerable : struct, IStructEnumerable<TEnumerable, T> // allows ref struct(but needs .NET 9...)
+public interface IStructEnumerable<T> : IDisposable
 {
-    bool IsNull { get; }
     bool TryGetNonEnumeratedCount(out int count);
-    bool TryGetNext(out T value); // as MoveNext + Current
+    bool TryGetNext(out T current); // as MoveNext + Current
 
-    StructEnumerator<TEnumerable, T> GetEnumerator(); // for foreach
+    // can't do like this(some operator needs ref field but it can't support lower target platforms)
+    // ref T TryGetNext(out bool success);
 }
 
 // generic implementation of enumerator
+[StructLayout(LayoutKind.Auto)]
 public struct StructEnumerator<TEnumerable, T>(TEnumerable source) : IDisposable
-    where TEnumerable : struct, IStructEnumerable<TEnumerable, T>
+    where TEnumerable : struct, IStructEnumerable<T>
 {
     T current = default!;
 
@@ -27,17 +29,30 @@ public struct StructEnumerator<TEnumerable, T>(TEnumerable source) : IDisposable
 
 public static partial class StructEnumerableExtensions
 {
-    public static IEnumerable<T> AsEnumerable<TEnumerable, T>(this TEnumerable source)
-        where TEnumerable : struct, IStructEnumerable<TEnumerable, T>
+    public static StructEnumerator<TEnumerable, T> GetEnumerator<TEnumerable, T>(ref this TEnumerable source)
+        where TEnumerable : struct, IStructEnumerable<T>
     {
-        foreach (var item in source)
+        return new(source);
+    }
+
+    public static IEnumerable<T> AsEnumerable<TEnumerable, T>(this TEnumerable source)
+        where TEnumerable : struct, IStructEnumerable<T>
+    {
+        try
         {
-            yield return item;
+            while (source.TryGetNext(out var current))
+            {
+                yield return current;
+            }
+        }
+        finally
+        {
+            source.Dispose();
         }
     }
 
     public static T[] ToArray<TEnumerable, T>(this TEnumerable source)
-        where TEnumerable : struct, IStructEnumerable<TEnumerable, T>
+        where TEnumerable : struct, IStructEnumerable<T>
     {
         try
         {
@@ -79,7 +94,7 @@ public static partial class StructEnumerableExtensions
 
 
     public static void CopyToList<TEnumerable, T>(this TEnumerable source, List<T> list)
-        where TEnumerable : struct, IStructEnumerable<TEnumerable, T>
+        where TEnumerable : struct, IStructEnumerable<T>
     {
         var i = 0;
         var count = list.Count;

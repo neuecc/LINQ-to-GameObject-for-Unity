@@ -40,8 +40,8 @@ public class IterateBenchmark
     public void ZLinq()
     {
         var seq = array.AsStructEnumerable()
-            .Select<int, ArrayStructEnumerable<int>, ArrayStructEnumerable<int>.Enumerator, int>(x => x * 3)
-            .Where<int, SelectStructEnumerable<int, ArrayStructEnumerable<int>, ArrayStructEnumerable<int>.Enumerator, int>, SelectStructEnumerable<int, ArrayStructEnumerable<int>, ArrayStructEnumerable<int>.Enumerator, int>.Enumerator>(x => x % 2 == 0);
+            .Select<ArrayStructEnumerable<int>, int, int>(x => x * 3)
+            .Where<SelectStructEnumerable<ArrayStructEnumerable<int>, int, int>, int>(x => x % 2 == 0);
 
         foreach (var item in seq)
         {

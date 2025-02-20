@@ -1,12 +1,11 @@
 ﻿namespace ZLinq;
 
-public readonly struct AncestorsEnumerable<T, TTraversable, TTraverser>(TTraversable traversable, bool withSelf)
-    : IStructEnumerable<T, AncestorsEnumerable<T, TTraversable, TTraverser>.Enumerator>
+[StructLayout(LayoutKind.Auto)]
+public struct AncestorsEnumerable<T, TTraversable, TTraverser>(TTraversable traversable, bool withSelf)
+    : IStructEnumerable<T>
     where TTraversable : struct, ITraversable<T, TTraversable, TTraverser>
     where TTraverser : struct, ITraverser<T>
 {
-    public bool IsNull => traversable.IsNull;
-
     public bool TryGetNonEnumeratedCount(out int count)
     {
         if (traversable.TryGetChildCount(out var childCount))
@@ -19,37 +18,27 @@ public readonly struct AncestorsEnumerable<T, TTraversable, TTraverser>(TTravers
         return false;
     }
 
-    public Enumerator GetEnumerator() => new(traversable, withSelf);
-
-    public struct Enumerator(TTraversable traversable, bool withSelf) : IStructEnumerator<T>
+    public bool TryGetNext(out T current)
     {
-        bool returnSelf = withSelf;
-        T current = default!;
-
-        public bool IsNull => traversable.IsNull;
-        public T Current => current;
-
-        public bool MoveNext()
+        if (withSelf)
         {
-            if (returnSelf)
-            {
-                current = traversable.Origin;
-                returnSelf = false;
-                return true;
-            }
-
-            if (traversable.TryGetParent(out var parent))
-            {
-                current = parent;
-                traversable = traversable.ConvertToTraversable(parent);
-                return true;
-            }
-
-            return false;
+            current = traversable.Origin;
+            withSelf = false;
+            return true;
         }
 
-        public void Dispose()
+        if (traversable.TryGetParent(out var parent))
         {
+            current = parent;
+            traversable = traversable.ConvertToTraversable(parent);
+            return true;
         }
+
+        Unsafe.SkipInit(out current);
+        return false;
+    }
+
+    public void Dispose()
+    {
     }
 }

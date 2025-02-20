@@ -1,66 +1,49 @@
-﻿using ZLinq.Linq;
-
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class StructEnumerableExtensions
     {
-        public static WhereStructEnumerable<T, TEnumerable, TEnumerator> Where<T, TEnumerable, TEnumerator>(
-            this TEnumerable source, Func<T, bool> predicate)
-            where TEnumerable : struct, IStructEnumerable<T, TEnumerator>
-            where TEnumerator : struct, IStructEnumerator<T>
+        public static WhereStructEnumerable<TEnumerable, T> Where<TEnumerable, T>(this TEnumerable source, Func<T, bool> predicate)
+            where TEnumerable : struct, IStructEnumerable<T>
         {
             return new(source, predicate);
+        }
+
+        public static StructEnumerator<WhereStructEnumerable<TEnumerable, T>, T> GetEnumerator<TEnumerable, T>(
+            this WhereStructEnumerable<TEnumerable, T> source)
+            where TEnumerable : struct, IStructEnumerable<T>
+        {
+            return new(source);
         }
     }
 }
 
 namespace ZLinq.Linq
 {
-    public readonly struct WhereStructEnumerable<T, TEnumerable, TEnumerator>(TEnumerable source, Func<T, bool> predicate)
-        : IStructEnumerable<T, WhereStructEnumerable<T, TEnumerable, TEnumerator>.Enumerator>
-        where TEnumerable : struct, IStructEnumerable<T, TEnumerator>
-        where TEnumerator : struct, IStructEnumerator<T>
+    [StructLayout(LayoutKind.Auto)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public struct WhereStructEnumerable<TEnumerable, T>(TEnumerable source, Func<T, bool> predicate) : IStructEnumerable<T>
+        where TEnumerable : struct, IStructEnumerable<T>
     {
-        public bool IsNull => source.IsNull;
-
         public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
 
-        public Enumerator GetEnumerator() => new(source, predicate);
-
-        public struct Enumerator(TEnumerable source, Func<T, bool> predicate) : IStructEnumerator<T>
+        public bool TryGetNext(out T current)
         {
-            TEnumerator enumerator;
-            T current = default!;
-
-            public bool IsNull => enumerator.IsNull;
-            public T Current => current;
-
-            public bool MoveNext()
+            while (source.TryGetNext(out var value))
             {
-                if (enumerator.IsNull)
+                if (predicate(value))
                 {
-                    this.enumerator = source.GetEnumerator();
+                    current = value;
+                    return true;
                 }
-
-                while (enumerator.MoveNext())
-                {
-                    var value = enumerator.Current;
-                    if (predicate(value))
-                    {
-                        current = value;
-                        return true;
-                    }
-                }
-                return false;
             }
 
-            public void Dispose()
-            {
-                if (!enumerator.IsNull)
-                {
-                    enumerator.Dispose();
-                }
-            }
+            Unsafe.SkipInit(out current);
+            return false;
+        }
+
+        public void Dispose()
+        {
+            source.Dispose();
         }
     }
 }
