@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace ZLinq
@@ -10,16 +9,37 @@ namespace ZLinq
 
         public static TransformTraversable AsTraversable(this Transform origin) => new(origin);
 
-        public static ChildrenEnumerable<TransformTraversable, Transform> Children(this Transform origin) => origin.AsTraversable().Children<TransformTraversable, Transform>();
-        public static ChildrenEnumerable<TransformTraversable, Transform> ChildrenAndSelf(this Transform origin) => origin.AsTraversable().ChildrenAndSelf<TransformTraversable, Transform>();
-        public static DescendantsEnumerable<TransformTraversable, Transform> Descendants(this Transform origin) => origin.AsTraversable().Descendants<TransformTraversable, Transform>();
-        public static DescendantsEnumerable<TransformTraversable, Transform> DescendantsAndSelf(this Transform origin) => origin.AsTraversable().DescendantsAndSelf<TransformTraversable, Transform>();
-        public static AncestorsEnumerable<TransformTraversable, Transform> Ancestors(this Transform origin) => origin.AsTraversable().Ancestors<TransformTraversable, Transform>();
-        public static AncestorsEnumerable<TransformTraversable, Transform> AncestorsAndSelf(this Transform origin) => origin.AsTraversable().AncestorsAndSelf<TransformTraversable, Transform>();
-        public static BeforeSelfEnumerable<TransformTraversable, Transform> BeforeSelf(this Transform origin) => origin.AsTraversable().BeforeSelf<TransformTraversable, Transform>();
-        public static BeforeSelfEnumerable<TransformTraversable, Transform> BeforeSelfAndSelf(this Transform origin) => origin.AsTraversable().BeforeSelfAndSelf<TransformTraversable, Transform>();
-        public static AfterSelfEnumerable<TransformTraversable, Transform> AfterSelf(this Transform origin) => origin.AsTraversable().AfterSelf<TransformTraversable, Transform>();
-        public static AfterSelfEnumerable<TransformTraversable, Transform> AfterSelfAndSelf(this Transform origin) => origin.AsTraversable().AfterSelfAndSelf<TransformTraversable, Transform>();
+        // type inference helper
+
+        public static ChildrenEnumerable<TransformTraversable, Transform> Children(this TransformTraversable traversable) => traversable.Children<TransformTraversable, Transform>();
+        public static ChildrenEnumerable<TransformTraversable, Transform> ChildrenAndSelf(this TransformTraversable traversable) => traversable.ChildrenAndSelf<TransformTraversable, Transform>();
+        public static DescendantsEnumerable<TransformTraversable, Transform> Descendants(this TransformTraversable traversable) => traversable.Descendants<TransformTraversable, Transform>();
+        public static DescendantsEnumerable<TransformTraversable, Transform> DescendantsAndSelf(this TransformTraversable traversable) => traversable.DescendantsAndSelf<TransformTraversable, Transform>();
+        public static AncestorsEnumerable<TransformTraversable, Transform> Ancestors(this TransformTraversable traversable) => traversable.Ancestors<TransformTraversable, Transform>();
+        public static AncestorsEnumerable<TransformTraversable, Transform> AncestorsAndSelf(this TransformTraversable traversable) => traversable.AncestorsAndSelf<TransformTraversable, Transform>();
+        public static BeforeSelfEnumerable<TransformTraversable, Transform> BeforeSelf(this TransformTraversable traversable) => traversable.BeforeSelf<TransformTraversable, Transform>();
+        public static BeforeSelfEnumerable<TransformTraversable, Transform> BeforeSelfAndSelf(this TransformTraversable traversable) => traversable.BeforeSelfAndSelf<TransformTraversable, Transform>();
+        public static AfterSelfEnumerable<TransformTraversable, Transform> AfterSelf(this TransformTraversable traversable) => traversable.AfterSelf<TransformTraversable, Transform>();
+        public static AfterSelfEnumerable<TransformTraversable, Transform> AfterSelfAndSelf(this TransformTraversable traversable) => traversable.AfterSelfAndSelf<TransformTraversable, Transform>();
+
+        public static StructEnumerator<ChildrenEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this ChildrenEnumerable<TransformTraversable, Transform> source) => new(source);
+        public static StructEnumerator<DescendantsEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this DescendantsEnumerable<TransformTraversable, Transform> source) => new(source);
+        public static StructEnumerator<AncestorsEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this AncestorsEnumerable<TransformTraversable, Transform> source) => new(source);
+        public static StructEnumerator<BeforeSelfEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this BeforeSelfEnumerable<TransformTraversable, Transform> source) => new(source);
+        public static StructEnumerator<AfterSelfEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this AfterSelfEnumerable<TransformTraversable, Transform> source) => new(source);
+
+        // direct shortcut
+
+        public static ChildrenEnumerable<TransformTraversable, Transform> Children(this Transform origin) => origin.AsTraversable().Children();
+        public static ChildrenEnumerable<TransformTraversable, Transform> ChildrenAndSelf(this Transform origin) => origin.AsTraversable().ChildrenAndSelf();
+        public static DescendantsEnumerable<TransformTraversable, Transform> Descendants(this Transform origin) => origin.AsTraversable().Descendants();
+        public static DescendantsEnumerable<TransformTraversable, Transform> DescendantsAndSelf(this Transform origin) => origin.AsTraversable().DescendantsAndSelf();
+        public static AncestorsEnumerable<TransformTraversable, Transform> Ancestors(this Transform origin) => origin.AsTraversable().Ancestors();
+        public static AncestorsEnumerable<TransformTraversable, Transform> AncestorsAndSelf(this Transform origin) => origin.AsTraversable().AncestorsAndSelf();
+        public static BeforeSelfEnumerable<TransformTraversable, Transform> BeforeSelf(this Transform origin) => origin.AsTraversable().BeforeSelf();
+        public static BeforeSelfEnumerable<TransformTraversable, Transform> BeforeSelfAndSelf(this Transform origin) => origin.AsTraversable().BeforeSelfAndSelf();
+        public static AfterSelfEnumerable<TransformTraversable, Transform> AfterSelf(this Transform origin) => origin.AsTraversable().AfterSelf();
+        public static AfterSelfEnumerable<TransformTraversable, Transform> AfterSelfAndSelf(this Transform origin) => origin.AsTraversable().AfterSelfAndSelf();
 
         // OfComponent
 
@@ -37,14 +57,6 @@ namespace ZLinq
 
         public static OfComponentTransformEnumerable<AfterSelfEnumerable<TransformTraversable, Transform>, Component> OfComponent<TComponent>(this AfterSelfEnumerable<TransformTraversable, Transform> source)
             where TComponent : Component => new(source);
-
-        // GetEnumerator
-
-        public static StructEnumerator<ChildrenEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this ChildrenEnumerable<TransformTraversable, Transform> source) => new(source);
-        public static StructEnumerator<DescendantsEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this DescendantsEnumerable<TransformTraversable, Transform> source) => new(source);
-        public static StructEnumerator<AncestorsEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this AncestorsEnumerable<TransformTraversable, Transform> source) => new(source);
-        public static StructEnumerator<BeforeSelfEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this BeforeSelfEnumerable<TransformTraversable, Transform> source) => new(source);
-        public static StructEnumerator<AfterSelfEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this AfterSelfEnumerable<TransformTraversable, Transform> source) => new(source);
     }
 
     [StructLayout(LayoutKind.Auto)]
