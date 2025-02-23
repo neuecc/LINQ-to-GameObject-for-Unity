@@ -4,7 +4,7 @@ using ZLinq;
 
 var xs = new[] { 1, 2, 3 };
 
-// xs.AsStructEnumerable().Select(x => x);`
+// xs.AsValueEnumerable().Select(x => x);`
 
 var json = JsonNode.Parse("""
 {

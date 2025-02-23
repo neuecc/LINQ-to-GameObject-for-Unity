@@ -5,10 +5,10 @@ using System.Dynamic;
 
 namespace ZLinq
 {
-    partial class StructEnumerableExtensions
+    partial class ValueEnumerableExtensions
     {
-        public static TakeStructEnumerable<TEnumerable, T> Take<TEnumerable, T>(this TEnumerable source, int count)
-            where TEnumerable : struct, IStructEnumerable<T>
+        public static TakeValueEnumerable<TEnumerable, T> Take<TEnumerable, T>(this TEnumerable source, int count)
+            where TEnumerable : struct, IValueEnumerable<T>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -16,9 +16,9 @@ namespace ZLinq
             return new(source, count);
         }
 
-        //        public static StructEnumerator<TakeStructEnumerable<TEnumerable, T>> GetEnumerator<TEnumerable, T>(
-        //            this TakeStructEnumerable<TEnumerable, T> source)
-        //            where TEnumerable : struct, IStructEnumerable<T>
+        //        public static StructEnumerator<TakeValueEnumerable<TEnumerable, T>> GetEnumerator<TEnumerable, T>(
+        //            this TakeValueEnumerable<TEnumerable, T> source)
+        //            where TEnumerable : struct, IValueEnumerable<T>
         //#if NET9_0_OR_GREATER
         //            , allows ref struct
         //#endif
@@ -37,8 +37,8 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct TakeStructEnumerable<TEnumerable, T>(TEnumerable source, int takeCount) : IStructEnumerable<T>
-        where TEnumerable : struct, IStructEnumerable<T>
+    struct TakeValueEnumerable<TEnumerable, T>(TEnumerable source, int takeCount) : IValueEnumerable<T>
+        where TEnumerable : struct, IValueEnumerable<T>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif

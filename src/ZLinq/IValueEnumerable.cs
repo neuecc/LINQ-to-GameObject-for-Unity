@@ -2,7 +2,7 @@
 
 // enumerable is enumerator because it always copied(don't share state)
 // to achives copy-cost for performance and reduce assembly size
-public interface IStructEnumerable<T> : IDisposable
+public interface IValueEnumerable<T> : IDisposable
 {
     bool TryGetNonEnumeratedCount(out int count);
     bool TryGetSpan(out ReadOnlySpan<T> span);
@@ -14,8 +14,8 @@ public interface IStructEnumerable<T> : IDisposable
 
 // generic implementation of enumerator
 [StructLayout(LayoutKind.Auto)]
-public ref struct StructEnumerator<TEnumerable, T>(TEnumerable source) : IDisposable
-    where TEnumerable : struct, IStructEnumerable<T>
+public ref struct ValueEnumerator<TEnumerable, T>(TEnumerable source) : IDisposable
+    where TEnumerable : struct, IValueEnumerable<T>
 #if NET9_0_OR_GREATER
     , allows ref struct
 #endif
@@ -31,10 +31,10 @@ public ref struct StructEnumerator<TEnumerable, T>(TEnumerable source) : IDispos
     public void Dispose() => source.Dispose();
 }
 
-public static partial class StructEnumerableExtensions
+public static partial class ValueEnumerableExtensions
 {
-    public static StructEnumerator<TEnumerable, T> GetEnumerator<TEnumerable, T>(this TEnumerable source)
-        where TEnumerable : struct, IStructEnumerable<T>
+    public static ValueEnumerator<TEnumerable, T> GetEnumerator<TEnumerable, T>(this TEnumerable source)
+        where TEnumerable : struct, IValueEnumerable<T>
 #if NET9_0_OR_GREATER
     , allows ref struct
 #endif
@@ -44,7 +44,7 @@ public static partial class StructEnumerableExtensions
 
     // not allows ref struct; in .NET 9, only use directly from ITraversable(or similar) sequence
     public static IEnumerable<T> AsEnumerable<TEnumerable, T>(this TEnumerable source)
-        where TEnumerable : struct, IStructEnumerable<T>
+        where TEnumerable : struct, IValueEnumerable<T>
     {
         try
         {
@@ -60,7 +60,7 @@ public static partial class StructEnumerableExtensions
     }
 
     public static T[] ToArray<TEnumerable, T>(this TEnumerable source)
-        where TEnumerable : struct, IStructEnumerable<T>
+        where TEnumerable : struct, IValueEnumerable<T>
 #if NET9_0_OR_GREATER
     , allows ref struct
 #endif
@@ -109,7 +109,7 @@ public static partial class StructEnumerableExtensions
 
     // TODO: CopyInto
     public static void CopyToList<TEnumerable, T>(this TEnumerable source, List<T> list)
-        where TEnumerable : struct, IStructEnumerable<T>
+        where TEnumerable : struct, IValueEnumerable<T>
 #if NET9_0_OR_GREATER
     , allows ref struct
 #endif

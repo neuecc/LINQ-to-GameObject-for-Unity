@@ -1,9 +1,9 @@
 ﻿namespace ZLinq
 {
-    partial class StructEnumerableExtensions
+    partial class ValueEnumerableExtensions
     {
-        public static WhereStructEnumerable<TEnumerable, T> Where<TEnumerable, T>(this TEnumerable source, Func<T, bool> predicate)
-            where TEnumerable : struct, IStructEnumerable<T>
+        public static WhereValueEnumerable<TEnumerable, T> Where<TEnumerable, T>(this TEnumerable source, Func<T, bool> predicate)
+            where TEnumerable : struct, IValueEnumerable<T>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -11,9 +11,9 @@
             return new(source, predicate);
         }
 
-        public static StructEnumerator<WhereStructEnumerable<TEnumerable, T>, T> GetEnumerator<TEnumerable, T>(
-            this WhereStructEnumerable<TEnumerable, T> source)
-            where TEnumerable : struct, IStructEnumerable<T>
+        public static ValueEnumerator<WhereValueEnumerable<TEnumerable, T>, T> GetEnumerator<TEnumerable, T>(
+            this WhereValueEnumerable<TEnumerable, T> source)
+            where TEnumerable : struct, IValueEnumerable<T>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -32,8 +32,8 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct WhereStructEnumerable<TEnumerable, T>(TEnumerable source, Func<T, bool> predicate) : IStructEnumerable<T>
-        where TEnumerable : struct, IStructEnumerable<T>
+    struct WhereValueEnumerable<TEnumerable, T>(TEnumerable source, Func<T, bool> predicate) : IValueEnumerable<T>
+        where TEnumerable : struct, IValueEnumerable<T>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif

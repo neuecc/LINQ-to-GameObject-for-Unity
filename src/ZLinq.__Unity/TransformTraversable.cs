@@ -23,11 +23,11 @@ namespace ZLinq
         public static AfterSelfEnumerable<TransformTraversable, Transform> AfterSelf(this TransformTraversable traversable) => traversable.AfterSelf<TransformTraversable, Transform>();
         public static AfterSelfEnumerable<TransformTraversable, Transform> AfterSelfAndSelf(this TransformTraversable traversable) => traversable.AfterSelfAndSelf<TransformTraversable, Transform>();
 
-        public static StructEnumerator<ChildrenEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this ChildrenEnumerable<TransformTraversable, Transform> source) => new(source);
-        public static StructEnumerator<DescendantsEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this DescendantsEnumerable<TransformTraversable, Transform> source) => new(source);
-        public static StructEnumerator<AncestorsEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this AncestorsEnumerable<TransformTraversable, Transform> source) => new(source);
-        public static StructEnumerator<BeforeSelfEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this BeforeSelfEnumerable<TransformTraversable, Transform> source) => new(source);
-        public static StructEnumerator<AfterSelfEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this AfterSelfEnumerable<TransformTraversable, Transform> source) => new(source);
+        public static ValueEnumerator<ChildrenEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this ChildrenEnumerable<TransformTraversable, Transform> source) => new(source);
+        public static ValueEnumerator<DescendantsEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this DescendantsEnumerable<TransformTraversable, Transform> source) => new(source);
+        public static ValueEnumerator<AncestorsEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this AncestorsEnumerable<TransformTraversable, Transform> source) => new(source);
+        public static ValueEnumerator<BeforeSelfEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this BeforeSelfEnumerable<TransformTraversable, Transform> source) => new(source);
+        public static ValueEnumerator<AfterSelfEnumerable<TransformTraversable, Transform>, Transform> GetEnumerator(this AfterSelfEnumerable<TransformTraversable, Transform> source) => new(source);
 
         // direct shortcut
 

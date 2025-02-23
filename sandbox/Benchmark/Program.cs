@@ -54,9 +54,9 @@ public class IterateBenchmark
     [Benchmark]
     public void ZLinq()
     {
-        var seq = array.AsStructEnumerable()
-            .Select<ArrayStructEnumerable<int>, int, int>(x => x * 3)
-            .Where<SelectStructEnumerable<ArrayStructEnumerable<int>, int, int>, int>(x => x % 2 == 0);
+        var seq = array.AsValueEnumerable()
+            .Select<ArrayValueEnumerable<int>, int, int>(x => x * 3)
+            .Where<SelectValueEnumerable<ArrayValueEnumerable<int>, int, int>, int>(x => x % 2 == 0);
 
         foreach (var item in seq)
         {
@@ -67,9 +67,9 @@ public class IterateBenchmark
     //[Benchmark]
     //public void ZLinqSpan()
     //{
-    //    var seq = array.AsSpan().AsStructEnumerable()
-    //        .Select<SpanStructEnumerable<int>, int, int>(x => x * 3)
-    //        .Where<SelectStructEnumerable<SpanStructEnumerable<int>, int, int>, int>(x => x % 2 == 0);
+    //    var seq = array.AsSpan().AsValueEnumerable()
+    //        .Select<SpanValueEnumerable<int>, int, int>(x => x * 3)
+    //        .Where<SelectValueEnumerable<SpanValueEnumerable<int>, int, int>, int>(x => x % 2 == 0);
 
     //    foreach (var item in seq)
     //    {
@@ -106,7 +106,7 @@ public class IterateBenchmark
     [Benchmark]
     public void StructLinq()
     {
-        var seq = array.ToStructEnumerable()
+        var seq = array.ToValueEnumerable()
             .Select(x => x * 3, x => x)
             .Where(x => x % 2 == 0, x => x);
 

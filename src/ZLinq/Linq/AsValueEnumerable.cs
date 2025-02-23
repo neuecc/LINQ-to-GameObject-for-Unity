@@ -1,40 +1,40 @@
 ﻿namespace ZLinq
 {
-    partial class StructEnumerableExtensions
+    partial class ValueEnumerableExtensions
     {
-        public static EnumerableStructEnumerable<T> AsStructEnumerable<T>(this IEnumerable<T> source)
+        public static EnumerableValueEnumerable<T> AsValueEnumerable<T>(this IEnumerable<T> source)
         {
             return new(source);
         }
 
-        public static ArrayStructEnumerable<T> AsStructEnumerable<T>(this T[] source)
+        public static ArrayValueEnumerable<T> AsValueEnumerable<T>(this T[] source)
         {
             return new(source);
         }
 
-        public static ListStructEnumerable<T> AsStructEnumerable<T>(this List<T> source)
+        public static ListValueEnumerable<T> AsValueEnumerable<T>(this List<T> source)
         {
             return new(source);
         }
 
-        public static MemoryStructEnumerable<T> AsStructEnumerable<T>(this Memory<T> source)
+        public static MemoryValueEnumerable<T> AsValueEnumerable<T>(this Memory<T> source)
         {
             return new(source);
         }
 
-        public static MemoryStructEnumerable<T> AsStructEnumerable<T>(this ReadOnlyMemory<T> source)
+        public static MemoryValueEnumerable<T> AsValueEnumerable<T>(this ReadOnlyMemory<T> source)
         {
             return new(source);
         }
 
 #if NET9_0_OR_GREATER
 
-        public static SpanStructEnumerable<T> AsStructEnumerable<T>(this Span<T> source)
+        public static SpanValueEnumerable<T> AsValueEnumerable<T>(this Span<T> source)
         {
             return new(source);
         }
 
-        public static SpanStructEnumerable<T> AsStructEnumerable<T>(this ReadOnlySpan<T> source)
+        public static SpanValueEnumerable<T> AsValueEnumerable<T>(this ReadOnlySpan<T> source)
         {
             return new(source);
         }
@@ -47,7 +47,7 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct EnumerableStructEnumerable<T>(IEnumerable<T> source) : IStructEnumerable<T>
+    public struct EnumerableValueEnumerable<T>(IEnumerable<T> source) : IValueEnumerable<T>
     {
         IEnumerator<T>? enumerator = null;
 
@@ -118,7 +118,7 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct ArrayStructEnumerable<T>(T[] source) : IStructEnumerable<T>
+    public struct ArrayValueEnumerable<T>(T[] source) : IValueEnumerable<T>
     {
         int index;
 
@@ -153,7 +153,7 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public ref struct MemoryStructEnumerable<T>(ReadOnlyMemory<T> source) : IStructEnumerable<T>
+    public ref struct MemoryValueEnumerable<T>(ReadOnlyMemory<T> source) : IValueEnumerable<T>
     {
 #if NET9_0_OR_GREATER
         ReadOnlySpan<T> source = source.Span;
@@ -200,7 +200,7 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct ListStructEnumerable<T>(List<T> source) : IStructEnumerable<T>
+    public struct ListValueEnumerable<T>(List<T> source) : IValueEnumerable<T>
     {
         bool isInit = false;
         List<T>.Enumerator enumerator;
@@ -248,7 +248,7 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public ref struct SpanStructEnumerable<T>(ReadOnlySpan<T> source) : IStructEnumerable<T>
+    public ref struct SpanValueEnumerable<T>(ReadOnlySpan<T> source) : IValueEnumerable<T>
     {
         ReadOnlySpan<T> source = source;
         int index;

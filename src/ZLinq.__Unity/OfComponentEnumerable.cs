@@ -5,8 +5,8 @@ using UnityEngine;
 namespace ZLinq
 {
     [StructLayout(LayoutKind.Auto)]
-    public struct OfComponentTransformEnumerable<TEnumerable, TComponent> : IStructEnumerable<TComponent>
-        where TEnumerable : struct, IStructEnumerable<Transform>
+    public struct OfComponentTransformEnumerable<TEnumerable, TComponent> : IValueEnumerable<TComponent>
+        where TEnumerable : struct, IValueEnumerable<Transform>
         where TComponent : Component
     {
         readonly TEnumerable source;

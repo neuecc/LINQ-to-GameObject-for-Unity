@@ -1,8 +1,8 @@
 ﻿namespace ZLinq
 {
-    public static partial class StructEnumerable
+    public static partial class ValueEnumerable
     {
-        public static RangeStructEnumerable<T> Range<T>(int start, int count)
+        public static RangeValueEnumerable<T> Range<T>(int start, int count)
         {
             // TODO: varidation
             return new(start, count);
@@ -14,7 +14,7 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct RangeStructEnumerable<T>(int start, int count) : IStructEnumerable<int>
+    public struct RangeValueEnumerable<T>(int start, int count) : IValueEnumerable<int>
     {
         // TODO: impl
         readonly int count = count;

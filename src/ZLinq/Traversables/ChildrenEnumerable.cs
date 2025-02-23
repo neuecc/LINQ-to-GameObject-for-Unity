@@ -2,7 +2,7 @@
 
 [StructLayout(LayoutKind.Auto)]
 public struct ChildrenEnumerable<TTraversable, T>(TTraversable traversable, bool withSelf)
-    : IStructEnumerable<T>
+    : IValueEnumerable<T>
     where TTraversable : struct, ITraversable<TTraversable, T>
 {
     public bool TryGetNonEnumeratedCount(out int count)

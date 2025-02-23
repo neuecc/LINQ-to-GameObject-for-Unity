@@ -2,7 +2,7 @@
 
 namespace ZLinq;
 
-// like IStructEnumerable, ITraversable as enumerable-enumerator so must implement as `struct` to copy state naturally.
+// like IValueEnumerable, ITraversable as enumerable-enumerator so must implement as `struct` to copy state naturally.
 public interface ITraversable<TTraversable, T> : IDisposable
     where TTraversable : struct, ITraversable<TTraversable, T> // self
 {

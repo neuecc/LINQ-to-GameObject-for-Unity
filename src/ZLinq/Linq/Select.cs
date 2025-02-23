@@ -1,9 +1,9 @@
 ﻿namespace ZLinq
 {
-    partial class StructEnumerableExtensions
+    partial class ValueEnumerableExtensions
     {
-        public static SelectStructEnumerable<TEnumerable, T, TResult> Select<TEnumerable, T, TResult>(this TEnumerable source, Func<T, TResult> selector)
-            where TEnumerable : struct, IStructEnumerable<T>
+        public static SelectValueEnumerable<TEnumerable, T, TResult> Select<TEnumerable, T, TResult>(this TEnumerable source, Func<T, TResult> selector)
+            where TEnumerable : struct, IValueEnumerable<T>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -11,9 +11,9 @@
             return new(source, selector);
         }
 
-        public static StructEnumerator<SelectStructEnumerable<TEnumerable, T, TResult>, TResult> GetEnumerator<TEnumerable, T, TResult>(
-            this SelectStructEnumerable<TEnumerable, T, TResult> source)
-            where TEnumerable : struct, IStructEnumerable<T>
+        public static ValueEnumerator<SelectValueEnumerable<TEnumerable, T, TResult>, TResult> GetEnumerator<TEnumerable, T, TResult>(
+            this SelectValueEnumerable<TEnumerable, T, TResult> source)
+            where TEnumerable : struct, IValueEnumerable<T>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -32,8 +32,8 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SelectStructEnumerable<TEnumerable, T, TResult>(TEnumerable source, Func<T, TResult> selector) : IStructEnumerable<TResult>
-        where TEnumerable : struct, IStructEnumerable<T>
+    struct SelectValueEnumerable<TEnumerable, T, TResult>(TEnumerable source, Func<T, TResult> selector) : IValueEnumerable<TResult>
+        where TEnumerable : struct, IValueEnumerable<T>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif

@@ -19,11 +19,11 @@ public static class FileSystemInfoExtensions
     public static AfterSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> AfterSelf(this FileSystemInfoTraversable traversable) => traversable.AfterSelf<FileSystemInfoTraversable, FileSystemInfo>();
     public static AfterSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> AfterSelfAndSelf(this FileSystemInfoTraversable traversable) => traversable.AfterSelfAndSelf<FileSystemInfoTraversable, FileSystemInfo>();
 
-    public static StructEnumerator<ChildrenEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this ChildrenEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
-    public static StructEnumerator<DescendantsEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this DescendantsEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
-    public static StructEnumerator<AncestorsEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this AncestorsEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
-    public static StructEnumerator<BeforeSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this BeforeSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
-    public static StructEnumerator<AfterSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this AfterSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
+    public static ValueEnumerator<ChildrenEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this ChildrenEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
+    public static ValueEnumerator<DescendantsEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this DescendantsEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
+    public static ValueEnumerator<AncestorsEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this AncestorsEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
+    public static ValueEnumerator<BeforeSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this BeforeSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
+    public static ValueEnumerator<AfterSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this AfterSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
 
     // direct shortcut
 

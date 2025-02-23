@@ -22,11 +22,11 @@ public static class JsonNodeExtensions
     public static AfterSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> AfterSelf(this JsonNodeTraversable traversable) => traversable.AfterSelf<JsonNodeTraversable, JsonNodeProperty>();
     public static AfterSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> AfterSelfAndSelf(this JsonNodeTraversable traversable) => traversable.AfterSelfAndSelf<JsonNodeTraversable, JsonNodeProperty>();
 
-    public static StructEnumerator<ChildrenEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this ChildrenEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
-    public static StructEnumerator<DescendantsEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this DescendantsEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
-    public static StructEnumerator<AncestorsEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this AncestorsEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
-    public static StructEnumerator<BeforeSelfEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this BeforeSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
-    public static StructEnumerator<AfterSelfEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this AfterSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
+    public static ValueEnumerator<ChildrenEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this ChildrenEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
+    public static ValueEnumerator<DescendantsEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this DescendantsEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
+    public static ValueEnumerator<AncestorsEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this AncestorsEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
+    public static ValueEnumerator<BeforeSelfEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this BeforeSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
+    public static ValueEnumerator<AfterSelfEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this AfterSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
 
     // direct shortcut
 
