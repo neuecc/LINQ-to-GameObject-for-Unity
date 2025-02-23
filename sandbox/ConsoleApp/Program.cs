@@ -70,7 +70,7 @@ var json = JsonNode.Parse("""
 
 var origin = json!["nesting"]!["level1"]!["level2"]!;
 
-foreach (var item in origin.Descendants().Select(x => x))
+foreach (var item in origin.Descendants().Select((x, i) => i))
 {
     Console.WriteLine(item);
 }
@@ -111,5 +111,5 @@ public static class MyExtensions
 
     // public static SelectValueEnumerable<global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty>, global::ZLinq.JsonNodeProperty, TResult> Select<TResult>(this global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty> source, Func<global::ZLinq.JsonNodeProperty, TResult> selector) => new(source, selector);
 
-
+    // public static global::ZLinq.Linq.SelectValueEnumerable2<global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty>, global::ZLinq.JsonNodeProperty, TResult> Select<TResult>(this global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty> source, Func<global::ZLinq.JsonNodeProperty, int, TResult> selector) => new(source, selector);
 }

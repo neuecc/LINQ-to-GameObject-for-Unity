@@ -36,98 +36,94 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                 var node = context.Node;
                 var model = context.SemanticModel;
 
+                var list = new List<string>();
                 var symbolInfo = model.GetSymbolInfo(node);
                 if (symbolInfo.CandidateReason == CandidateReason.OverloadResolutionFailure)
                 {
-                    var methodSymbol = symbolInfo.CandidateSymbols[0] as IMethodSymbol;
-                    if (methodSymbol == null) return "";
-
-                    // TEnumerable(0), T(1), others...
-                    // EnumerableType is IValueEnumerable<T>, know what is T.
-                    if (methodSymbol.TypeArguments.Length == 0) return "";
-                    var enumerableType = methodSymbol.TypeArguments[0];
-                    var enumerableTypeFull = enumerableType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-                    var a = enumerableType.AllInterfaces.FirstOrDefault(x => x.Name == "IValueEnumerable"); // TODO:
-                    if (a == null) return "";
-
-                    var elementType = a.TypeArguments[0];
-                    var elementTypeFull = elementType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-                    var otherTypeArguments = methodSymbol.TypeArguments.AsSpan()[2..];
-                    var returnType = $"{methodSymbol.ReturnType.ContainingNamespace.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}.{methodSymbol.ReturnType.Name}<{enumerableTypeFull}, {elementTypeFull}{OthersJoin(otherTypeArguments, emitFirstComma: true)}>";
-
-                    var t = methodSymbol.TypeArguments[1];
-
-                    var parameterArgs = new StringBuilder();
-                    var parameterNames = new StringBuilder();
-                    foreach (var item in methodSymbol.Parameters)
+                    foreach (var methodSymbol in symbolInfo.CandidateSymbols.OfType<IMethodSymbol>())
                     {
-                        var parameterType = item.Type as INamedTypeSymbol; // TODO: []?
-                        // Type
-                        parameterArgs.Append(", ");
-                        parameterArgs.Append(parameterType!.Name);
-                        if (parameterType.IsGenericType)
+                        // TEnumerable(0), T(1), others...
+                        // EnumerableType is IValueEnumerable<T>, know what is T.
+                        if (methodSymbol.TypeArguments.Length == 0) return [];
+                        var enumerableType = methodSymbol.TypeArguments[0];
+                        var enumerableTypeFull = enumerableType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+                        var a = enumerableType.AllInterfaces.FirstOrDefault(x => x.Name == "IValueEnumerable"); // TODO:
+                        if (a == null) return [];
+
+                        var elementType = a.TypeArguments[0];
+                        var elementTypeFull = elementType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+                        var otherTypeArguments = methodSymbol.TypeArguments.AsSpan()[2..];
+                        var returnType = $"{methodSymbol.ReturnType.ContainingNamespace.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}.{methodSymbol.ReturnType.Name}<{enumerableTypeFull}, {elementTypeFull}{OthersJoin(otherTypeArguments, emitFirstComma: true)}>";
+
+                        var t = methodSymbol.TypeArguments[1];
+
+                        var parameterArgs = new StringBuilder();
+                        var parameterNames = new StringBuilder();
+                        foreach (var item in methodSymbol.Parameters)
                         {
-                            var first = true;
-                            parameterArgs.Append("<");
-                            foreach (var genericTypeArgs in parameterType.TypeArguments)
+                            var parameterType = item.Type as INamedTypeSymbol; // TODO: []?
+                                                                               // Type
+                            parameterArgs.Append(", ");
+                            parameterArgs.Append(parameterType!.Name);
+                            if (parameterType.IsGenericType)
                             {
-                                if (first)
+                                var first = true;
+                                parameterArgs.Append("<");
+                                foreach (var genericTypeArgs in parameterType.TypeArguments)
                                 {
-                                    first = false;
-                                }
-                                else
-                                {
-                                    parameterArgs.Append(", ");
-                                }
+                                    if (first)
+                                    {
+                                        first = false;
+                                    }
+                                    else
+                                    {
+                                        parameterArgs.Append(", ");
+                                    }
 
-                                // replace concrete T
-                                if (genericTypeArgs.Equals(t, SymbolEqualityComparer.Default))
-                                {
-                                    parameterArgs.Append(elementTypeFull);
+                                    // replace concrete T
+                                    if (genericTypeArgs.Equals(t, SymbolEqualityComparer.Default))
+                                    {
+                                        parameterArgs.Append(elementTypeFull);
+                                    }
+                                    else
+                                    {
+                                        parameterArgs.Append(genericTypeArgs.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+                                    }
                                 }
-                                else
-                                {
-                                    parameterArgs.Append(genericTypeArgs.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
-                                }
+                                parameterArgs.Append(">");
                             }
-                            parameterArgs.Append(">");
+                            // name
+                            parameterArgs.Append(" ");
+                            parameterArgs.Append(item.Name);
+
+                            parameterNames.Append(", ");
+                            parameterNames.Append(item.Name);
                         }
-                        // name
-                        parameterArgs.Append(" ");
-                        parameterArgs.Append(item.Name);
 
-                        parameterNames.Append(", ");
-                        parameterNames.Append(item.Name);
-                    }
+                        // replacing T -> known T
 
-                    // replacing T -> known T
+                        var typeArgs = otherTypeArguments.Length == 0 ? "" : $"<{OthersJoin(otherTypeArguments, emitFirstComma: false)}>";
 
-                    var typeArgs = otherTypeArguments.Length == 0 ? "" : $"<{OthersJoin(otherTypeArguments, emitFirstComma: false)}>";
-
-                    var emit = $"""
+                        var emit = $"""
 public static {returnType} {methodSymbol.Name}{typeArgs}(this {enumerableTypeFull} source{parameterArgs}) => new(source{parameterNames});
 """;
 
-
-
-                    return emit;
-
-
-
-
+                        list.Add(emit);
+                    }
                 }
-                return "";
+
+                return list.ToArray();
             });
 
         context.RegisterSourceOutput(runSource.Collect(), Emit);
     }
 
 
-    static void Emit(SourceProductionContext sourceProductionContext, ImmutableArray<string> sources)
+    static void Emit(SourceProductionContext sourceProductionContext, ImmutableArray<string[]> sources)
     {
-        var codes = sources.Distinct().ToArray();
+        var codes = sources.SelectMany(x => x).Distinct().ToArray();
 
         var join = string.Join(Environment.NewLine, codes);
 
