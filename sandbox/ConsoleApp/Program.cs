@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Nodes;
 using ZLinq;
+using ZLinq.Linq;
 
 var xs = new[] { 1, 2, 3 };
 
@@ -69,7 +70,12 @@ var json = JsonNode.Parse("""
 
 var origin = json!["nesting"]!["level1"]!["level2"]!;
 
-foreach (var item in origin.Descendants())
+foreach (var item in origin.Descendants().Select(x => x))
+{
+    Console.WriteLine(item);
+}
+
+foreach (var item in origin.Descendants().Where(x => x.Name == "hoge"))
 {
     if (item.Node == null)
     {
@@ -83,3 +89,27 @@ foreach (var item in origin.Descendants())
 
 // je.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object
 
+
+public static class MyExtensions
+{
+    //public static SelectValueEnumerable<global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty>, global::ZLinq.JsonNodeProperty, TResult> 
+    //       Select<TResult>(
+    //       this global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty> source, 
+    //       Func<global::ZLinq.JsonNodeProperty, TResult> selector)
+    //{
+    //	return new(source, selector);
+    //}
+
+    //public static SelectValueEnumerable<TEnumerable, T, TResult>
+    //	   Select<TEnumerable, T, TResult>(
+    //	   this global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, T> source,
+    //	   Func<T, TResult> selector)
+    //           where TEnumerable : struct, IValueEnumerable<T>
+    //{
+    //	return new(source, selector);
+    //}
+
+    // public static SelectValueEnumerable<global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty>, global::ZLinq.JsonNodeProperty, TResult> Select<TResult>(this global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty> source, Func<global::ZLinq.JsonNodeProperty, TResult> selector) => new(source, selector);
+
+
+}

@@ -103,18 +103,18 @@ public class IterateBenchmark
         }
     }
 
-    [Benchmark]
-    public void StructLinq()
-    {
-        var seq = array.ToValueEnumerable()
-            .Select(x => x * 3, x => x)
-            .Where(x => x % 2 == 0, x => x);
+    //[Benchmark]
+    //public void StructLinq()
+    //{
+    //    var seq = array.ToValueEnumerable()
+    //        .Select(x => x * 3, x => x)
+    //        .Where(x => x % 2 == 0, x => x);
 
-        foreach (var item in seq)
-        {
+    //    foreach (var item in seq)
+    //    {
 
-        }
-    }
+    //    }
+    //}
 
     [Benchmark]
     public void SpanLinq()

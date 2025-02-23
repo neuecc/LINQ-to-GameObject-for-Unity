@@ -18,6 +18,7 @@
 	<ItemGroup>
 		<Using Include="ZLinq" />
 		<Using Include="ZLinq.Internal" />
+		<Using Include="ZLinq.Traversables" />
 		<Using Include="ZLinq.Linq" />
 		<Using Include="System.Runtime.CompilerServices" />
 		<Using Include="System.Runtime.InteropServices" />
