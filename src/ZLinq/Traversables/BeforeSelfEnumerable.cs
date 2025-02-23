@@ -1,4 +1,4 @@
-﻿namespace ZLinq;
+﻿namespace ZLinq.Traversables;
 
 [StructLayout(LayoutKind.Auto)]
 public struct BeforeSelfEnumerable<TTraversable, T>(TTraversable traversable, bool withSelf)

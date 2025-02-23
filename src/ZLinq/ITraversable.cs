@@ -1,4 +1,6 @@
-﻿namespace ZLinq;
+﻿using ZLinq.Traversables;
+
+namespace ZLinq;
 
 // like IStructEnumerable, ITraversable as enumerable-enumerator so must implement as `struct` to copy state naturally.
 public interface ITraversable<TTraversable, T> : IDisposable

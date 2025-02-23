@@ -42,7 +42,7 @@ public static partial class StructEnumerableExtensions
         return new(source);
     }
 
-    // not allows ref struct, only use directly from ITraversable sequence
+    // not allows ref struct; in .NET 9, only use directly from ITraversable(or similar) sequence
     public static IEnumerable<T> AsEnumerable<TEnumerable, T>(this TEnumerable source)
         where TEnumerable : struct, IStructEnumerable<T>
     {
@@ -67,7 +67,11 @@ public static partial class StructEnumerableExtensions
     {
         try
         {
-            if (source.TryGetNonEnumeratedCount(out var count))
+            if (source.TryGetSpan(out var span))
+            {
+                return span.ToArray();
+            }
+            else if (source.TryGetNonEnumeratedCount(out var count))
             {
                 var i = 0;
                 var array = new T[count];
@@ -103,13 +107,14 @@ public static partial class StructEnumerableExtensions
         }
     }
 
-
+    // TODO: CopyInto
     public static void CopyToList<TEnumerable, T>(this TEnumerable source, List<T> list)
         where TEnumerable : struct, IStructEnumerable<T>
 #if NET9_0_OR_GREATER
     , allows ref struct
 #endif
     {
+        // TODO: CollectionSmarshal.SetCount
         var i = 0;
         var count = list.Count;
         try

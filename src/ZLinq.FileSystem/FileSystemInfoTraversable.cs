@@ -1,4 +1,6 @@
-﻿namespace ZLinq;
+﻿using ZLinq.Traversables;
+
+namespace ZLinq;
 
 public static class FileSystemInfoExtensions
 {

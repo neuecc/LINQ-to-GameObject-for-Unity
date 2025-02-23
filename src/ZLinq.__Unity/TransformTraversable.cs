@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using UnityEngine;
+using ZLinq.Traversables;
 
 namespace ZLinq
 {
