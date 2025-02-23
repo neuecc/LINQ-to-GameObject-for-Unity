@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -19,6 +20,12 @@ namespace ZLinq
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = 0;
+            return false;
+        }
+
+        public bool TryGetSpan(out ReadOnlySpan<TComponent> span)
+        {
+            span = default;
             return false;
         }
 

@@ -8,10 +8,10 @@ internal struct BitBool
     public bool IsZero
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => (value & 0b00000001) != 0;
+        get => value == 0;
     }
 
-    public bool IsBit1 
+    public bool IsBit1
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => (value & 0b00000001) != 0;
