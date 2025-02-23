@@ -71,6 +71,25 @@ namespace ZLinq.Linq
 #endif
         }
 
+        public bool TryGetSpan(out ReadOnlySpan<T> span)
+        {
+            if (source.GetType() == typeof(T[]))
+            {
+                span = Unsafe.As<T[]>(source);
+                return true;
+            }
+            else if (source.GetType() == typeof(List<T>))
+            {
+                span = CollectionsMarshal.AsSpan(Unsafe.As<List<T>>(source));
+                return true;
+            }
+            else
+            {
+                span = default;
+                return false;
+            }
+        }
+
         public bool TryGetNext(out T current)
         {
             if (enumerator == null)
@@ -90,6 +109,10 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
+            if (enumerator != null)
+            {
+                enumerator.Dispose();
+            }
         }
     }
 
@@ -103,6 +126,12 @@ namespace ZLinq.Linq
         {
             count = source.Length;
             return false;
+        }
+
+        public bool TryGetSpan(out ReadOnlySpan<T> span)
+        {
+            span = source.AsSpan();
+            return true;
         }
 
         public bool TryGetNext(out T current)
@@ -138,6 +167,16 @@ namespace ZLinq.Linq
             return false;
         }
 
+        public bool TryGetSpan(out ReadOnlySpan<T> span)
+        {
+#if NET9_0_OR_GREATER
+            span = source;
+#else
+            span = source.Span;
+#endif
+            return true;
+        }
+
         public bool TryGetNext(out T current)
         {
             if (index < source.Length)
@@ -169,6 +208,12 @@ namespace ZLinq.Linq
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Count;
+            return true;
+        }
+
+        public bool TryGetSpan(out ReadOnlySpan<T> span)
+        {
+            span = CollectionsMarshal.AsSpan(source);
             return true;
         }
 
@@ -212,6 +257,12 @@ namespace ZLinq.Linq
         {
             count = source.Length;
             return false;
+        }
+
+        public bool TryGetSpan(out ReadOnlySpan<T> span)
+        {
+            span = source;
+            return true;
         }
 
         public bool TryGetNext(out T current)

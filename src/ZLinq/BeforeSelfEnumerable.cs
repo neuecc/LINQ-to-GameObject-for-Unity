@@ -13,6 +13,12 @@ public struct BeforeSelfEnumerable<TTraversable, T>(TTraversable traversable, bo
         return false;
     }
 
+    public bool TryGetSpan(out ReadOnlySpan<T> span)
+    {
+        span = default;
+        return false;
+    }
+
     public bool TryGetNext(out T current)
     {
         if (iterateCompleted)

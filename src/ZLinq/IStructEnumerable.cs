@@ -5,6 +5,7 @@
 public interface IStructEnumerable<T> : IDisposable
 {
     bool TryGetNonEnumeratedCount(out int count);
+    bool TryGetSpan(out ReadOnlySpan<T> span);
     bool TryGetNext(out T current); // as MoveNext + Current
 
     // can't do like this(some operator needs ref field but it can't support lower target platforms)

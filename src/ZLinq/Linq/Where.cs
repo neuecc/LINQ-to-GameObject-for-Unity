@@ -28,7 +28,7 @@ namespace ZLinq.Linq
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
 #if NET9_0_OR_GREATER
-    public ref 
+    public ref
 #else
     public
 #endif
@@ -40,7 +40,17 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            count = default;
+            return false;
+        }
+
+        public bool TryGetSpan(out ReadOnlySpan<T> span)
+        {
+            span = default;
+            return false;
+        }
 
         public bool TryGetNext(out T current)
         {

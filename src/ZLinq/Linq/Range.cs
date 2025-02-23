@@ -27,6 +27,12 @@ namespace ZLinq.Linq
             return true;
         }
 
+        public bool TryGetSpan(out ReadOnlySpan<int> span)
+        {
+            span = default;
+            return false;
+        }
+
         public bool TryGetNext(out int current)
         {
             if (start < to)

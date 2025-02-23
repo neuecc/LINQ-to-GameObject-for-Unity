@@ -11,6 +11,12 @@ public struct AfterSelfEnumerable<TTraversable, T>(TTraversable traversable, boo
         return false;
     }
 
+    public bool TryGetSpan(out ReadOnlySpan<T> span)
+    {
+        span = default;
+        return false;
+    }
+
     public bool TryGetNext(out T current)
     {
         if (withSelf)
