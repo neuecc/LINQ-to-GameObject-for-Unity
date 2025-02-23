@@ -4,6 +4,7 @@
 		<RootNamespace>ZLinq</RootNamespace>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<NoWarn>1701;1702;9124</NoWarn>
 		<LangVersion>13</LangVersion>
 		<!-- Support for Unity -->
 		<TargetFrameworks>netstandard2.1;net8.0;net9.0</TargetFrameworks>
