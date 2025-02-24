@@ -1,8 +1,8 @@
-﻿{
+{
   "profiles": {
     "ZLinq.SourceGenerator": {
       "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\..\\sandbox\\ConsoleApp\\ConsoleApp.csproj"
+      "targetProject": "..\\..\\sandbox\\Benchmark\\Benchmark.csproj"
     }
   }
 }

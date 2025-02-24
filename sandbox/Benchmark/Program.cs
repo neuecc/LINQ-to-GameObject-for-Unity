@@ -16,6 +16,8 @@ BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(Su
 
 #else
 
+BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
+
 var i = 0;
 foreach (var item in typeof(Enumerable).GetMethods().GroupBy(x => x.Name))
 {
@@ -55,8 +57,8 @@ public class IterateBenchmark
     public void ZLinq()
     {
         var seq = array.AsValueEnumerable()
-            .Select<ArrayValueEnumerable<int>, int, int>(x => x * 3)
-            .Where<SelectValueEnumerable<ArrayValueEnumerable<int>, int, int>, int>(x => x % 2 == 0);
+            .Select(x => x * 3)
+            .Where(x => x % 2 == 0);
 
         foreach (var item in seq)
         {

@@ -8,17 +8,20 @@ var xs = new[] { 1, 2, 3 };
 
 
 var enumerable = xs.AsValueEnumerable()
-    .Select(x => x * x)
-    .Select(x => x.ToString())
-    .Where(x => x == "2")
-    .ToArray();
+    .Select(x => x * x);
+    //.Select(x => x.ToString())
+    //.Where(x => x == "2")
+    //.ToArray();
 
 var e3 = enumerable;
 
 // var array = e3.ToAS
 
 
-
+foreach (var item in e3)
+{
+    Console.WriteLine(item);
+}
 
 
 // xs.AsValueEnumerable().Select(x => x);`
@@ -104,29 +107,4 @@ var e3 = enumerable;
 //}
 
 // je.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object
-
-
-public static class MyExtensions
-{
-    //public static SelectValueEnumerable<global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty>, global::ZLinq.JsonNodeProperty, TResult> 
-    //       Select<TResult>(
-    //       this global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty> source, 
-    //       Func<global::ZLinq.JsonNodeProperty, TResult> selector)
-    //{
-    //	return new(source, selector);
-    //}
-
-    //public static SelectValueEnumerable<TEnumerable, T, TResult>
-    //	   Select<TEnumerable, T, TResult>(
-    //	   this global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, T> source,
-    //	   Func<T, TResult> selector)
-    //           where TEnumerable : struct, IValueEnumerable<T>
-    //{
-    //	return new(source, selector);
-    //}
-
-    // public static SelectValueEnumerable<global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty>, global::ZLinq.JsonNodeProperty, TResult> Select<TResult>(this global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty> source, Func<global::ZLinq.JsonNodeProperty, TResult> selector) => new(source, selector);
-
-    // public static global::ZLinq.Linq.SelectValueEnumerable2<global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty>, global::ZLinq.JsonNodeProperty, TResult> Select<TResult>(this global::ZLinq.Traversables.DescendantsEnumerable<global::ZLinq.JsonNodeTraversable, global::ZLinq.JsonNodeProperty> source, Func<global::ZLinq.JsonNodeProperty, int, TResult> selector) => new(source, selector);
-}
 

@@ -1,9 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.CSharp;
-using System.Text;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
-using System.Collections;
+using System.Text;
 
 namespace ZLinq.SourceGenerator;
 
@@ -39,19 +38,21 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                 {
                     var symbolInfo = semanticModel.GetSymbolInfo(node);
 
-                    if (symbolInfo.CandidateReason != CandidateReason.OverloadResolutionFailure && symbolInfo.CandidateSymbols.Length != 0)
+                    if (symbolInfo.CandidateReason != CandidateReason.OverloadResolutionFailure || symbolInfo.CandidateSymbols.Length == 0)
                     {
                         return list ?? []; // break;
                     }
 
                     foreach (var methodSymbol in symbolInfo.CandidateSymbols.OfType<IMethodSymbol>())
                     {
+                        if (methodSymbol.TypeArguments.Length == 0) continue;
+
                         var enumerableType = methodSymbol.TypeArguments[0]; // TEnumerable
                         var sourceType = enumerableType.AllInterfaces.FirstOrDefault(x => x.Name == "IValueEnumerable")?.TypeArguments[0]; // TSource
-                        if (sourceType == null) return [];
+                        if (sourceType == null) continue;
 
-                        var extensionMethod = methodSymbol.ReducedFrom;
-                        if (extensionMethod == null) return [];
+                        var extensionMethod = methodSymbol.ReducedFrom; // reduced code to original extension method
+                        if (extensionMethod == null) continue;
 
                         ITypeSymbol[] constructTypeArguments = [enumerableType, sourceType, .. methodSymbol.TypeArguments.AsSpan()[2..]];
 
@@ -63,10 +64,13 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
 
                         var formattedReturnType = constructedMethod.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                         var formattedParameters = string.Join(", ", constructedMethod.Parameters.Select((x, i) => $"{(i == 0 ? "this " : "")}{x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} {x.Name}"));
-                        var formattedTypeArguments = string.Join(", ", constructedMethod.TypeArguments.Skip(2).Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))).SurroundIsNotEmpty("<", ">");
+                        var formattedTypeArguments = string.Join(", ", constructedMethod.TypeArguments.Skip(2).Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))).SurroundIfNotEmpty("<", ">");
+                        var className = constructedMethod.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                        var methodName = constructedMethod.Name;
+                        var fullTypeArguments = string.Join(", ", constructedMethod.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))).SurroundIfNotEmpty("<", ">");
                         var parameterNames = string.Join(", ", constructedMethod.Parameters.Select(x => x.Name));
 
-                        var formattedSignature = $"public static {formattedReturnType} {constructedMethod.Name}{formattedTypeArguments}({formattedParameters}) => new({parameterNames});";
+                        var formattedSignature = $"public static {formattedReturnType} {constructedMethod.Name}{formattedTypeArguments}({formattedParameters}) => {className}.{methodName}{fullTypeArguments}({parameterNames});";
 
                         if (list == null)
                         {
@@ -125,7 +129,7 @@ namespace ZLinq
 
 internal static class StringExtensions
 {
-    public static string SurroundIsNotEmpty(this string s, string prefix = "", string suffix = "")
+    public static string SurroundIfNotEmpty(this string s, string prefix = "", string suffix = "")
     {
         if (s == "") return "";
         return $"{prefix}{s}{suffix}";
