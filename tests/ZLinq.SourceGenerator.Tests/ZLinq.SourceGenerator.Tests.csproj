@@ -16,15 +16,13 @@
 	<ItemGroup>
 		<PackageReference Include="xunit.v3" Version="1.1.0" />
 		<PackageReference Include="Shouldly" Version="4.3.0" />
+
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\ZLinq.__Unity\ZLinq.__Unity.csproj" />
-		<ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
-		<ProjectReference Include="..\..\src\ZLinq.SourceGenerator\ZLinq.SourceGenerator.csproj">
-			<OutputItemType>Analyzer</OutputItemType>
-			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-		</ProjectReference>
+	  <ProjectReference Include="..\..\src\ZLinq.SourceGenerator\ZLinq.SourceGenerator.csproj" />
+	  <ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -32,4 +30,5 @@
 		<Using Include="Shouldly" />
 		<Using Include="ZLinq" />
 	</ItemGroup>
+
 </Project>

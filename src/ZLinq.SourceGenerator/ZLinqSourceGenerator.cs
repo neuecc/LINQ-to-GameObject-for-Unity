@@ -3,17 +3,16 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Text;
 using System.Collections.Immutable;
+using System.Collections;
 
 namespace ZLinq.SourceGenerator;
 
 [Generator(LanguageNames.CSharp)]
 public partial class ZLinqSourceGenerator : IIncrementalGenerator
 {
-    // TODO: cleanup
-
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var runSource = context.SyntaxProvider
+        var overloadResolutionFailureSymbols = context.SyntaxProvider
             .CreateSyntaxProvider((node, ct) =>
             {
                 if (node.IsKind(SyntaxKind.InvocationExpression))
@@ -31,135 +30,121 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                 }
 
                 return false;
-            }, (context, ct) =>
+            }, (context, cancellationToken) => context)
+            .SelectMany((context, cancellationToken) =>
             {
-                var node = context.Node;
-                var model = context.SemanticModel;
-
-                var list = new List<string>();
-                var symbolInfo = model.GetSymbolInfo(node);
-                if (symbolInfo.CandidateReason == CandidateReason.OverloadResolutionFailure)
+                List<string>? list = null;
+                var semanticModel = context.SemanticModel; // mutable var
+                foreach (var node in context.Node.AncestorsAndSelf().OfType<InvocationExpressionSyntax>())
                 {
+                    var symbolInfo = semanticModel.GetSymbolInfo(node);
+
+                    if (symbolInfo.CandidateReason != CandidateReason.OverloadResolutionFailure && symbolInfo.CandidateSymbols.Length != 0)
+                    {
+                        return list ?? []; // break;
+                    }
+
                     foreach (var methodSymbol in symbolInfo.CandidateSymbols.OfType<IMethodSymbol>())
                     {
-                        // TEnumerable(0), T(1), others...
-                        // EnumerableType is IValueEnumerable<T>, know what is T.
-                        if (methodSymbol.TypeArguments.Length == 0) return [];
-                        var enumerableType = methodSymbol.TypeArguments[0];
-                        var enumerableTypeFull = enumerableType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                        var enumerableType = methodSymbol.TypeArguments[0]; // TEnumerable
+                        var sourceType = enumerableType.AllInterfaces.FirstOrDefault(x => x.Name == "IValueEnumerable")?.TypeArguments[0]; // TSource
+                        if (sourceType == null) return [];
 
-                        var a = enumerableType.AllInterfaces.FirstOrDefault(x => x.Name == "IValueEnumerable"); // TODO:
-                        if (a == null) return [];
+                        var extensionMethod = methodSymbol.ReducedFrom;
+                        if (extensionMethod == null) return [];
 
-                        var elementType = a.TypeArguments[0];
-                        var elementTypeFull = elementType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                        ITypeSymbol[] constructTypeArguments = [enumerableType, sourceType, .. methodSymbol.TypeArguments.AsSpan()[2..]];
 
-                        var otherTypeArguments = methodSymbol.TypeArguments.AsSpan()[2..];
-                        var returnType = $"{methodSymbol.ReturnType.ContainingNamespace.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}.{methodSymbol.ReturnType.Name}<{enumerableTypeFull}, {elementTypeFull}{OthersJoin(otherTypeArguments, emitFirstComma: true)}>";
+                        var constructedMethod = extensionMethod.Construct(constructTypeArguments);  // TEnumerable, TSource, others...
 
-                        var t = methodSymbol.TypeArguments[1];
+                        // Since formatting it directly would include the constructed Type in the type arguments as well,
+                        // we need to break it down and build it separately.
+                        // can not use FullMethodSignatureFormat like `constructedMethod.ToDisplayString(FullMethodSignatureFormat)`
 
-                        var parameterArgs = new StringBuilder();
-                        var parameterNames = new StringBuilder();
-                        foreach (var item in methodSymbol.Parameters)
+                        var formattedReturnType = constructedMethod.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                        var formattedParameters = string.Join(", ", constructedMethod.Parameters.Select((x, i) => $"{(i == 0 ? "this " : "")}{x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} {x.Name}"));
+                        var formattedTypeArguments = string.Join(", ", constructedMethod.TypeArguments.Skip(2).Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))).SurroundIsNotEmpty("<", ">");
+                        var parameterNames = string.Join(", ", constructedMethod.Parameters.Select(x => x.Name));
+
+                        var formattedSignature = $"public static {formattedReturnType} {constructedMethod.Name}{formattedTypeArguments}({formattedParameters}) => new({parameterNames});";
+
+                        if (list == null)
                         {
-                            var parameterType = item.Type as INamedTypeSymbol; // TODO: []?
-                                                                               // Type
-                            parameterArgs.Append(", ");
-                            parameterArgs.Append(parameterType!.Name);
-                            if (parameterType.IsGenericType)
-                            {
-                                var first = true;
-                                parameterArgs.Append("<");
-                                foreach (var genericTypeArgs in parameterType.TypeArguments)
-                                {
-                                    if (first)
-                                    {
-                                        first = false;
-                                    }
-                                    else
-                                    {
-                                        parameterArgs.Append(", ");
-                                    }
-
-                                    // replace concrete T
-                                    if (genericTypeArgs.Equals(t, SymbolEqualityComparer.Default))
-                                    {
-                                        parameterArgs.Append(elementTypeFull);
-                                    }
-                                    else
-                                    {
-                                        parameterArgs.Append(genericTypeArgs.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
-                                    }
-                                }
-                                parameterArgs.Append(">");
-                            }
-                            // name
-                            parameterArgs.Append(" ");
-                            parameterArgs.Append(item.Name);
-
-                            parameterNames.Append(", ");
-                            parameterNames.Append(item.Name);
+                            list = new List<string>();
                         }
-
-                        // replacing T -> known T
-
-                        var typeArgs = otherTypeArguments.Length == 0 ? "" : $"<{OthersJoin(otherTypeArguments, emitFirstComma: false)}>";
-
-                        var emit = $"""
-public static {returnType} {methodSymbol.Name}{typeArgs}(this {enumerableTypeFull} source{parameterArgs}) => new(source{parameterNames});
-""";
-
-                        list.Add(emit);
+                        list.Add(formattedSignature);
                     }
+
+                    if (list == null) return [];
+
+                    // Create a new Compilation with the current results, generate OverloadResolutionFailure and CandidateSymbols for the following method chain, and continue the exploration
+                    var code = BuildCode(list);
+                    var newCompilation = context.SemanticModel.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(code));
+
+                    // replace new Compilation's new SemanticModel
+                    semanticModel = newCompilation.GetSemanticModel(node.SyntaxTree);
                 }
 
-                return list.ToArray();
-            });
+                return list ?? (IEnumerable<string>)[];
+            })
+            .Collect();
 
-        context.RegisterSourceOutput(runSource.Collect(), Emit);
+        context.RegisterSourceOutput(overloadResolutionFailureSymbols, Emit);
     }
 
-
-    static void Emit(SourceProductionContext sourceProductionContext, ImmutableArray<string[]> sources)
+    static string BuildCode(IEnumerable<string> sources)
     {
-        var codes = sources.SelectMany(x => x).Distinct().ToArray();
+        var codes = string.Join(Environment.NewLine, sources.Distinct().Select(x => "        " + x));
 
-        var join = string.Join(Environment.NewLine, codes);
+        var sb = new StringBuilder();
+        sb.AppendLine("""
+// <auto-generated/>
+#nullable enable
+#pragma warning disable
+            
+using System;
 
-        var code = $$"""
 namespace ZLinq
 {
     internal static partial class ZLinqTypeInferenceHelper
     {
-{{join}}        
+""");
+        sb.AppendLine(codes);
+        sb.AppendLine("    }");
+        sb.AppendLine("}");
+
+        return sb.ToString();
+    }
+
+    static void Emit(SourceProductionContext sourceProductionContext, ImmutableArray<string> sources)
+    {
+        var code = BuildCode(sources);
+        sourceProductionContext.AddSource("ZLinqTypeInferenceHelper.g.cs", code.ReplaceLineEndings());
     }
 }
-""";
 
-        sourceProductionContext.AddSource("ZLinqTypeInferenceHelper.g.cs", code);
+internal static class StringExtensions
+{
+    public static string SurroundIsNotEmpty(this string s, string prefix = "", string suffix = "")
+    {
+        if (s == "") return "";
+        return $"{prefix}{s}{suffix}";
     }
 
-    static string OthersJoin(ReadOnlySpan<ITypeSymbol> symbol, bool emitFirstComma)
+    public static string ReplaceLineEndings(this string input)
     {
-        var first = true;
-        var sb = new StringBuilder();
-        foreach (var item in symbol)
-        {
-            if (first)
-            {
-                if (emitFirstComma)
-                {
-                    sb.Append(", ");
-                }
-                first = false;
-            }
-            else
-            {
-                sb.Append(", ");
-            }
-            sb.Append(item.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
-        }
-        return sb.ToString();
+#pragma warning disable RS1035
+        return ReplaceLineEndings(input, Environment.NewLine);
+#pragma warning restore RS1035
+    }
+
+    public static string ReplaceLineEndings(this string text, string replacementText)
+    {
+        text = text.Replace("\r\n", "\n");
+
+        if (replacementText != "\n")
+            text = text.Replace("\n", replacementText);
+
+        return text;
     }
 }
