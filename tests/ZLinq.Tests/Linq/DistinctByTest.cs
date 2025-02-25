@@ -1,6 +1,6 @@
 namespace ZLinq.Tests.Linq;
 
-public class SelectTest
+public class DistinctByTest
 {
     [Fact]
     public void Empty()

@@ -23,7 +23,7 @@ var others = enumerableMethods
 
 foreach (var item in returnEnumerables)
 {
-    // EmitEnumerableTemplate(item);
+    EmitEnumerableTemplate(item);
     //Console.WriteLine(item.Key + ":" + item.Count());
 }
 
@@ -35,9 +35,11 @@ foreach (var item in others)
 static void EmitEnumerableTemplate(IGrouping<string, MethodInfo> methods)
 {
     Directory.CreateDirectory("linq1");
+    Directory.CreateDirectory("linq1_test");
 
     var className = methods.Key;
     var fileName = $"{className}.cs";
+    var testFileName = $"{className}Test.cs";
 
     var sb1 = new StringBuilder(); // ZLinq
     sb1.AppendLine("namespace ZLinq");
@@ -49,7 +51,11 @@ static void EmitEnumerableTemplate(IGrouping<string, MethodInfo> methods)
     sb2.AppendLine("namespace ZLinq.Linq");
     sb2.AppendLine("{");
 
-    var test = new StringBuilder(); // TODO:...
+    var test = new StringBuilder();
+    test.AppendLine("namespace ZLinq.Tests.Linq;");
+    test.AppendLine();
+    test.AppendLine($"public class {className}Test");
+    test.AppendLine("{");
 
     var i = 0;
     foreach (var methodInfo in methods)
@@ -127,24 +133,72 @@ static void EmitEnumerableTemplate(IGrouping<string, MethodInfo> methods)
     }
 
 """);
+
+        // test
+        test.AppendLine($$"""
+    [Fact]
+    public void Empty{{suffix}}()
+    {
+        var xs = new int[0];
+
+        var enumerable = xs.AsValueEnumerable(); // TODO: impl method like .Select(x => x);
+
+        var e1 = enumerable;
+        e1.TryGetNonEnumeratedCount(out var nonEnumeratedCount).ShouldBe(true); // TODO: true | false
+
+        var e2 = enumerable;
+        e2.TryGetSpan(out var span).ShouldBe(true); // TODO: true | false
+
+        var e3 = enumerable;
+        e3.TryGetNext(out var next).ShouldBeFalse();
+
+        enumerable.Dispose();
+    }
+
+    [Fact]
+    public void NonEmpty{{suffix}}()
+    {
+        var xs = new int[] { 1, 2, 3, 4, 5 };
+
+        var enumerable = xs.AsValueEnumerable(); // TODO: impl method like .Select(x => x);
+
+        var e1 = enumerable;
+        e1.TryGetNonEnumeratedCount(out var nonEnumeratedCount).ShouldBe(true); // TODO: true | false
+
+        var e2 = enumerable;
+        e2.TryGetSpan(out var span).ShouldBe(true); // TODO: true | false
+
+        var e3 = enumerable;
+        var array = e3.ToArray();
+        array.ShouldBe(xs.ToArray()); // TODO: impl compare for standard array
+
+        enumerable.Dispose();
+    }
+
+""");
     }
 
     sb1.AppendLine("    }");
     sb1.AppendLine("}");
     sb2.AppendLine("}");
+    test.AppendLine("}");
 
     var file = sb1.ToString() + Environment.NewLine + sb2.ToString();
+    var testFile = test.ToString();
 
     Console.WriteLine(file);
     File.WriteAllText(Path.Combine("linq1", fileName), file);
+    File.WriteAllText(Path.Combine("linq1_test", testFileName), testFile);
 }
 
 static void EmitOtherTemplate(IGrouping<string, MethodInfo> methods)
 {
     Directory.CreateDirectory("linq2");
+    Directory.CreateDirectory("linq2_test");
 
     var className = methods.Key;
     var fileName = $"{className}.cs";
+    var testFileName = $"{className}Test.cs";
 
     var sb1 = new StringBuilder(); // ZLinq
     sb1.AppendLine("namespace ZLinq");
@@ -153,11 +207,15 @@ static void EmitOtherTemplate(IGrouping<string, MethodInfo> methods)
     sb1.AppendLine("    {");
 
     var test = new StringBuilder(); // TODO:...
+    test.AppendLine("namespace ZLinq.Tests.Linq;");
+    test.AppendLine();
+    test.AppendLine($"public class {className}Test");
+    test.AppendLine("{");
 
     var i = 0;
     foreach (var methodInfo in methods)
     {
-        // var suffix = (++i == 1) ? "" : i.ToString();
+        var suffix = (++i == 1) ? "" : i.ToString();
 
         if (!methodInfo.GetParameters()[0].ParameterType.IsGenericType) continue;
 
@@ -184,15 +242,38 @@ static void EmitOtherTemplate(IGrouping<string, MethodInfo> methods)
         }
 
 """);
+
+        // test
+        test.AppendLine($$"""
+    [Fact]
+    public void Empty{{suffix}}()
+    {
+        var xs = new int[0];
+
+        var actual = xs.AsValueEnumerable(); // TODO:Do
+    }
+
+    [Fact]
+    public void NonEmpty{{suffix}}()
+    {
+        var xs = new int[] { 1, 2, 3, 4, 5 };
+
+        var actual = xs.AsValueEnumerable(); // TODO:Do
+    }
+
+""");
     }
 
     sb1.AppendLine("    }");
     sb1.AppendLine("}");
+    test.AppendLine("}");
 
-    var file = sb1.ToString() ;
+    var file = sb1.ToString();
+    var testFile = test.ToString();
 
     Console.WriteLine(file);
     File.WriteAllText(Path.Combine("linq2", fileName), file);
+    File.WriteAllText(Path.Combine("linq2_test", testFileName), testFile);
 }
 
 static bool IsExtensionMethod(MethodInfo methodInfo)

@@ -1,6 +1,6 @@
 namespace ZLinq.Tests.Linq;
 
-public class SelectTest
+public class ExceptByTest
 {
     [Fact]
     public void Empty()

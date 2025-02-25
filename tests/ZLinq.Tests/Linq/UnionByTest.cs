@@ -1,6 +1,6 @@
 namespace ZLinq.Tests.Linq;
 
-public class SelectTest
+public class UnionByTest
 {
     [Fact]
     public void Empty()

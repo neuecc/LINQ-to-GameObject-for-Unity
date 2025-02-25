@@ -1,6 +1,6 @@
 namespace ZLinq.Tests.Linq;
 
-public class SelectTest
+public class TakeTest
 {
     [Fact]
     public void Empty()
