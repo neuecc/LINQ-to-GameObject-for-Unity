@@ -36,7 +36,7 @@ public class SelectTest
 
         var e3 = enumerable;
         var array = e3.ToArray();
-        array.ShouldBe([1, 2, 3, 4, 5]); // TODO:
+        array.ShouldBe(xs.ToArray());
 
         enumerable.Dispose();
     }

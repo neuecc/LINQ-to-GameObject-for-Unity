@@ -1,12 +1,10 @@
-﻿// See https://aka.ms/new-console-template for more information
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 
 var enumerableMethods = typeof(Enumerable).GetMethods()
     .Where(x => IsExtensionMethod(x))
     .ToArray();
-
 
 var returnEnumerables = enumerableMethods
     .Where(x => x.ReturnType.Name == "IEnumerable`1")
@@ -21,6 +19,7 @@ var others = enumerableMethods
     .OrderBy(x => x.Key)
     .ToArray();
 
+// TODO: foreach others
 
 foreach (var item in returnEnumerables)
 {
@@ -28,11 +27,9 @@ foreach (var item in returnEnumerables)
     //Console.WriteLine(item.Key + ":" + item.Count());
 }
 
-
-
 static void EmitEnumerableTemplate(IGrouping<string, MethodInfo> methods)
 {
-    if (methods.Key != "Select") return; // TODO
+    Directory.CreateDirectory("linq1");
 
     var className = methods.Key;
     var fileName = $"{className}.cs";
@@ -53,6 +50,9 @@ static void EmitEnumerableTemplate(IGrouping<string, MethodInfo> methods)
     foreach (var methodInfo in methods)
     {
         var suffix = (++i == 1) ? "" : i.ToString();
+
+        if (!methodInfo.GetParameters()[0].ParameterType.IsGenericType) continue;
+
         var t = methodInfo.GetParameters()[0].ParameterType.GetGenericArguments()[0]; // this IEnumerable<T> source's T
         var enumerableType = $"{className}ValueEnumerable{suffix}";
         var baseGenericArguments = string.Join(", ", methodInfo.GetGenericArguments().Select(x => x.Name));
@@ -64,24 +64,25 @@ static void EmitEnumerableTemplate(IGrouping<string, MethodInfo> methods)
         var enumerableElementType = methodInfo.ReturnType.GetGenericArguments()[0].Name;
 
         // sb1
-        sb1.AppendLine($"        public static {enumerableType}<{genericArguments}> Select<{genericArguments}>(this {parameters})");
-        sb1.AppendLine($"            where TEnumerable : struct, IValueEnumerable<{t}>");
-        sb1.AppendLine($"#if NET9_0_OR_GREATER");
-        sb1.AppendLine($"            , allows ref struct");
-        sb1.AppendLine($"#endif");
-        sb1.AppendLine($"            => new({parameterNames});");
-        sb1.AppendLine();
+        sb1.AppendLine($"""
+        public static {enumerableType}<{genericArguments}> {className}<{genericArguments}>(this {parameters})
+            where TEnumerable : struct, IValueEnumerable<{t}>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new({parameterNames});
+            
+        public static ValueEnumerator<{enumerableType}<{genericArguments}>, {enumerableElementType}> GetEnumerator<{genericArguments}>(this {enumerableType}<{genericArguments}> source)
+            where TEnumerable : struct, IValueEnumerable<{t}>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(source);
 
-        sb1.AppendLine($"        public static ValueEnumerator<{enumerableType}<{genericArguments}>, {enumerableElementType}> GetEnumerator<{genericArguments}>(this {enumerableType}<{genericArguments}> source)");
-        sb1.AppendLine($"            where TEnumerable : struct, IValueEnumerable<{t}>");
-        sb1.AppendLine($"#if NET9_0_OR_GREATER");
-        sb1.AppendLine($"            , allows ref struct");
-        sb1.AppendLine($"#endif");
-        sb1.AppendLine($"            => new(source);");
-        sb1.AppendLine();
+""");
 
         // sb2
-        sb2.AppendLine("""
+        sb2.AppendLine($$"""
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
 #if NET9_0_OR_GREATER
@@ -89,59 +90,48 @@ static void EmitEnumerableTemplate(IGrouping<string, MethodInfo> methods)
 #else
     public
 #endif
-""");
-
-        sb2.AppendLine($"    struct {enumerableType}<{genericArguments}>({parameters})");
-        sb2.AppendLine($"        : IValueEnumerable<{enumerableElementType}>");
-        sb2.AppendLine($"        where TEnumerable : struct, IValueEnumerable<{t}>");
-        sb2.AppendLine("""
+    struct {{enumerableType}}<{{genericArguments}}>({{parameters}})
+        : IValueEnumerable<{{enumerableElementType}}>
+        where TEnumerable : struct, IValueEnumerable<{{t}}>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
-""");
-        sb2.AppendLine("    {");
-        sb2.AppendLine("        TEnumerable source = source;");
-        sb2.AppendLine();
-        // TryGetNonEnumeratedCount
-        sb2.AppendLine("        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();");
-        sb2.AppendLine();
+    {
+        TEnumerable source = source;
 
-        // TryGetSpan
-        sb2.AppendLine($"        public bool TryGetSpan(out ReadOnlySpan<{enumerableElementType}> span)");
-        sb2.AppendLine("        {");
-        sb2.AppendLine($"            throw new NotImplementedException();");
-        sb2.AppendLine($"            // span = default;");
-        sb2.AppendLine($"            // return false;");
-        sb2.AppendLine("        }");
-        sb2.AppendLine();
+        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
 
-        // TryGetNext
-        sb2.AppendLine($"        public bool TryGetNext(out {enumerableElementType} current)");
-        sb2.AppendLine("        {");
-        sb2.AppendLine($"            throw new NotImplementedException();");
-        sb2.AppendLine($"            // Unsafe.SkipInit(out current);");
-        sb2.AppendLine($"            // return false;");
-        sb2.AppendLine("        }");
-        sb2.AppendLine();
+        public bool TryGetSpan(out ReadOnlySpan<{{enumerableElementType}}> span)
+        {
+            throw new NotImplementedException();
+            // span = default;
+            // return false;
+        }
 
-        // Dispose
-        sb2.AppendLine("        public void Dispose()");
-        sb2.AppendLine("        {");
-        sb2.AppendLine("            source.Dispose();");
-        sb2.AppendLine("        }");
+        public bool TryGetNext(out {{enumerableElementType}} current)
+        {
+            throw new NotImplementedException();
+            // Unsafe.SkipInit(out current);
+            // return false;
+        }
 
-        sb2.AppendLine("    }");
-        sb2.AppendLine();
+        public void Dispose()
+        {
+            source.Dispose();
+        }
     }
 
-    sb1.Append("    }");
-    sb1.Append("}");
+""");
+    }
 
-    sb2.Append("}");
+    sb1.AppendLine("    }");
+    sb1.AppendLine("}");
+    sb2.AppendLine("}");
 
-    var file = sb1.ToString() + Environment.NewLine + Environment.NewLine + sb2.ToString();
+    var file = sb1.ToString() + Environment.NewLine + sb2.ToString();
 
     Console.WriteLine(file);
+    File.WriteAllText(Path.Combine("linq1", fileName), file);
 }
 
 static bool IsExtensionMethod(MethodInfo methodInfo)
