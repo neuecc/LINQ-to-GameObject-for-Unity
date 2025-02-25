@@ -23,8 +23,13 @@ var others = enumerableMethods
 
 foreach (var item in returnEnumerables)
 {
-    EmitEnumerableTemplate(item);
+    // EmitEnumerableTemplate(item);
     //Console.WriteLine(item.Key + ":" + item.Count());
+}
+
+foreach (var item in others)
+{
+    EmitOtherTemplate(item);
 }
 
 static void EmitEnumerableTemplate(IGrouping<string, MethodInfo> methods)
@@ -132,6 +137,62 @@ static void EmitEnumerableTemplate(IGrouping<string, MethodInfo> methods)
 
     Console.WriteLine(file);
     File.WriteAllText(Path.Combine("linq1", fileName), file);
+}
+
+static void EmitOtherTemplate(IGrouping<string, MethodInfo> methods)
+{
+    Directory.CreateDirectory("linq2");
+
+    var className = methods.Key;
+    var fileName = $"{className}.cs";
+
+    var sb1 = new StringBuilder(); // ZLinq
+    sb1.AppendLine("namespace ZLinq");
+    sb1.AppendLine("{");
+    sb1.AppendLine("    partial class ValueEnumerableExtensions");
+    sb1.AppendLine("    {");
+
+    var test = new StringBuilder(); // TODO:...
+
+    var i = 0;
+    foreach (var methodInfo in methods)
+    {
+        // var suffix = (++i == 1) ? "" : i.ToString();
+
+        if (!methodInfo.GetParameters()[0].ParameterType.IsGenericType) continue;
+
+        var t = methodInfo.GetParameters()[0].ParameterType.GetGenericArguments()[0]; // this IEnumerable<T> source's T
+        // var enumerableType = $"{className}ValueEnumerable{suffix}";
+        var baseGenericArguments = string.Join(", ", methodInfo.GetGenericArguments().Select(x => x.Name));
+        var genericArguments = "TEnumerable" + (baseGenericArguments == "" ? "" : $", {baseGenericArguments}");
+        var baseParameters = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{FormatType(x.ParameterType)} {x.Name}")); // skip TSource source
+        var parameters = "TEnumerable source" + (baseParameters == "" ? "" : $", {baseParameters}");
+        //var baseParameterNames = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{x.Name}"));
+        //var parameterNames = "source" + (baseParameterNames == "" ? "" : $", {baseParameterNames}");
+        //var enumerableElementType = methodInfo.ReturnType.GetGenericArguments()[0].Name;
+        var returnType = FormatType(methodInfo.ReturnType);
+
+        // sb1
+        sb1.AppendLine($$"""
+        public static {{returnType}} {{className}}<{{genericArguments}}>(this {{parameters}})
+            where TEnumerable : struct, IValueEnumerable<{{t}}>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+        {
+            throw new NotImplementedException();
+        }
+
+""");
+    }
+
+    sb1.AppendLine("    }");
+    sb1.AppendLine("}");
+
+    var file = sb1.ToString() ;
+
+    Console.WriteLine(file);
+    File.WriteAllText(Path.Combine("linq2", fileName), file);
 }
 
 static bool IsExtensionMethod(MethodInfo methodInfo)

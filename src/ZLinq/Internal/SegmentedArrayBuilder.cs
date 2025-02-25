@@ -1,5 +1,4 @@
 ﻿using System.Buffers;
-using System.Runtime.CompilerServices;
 
 namespace ZLinq.Internal;
 
@@ -39,6 +38,8 @@ internal ref struct SegmentedArrayBuilder<T>
     int indexInSegment;
     int segmentIndex;
     int count;
+
+    public int Count => count;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(T value)
@@ -115,16 +116,8 @@ internal ref struct SegmentedArrayBuilder<T>
         count++;
     }
 
-    public T[] ToArray()
+    public void CopyTo(Span<T> dest)
     {
-        if (count == 0) return Array.Empty<T>();
-
-#if NET8_0_OR_GREATER
-        var array = GC.AllocateUninitializedArray<T>(count);
-#else
-        var array = new T[count];
-#endif
-        var filled = 0;
         for (int i = 0; i <= segmentIndex; i++)
         {
             T[] segment = default!;
@@ -162,16 +155,28 @@ internal ref struct SegmentedArrayBuilder<T>
 
             if (segmentIndex != i)
             {
-                segment.CopyTo(array, filled);
-                filled += segment.Length;
+                // copy full
+                segment.AsSpan().CopyTo(dest);
+                dest = dest.Slice(segment.Length);
             }
             else
             {
                 // last
-                segment.AsSpan(0, indexInSegment).CopyTo(array.AsSpan(filled));
+                segment.AsSpan(0, indexInSegment).CopyTo(dest);
             }
         }
+    }
 
+    public T[] ToArray()
+    {
+        if (count == 0) return Array.Empty<T>();
+
+#if NET8_0_OR_GREATER
+        var array = GC.AllocateUninitializedArray<T>(count);
+#else
+        var array = new T[count];
+#endif
+        CopyTo(array);
         return array;
     }
 

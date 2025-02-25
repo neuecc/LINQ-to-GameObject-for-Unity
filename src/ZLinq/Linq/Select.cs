@@ -30,6 +30,12 @@
 #endif
             => new(source);
 
+        public static ValueEnumerator<SelectWhereValueEnumerable<TEnumerable, TSource, TResult>, TResult> GetEnumerator<TEnumerable, TSource, TResult>(this SelectWhereValueEnumerable<TEnumerable, TSource, TResult> source)
+            where TEnumerable : struct, IValueEnumerable<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(source);
     }
 }
 
@@ -75,6 +81,10 @@ namespace ZLinq.Linq
         {
             source.Dispose();
         }
+
+        // Optimize for common pattern: Select().Where()
+        public SelectWhereValueEnumerable<TEnumerable, TSource, TResult> Where(Func<TResult, bool> predicate)
+            => new(source, selector, predicate);
     }
 
     [StructLayout(LayoutKind.Auto)]
@@ -120,4 +130,49 @@ namespace ZLinq.Linq
         }
     }
 
+    [StructLayout(LayoutKind.Auto)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+#if NET9_0_OR_GREATER
+    public ref
+#else
+    public
+#endif
+    struct SelectWhereValueEnumerable<TEnumerable, TSource, TResult>(TEnumerable source, Func<TSource, TResult> selector, Func<TResult, bool> predicate)
+        : IValueEnumerable<TResult>
+        where TEnumerable : struct, IValueEnumerable<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    {
+        TEnumerable source = source;
+
+        public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
+
+        public bool TryGetSpan(out ReadOnlySpan<TResult> span)
+        {
+            span = default;
+            return false;
+        }
+
+        public bool TryGetNext(out TResult current)
+        {
+            while (source.TryGetNext(out var value))
+            {
+                var result = selector(value);
+                if (predicate(result))
+                {
+                    current = result;
+                    return true;
+                }
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
+        }
+
+        public void Dispose()
+        {
+            source.Dispose();
+        }
+    }
 }

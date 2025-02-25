@@ -9,10 +9,12 @@ using SpanLinq;
 using StructLinq;
 using ZLinq;
 using ZLinq.Linq;
+using Benchmark;
 
 #if !DEBUG
 
 BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
+// BenchmarkRunner.Run<CopyBattle>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
 
 #else
 

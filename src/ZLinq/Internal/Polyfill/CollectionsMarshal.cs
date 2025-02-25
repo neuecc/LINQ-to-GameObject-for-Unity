@@ -23,6 +23,18 @@ namespace System.Runtime.InteropServices
 
             return span;
         }
+
+        // This is not polyfill.
+        // Unlike the original SetCount, this does not grow if the count is smaller.
+        // Therefore, the internal collection size of the List must always be greater than or equal to the count.
+        internal static void UnsafeSetCount<T>(this List<T>? list, int count)
+        {
+            if (list is not null)
+            {
+                var view = Unsafe.As<ListView<T>>(list);
+                view._size = count;
+            }
+        }
     }
 
 #pragma warning disable CS8618

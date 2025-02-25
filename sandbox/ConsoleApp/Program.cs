@@ -11,11 +11,24 @@ var xs = new[] { 1, 2, 3 };
 var hoge = xs.Select(x => x).Where(x => x % 2 == 0).ToArray();
 
 var enumerable = xs.AsSpan().AsValueEnumerable()
-    .Select(x => x * x)
     .Where(x => x == 2)
-    .Prepend(1000)
-    .Append(99)
-    .Distinct();
+    .Select(x => x * x);
+
+var ok = enumerable.Count();
+
+
+
+foreach (var item in enumerable)
+{
+
+}
+
+//    .Select(x => x * x)
+//  .Distinct()
+// .Prepend(100);
+//.Prepend(1000)
+//.Append(99)
+//.Distinct();
 
 //var size = Marshal.SizeOf(enumerable);
 var size = Unsafe.SizeOf<DistinctValueEnumerable<AppendValueEnumerable<PrependValueEnumerable<WhereValueEnumerable<SelectValueEnumerable<SpanValueEnumerable<int>, int, int>, int>, int>, int>, int>>();
