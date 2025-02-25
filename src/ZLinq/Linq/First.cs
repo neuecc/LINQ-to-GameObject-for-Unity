@@ -1,4 +1,4 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -8,7 +8,14 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
+            // TODO:TryGetSpan, optimize path
+
+            if (source.TryGetNext(out var current))
+            {
+                return current;
+            }
+
+            throw new InvalidOperationException("Sequence contains no elements");
         }
 
         public static TSource First<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
@@ -17,7 +24,15 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
+            while (source.TryGetNext(out var current))
+            {
+                if (predicate(current))
+                {
+                    return current;
+                }
+            }
+
+            throw new InvalidOperationException("Sequence contains no matching element");
         }
 
     }
