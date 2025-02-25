@@ -12,23 +12,24 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
     /// <summary>
     /// Mutable context that allows updating the Compilation reference
     /// </summary>
-    class UpdatablePipelineContext(Compilation compilation)
+    class UpdatablePipelineContext(Compilation compilation, ParseOptions parseOptions)
     {
         readonly Compilation originalCompilation = compilation;
 
         public HashSet<string> MethodLines { get; } = new HashSet<string>();
         public Compilation Compilation { get; private set; } = compilation;
 
-        public void UpdateCompilation(string code)
+        public void UpdateCompilation(string code, CancellationToken cancellationToken)
         {
-            this.Compilation = originalCompilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(code));
+            this.Compilation = originalCompilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(code, options: (CSharpParseOptions)parseOptions, cancellationToken: cancellationToken));
         }
     }
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var compilationProvider = context.CompilationProvider
-            .Select((compilation, _) => new UpdatablePipelineContext(compilation));
+            .Combine(context.ParseOptionsProvider)
+            .Select((tuple, _) => new UpdatablePipelineContext(tuple.Left, tuple.Right));
 
         var resolvedOverloadResolutionFailure = context.SyntaxProvider
             .CreateSyntaxProvider((node, ct) =>
@@ -55,16 +56,27 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                 var (providedNode, pipelineContext) = tuple;
 
                 List<string>? list = null;
-
+                var newResolved = false;
                 // .Select().Where() calls Where -> Select but Failure is most children node so we need to analyze to parent node.
                 foreach (var node in providedNode.AncestorsAndSelf().OfType<InvocationExpressionSyntax>())
                 {
                     var semanticModel = pipelineContext.Compilation.GetSemanticModel(node.SyntaxTree);
                     var symbolInfo = semanticModel.GetSymbolInfo(node);
-                    
+
                     if (symbolInfo.CandidateReason != CandidateReason.OverloadResolutionFailure || symbolInfo.CandidateSymbols.Length == 0)
                     {
-                        break;
+                        if (newResolved)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        newResolved = true;
                     }
 
                     bool addedNewLine = false;
@@ -117,7 +129,7 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                     if (addedNewLine)
                     {
                         var code = BuildCode(pipelineContext.MethodLines);
-                        pipelineContext.UpdateCompilation(code);
+                        pipelineContext.UpdateCompilation(code, cancellationToken);
                     }
                 }
 

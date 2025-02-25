@@ -1,15 +1,32 @@
-﻿using System.Text.Json;
+﻿using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using ZLinq;
 using ZLinq.Linq;
+using ZLinq.AutoInstrument;
+using System.Runtime.InteropServices;
 
 var xs = new[] { 1, 2, 3 };
 
+var hoge = xs.Select(x => x).Where(x => x % 2 == 0).ToArray();
 
-
-var enumerable = xs.AsValueEnumerable()
+var enumerable = xs.AsSpan().AsValueEnumerable()
     .Select(x => x * x)
-    .Where(x => x == 2);
+    .Where(x => x == 2)
+    .Prepend(1000)
+    .Append(99)
+    .Distinct();
+
+//var size = Marshal.SizeOf(enumerable);
+var size = Unsafe.SizeOf<DistinctValueEnumerable<AppendValueEnumerable<PrependValueEnumerable<WhereValueEnumerable<SelectValueEnumerable<SpanValueEnumerable<int>, int, int>, int>, int>, int>, int>>();
+Console.WriteLine(size);
+
+//Console.WriteLine(Unsafe.SizeOf();
+// .Select(x => x);
+//.Select(x => x * 100)
+//.Select(x => x * x);
+//.((x, i) => x * 100);
+
 //.ToArray();
 
 var e3 = enumerable;
@@ -135,3 +152,14 @@ static void More()
 
 // je.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object
 
+
+namespace ZLinq.AutoInstrument
+{
+    public static class AutoInstrumentLinq
+    {
+        public static SelectValueEnumerable<ArrayValueEnumerable<TSource>, TSource, TResult> Select<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector)
+        {
+            return source.AsValueEnumerable().Select(selector);
+        }
+    }
+}
