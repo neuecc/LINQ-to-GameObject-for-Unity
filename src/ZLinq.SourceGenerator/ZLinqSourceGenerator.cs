@@ -30,7 +30,7 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
         var compilationProvider = context.CompilationProvider
             .Select((compilation, _) => new UpdatablePipelineContext(compilation));
 
-        var overloadResolutionFailureSymbols = context.SyntaxProvider
+        var resolvedOverloadResolutionFailure = context.SyntaxProvider
             .CreateSyntaxProvider((node, ct) =>
             {
                 if (node.IsKind(SyntaxKind.InvocationExpression))
@@ -120,7 +120,7 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
             })
             .Collect();
 
-        context.RegisterSourceOutput(overloadResolutionFailureSymbols, Emit);
+        context.RegisterSourceOutput(resolvedOverloadResolutionFailure, Emit);
     }
 
     static string BuildCode(IEnumerable<string> sources)
