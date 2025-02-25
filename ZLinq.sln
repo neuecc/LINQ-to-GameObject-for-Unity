@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileGen", "sandbox\FileGen\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZLinq.SourceGenerator.Tests", "tests\ZLinq.SourceGenerator.Tests\ZLinq.SourceGenerator.Tests.csproj", "{E9ECC531-2D37-4173-B30A-C59B756DBE56}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoSourceGenerator", "sandbox\NoSourceGenerator\NoSourceGenerator.csproj", "{FA9F7CDF-DF1C-4D3D-9F76-8B658B2C0A4D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{E9ECC531-2D37-4173-B30A-C59B756DBE56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9ECC531-2D37-4173-B30A-C59B756DBE56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9ECC531-2D37-4173-B30A-C59B756DBE56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA9F7CDF-DF1C-4D3D-9F76-8B658B2C0A4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA9F7CDF-DF1C-4D3D-9F76-8B658B2C0A4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA9F7CDF-DF1C-4D3D-9F76-8B658B2C0A4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA9F7CDF-DF1C-4D3D-9F76-8B658B2C0A4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -89,6 +95,7 @@ Global
 		{1B36B6F5-A573-406D-981A-7CCBA652E617} = {F462254E-52F2-4CA2-8518-583E60F81452}
 		{873D634E-DA03-411C-AFED-F2651E7B749B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{E9ECC531-2D37-4173-B30A-C59B756DBE56} = {DDB4EF12-CC4E-5E88-E6FC-71A802F4DE97}
+		{FA9F7CDF-DF1C-4D3D-9F76-8B658B2C0A4D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2FFC585D-0FDF-489B-87D0-AB1122FD8C51}

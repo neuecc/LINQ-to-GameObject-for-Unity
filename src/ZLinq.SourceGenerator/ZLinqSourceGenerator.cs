@@ -61,7 +61,7 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                 {
                     var semanticModel = pipelineContext.Compilation.GetSemanticModel(node.SyntaxTree);
                     var symbolInfo = semanticModel.GetSymbolInfo(node);
-
+                    
                     if (symbolInfo.CandidateReason != CandidateReason.OverloadResolutionFailure || symbolInfo.CandidateSymbols.Length == 0)
                     {
                         break;
@@ -96,6 +96,11 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                         var parameterNames = string.Join(", ", constructedMethod.Parameters.Select(x => x.Name));
 
                         var formattedSignature = $"        public static {formattedReturnType} {constructedMethod.Name}{formattedTypeArguments}({formattedParameters}) => {className}.{methodName}{fullTypeArguments}({parameterNames});";
+                        formattedSignature = formattedSignature // extra alloc but easy to read
+                            .Replace("global::ZLinq.Linq.", "")
+                            .Replace("global::ZLinq.ValueEnumerableExtensions.", "ValueEnumerableExtensions.")
+                            .Replace("global::System.Func", "Func")
+                            .Replace("global::System.Action", "Action");
 
                         if (pipelineContext.MethodLines.Add(formattedSignature))
                         {
@@ -134,6 +139,7 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
 #pragma warning disable
             
 using System;
+using ZLinq.Linq;
 
 namespace ZLinq
 {
