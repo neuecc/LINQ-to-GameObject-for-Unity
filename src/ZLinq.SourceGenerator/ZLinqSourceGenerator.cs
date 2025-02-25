@@ -9,8 +9,27 @@ namespace ZLinq.SourceGenerator;
 [Generator(LanguageNames.CSharp)]
 public partial class ZLinqSourceGenerator : IIncrementalGenerator
 {
+    /// <summary>
+    /// Mutable context that allows updating the Compilation reference
+    /// </summary>
+    class UpdatablePipelineContext(Compilation compilation)
+    {
+        readonly Compilation originalCompilation = compilation;
+
+        public HashSet<string> MethodLines { get; } = new HashSet<string>();
+        public Compilation Compilation { get; private set; } = compilation;
+
+        public void UpdateCompilation(string code)
+        {
+            this.Compilation = originalCompilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(code));
+        }
+    }
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        var compilationProvider = context.CompilationProvider
+            .Select((compilation, _) => new UpdatablePipelineContext(compilation));
+
         var overloadResolutionFailureSymbols = context.SyntaxProvider
             .CreateSyntaxProvider((node, ct) =>
             {
@@ -29,20 +48,26 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                 }
 
                 return false;
-            }, (context, cancellationToken) => context)
-            .SelectMany((context, cancellationToken) =>
+            }, (context, cancellationToken) => context.Node)
+            .Combine(compilationProvider)
+            .SelectMany((tuple, cancellationToken) =>
             {
+                var (providedNode, pipelineContext) = tuple;
+
                 List<string>? list = null;
-                var semanticModel = context.SemanticModel; // mutable var
-                foreach (var node in context.Node.AncestorsAndSelf().OfType<InvocationExpressionSyntax>())
+
+                // .Select().Where() calls Where -> Select but Failure is most children node so we need to analyze to parent node.
+                foreach (var node in providedNode.AncestorsAndSelf().OfType<InvocationExpressionSyntax>())
                 {
+                    var semanticModel = pipelineContext.Compilation.GetSemanticModel(node.SyntaxTree);
                     var symbolInfo = semanticModel.GetSymbolInfo(node);
 
                     if (symbolInfo.CandidateReason != CandidateReason.OverloadResolutionFailure || symbolInfo.CandidateSymbols.Length == 0)
                     {
-                        return list ?? []; // break;
+                        break;
                     }
 
+                    bool addedNewLine = false;
                     foreach (var methodSymbol in symbolInfo.CandidateSymbols.OfType<IMethodSymbol>())
                     {
                         if (methodSymbol.TypeArguments.Length == 0) continue;
@@ -70,23 +95,25 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                         var fullTypeArguments = string.Join(", ", constructedMethod.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))).SurroundIfNotEmpty("<", ">");
                         var parameterNames = string.Join(", ", constructedMethod.Parameters.Select(x => x.Name));
 
-                        var formattedSignature = $"public static {formattedReturnType} {constructedMethod.Name}{formattedTypeArguments}({formattedParameters}) => {className}.{methodName}{fullTypeArguments}({parameterNames});";
+                        var formattedSignature = $"        public static {formattedReturnType} {constructedMethod.Name}{formattedTypeArguments}({formattedParameters}) => {className}.{methodName}{fullTypeArguments}({parameterNames});";
 
-                        if (list == null)
+                        if (pipelineContext.MethodLines.Add(formattedSignature))
                         {
-                            list = new List<string>();
+                            addedNewLine = true;
+                            if (list == null)
+                            {
+                                list = new();
+                            }
+                            list.Add(formattedSignature);
                         }
-                        list.Add(formattedSignature);
                     }
 
-                    if (list == null) return [];
-
                     // Create a new Compilation with the current results, generate OverloadResolutionFailure and CandidateSymbols for the following method chain, and continue the exploration
-                    var code = BuildCode(list);
-                    var newCompilation = context.SemanticModel.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(code));
-
-                    // replace new Compilation's new SemanticModel
-                    semanticModel = newCompilation.GetSemanticModel(node.SyntaxTree);
+                    if (addedNewLine)
+                    {
+                        var code = BuildCode(pipelineContext.MethodLines);
+                        pipelineContext.UpdateCompilation(code);
+                    }
                 }
 
                 return list ?? (IEnumerable<string>)[];
@@ -98,7 +125,7 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
 
     static string BuildCode(IEnumerable<string> sources)
     {
-        var codes = string.Join(Environment.NewLine, sources.Distinct().Select(x => "        " + x));
+        var codes = string.Join(Environment.NewLine, sources);
 
         var sb = new StringBuilder();
         sb.AppendLine("""

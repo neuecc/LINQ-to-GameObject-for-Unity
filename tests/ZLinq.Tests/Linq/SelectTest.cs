@@ -35,8 +35,8 @@ public class SelectTest
         e2.TryGetSpan(out var span).ShouldBe(true); // TODO: true | false
 
         var e3 = enumerable;
-        // var array = e3.AsEnumerable().ToArray();
-        // array.ShouldBe(1, 2, 3, 4, 5); // TODO:
+        var array = e3.ToArray();
+        array.ShouldBe([1, 2, 3, 4, 5]); // TODO:
 
         enumerable.Dispose();
     }

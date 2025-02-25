@@ -8,19 +8,46 @@ var xs = new[] { 1, 2, 3 };
 
 
 var enumerable = xs.AsValueEnumerable()
-    .Select(x => x * x);
-    //.Select(x => x.ToString())
-    //.Where(x => x == "2")
-    //.ToArray();
+    .Select(x => x * x)
+    .Where(x => x == 2);
+//.ToArray();
 
 var e3 = enumerable;
 
-// var array = e3.ToAS
+var array = e3.ToArray();
 
+var zzz = enumerable.Select(takoyakix =>
+{
+    var note = takoyakix;
+    return note * 2;
+});
 
-foreach (var item in e3)
+More();
+
+foreach (var item in zzz)
 {
     Console.WriteLine(item);
+}
+
+static void More()
+{
+    var xs = new[] { 1, 2, 3 };
+
+    var enumerable = xs.AsValueEnumerable()
+        .Select(x => x * x)
+        .Where(x => x == 2);
+    //.ToArray();
+
+    var e3 = enumerable;
+
+    // var array = e3.ToAS
+
+    var zzz = e3.Select(takoyakix =>
+    {
+        var note = takoyakix;
+        return note * 2;
+    });
+
 }
 
 
