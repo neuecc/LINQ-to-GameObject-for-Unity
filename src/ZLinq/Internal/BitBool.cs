@@ -59,6 +59,12 @@ internal struct BitBool
         get => (value & 0b10000000) != 0;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetTrueAll() => value = byte.MaxValue;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetFalseAll() => value = 0;
+
     // Bit1
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetTrueToBit1() => value |= 0b00000001;

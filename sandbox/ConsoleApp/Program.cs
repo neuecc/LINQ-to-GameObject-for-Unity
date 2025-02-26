@@ -8,76 +8,15 @@ using System.Runtime.InteropServices;
 
 var xs = new[] { 1, 2, 3 };
 
-var hoge = xs.Select(x => x).Where(x => x % 2 == 0).ToArray();
 
-var enumerable = xs.AsSpan().AsValueEnumerable()
-    .Where(x => x == 2)
-    .Select(x => x * x);
+var seq = xs.AsSpan().AsValueEnumerable()
+    .Select(x => x * 10)
+    .Where(x => x % 2 == 0)
+    .SelectMany(x => Enumerable.Repeat(x, 3));
 
-var ok = enumerable.Count();
-
-
-
-foreach (var item in enumerable)
-{
-
-}
-
-//    .Select(x => x * x)
-//  .Distinct()
-// .Prepend(100);
-//.Prepend(1000)
-//.Append(99)
-//.Distinct();
-
-//var size = Marshal.SizeOf(enumerable);
-var size = Unsafe.SizeOf<DistinctValueEnumerable<AppendValueEnumerable<PrependValueEnumerable<WhereValueEnumerable<SelectValueEnumerable<SpanValueEnumerable<int>, int, int>, int>, int>, int>, int>>();
-Console.WriteLine(size);
-
-//Console.WriteLine(Unsafe.SizeOf();
-// .Select(x => x);
-//.Select(x => x * 100)
-//.Select(x => x * x);
-//.((x, i) => x * 100);
-
-//.ToArray();
-
-var e3 = enumerable;
-
-var array = e3.ToArray();
-
-var zzz = enumerable.Select(takoyakix =>
-{
-    var note = takoyakix;
-    return note * 2;
-});
-
-More();
-
-foreach (var item in zzz)
+foreach (var item in seq)
 {
     Console.WriteLine(item);
-}
-
-static void More()
-{
-    var xs = new[] { 1, 2, 3 };
-
-    var enumerable = xs.AsValueEnumerable()
-        .Select(x => x * x)
-        .Where(x => x == 2);
-    //.ToArray();
-
-    var e3 = enumerable;
-
-    // var array = e3.ToAS
-
-    var zzz = e3.Select(takoyakix =>
-    {
-        var note = takoyakix;
-        return note * 2;
-    });
-
 }
 
 

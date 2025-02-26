@@ -1,4 +1,4 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -8,7 +8,7 @@ namespace ZLinq
             , allows ref struct
 #endif
             => new(source, selector);
-            
+
         public static ValueEnumerator<SelectManyValueEnumerable<TEnumerable, TSource, TResult>, TResult> GetEnumerator<TEnumerable, TSource, TResult>(this SelectManyValueEnumerable<TEnumerable, TSource, TResult> source)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -22,7 +22,7 @@ namespace ZLinq
             , allows ref struct
 #endif
             => new(source, selector);
-            
+
         public static ValueEnumerator<SelectManyValueEnumerable2<TEnumerable, TSource, TResult>, TResult> GetEnumerator<TEnumerable, TSource, TResult>(this SelectManyValueEnumerable2<TEnumerable, TSource, TResult> source)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -36,7 +36,7 @@ namespace ZLinq
             , allows ref struct
 #endif
             => new(source, collectionSelector, resultSelector);
-            
+
         public static ValueEnumerator<SelectManyValueEnumerable3<TEnumerable, TSource, TCollection, TResult>, TResult> GetEnumerator<TEnumerable, TSource, TCollection, TResult>(this SelectManyValueEnumerable3<TEnumerable, TSource, TCollection, TResult> source)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -50,7 +50,7 @@ namespace ZLinq
             , allows ref struct
 #endif
             => new(source, collectionSelector, resultSelector);
-            
+
         public static ValueEnumerator<SelectManyValueEnumerable4<TEnumerable, TSource, TCollection, TResult>, TResult> GetEnumerator<TEnumerable, TSource, TCollection, TResult>(this SelectManyValueEnumerable4<TEnumerable, TSource, TCollection, TResult> source)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -78,25 +78,53 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
+        bool hasInner;
+        EnumerableValueEnumerable<TResult> innerEnumerable;
 
-        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            count = 0;
+            return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<TResult> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            span = default;
+            return false;
         }
 
         public bool TryGetNext(out TResult current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+        BEGIN:
+            if (hasInner)
+            {
+                if (innerEnumerable.TryGetNext(out current))
+                {
+                    return true;
+                }
+                else
+                {
+                    innerEnumerable.Dispose();
+                }
+            }
+
+            if (source.TryGetNext(out var value))
+            {
+                hasInner = true;
+                innerEnumerable = selector(value).AsValueEnumerable();
+                goto BEGIN;
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
         }
 
         public void Dispose()
         {
+            if (hasInner)
+            {
+                innerEnumerable.Dispose();
+            }
             source.Dispose();
         }
     }
