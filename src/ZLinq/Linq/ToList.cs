@@ -12,14 +12,9 @@
             {
                 if (source.TryGetSpan(out var span))
                 {
-                    var list = new List<TSource>(span.Length);
-#if NET8_0_OR_GREATER
-                    CollectionsMarshal.SetCount(list, span.Length);
-#else
-                    CollectionsMarshal.UnsafeSetCount(list, span.Length);
-#endif
-                    span.CopyTo(CollectionsMarshal.AsSpan(list));
-                    return list;
+                    var array = GC.AllocateUninitializedArray<TSource>(span.Length);
+                    span.CopyTo(array);
+                    return ListMarshal.AsList(array);
                 }
 
                 if (source.TryGetNonEnumeratedCount(out var count))
@@ -43,16 +38,9 @@
                         arrayBuilder.Add(item);
                     }
 
-                    count = arrayBuilder.Count;
-                    var list = new List<TSource>(count);
-#if NET8_0_OR_GREATER
-                    CollectionsMarshal.SetCount(list, count);
-#else
-                    CollectionsMarshal.UnsafeSetCount(list, count);
-#endif
-                    var dest = CollectionsMarshal.AsSpan(list);
-                    arrayBuilder.CopyTo(dest);
-                    return list;
+                    var array = GC.AllocateUninitializedArray<TSource>(arrayBuilder.Count);
+                    arrayBuilder.CopyTo(array);
+                    return ListMarshal.AsList(array);
                 }
                 finally
                 {

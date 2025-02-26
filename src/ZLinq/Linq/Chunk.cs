@@ -12,14 +12,6 @@
 
             return new(source, size);
         }
-
-        public static ValueEnumerator<ChunkValueEnumerable<TEnumerable, TSource>, TSource[]> GetEnumerator<TEnumerable, TSource>(this ChunkValueEnumerable<TEnumerable, TSource> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
-
     }
 }
 
@@ -48,6 +40,11 @@ namespace ZLinq.Linq
         bool isInitialized;
         bool isCompleted; 
         bool isCanGetSpan;
+
+        public ValueEnumerator<ChunkValueEnumerable<TEnumerable, TSource>, TSource[]> GetEnumerator()
+        {
+            return new(this);
+        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

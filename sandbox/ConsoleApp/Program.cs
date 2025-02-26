@@ -9,13 +9,12 @@ using System.Runtime.InteropServices;
 var xs = new[] { 1, 2, 3 };
 
 
-var seq = xs.AsSpan().AsValueEnumerable()
-    .Select(x => x * 10)
-    .Where(x => x % 2 == 0)
-    .SelectMany(x => Enumerable.Repeat(x, 3));
+var seq = Enumerable.Range(1, 10).AsValueEnumerable().Select(x => x * x);
+
 
 foreach (var item in seq)
 {
+    var a = item;
     Console.WriteLine(item);
 }
 

@@ -9,33 +9,12 @@
 #endif
             => new(source, predicate);
 
-        public static ValueEnumerator<WhereValueEnumerable<TEnumerable, TSource>, TSource> GetEnumerator<TEnumerable, TSource>(this WhereValueEnumerable<TEnumerable, TSource> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
-
         public static WhereValueEnumerable2<TEnumerable, TSource> Where<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Int32, Boolean> predicate)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, predicate);
-
-        public static ValueEnumerator<WhereValueEnumerable2<TEnumerable, TSource>, TSource> GetEnumerator<TEnumerable, TSource>(this WhereValueEnumerable2<TEnumerable, TSource> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
-
-        public static ValueEnumerator<WhereSelectValueEnumerable<TEnumerable, TSource, TResult>, TResult> GetEnumerator<TEnumerable, TSource, TResult>(this WhereSelectValueEnumerable<TEnumerable, TSource, TResult> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
     }
 }
 
@@ -56,6 +35,11 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
+
+        public ValueEnumerator<WhereValueEnumerable<TEnumerable, TSource>, TSource> GetEnumerator()
+        {
+            return new(this);
+        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -111,6 +95,11 @@ namespace ZLinq.Linq
         TEnumerable source = source;
         int index = 0;
 
+        public ValueEnumerator<WhereValueEnumerable2<TEnumerable, TSource>, TSource> GetEnumerator()
+        {
+            return new(this);
+        }
+
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = default;
@@ -159,6 +148,11 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
+
+        public ValueEnumerator<WhereSelectValueEnumerable<TEnumerable, TSource, TResult>, TResult> GetEnumerator()
+        {
+            return new(this);
+        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

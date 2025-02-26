@@ -5,6 +5,8 @@ using System.Collections.Immutable;
 
 namespace ZLinq
 {
+    // TODO: impl GetEnumerator
+
     public static partial class ValueEnumerable
     {
         public static EnumerableValueEnumerable<T> AsValueEnumerable<T>(this IEnumerable<T> source)

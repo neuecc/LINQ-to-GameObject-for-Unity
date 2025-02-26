@@ -17,7 +17,7 @@ partial class ValueEnumerableExtensions
             else if (source.TryGetNonEnumeratedCount(out var count))
             {
                 var i = 0;
-                var array = new TSource[count];
+                var array = GC.AllocateUninitializedArray<TSource>(count);
 
                 while (source.TryGetNext(out var item))
                 {

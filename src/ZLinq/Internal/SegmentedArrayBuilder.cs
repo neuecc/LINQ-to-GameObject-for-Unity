@@ -171,11 +171,7 @@ internal ref struct SegmentedArrayBuilder<T>
     {
         if (count == 0) return Array.Empty<T>();
 
-#if NET8_0_OR_GREATER
         var array = GC.AllocateUninitializedArray<T>(count);
-#else
-        var array = new T[count];
-#endif
         CopyTo(array);
         return array;
     }
