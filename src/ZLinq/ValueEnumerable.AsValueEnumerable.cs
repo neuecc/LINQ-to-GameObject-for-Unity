@@ -178,7 +178,7 @@ namespace ZLinq.Linq
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Length;
-            return false;
+            return true;
         }
 
         public bool TryGetSpan(out ReadOnlySpan<T> span)
@@ -222,7 +222,7 @@ namespace ZLinq.Linq
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Length;
-            return false;
+            return true;
         }
 
         public bool TryGetSpan(out ReadOnlySpan<T> span)
@@ -656,7 +656,7 @@ namespace ZLinq.Linq
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Length;
-            return false;
+            return true;
         }
 
         public bool TryGetSpan(out ReadOnlySpan<T> span)

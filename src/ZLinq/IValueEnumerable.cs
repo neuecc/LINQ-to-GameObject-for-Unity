@@ -52,7 +52,7 @@ public static partial class ValueEnumerableExtensions
         return new(source);
     }
 
-    // not allows ref struct; in .NET 9, only use directly from ITraversable(or similar) sequence
+    // not allows ref struct; in .NET 9, only use directly from ITraversable or simple sequence source like IEnumerable<T>.AsValueEnumerable.
     public static IEnumerable<T> AsEnumerable<TEnumerable, T>(this TEnumerable source)
         where TEnumerable : struct, IValueEnumerable<T>
     {
