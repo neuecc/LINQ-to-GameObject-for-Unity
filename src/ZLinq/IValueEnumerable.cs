@@ -26,13 +26,18 @@ struct ValueEnumerator<TEnumerable, T>(TEnumerable source) : IDisposable
 #endif
 {
     TEnumerable source = source;
-
     T current = default!;
 
-    public T Current => current;
+    public T Current
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => current;
+    }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool MoveNext() => source.TryGetNext(out current);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Dispose() => source.Dispose();
 }
 

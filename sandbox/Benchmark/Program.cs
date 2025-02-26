@@ -68,6 +68,34 @@ public class IterateBenchmark
         }
     }
 
+    [Benchmark]
+    public void ZLinqBest()
+    {
+        var seq = array.AsValueEnumerable()
+            .Select(x => x * 3)
+            .Where(x => x % 2 == 0);
+
+        while (seq.TryGetNext(out var _))
+        {
+
+        }
+    }
+
+    [Benchmark]
+    public void ZLinqBest2()
+    {
+        var seq = array.AsValueEnumerable()
+            .Select(x => x * 3)
+            .Where(x => x % 2 == 0);
+
+        while (seq.TryGetNext(out var _))
+        {
+
+        }
+
+        seq.Dispose();
+    }
+
     //[Benchmark]
     //public void ZLinqSpan()
     //{
