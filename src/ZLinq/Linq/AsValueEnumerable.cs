@@ -1,6 +1,8 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 #if NET8_0_OR_GREATER
 using System.Collections.Immutable;
+using System.Numerics;
 #endif
 
 namespace ZLinq
@@ -648,6 +650,17 @@ namespace ZLinq.Linq
 
 #if NET9_0_OR_GREATER
 
+
+    // TODO:remove? implementing
+    public delegate Vector<T> VectorSelector<T>(ref readonly Vector<T> source);
+
+
+    public ref struct VectorizedSelect<T>(ReadOnlySpan<T> source)
+    {
+    }
+
+    // AsVectorize()
+
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public ref struct SpanValueEnumerable<T>(ReadOnlySpan<T> source) : IValueEnumerable<T>
@@ -681,6 +694,122 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
+        }
+
+        // SIMD Optimize
+
+#pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
+        public void VectorizedSelectCopyTo(Span<T> destination, Func<Vector<T>, Vector<T>> selector, Func<T, T> fallbackSelector)
+        {
+            if (!(Vector.IsHardwareAccelerated && Vector<T>.IsSupported))
+            {
+                throw new Exception(); // todo:...
+            }
+
+            // TODO: destination size check
+
+
+            ref var pointer = ref MemoryMarshal.GetReference(source);
+            ref var end = ref Unsafe.Add(ref pointer, source.Length);
+
+            ref var dest = ref MemoryMarshal.GetReference(destination);
+
+
+            if (source.Length >= Vector<T>.Count)
+            {
+                ref var to = ref Unsafe.Subtract(ref end, Vector<int>.Count);
+                do
+                {
+                    var vector = Vector.LoadUnsafe(ref pointer);
+                    var projected = selector(vector);
+
+                    projected.StoreUnsafe(ref dest);
+                    pointer = ref Unsafe.Add(ref pointer, Vector<T>.Count);
+                    dest = ref Unsafe.Add(ref dest, Vector<T>.Count);
+                } while (!Unsafe.IsAddressGreaterThan(ref pointer, ref to));
+            }
+
+            while (Unsafe.IsAddressLessThan(ref pointer, ref end))
+            {
+                dest = fallbackSelector(pointer);
+                pointer = ref Unsafe.Add(ref pointer, 1);
+                dest = ref Unsafe.Add(ref dest, 1);
+            }
+        }
+
+        public void VectorizedSelectCopyTo2(Span<T> destination, VectorSelector<T> selector, Func<T, T> fallbackSelector)
+        {
+            if (!(Vector.IsHardwareAccelerated && Vector<T>.IsSupported))
+            {
+                throw new Exception(); // todo:...
+            }
+
+            // TODO: destination size check
+
+
+            ref var pointer = ref MemoryMarshal.GetReference(source);
+            ref var end = ref Unsafe.Add(ref pointer, source.Length);
+
+            ref var dest = ref MemoryMarshal.GetReference(destination);
+
+
+            if (source.Length >= Vector<T>.Count)
+            {
+                ref var to = ref Unsafe.Subtract(ref end, Vector<int>.Count);
+                do
+                {
+                    var vector = Vector.LoadUnsafe(ref pointer);
+
+                    var projected = selector(ref vector);
+                    projected.StoreUnsafe(ref dest);
+                    pointer = ref Unsafe.Add(ref pointer, Vector<T>.Count);
+                    dest = ref Unsafe.Add(ref dest, Vector<T>.Count);
+                } while (!Unsafe.IsAddressGreaterThan(ref pointer, ref to));
+            }
+
+            while (Unsafe.IsAddressLessThan(ref pointer, ref end))
+            {
+                dest = fallbackSelector(pointer);
+                pointer = ref Unsafe.Add(ref pointer, 1);
+                dest = ref Unsafe.Add(ref dest, 1);
+            }
+        }
+        public unsafe void VectorizedSelectCopyTo3(Span<T> destination, delegate* managed<Vector<T>, Vector<T>> selector, Func<T, T> fallbackSelector)
+        {
+            if (!(Vector.IsHardwareAccelerated && Vector<T>.IsSupported))
+            {
+                throw new Exception(); // todo:...
+            }
+
+            // TODO: destination size check
+
+
+            ref var pointer = ref MemoryMarshal.GetReference(source);
+            ref var end = ref Unsafe.Add(ref pointer, source.Length);
+
+            ref var dest = ref MemoryMarshal.GetReference(destination);
+
+
+            if (source.Length >= Vector<T>.Count)
+            {
+                ref var to = ref Unsafe.Subtract(ref end, Vector<int>.Count);
+                do
+                {
+                    var vector = Vector.LoadUnsafe(ref pointer);
+                    var projected = selector(vector);
+
+                    projected.StoreUnsafe(ref dest);
+                    pointer = ref Unsafe.Add(ref pointer, Vector<T>.Count);
+                    dest = ref Unsafe.Add(ref dest, Vector<T>.Count);
+                } while (!Unsafe.IsAddressGreaterThan(ref pointer, ref to));
+            }
+
+            while (Unsafe.IsAddressLessThan(ref pointer, ref end))
+            {
+                dest = fallbackSelector(pointer);
+                pointer = ref Unsafe.Add(ref pointer, 1);
+                dest = ref Unsafe.Add(ref dest, 1);
+            }
         }
     }
 

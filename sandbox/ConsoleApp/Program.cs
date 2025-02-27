@@ -5,19 +5,16 @@ using ZLinq;
 using ZLinq.Linq;
 using ZLinq.AutoInstrument;
 using System.Runtime.InteropServices;
-
-var xs = new[] { 1, 2, 3 };
-
-
-var seq = Enumerable.Range(1, 10).AsValueEnumerable().Select(x => x * x);
+using System.Numerics;
 
 
-foreach (var item in seq)
-{
-    var a = item;
-    Console.WriteLine(item);
-}
+//Span<int> xs = stackalloc int[255];
 
+var range = Enumerable.Range(1, 10000).ToArray();
+
+range.AsSpan().AsValueEnumerable().VectorizedSelectCopyTo(range, x => x * 3, x => x * x);
+
+Console.WriteLine("do");
 
 // xs.AsValueEnumerable().Select(x => x);`
 

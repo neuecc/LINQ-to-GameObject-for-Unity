@@ -6,8 +6,6 @@ namespace ZLinq
 {
     public static partial class ValueEnumerable
     {
-        // TODO; Range, Repeat, Empty
-
         public static RangeValueEnumerable Range(int start, int count)
         {
             long max = ((long)start) + count - 1;
@@ -28,8 +26,9 @@ namespace ZLinq.Linq
     public struct RangeValueEnumerable(int start, int count) : IValueEnumerable<int>
     {
         readonly int count = count;
-        int start = start;
-        int to = start + count;
+        readonly int start = start;
+        readonly int to = start + count;
+        int value = start;
 
         public ValueEnumerator<RangeValueEnumerable, int> GetEnumerator()
         {
@@ -48,13 +47,11 @@ namespace ZLinq.Linq
             return false;
         }
 
-        // TODO: impl standard
-
         public bool TryGetNext(out int current)
         {
-            if (start < to)
+            if (value < to)
             {
-                current = start++;
+                current = value++;
                 return true;
             }
 
@@ -78,7 +75,10 @@ namespace ZLinq.Linq
             return ListMarshal.AsList(ToArray());
         }
 
-        // TODO: CopyTo()
+        public void CopyTo(Span<int> dest)
+        {
+            FillIncremental(dest.Slice(0, count), start);
+        }
 
         // borrowed from .NET Enumerable.Range vectorized fill, originally implemented by @neon-sunset.
         static void FillIncremental(Span<int> span, int start)

@@ -8,6 +8,7 @@
 		<LangVersion>13</LangVersion>
 		<!-- Support for Unity -->
 		<TargetFrameworks>netstandard2.1;net8.0;net9.0</TargetFrameworks>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<!--<TargetFrameworks>net9.0</TargetFrameworks>-->
 	</PropertyGroup>
 

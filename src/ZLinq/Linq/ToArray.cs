@@ -16,6 +16,11 @@ partial class ValueEnumerableExtensions
             }
             else if (source.TryGetNonEnumeratedCount(out var count))
             {
+                if (count == 0)
+                {
+                    return Array.Empty<TSource>();
+                }
+
                 var i = 0;
                 var array = GC.AllocateUninitializedArray<TSource>(count);
 
