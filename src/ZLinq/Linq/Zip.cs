@@ -8,13 +8,6 @@
 //            , allows ref struct
 //#endif
 //            => new(source, second, resultSelector);
-            
-//        public static ValueEnumerator<ZipValueEnumerable<TEnumerable, TFirst, TSecond, TResult>, TResult> GetEnumerator<TEnumerable, TFirst, TSecond, TResult>(this ZipValueEnumerable<TEnumerable, TFirst, TSecond, TResult> source)
-//            where TEnumerable : struct, IValueEnumerable<TFirst>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//            => new(source);
 
 //        public static ZipValueEnumerable2<TEnumerable, TFirst, TSecond> Zip<TEnumerable, TFirst, TSecond>(this TEnumerable source, IEnumerable<TSecond> second)
 //            where TEnumerable : struct, IValueEnumerable<TFirst>
@@ -22,13 +15,6 @@
 //            , allows ref struct
 //#endif
 //            => new(source, second);
-            
-//        public static ValueEnumerator<ZipValueEnumerable2<TEnumerable, TFirst, TSecond>, ValueTuple`2> GetEnumerator<TEnumerable, TFirst, TSecond>(this ZipValueEnumerable2<TEnumerable, TFirst, TSecond> source)
-//            where TEnumerable : struct, IValueEnumerable<TFirst>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//            => new(source);
 
 //        public static ZipValueEnumerable3<TEnumerable, TFirst, TSecond, TThird> Zip<TEnumerable, TFirst, TSecond, TThird>(this TEnumerable source, IEnumerable<TSecond> second, IEnumerable<TThird> third)
 //            where TEnumerable : struct, IValueEnumerable<TFirst>
@@ -36,13 +22,6 @@
 //            , allows ref struct
 //#endif
 //            => new(source, second, third);
-            
-//        public static ValueEnumerator<ZipValueEnumerable3<TEnumerable, TFirst, TSecond, TThird>, ValueTuple`3> GetEnumerator<TEnumerable, TFirst, TSecond, TThird>(this ZipValueEnumerable3<TEnumerable, TFirst, TSecond, TThird> source)
-//            where TEnumerable : struct, IValueEnumerable<TFirst>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//            => new(source);
 
 //    }
 //}
@@ -65,7 +44,15 @@
 //    {
 //        TEnumerable source = source;
 
-//        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+//        public ValueEnumerator<ZipValueEnumerable<TEnumerable, TFirst, TSecond, TResult>, TResult> GetEnumerator() => new(this);
+
+//        public bool TryGetNonEnumeratedCount(out int count)
+//        {
+//            throw new NotImplementedException();
+//            // return source.TryGetNonEnumeratedCount(count);
+//            // count = 0;
+//            // return false;
+//        }
 
 //        public bool TryGetSpan(out ReadOnlySpan<TResult> span)
 //        {
@@ -103,7 +90,15 @@
 //    {
 //        TEnumerable source = source;
 
-//        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+//        public ValueEnumerator<ZipValueEnumerable2<TEnumerable, TFirst, TSecond>, ValueTuple`2> GetEnumerator() => new(this);
+
+//        public bool TryGetNonEnumeratedCount(out int count)
+//        {
+//            throw new NotImplementedException();
+//            // return source.TryGetNonEnumeratedCount(count);
+//            // count = 0;
+//            // return false;
+//        }
 
 //        public bool TryGetSpan(out ReadOnlySpan<ValueTuple`2> span)
 //        {
@@ -141,7 +136,15 @@
 //    {
 //        TEnumerable source = source;
 
-//        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+//        public ValueEnumerator<ZipValueEnumerable3<TEnumerable, TFirst, TSecond, TThird>, ValueTuple`3> GetEnumerator() => new(this);
+
+//        public bool TryGetNonEnumeratedCount(out int count)
+//        {
+//            throw new NotImplementedException();
+//            // return source.TryGetNonEnumeratedCount(count);
+//            // count = 0;
+//            // return false;
+//        }
 
 //        public bool TryGetSpan(out ReadOnlySpan<ValueTuple`3> span)
 //        {

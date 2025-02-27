@@ -8,13 +8,6 @@ namespace ZLinq
             , allows ref struct
 #endif
             => new(source, keySelector);
-            
-        public static ValueEnumerator<DistinctByValueEnumerable<TEnumerable, TSource, TKey>, TSource> GetEnumerator<TEnumerable, TSource, TKey>(this DistinctByValueEnumerable<TEnumerable, TSource, TKey> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
 
         public static DistinctByValueEnumerable2<TEnumerable, TSource, TKey> DistinctBy<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
             where TEnumerable : struct, IValueEnumerable<TSource>
@@ -22,13 +15,6 @@ namespace ZLinq
             , allows ref struct
 #endif
             => new(source, keySelector, comparer);
-            
-        public static ValueEnumerator<DistinctByValueEnumerable2<TEnumerable, TSource, TKey>, TSource> GetEnumerator<TEnumerable, TSource, TKey>(this DistinctByValueEnumerable2<TEnumerable, TSource, TKey> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
 
     }
 }
@@ -51,7 +37,15 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+        public ValueEnumerator<DistinctByValueEnumerable<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            throw new NotImplementedException();
+            // return source.TryGetNonEnumeratedCount(count);
+            // count = 0;
+            // return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
@@ -89,7 +83,15 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+        public ValueEnumerator<DistinctByValueEnumerable2<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            throw new NotImplementedException();
+            // return source.TryGetNonEnumeratedCount(count);
+            // count = 0;
+            // return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {

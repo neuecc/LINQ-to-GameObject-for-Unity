@@ -8,13 +8,6 @@
 //            , allows ref struct
 //#endif
 //            => new(source);
-            
-//        public static ValueEnumerator<IndexValueEnumerable<TEnumerable, TSource>, ValueTuple`2> GetEnumerator<TEnumerable, TSource>(this IndexValueEnumerable<TEnumerable, TSource> source)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//            => new(source);
 
 //    }
 //}
@@ -37,7 +30,15 @@
 //    {
 //        TEnumerable source = source;
 
-//        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+//        public ValueEnumerator<IndexValueEnumerable<TEnumerable, TSource>, ValueTuple`2> GetEnumerator() => new(this);
+
+//        public bool TryGetNonEnumeratedCount(out int count)
+//        {
+//            throw new NotImplementedException();
+//            // return source.TryGetNonEnumeratedCount(count);
+//            // count = 0;
+//            // return false;
+//        }
 
 //        public bool TryGetSpan(out ReadOnlySpan<ValueTuple`2> span)
 //        {

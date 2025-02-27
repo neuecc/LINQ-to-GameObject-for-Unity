@@ -8,13 +8,6 @@
 //            , allows ref struct
 //#endif
 //            => new(source, keySelector, seed, func, keyComparer);
-            
-//        public static ValueEnumerator<AggregateByValueEnumerable<TEnumerable, TSource, TKey, TAccumulate>, KeyValuePair`2> GetEnumerator<TEnumerable, TSource, TKey, TAccumulate>(this AggregateByValueEnumerable<TEnumerable, TSource, TKey, TAccumulate> source)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//            => new(source);
 
 //        public static AggregateByValueEnumerable2<TEnumerable, TSource, TKey, TAccumulate> AggregateBy<TEnumerable, TSource, TKey, TAccumulate>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer)
 //            where TEnumerable : struct, IValueEnumerable<TSource>
@@ -22,13 +15,6 @@
 //            , allows ref struct
 //#endif
 //            => new(source, keySelector, seedSelector, func, keyComparer);
-            
-//        public static ValueEnumerator<AggregateByValueEnumerable2<TEnumerable, TSource, TKey, TAccumulate>, KeyValuePair`2> GetEnumerator<TEnumerable, TSource, TKey, TAccumulate>(this AggregateByValueEnumerable2<TEnumerable, TSource, TKey, TAccumulate> source)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//            => new(source);
 
 //    }
 //}
@@ -51,7 +37,15 @@
 //    {
 //        TEnumerable source = source;
 
-//        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+//        public ValueEnumerator<AggregateByValueEnumerable<TEnumerable, TSource, TKey, TAccumulate>, KeyValuePair`2> GetEnumerator() => new(this);
+
+//        public bool TryGetNonEnumeratedCount(out int count)
+//        {
+//            throw new NotImplementedException();
+//            // return source.TryGetNonEnumeratedCount(count);
+//            // count = 0;
+//            // return false;
+//        }
 
 //        public bool TryGetSpan(out ReadOnlySpan<KeyValuePair`2> span)
 //        {
@@ -89,7 +83,15 @@
 //    {
 //        TEnumerable source = source;
 
-//        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+//        public ValueEnumerator<AggregateByValueEnumerable2<TEnumerable, TSource, TKey, TAccumulate>, KeyValuePair`2> GetEnumerator() => new(this);
+
+//        public bool TryGetNonEnumeratedCount(out int count)
+//        {
+//            throw new NotImplementedException();
+//            // return source.TryGetNonEnumeratedCount(count);
+//            // count = 0;
+//            // return false;
+//        }
 
 //        public bool TryGetSpan(out ReadOnlySpan<KeyValuePair`2> span)
 //        {

@@ -8,13 +8,6 @@ namespace ZLinq
             , allows ref struct
 #endif
             => new(source);
-            
-        public static ValueEnumerator<DefaultIfEmptyValueEnumerable<TEnumerable, TSource>, TSource> GetEnumerator<TEnumerable, TSource>(this DefaultIfEmptyValueEnumerable<TEnumerable, TSource> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
 
         public static DefaultIfEmptyValueEnumerable2<TEnumerable, TSource> DefaultIfEmpty<TEnumerable, TSource>(this TEnumerable source, TSource defaultValue)
             where TEnumerable : struct, IValueEnumerable<TSource>
@@ -22,13 +15,6 @@ namespace ZLinq
             , allows ref struct
 #endif
             => new(source, defaultValue);
-            
-        public static ValueEnumerator<DefaultIfEmptyValueEnumerable2<TEnumerable, TSource>, TSource> GetEnumerator<TEnumerable, TSource>(this DefaultIfEmptyValueEnumerable2<TEnumerable, TSource> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
 
     }
 }
@@ -51,7 +37,15 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+        public ValueEnumerator<DefaultIfEmptyValueEnumerable<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            throw new NotImplementedException();
+            // return source.TryGetNonEnumeratedCount(count);
+            // count = 0;
+            // return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
@@ -89,7 +83,15 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+        public ValueEnumerator<DefaultIfEmptyValueEnumerable2<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            throw new NotImplementedException();
+            // return source.TryGetNonEnumeratedCount(count);
+            // count = 0;
+            // return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {

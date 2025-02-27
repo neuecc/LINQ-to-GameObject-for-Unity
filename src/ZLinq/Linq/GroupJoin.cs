@@ -8,13 +8,6 @@ namespace ZLinq
             , allows ref struct
 #endif
             => new(source, inner, outerKeySelector, innerKeySelector, resultSelector);
-            
-        public static ValueEnumerator<GroupJoinValueEnumerable<TEnumerable, TOuter, TInner, TKey, TResult>, TResult> GetEnumerator<TEnumerable, TOuter, TInner, TKey, TResult>(this GroupJoinValueEnumerable<TEnumerable, TOuter, TInner, TKey, TResult> source)
-            where TEnumerable : struct, IValueEnumerable<TOuter>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
 
         public static GroupJoinValueEnumerable2<TEnumerable, TOuter, TInner, TKey, TResult> GroupJoin<TEnumerable, TOuter, TInner, TKey, TResult>(this TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
             where TEnumerable : struct, IValueEnumerable<TOuter>
@@ -22,13 +15,6 @@ namespace ZLinq
             , allows ref struct
 #endif
             => new(source, inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
-            
-        public static ValueEnumerator<GroupJoinValueEnumerable2<TEnumerable, TOuter, TInner, TKey, TResult>, TResult> GetEnumerator<TEnumerable, TOuter, TInner, TKey, TResult>(this GroupJoinValueEnumerable2<TEnumerable, TOuter, TInner, TKey, TResult> source)
-            where TEnumerable : struct, IValueEnumerable<TOuter>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
 
     }
 }
@@ -51,7 +37,15 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+        public ValueEnumerator<GroupJoinValueEnumerable<TEnumerable, TOuter, TInner, TKey, TResult>, TResult> GetEnumerator() => new(this);
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            throw new NotImplementedException();
+            // return source.TryGetNonEnumeratedCount(count);
+            // count = 0;
+            // return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<TResult> span)
         {
@@ -89,7 +83,15 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+        public ValueEnumerator<GroupJoinValueEnumerable2<TEnumerable, TOuter, TInner, TKey, TResult>, TResult> GetEnumerator() => new(this);
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            throw new NotImplementedException();
+            // return source.TryGetNonEnumeratedCount(count);
+            // count = 0;
+            // return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<TResult> span)
         {

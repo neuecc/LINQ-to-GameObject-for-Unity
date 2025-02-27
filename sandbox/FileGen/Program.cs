@@ -103,7 +103,7 @@ static void EmitEnumerableTemplate(IGrouping<string, MethodInfo> methods)
     {
         TEnumerable source = source;
 
-        public static ValueEnumerator<{{enumerableType}}<{{genericArguments}}>, {{enumerableElementType}}> GetEnumerator() => new(this);
+        public ValueEnumerator<{{enumerableType}}<{{genericArguments}}>, {{enumerableElementType}}> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
