@@ -10,13 +10,12 @@ using System.Numerics;
 
 //Span<int> xs = stackalloc int[255];
 
-var range = Enumerable.Range(1, 10000).ToArray();
+var array = ValueEnumerable.Range(1, 100000).ToArray();
 
-range.AsSpan().AsValueEnumerable().VectorizedSelectCopyTo(range, x => x * 3, x => x * x);
+var z = array.AsValueEnumerable().Contains(95356);
+Console.WriteLine(z);
 
-Console.WriteLine("do");
 
-// xs.AsValueEnumerable().Select(x => x);`
 
 //var json = JsonNode.Parse("""
 //{
@@ -60,19 +59,6 @@ Console.WriteLine("do");
 //            }
 //          }
 //        }
-//      },
-//      "alternativePath": {
-//        "branchA": {
-//          "leaf1": "End of branch A path"
-//        },
-//        "branchB": {
-//          "section1": {
-//            "leaf2": "End of branch B section 1"
-//          },
-//          "section2": {
-//            "leaf3": "End of branch B section 2"
-//          }
-//        }
 //      }
 //    }
 //}
@@ -81,10 +67,14 @@ Console.WriteLine("do");
 
 //var origin = json!["nesting"]!["level1"]!["level2"]!;
 
-//foreach (var item in origin.Descendants().Select((x, i) => i))
+//foreach (var item in origin.Descendants().Select(x => x.Node).OfType(default(JsonArray)))
 //{
 //    Console.WriteLine(item);
 //}
+
+
+
+
 
 //foreach (var item in origin.Descendants().Where(x => x.Name == "hoge"))
 //{
@@ -109,5 +99,10 @@ namespace ZLinq.AutoInstrument
         {
             return source.AsValueEnumerable().Select(selector);
         }
+
+        //public static ConcatValueEnumerable2<RangeValueEnumerable, int, ArrayValueEnumerable<int>> Concat2(this RangeValueEnumerable source, ArrayValueEnumerable<int> second)
+        //{
+        //    return ValueEnumerableExtensions.Concat2<RangeValueEnumerable, int, ArrayValueEnumerable<int>>(source, second);
+        //}
     }
 }

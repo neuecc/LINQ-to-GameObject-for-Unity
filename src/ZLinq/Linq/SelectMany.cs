@@ -78,8 +78,7 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
-        bool hasInner;
-        EnumerableValueEnumerable<TResult> innerEnumerable;
+        IEnumerator<TResult>? innerEnumerator;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -96,22 +95,21 @@ namespace ZLinq.Linq
         public bool TryGetNext(out TResult current)
         {
         BEGIN:
-            if (hasInner)
+            if (innerEnumerator != null)
             {
-                if (innerEnumerable.TryGetNext(out current))
+                if (innerEnumerator.MoveNext())
                 {
+                    current = innerEnumerator.Current;
                     return true;
                 }
-                else
-                {
-                    innerEnumerable.Dispose();
-                }
+
+                innerEnumerator.Dispose();
+                innerEnumerator = null;
             }
 
             if (source.TryGetNext(out var value))
             {
-                hasInner = true;
-                innerEnumerable = selector(value).AsValueEnumerable();
+                innerEnumerator = selector(value).GetEnumerator();
                 goto BEGIN;
             }
 
@@ -121,9 +119,9 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
-            if (hasInner)
+            if (innerEnumerator != null)
             {
-                innerEnumerable.Dispose();
+                innerEnumerator.Dispose();
             }
             source.Dispose();
         }
