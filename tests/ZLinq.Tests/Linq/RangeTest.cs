@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,6 +27,7 @@ public class RangeTest
         {
             for (int j = 0; j < 100; j++)
             {
+
                 ValueEnumerable.Range(i, j).ToList().ShouldBe(Enumerable.Range(i, j).ToList());
             }
         }

@@ -82,13 +82,6 @@ static void EmitEnumerableTemplate(IGrouping<string, MethodInfo> methods)
             , allows ref struct
 #endif
             => new({parameterNames});
-            
-        public static ValueEnumerator<{enumerableType}<{genericArguments}>, {enumerableElementType}> GetEnumerator<{genericArguments}>(this {enumerableType}<{genericArguments}> source)
-            where TEnumerable : struct, IValueEnumerable<{t}>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
 
 """);
 
@@ -110,7 +103,15 @@ static void EmitEnumerableTemplate(IGrouping<string, MethodInfo> methods)
     {
         TEnumerable source = source;
 
-        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+        public static ValueEnumerator<{{enumerableType}}<{{genericArguments}}>, {{enumerableElementType}}> GetEnumerator() => new(this);
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            throw new NotImplementedException();
+            // return source.TryGetNonEnumeratedCount(count);
+            // count = 0;
+            // return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<{{enumerableElementType}}> span)
         {

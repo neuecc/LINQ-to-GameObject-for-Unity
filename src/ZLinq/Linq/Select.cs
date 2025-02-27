@@ -1,4 +1,6 @@
-﻿namespace ZLinq
+﻿using System.Numerics;
+
+namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -169,4 +171,9 @@ namespace ZLinq.Linq
             source.Dispose();
         }
     }
+   
+
+
+
+
 }
