@@ -10,9 +10,13 @@ using System.Numerics;
 
 //Span<int> xs = stackalloc int[255];
 
-var array = ValueEnumerable.Range(1, 100000).ToArray();
+// caseof bool, char, decimal, nint...
+var array = Enumerable.Range(1, 1000).Select(_ => _.ToString()).ToArray();
 
-var z = array.AsValueEnumerable().Contains(95356);
+array.AsSpan().Contains("874");
+
+
+var z = array.AsValueEnumerable().Contains("874");
 Console.WriteLine(z);
 
 
