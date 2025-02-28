@@ -1,15 +1,15 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static DefaultIfEmptyValueEnumerable<TEnumerable, TSource> DefaultIfEmpty<TEnumerable, TSource>(this TEnumerable source)
+        public static DefaultIfEmpty<TEnumerable, TSource> DefaultIfEmpty<TEnumerable, TSource>(this TEnumerable source)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source);
 
-        public static DefaultIfEmptyValueEnumerable2<TEnumerable, TSource> DefaultIfEmpty<TEnumerable, TSource>(this TEnumerable source, TSource defaultValue)
+        public static DefaultIfEmpty2<TEnumerable, TSource> DefaultIfEmpty<TEnumerable, TSource>(this TEnumerable source, TSource defaultValue)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct DefaultIfEmptyValueEnumerable<TEnumerable, TSource>(TEnumerable source)
+    struct DefaultIfEmpty<TEnumerable, TSource>(TEnumerable source)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -37,7 +37,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<DefaultIfEmptyValueEnumerable<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<DefaultIfEmpty<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -74,7 +74,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct DefaultIfEmptyValueEnumerable2<TEnumerable, TSource>(TEnumerable source, TSource defaultValue)
+    struct DefaultIfEmpty2<TEnumerable, TSource>(TEnumerable source, TSource defaultValue)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -83,7 +83,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<DefaultIfEmptyValueEnumerable2<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<DefaultIfEmpty2<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

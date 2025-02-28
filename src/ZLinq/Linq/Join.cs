@@ -1,15 +1,15 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static JoinValueEnumerable<TEnumerable, TOuter, TInner, TKey, TResult> Join<TEnumerable, TOuter, TInner, TKey, TResult>(this TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector)
+        public static Join<TEnumerable, TOuter, TInner, TKey, TResult> Join<TEnumerable, TOuter, TInner, TKey, TResult>(this TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector)
             where TEnumerable : struct, IValueEnumerable<TOuter>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, inner, outerKeySelector, innerKeySelector, resultSelector);
 
-        public static JoinValueEnumerable2<TEnumerable, TOuter, TInner, TKey, TResult> Join<TEnumerable, TOuter, TInner, TKey, TResult>(this TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer)
+        public static Join2<TEnumerable, TOuter, TInner, TKey, TResult> Join<TEnumerable, TOuter, TInner, TKey, TResult>(this TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer)
             where TEnumerable : struct, IValueEnumerable<TOuter>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct JoinValueEnumerable<TEnumerable, TOuter, TInner, TKey, TResult>(TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector)
+    struct Join<TEnumerable, TOuter, TInner, TKey, TResult>(TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector)
         : IValueEnumerable<TResult>
         where TEnumerable : struct, IValueEnumerable<TOuter>
 #if NET9_0_OR_GREATER
@@ -37,7 +37,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<JoinValueEnumerable<TEnumerable, TOuter, TInner, TKey, TResult>, TResult> GetEnumerator() => new(this);
+        public ValueEnumerator<Join<TEnumerable, TOuter, TInner, TKey, TResult>, TResult> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -74,7 +74,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct JoinValueEnumerable2<TEnumerable, TOuter, TInner, TKey, TResult>(TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer)
+    struct Join2<TEnumerable, TOuter, TInner, TKey, TResult>(TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer)
         : IValueEnumerable<TResult>
         where TEnumerable : struct, IValueEnumerable<TOuter>
 #if NET9_0_OR_GREATER
@@ -83,7 +83,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<JoinValueEnumerable2<TEnumerable, TOuter, TInner, TKey, TResult>, TResult> GetEnumerator() => new(this);
+        public ValueEnumerator<Join2<TEnumerable, TOuter, TInner, TKey, TResult>, TResult> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

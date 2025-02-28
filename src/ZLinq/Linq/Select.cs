@@ -4,14 +4,14 @@ namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static SelectValueEnumerable<TEnumerable, TSource, TResult> Select<TEnumerable, TSource, TResult>(this TEnumerable source, Func<TSource, TResult> selector)
+        public static Select<TEnumerable, TSource, TResult> Select<TEnumerable, TSource, TResult>(this TEnumerable source, Func<TSource, TResult> selector)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, selector);
 
-        public static SelectValueEnumerable2<TEnumerable, TSource, TResult> Select<TEnumerable, TSource, TResult>(this TEnumerable source, Func<TSource, Int32, TResult> selector)
+        public static Select2<TEnumerable, TSource, TResult> Select<TEnumerable, TSource, TResult>(this TEnumerable source, Func<TSource, Int32, TResult> selector)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -29,7 +29,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SelectValueEnumerable<TEnumerable, TSource, TResult>(TEnumerable source, Func<TSource, TResult> selector)
+    struct Select<TEnumerable, TSource, TResult>(TEnumerable source, Func<TSource, TResult> selector)
         : IValueEnumerable<TResult>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -38,7 +38,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<SelectValueEnumerable<TEnumerable, TSource, TResult>, TResult> GetEnumerator()
+        public ValueEnumerator<Select<TEnumerable, TSource, TResult>, TResult> GetEnumerator()
         {
             return new(this);
         }
@@ -69,7 +69,7 @@ namespace ZLinq.Linq
         }
 
         // Optimize for common pattern: Select().Where()
-        public SelectWhereValueEnumerable<TEnumerable, TSource, TResult> Where(Func<TResult, bool> predicate)
+        public SelectWhere<TEnumerable, TSource, TResult> Where(Func<TResult, bool> predicate)
             => new(source, selector, predicate);
     }
 
@@ -80,7 +80,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SelectValueEnumerable2<TEnumerable, TSource, TResult>(TEnumerable source, Func<TSource, Int32, TResult> selector)
+    struct Select2<TEnumerable, TSource, TResult>(TEnumerable source, Func<TSource, Int32, TResult> selector)
         : IValueEnumerable<TResult>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -90,7 +90,7 @@ namespace ZLinq.Linq
         TEnumerable source = source;
         int index = 0;
 
-        public ValueEnumerator<SelectValueEnumerable2<TEnumerable, TSource, TResult>, TResult> GetEnumerator()
+        public ValueEnumerator<Select2<TEnumerable, TSource, TResult>, TResult> GetEnumerator()
         {
             return new(this);
         }
@@ -128,7 +128,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SelectWhereValueEnumerable<TEnumerable, TSource, TResult>(TEnumerable source, Func<TSource, TResult> selector, Func<TResult, bool> predicate)
+    struct SelectWhere<TEnumerable, TSource, TResult>(TEnumerable source, Func<TSource, TResult> selector, Func<TResult, bool> predicate)
         : IValueEnumerable<TResult>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -137,7 +137,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<SelectWhereValueEnumerable<TEnumerable, TSource, TResult>, TResult> GetEnumerator()
+        public ValueEnumerator<SelectWhere<TEnumerable, TSource, TResult>, TResult> GetEnumerator()
         {
             return new(this);
         }

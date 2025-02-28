@@ -1,8 +1,8 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static SkipValueEnumerable<TEnumerable, TSource> Skip<TEnumerable, TSource>(this TEnumerable source, Int32 count)
+        public static Skip<TEnumerable, TSource> Skip<TEnumerable, TSource>(this TEnumerable source, Int32 count)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -21,7 +21,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SkipValueEnumerable<TEnumerable, TSource>(TEnumerable source, Int32 count)
+    struct Skip<TEnumerable, TSource>(TEnumerable source, Int32 count)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -30,7 +30,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<SkipValueEnumerable<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<Skip<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

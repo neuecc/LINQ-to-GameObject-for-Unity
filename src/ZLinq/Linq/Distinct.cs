@@ -1,15 +1,15 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static DistinctValueEnumerable<TEnumerable, TSource> Distinct<TEnumerable, TSource>(this TEnumerable source)
+        public static Distinct<TEnumerable, TSource> Distinct<TEnumerable, TSource>(this TEnumerable source)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source);
 
-        public static DistinctValueEnumerable2<TEnumerable, TSource> Distinct<TEnumerable, TSource>(this TEnumerable source, IEqualityComparer<TSource> comparer)
+        public static Distinct2<TEnumerable, TSource> Distinct<TEnumerable, TSource>(this TEnumerable source, IEqualityComparer<TSource> comparer)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct DistinctValueEnumerable<TEnumerable, TSource>(TEnumerable source)
+    struct Distinct<TEnumerable, TSource>(TEnumerable source)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -37,7 +37,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<DistinctValueEnumerable<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<Distinct<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -74,7 +74,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct DistinctValueEnumerable2<TEnumerable, TSource>(TEnumerable source, IEqualityComparer<TSource> comparer)
+    struct Distinct2<TEnumerable, TSource>(TEnumerable source, IEqualityComparer<TSource> comparer)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -83,7 +83,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<DistinctValueEnumerable2<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<Distinct2<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

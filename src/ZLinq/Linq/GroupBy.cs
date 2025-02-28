@@ -2,56 +2,56 @@
 //{
 //    partial class ValueEnumerableExtensions
 //    {
-//        public static GroupByValueEnumerable<TEnumerable, TSource, TKey> GroupBy<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector)
+//        public static GroupBy<TEnumerable, TSource, TKey> GroupBy<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector)
 //            where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
 //#endif
 //            => new(source, keySelector);
 
-//        public static GroupByValueEnumerable2<TEnumerable, TSource, TKey> GroupBy<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+//        public static GroupBy2<TEnumerable, TSource, TKey> GroupBy<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
 //            where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
 //#endif
 //            => new(source, keySelector, comparer);
 
-//        public static GroupByValueEnumerable3<TEnumerable, TSource, TKey, TElement> GroupBy<TEnumerable, TSource, TKey, TElement>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
+//        public static GroupBy3<TEnumerable, TSource, TKey, TElement> GroupBy<TEnumerable, TSource, TKey, TElement>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
 //            where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
 //#endif
 //            => new(source, keySelector, elementSelector);
 
-//        public static GroupByValueEnumerable4<TEnumerable, TSource, TKey, TElement> GroupBy<TEnumerable, TSource, TKey, TElement>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
+//        public static GroupBy4<TEnumerable, TSource, TKey, TElement> GroupBy<TEnumerable, TSource, TKey, TElement>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
 //            where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
 //#endif
 //            => new(source, keySelector, elementSelector, comparer);
 
-//        public static GroupByValueEnumerable5<TEnumerable, TSource, TKey, TResult> GroupBy<TEnumerable, TSource, TKey, TResult>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector)
+//        public static GroupBy5<TEnumerable, TSource, TKey, TResult> GroupBy<TEnumerable, TSource, TKey, TResult>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector)
 //            where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
 //#endif
 //            => new(source, keySelector, resultSelector);
 
-//        public static GroupByValueEnumerable6<TEnumerable, TSource, TKey, TResult> GroupBy<TEnumerable, TSource, TKey, TResult>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
+//        public static GroupBy6<TEnumerable, TSource, TKey, TResult> GroupBy<TEnumerable, TSource, TKey, TResult>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
 //            where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
 //#endif
 //            => new(source, keySelector, resultSelector, comparer);
 
-//        public static GroupByValueEnumerable7<TEnumerable, TSource, TKey, TElement, TResult> GroupBy<TEnumerable, TSource, TKey, TElement, TResult>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector)
+//        public static GroupBy7<TEnumerable, TSource, TKey, TElement, TResult> GroupBy<TEnumerable, TSource, TKey, TElement, TResult>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector)
 //            where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
 //#endif
 //            => new(source, keySelector, elementSelector, resultSelector);
 
-//        public static GroupByValueEnumerable8<TEnumerable, TSource, TKey, TElement, TResult> GroupBy<TEnumerable, TSource, TKey, TElement, TResult>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
+//        public static GroupBy8<TEnumerable, TSource, TKey, TElement, TResult> GroupBy<TEnumerable, TSource, TKey, TElement, TResult>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
 //            where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
@@ -70,7 +70,7 @@
 //#else
 //    public
 //#endif
-//    struct GroupByValueEnumerable<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector)
+//    struct GroupBy<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector)
 //        : IValueEnumerable<IGrouping`2>
 //        where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
@@ -79,7 +79,7 @@
 //    {
 //        TEnumerable source = source;
 
-//        public ValueEnumerator<GroupByValueEnumerable<TEnumerable, TSource, TKey>, IGrouping`2> GetEnumerator() => new(this);
+//        public ValueEnumerator<GroupBy<TEnumerable, TSource, TKey>, IGrouping`2> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {
@@ -116,7 +116,7 @@
 //#else
 //    public
 //#endif
-//    struct GroupByValueEnumerable2<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+//    struct GroupBy2<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
 //        : IValueEnumerable<IGrouping`2>
 //        where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
@@ -125,7 +125,7 @@
 //    {
 //        TEnumerable source = source;
 
-//        public ValueEnumerator<GroupByValueEnumerable2<TEnumerable, TSource, TKey>, IGrouping`2> GetEnumerator() => new(this);
+//        public ValueEnumerator<GroupBy2<TEnumerable, TSource, TKey>, IGrouping`2> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {
@@ -162,7 +162,7 @@
 //#else
 //    public
 //#endif
-//    struct GroupByValueEnumerable3<TEnumerable, TSource, TKey, TElement>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
+//    struct GroupBy3<TEnumerable, TSource, TKey, TElement>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
 //        : IValueEnumerable<IGrouping`2>
 //        where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
@@ -171,7 +171,7 @@
 //    {
 //        TEnumerable source = source;
 
-//        public ValueEnumerator<GroupByValueEnumerable3<TEnumerable, TSource, TKey, TElement>, IGrouping`2> GetEnumerator() => new(this);
+//        public ValueEnumerator<GroupBy3<TEnumerable, TSource, TKey, TElement>, IGrouping`2> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {
@@ -208,7 +208,7 @@
 //#else
 //    public
 //#endif
-//    struct GroupByValueEnumerable4<TEnumerable, TSource, TKey, TElement>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
+//    struct GroupBy4<TEnumerable, TSource, TKey, TElement>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
 //        : IValueEnumerable<IGrouping`2>
 //        where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
@@ -217,7 +217,7 @@
 //    {
 //        TEnumerable source = source;
 
-//        public ValueEnumerator<GroupByValueEnumerable4<TEnumerable, TSource, TKey, TElement>, IGrouping`2> GetEnumerator() => new(this);
+//        public ValueEnumerator<GroupBy4<TEnumerable, TSource, TKey, TElement>, IGrouping`2> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {
@@ -254,7 +254,7 @@
 //#else
 //    public
 //#endif
-//    struct GroupByValueEnumerable5<TEnumerable, TSource, TKey, TResult>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector)
+//    struct GroupBy5<TEnumerable, TSource, TKey, TResult>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector)
 //        : IValueEnumerable<TResult>
 //        where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
@@ -263,7 +263,7 @@
 //    {
 //        TEnumerable source = source;
 
-//        public ValueEnumerator<GroupByValueEnumerable5<TEnumerable, TSource, TKey, TResult>, TResult> GetEnumerator() => new(this);
+//        public ValueEnumerator<GroupBy5<TEnumerable, TSource, TKey, TResult>, TResult> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {
@@ -300,7 +300,7 @@
 //#else
 //    public
 //#endif
-//    struct GroupByValueEnumerable6<TEnumerable, TSource, TKey, TResult>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
+//    struct GroupBy6<TEnumerable, TSource, TKey, TResult>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
 //        : IValueEnumerable<TResult>
 //        where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
@@ -309,7 +309,7 @@
 //    {
 //        TEnumerable source = source;
 
-//        public ValueEnumerator<GroupByValueEnumerable6<TEnumerable, TSource, TKey, TResult>, TResult> GetEnumerator() => new(this);
+//        public ValueEnumerator<GroupBy6<TEnumerable, TSource, TKey, TResult>, TResult> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {
@@ -346,7 +346,7 @@
 //#else
 //    public
 //#endif
-//    struct GroupByValueEnumerable7<TEnumerable, TSource, TKey, TElement, TResult>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector)
+//    struct GroupBy7<TEnumerable, TSource, TKey, TElement, TResult>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector)
 //        : IValueEnumerable<TResult>
 //        where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
@@ -355,7 +355,7 @@
 //    {
 //        TEnumerable source = source;
 
-//        public ValueEnumerator<GroupByValueEnumerable7<TEnumerable, TSource, TKey, TElement, TResult>, TResult> GetEnumerator() => new(this);
+//        public ValueEnumerator<GroupBy7<TEnumerable, TSource, TKey, TElement, TResult>, TResult> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {
@@ -392,7 +392,7 @@
 //#else
 //    public
 //#endif
-//    struct GroupByValueEnumerable8<TEnumerable, TSource, TKey, TElement, TResult>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
+//    struct GroupBy8<TEnumerable, TSource, TKey, TElement, TResult>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
 //        : IValueEnumerable<TResult>
 //        where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
@@ -401,7 +401,7 @@
 //    {
 //        TEnumerable source = source;
 
-//        public ValueEnumerator<GroupByValueEnumerable8<TEnumerable, TSource, TKey, TElement, TResult>, TResult> GetEnumerator() => new(this);
+//        public ValueEnumerator<GroupBy8<TEnumerable, TSource, TKey, TElement, TResult>, TResult> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {

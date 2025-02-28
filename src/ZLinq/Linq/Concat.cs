@@ -4,7 +4,7 @@
     {
         // currently source-generator only infer first argument type so can not define `TEnumerable source, TEnumerable2 second`.
 
-        public static ConcatValueEnumerable<TEnumerable, TSource> Concat<TEnumerable, TSource>(this TEnumerable source, IEnumerable<TSource> second)
+        public static Concat<TEnumerable, TSource> Concat<TEnumerable, TSource>(this TEnumerable source, IEnumerable<TSource> second)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -22,7 +22,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct ConcatValueEnumerable<TEnumerable, TSource>(TEnumerable source, IEnumerable<TSource> second)
+    struct Concat<TEnumerable, TSource>(TEnumerable source, IEnumerable<TSource> second)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -33,7 +33,7 @@ namespace ZLinq.Linq
         IEnumerator<TSource>? secondEnumerator;
         bool firstCompleted;
 
-        public ValueEnumerator<ConcatValueEnumerable<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<Concat<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

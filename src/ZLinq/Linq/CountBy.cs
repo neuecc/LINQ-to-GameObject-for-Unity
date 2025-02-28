@@ -2,7 +2,7 @@
 //{
 //    partial class ValueEnumerableExtensions
 //    {
-//        public static CountByValueEnumerable<TEnumerable, TSource, TKey> CountBy<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> keyComparer)
+//        public static CountBy<TEnumerable, TSource, TKey> CountBy<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> keyComparer)
 //            where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
@@ -21,7 +21,7 @@
 //#else
 //    public
 //#endif
-//    struct CountByValueEnumerable<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> keyComparer)
+//    struct CountBy<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> keyComparer)
 //        : IValueEnumerable<KeyValuePair`2>
 //        where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
@@ -30,7 +30,7 @@
 //    {
 //        TEnumerable source = source;
 
-//        public ValueEnumerator<CountByValueEnumerable<TEnumerable, TSource, TKey>, KeyValuePair`2> GetEnumerator() => new(this);
+//        public ValueEnumerator<CountBy<TEnumerable, TSource, TKey>, KeyValuePair`2> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {

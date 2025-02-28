@@ -2,28 +2,28 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static TakeValueEnumerable<TEnumerable, TSource> Take<TEnumerable, TSource>(this TEnumerable source, Int32 count)
+        public static Take<TEnumerable, TSource> Take<TEnumerable, TSource>(this TEnumerable source, Int32 count)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, count);
             
-        public static ValueEnumerator<TakeValueEnumerable<TEnumerable, TSource>, TSource> GetEnumerator<TEnumerable, TSource>(this TakeValueEnumerable<TEnumerable, TSource> source)
+        public static ValueEnumerator<Take<TEnumerable, TSource>, TSource> GetEnumerator<TEnumerable, TSource>(this Take<TEnumerable, TSource> source)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source);
 
-        public static TakeValueEnumerable2<TEnumerable, TSource> Take<TEnumerable, TSource>(this TEnumerable source, Range range)
+        public static Take2<TEnumerable, TSource> Take<TEnumerable, TSource>(this TEnumerable source, Range range)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, range);
             
-        public static ValueEnumerator<TakeValueEnumerable2<TEnumerable, TSource>, TSource> GetEnumerator<TEnumerable, TSource>(this TakeValueEnumerable2<TEnumerable, TSource> source)
+        public static ValueEnumerator<Take2<TEnumerable, TSource>, TSource> GetEnumerator<TEnumerable, TSource>(this Take2<TEnumerable, TSource> source)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -42,7 +42,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct TakeValueEnumerable<TEnumerable, TSource>(TEnumerable source, Int32 count)
+    struct Take<TEnumerable, TSource>(TEnumerable source, Int32 count)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -80,7 +80,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct TakeValueEnumerable2<TEnumerable, TSource>(TEnumerable source, Range range)
+    struct Take2<TEnumerable, TSource>(TEnumerable source, Range range)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -123,7 +123,7 @@ namespace ZLinq.Linq
 //{
 //    partial class ValueEnumerableExtensions
 //    {
-//        public static TakeValueEnumerable<TEnumerable, T> Take<TEnumerable, T>(this TEnumerable source, int count)
+//        public static Take<TEnumerable, T> Take<TEnumerable, T>(this TEnumerable source, int count)
 //            where TEnumerable : struct, IValueEnumerable<T>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
@@ -132,8 +132,8 @@ namespace ZLinq.Linq
 //            return new(source, count);
 //        }
 
-//        //        public static StructEnumerator<TakeValueEnumerable<TEnumerable, T>> GetEnumerator<TEnumerable, T>(
-//        //            this TakeValueEnumerable<TEnumerable, T> source)
+//        //        public static StructEnumerator<Take<TEnumerable, T>> GetEnumerator<TEnumerable, T>(
+//        //            this Take<TEnumerable, T> source)
 //        //            where TEnumerable : struct, IValueEnumerable<T>
 //        //#if NET9_0_OR_GREATER
 //        //            , allows ref struct
@@ -153,7 +153,7 @@ namespace ZLinq.Linq
 //#else
 //    public
 //#endif
-//    struct TakeValueEnumerable<TEnumerable, T>(TEnumerable source, int takeCount) : IValueEnumerable<T>
+//    struct Take<TEnumerable, T>(TEnumerable source, int takeCount) : IValueEnumerable<T>
 //        where TEnumerable : struct, IValueEnumerable<T>
 //#if NET9_0_OR_GREATER
 //        , allows ref struct

@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ChunkValueEnumerable<TEnumerable, TSource> Chunk<TEnumerable, TSource>(this TEnumerable source, Int32 size)
+        public static Chunk<TEnumerable, TSource> Chunk<TEnumerable, TSource>(this TEnumerable source, Int32 size)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -24,7 +24,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct ChunkValueEnumerable<TEnumerable, TSource>(TEnumerable source, Int32 size)
+    struct Chunk<TEnumerable, TSource>(TEnumerable source, Int32 size)
         : IValueEnumerable<TSource[]>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -41,7 +41,7 @@ namespace ZLinq.Linq
         bool isCompleted; 
         bool isCanGetSpan;
 
-        public ValueEnumerator<ChunkValueEnumerable<TEnumerable, TSource>, TSource[]> GetEnumerator()
+        public ValueEnumerator<Chunk<TEnumerable, TSource>, TSource[]> GetEnumerator()
         {
             return new(this);
         }

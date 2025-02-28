@@ -2,14 +2,14 @@
 //{
 //    partial class ValueEnumerableExtensions
 //    {
-//        public static AggregateByValueEnumerable<TEnumerable, TSource, TKey, TAccumulate> AggregateBy<TEnumerable, TSource, TKey, TAccumulate>(this TEnumerable source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer)
+//        public static AggregateBy<TEnumerable, TSource, TKey, TAccumulate> AggregateBy<TEnumerable, TSource, TKey, TAccumulate>(this TEnumerable source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer)
 //            where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
 //#endif
 //            => new(source, keySelector, seed, func, keyComparer);
 
-//        public static AggregateByValueEnumerable2<TEnumerable, TSource, TKey, TAccumulate> AggregateBy<TEnumerable, TSource, TKey, TAccumulate>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer)
+//        public static AggregateBy2<TEnumerable, TSource, TKey, TAccumulate> AggregateBy<TEnumerable, TSource, TKey, TAccumulate>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer)
 //            where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
@@ -28,7 +28,7 @@
 //#else
 //    public
 //#endif
-//    struct AggregateByValueEnumerable<TEnumerable, TSource, TKey, TAccumulate>(TEnumerable source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer)
+//    struct AggregateBy<TEnumerable, TSource, TKey, TAccumulate>(TEnumerable source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer)
 //        : IValueEnumerable<KeyValuePair`2>
 //        where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
@@ -37,7 +37,7 @@
 //    {
 //        TEnumerable source = source;
 
-//        public ValueEnumerator<AggregateByValueEnumerable<TEnumerable, TSource, TKey, TAccumulate>, KeyValuePair`2> GetEnumerator() => new(this);
+//        public ValueEnumerator<AggregateBy<TEnumerable, TSource, TKey, TAccumulate>, KeyValuePair`2> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {
@@ -74,7 +74,7 @@
 //#else
 //    public
 //#endif
-//    struct AggregateByValueEnumerable2<TEnumerable, TSource, TKey, TAccumulate>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer)
+//    struct AggregateBy2<TEnumerable, TSource, TKey, TAccumulate>(TEnumerable source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer)
 //        : IValueEnumerable<KeyValuePair`2>
 //        where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
@@ -83,7 +83,7 @@
 //    {
 //        TEnumerable source = source;
 
-//        public ValueEnumerator<AggregateByValueEnumerable2<TEnumerable, TSource, TKey, TAccumulate>, KeyValuePair`2> GetEnumerator() => new(this);
+//        public ValueEnumerator<AggregateBy2<TEnumerable, TSource, TKey, TAccumulate>, KeyValuePair`2> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {

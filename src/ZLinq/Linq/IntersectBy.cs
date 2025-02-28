@@ -1,15 +1,15 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static IntersectByValueEnumerable<TEnumerable, TSource, TKey> IntersectBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector)
+        public static IntersectBy<TEnumerable, TSource, TKey> IntersectBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, second, keySelector);
 
-        public static IntersectByValueEnumerable2<TEnumerable, TSource, TKey> IntersectBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+        public static IntersectBy2<TEnumerable, TSource, TKey> IntersectBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct IntersectByValueEnumerable<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector)
+    struct IntersectBy<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -37,7 +37,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<IntersectByValueEnumerable<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<IntersectBy<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -74,7 +74,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct IntersectByValueEnumerable2<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+    struct IntersectBy2<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -83,7 +83,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<IntersectByValueEnumerable2<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<IntersectBy2<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

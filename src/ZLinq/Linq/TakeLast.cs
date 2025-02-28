@@ -1,8 +1,8 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static TakeLastValueEnumerable<TEnumerable, TSource> TakeLast<TEnumerable, TSource>(this TEnumerable source, Int32 count)
+        public static TakeLast<TEnumerable, TSource> TakeLast<TEnumerable, TSource>(this TEnumerable source, Int32 count)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -21,7 +21,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct TakeLastValueEnumerable<TEnumerable, TSource>(TEnumerable source, Int32 count)
+    struct TakeLast<TEnumerable, TSource>(TEnumerable source, Int32 count)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -30,7 +30,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<TakeLastValueEnumerable<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<TakeLast<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

@@ -1,15 +1,15 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static UnionByValueEnumerable<TEnumerable, TSource, TKey> UnionBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector)
+        public static UnionBy<TEnumerable, TSource, TKey> UnionBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, second, keySelector);
 
-        public static UnionByValueEnumerable2<TEnumerable, TSource, TKey> UnionBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+        public static UnionBy2<TEnumerable, TSource, TKey> UnionBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct UnionByValueEnumerable<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector)
+    struct UnionBy<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -37,7 +37,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<UnionByValueEnumerable<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<UnionBy<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -74,7 +74,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct UnionByValueEnumerable2<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+    struct UnionBy2<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -83,7 +83,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<UnionByValueEnumerable2<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<UnionBy2<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

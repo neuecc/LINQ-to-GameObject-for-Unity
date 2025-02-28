@@ -2,7 +2,7 @@
 //{
 //    partial class ValueEnumerableExtensions
 //    {
-//        public static IndexValueEnumerable<TEnumerable, TSource> Index<TEnumerable, TSource>(this TEnumerable source)
+//        public static Index<TEnumerable, TSource> Index<TEnumerable, TSource>(this TEnumerable source)
 //            where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
@@ -21,7 +21,7 @@
 //#else
 //    public
 //#endif
-//    struct IndexValueEnumerable<TEnumerable, TSource>(TEnumerable source)
+//    struct Index<TEnumerable, TSource>(TEnumerable source)
 //        : IValueEnumerable<ValueTuple`2>
 //        where TEnumerable : struct, IValueEnumerable<TSource>
 //#if NET9_0_OR_GREATER
@@ -30,7 +30,7 @@
 //    {
 //        TEnumerable source = source;
 
-//        public ValueEnumerator<IndexValueEnumerable<TEnumerable, TSource>, ValueTuple`2> GetEnumerator() => new(this);
+//        public ValueEnumerator<Index<TEnumerable, TSource>, ValueTuple`2> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {

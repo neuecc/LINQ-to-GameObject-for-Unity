@@ -1,15 +1,15 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static TakeWhileValueEnumerable<TEnumerable, TSource> TakeWhile<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
+        public static TakeWhile<TEnumerable, TSource> TakeWhile<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, predicate);
 
-        public static TakeWhileValueEnumerable2<TEnumerable, TSource> TakeWhile<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Int32, Boolean> predicate)
+        public static TakeWhile2<TEnumerable, TSource> TakeWhile<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Int32, Boolean> predicate)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct TakeWhileValueEnumerable<TEnumerable, TSource>(TEnumerable source, Func<TSource, Boolean> predicate)
+    struct TakeWhile<TEnumerable, TSource>(TEnumerable source, Func<TSource, Boolean> predicate)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -37,7 +37,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<TakeWhileValueEnumerable<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<TakeWhile<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -74,7 +74,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct TakeWhileValueEnumerable2<TEnumerable, TSource>(TEnumerable source, Func<TSource, Int32, Boolean> predicate)
+    struct TakeWhile2<TEnumerable, TSource>(TEnumerable source, Func<TSource, Int32, Boolean> predicate)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -83,7 +83,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<TakeWhileValueEnumerable2<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<TakeWhile2<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
