@@ -67,9 +67,10 @@ namespace ZLinq.Linq
             return ListMarshal.AsList(ToArray());
         }
 
-        public void CopyTo(Span<T> dest)
+        public int CopyTo(Span<T> dest)
         {
             dest.Slice(0, _count).Fill(_element);
+            return _count;
         }
     }
 }

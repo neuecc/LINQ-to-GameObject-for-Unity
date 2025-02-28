@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static WhereValueEnumerable<TEnumerable, TSource> Where<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
+        public static Where<TEnumerable, TSource> Where<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -27,7 +27,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct WhereValueEnumerable<TEnumerable, TSource>(TEnumerable source, Func<TSource, Boolean> predicate)
+    struct Where<TEnumerable, TSource>(TEnumerable source, Func<TSource, Boolean> predicate)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -36,7 +36,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<WhereValueEnumerable<TEnumerable, TSource>, TSource> GetEnumerator()
+        public ValueEnumerator<Where<TEnumerable, TSource>, TSource> GetEnumerator()
         {
             return new(this);
         }
@@ -74,7 +74,7 @@ namespace ZLinq.Linq
         }
 
         // Optimize for common pattern: Where().Select()
-        public WhereSelectValueEnumerable<TEnumerable, TSource, TResult> Select<TResult>(Func<TSource, TResult> selector)
+        public WhereSelect<TEnumerable, TSource, TResult> Select<TResult>(Func<TSource, TResult> selector)
             => new(source, predicate, selector);
     }
 
@@ -140,7 +140,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct WhereSelectValueEnumerable<TEnumerable, TSource, TResult>(TEnumerable source, Func<TSource, Boolean> predicate, Func<TSource, TResult> selector)
+    struct WhereSelect<TEnumerable, TSource, TResult>(TEnumerable source, Func<TSource, Boolean> predicate, Func<TSource, TResult> selector)
         : IValueEnumerable<TResult>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -149,7 +149,7 @@ namespace ZLinq.Linq
     {
         TEnumerable source = source;
 
-        public ValueEnumerator<WhereSelectValueEnumerable<TEnumerable, TSource, TResult>, TResult> GetEnumerator()
+        public ValueEnumerator<WhereSelect<TEnumerable, TSource, TResult>, TResult> GetEnumerator()
         {
             return new(this);
         }

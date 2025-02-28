@@ -75,9 +75,10 @@ namespace ZLinq.Linq
             return ListMarshal.AsList(ToArray());
         }
 
-        public void CopyTo(Span<int> dest)
+        public int CopyTo(Span<int> dest)
         {
             FillIncremental(dest.Slice(0, count), start);
+            return count;
         }
 
         // borrowed from .NET Enumerable.Range vectorized fill, originally implemented by @neon-sunset.

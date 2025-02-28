@@ -35,6 +35,16 @@ namespace System.Runtime.InteropServices
                 view._size = count;
             }
         }
+
+        internal static Span<T> UnsafeAsRawSpan<T>(this List<T>? list)
+        {
+            if (list is not null)
+            {
+                var view = Unsafe.As<ListView<T>>(list);
+                return view._items.AsSpan();
+            }
+            return default; 
+        }
     }
 
 #pragma warning disable CS8618

@@ -20,6 +20,14 @@ var z = array.AsValueEnumerable().Contains("874");
 Console.WriteLine(z);
 
 
+var yes = ValueEnumerable.Range(1, 100)
+    .Select(x => x * x)
+    .Where(x => x % 2 == 0)
+    .Prepend(10000)
+    .Chunk(100)
+    .Skip(2000)
+    .ElementAt(9);
+
 
 //var json = JsonNode.Parse("""
 //{

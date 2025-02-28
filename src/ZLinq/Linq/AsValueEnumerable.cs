@@ -7,8 +7,6 @@ using System.Numerics;
 
 namespace ZLinq
 {
-    // TODO: impl GetEnumerator
-
     public static partial class ValueEnumerable
     {
         public static EnumerableValueEnumerable<T> AsValueEnumerable<T>(this IEnumerable<T> source)
@@ -108,6 +106,11 @@ namespace ZLinq.Linq
     {
         IEnumerator<T>? enumerator = null;
 
+        public ValueEnumerator<EnumerableValueEnumerable<T>, T> GetEnumerator()
+        {
+            return new(this);
+        }
+
         public bool TryGetNonEnumeratedCount(out int count)
         {
 #if NET8_0_OR_GREATER
@@ -179,6 +182,10 @@ namespace ZLinq.Linq
     {
         int index;
 
+        public ValueEnumerator<ArrayValueEnumerable<T>, T> GetEnumerator()
+        {
+            return new(this);
+        }
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Length;
@@ -223,6 +230,11 @@ namespace ZLinq.Linq
 
         int index;
 
+        public ValueEnumerator<MemoryValueEnumerable<T>, T> GetEnumerator()
+        {
+            return new(this);
+        }
+
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Length;
@@ -266,6 +278,11 @@ namespace ZLinq.Linq
     {
         bool isInit = false;
         List<T>.Enumerator enumerator;
+
+        public ValueEnumerator<ListValueEnumerable<T>, T> GetEnumerator()
+        {
+            return new(this);
+        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -313,6 +330,11 @@ namespace ZLinq.Linq
     {
         bool isInit = false;
         Dictionary<TKey, TValue>.Enumerator enumerator;
+
+        public ValueEnumerator<DictionaryValueEnumerable<TKey, TValue>, KeyValuePair<TKey, TValue>> GetEnumerator()
+        {
+            return new(this);
+        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -365,6 +387,11 @@ namespace ZLinq.Linq
         bool isInit = false;
         ReadOnlySequence<T>.Enumerator sequenceEnumerator;
         ValueEnumerator<MemoryValueEnumerable<T>, T> enumerator;
+
+        public ValueEnumerator<ReadOnlySequenceValueEnumerable<T>, T> GetEnumerator()
+        {
+            return new(this);
+        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -425,6 +452,11 @@ namespace ZLinq.Linq
         bool isInit;
         Queue<T>.Enumerator enumerator;
 
+        public ValueEnumerator<QueueValueEnumerable<T>, T> GetEnumerator()
+        {
+            return new(this);
+        }
+
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Count;
@@ -470,6 +502,11 @@ namespace ZLinq.Linq
     {
         bool isInit;
         Stack<T>.Enumerator enumerator;
+
+        public ValueEnumerator<StackValueEnumerable<T>, T> GetEnumerator()
+        {
+            return new(this);
+        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -517,6 +554,11 @@ namespace ZLinq.Linq
         bool isInit;
         LinkedList<T>.Enumerator enumerator;
 
+        public ValueEnumerator<LinkedListValueEnumerable<T>, T> GetEnumerator()
+        {
+            return new(this);
+        }
+
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Count;
@@ -562,6 +604,11 @@ namespace ZLinq.Linq
     {
         bool isInit;
         HashSet<T>.Enumerator enumerator;
+
+        public ValueEnumerator<HashSetValueEnumerable<T>, T> GetEnumerator()
+        {
+            return new(this);
+        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -611,6 +658,11 @@ namespace ZLinq.Linq
         bool isInit = false;
         ImmutableArray<T>.Enumerator enumerator;
 
+        public ValueEnumerator<ImmutableArrayValueEnumerable<T>, T> GetEnumerator()
+        {
+            return new(this);
+        }
+
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Length;
@@ -650,23 +702,17 @@ namespace ZLinq.Linq
 
 #if NET9_0_OR_GREATER
 
-
-    // TODO:remove? implementing
-    public delegate Vector<T> VectorSelector<T>(ref readonly Vector<T> source);
-
-
-    public ref struct VectorizedSelect<T>(ReadOnlySpan<T> source)
-    {
-    }
-
-    // AsVectorize()
-
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public ref struct SpanValueEnumerable<T>(ReadOnlySpan<T> source) : IValueEnumerable<T>
     {
         ReadOnlySpan<T> source = source;
         int index;
+
+        public ValueEnumerator<SpanValueEnumerable<T>, T> GetEnumerator()
+        {
+            return new(this);
+        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -695,123 +741,6 @@ namespace ZLinq.Linq
         public void Dispose()
         {
         }
-
-        // SIMD Optimize
-
-#pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
-        public void VectorizedSelectCopyTo(Span<T> destination, Func<Vector<T>, Vector<T>> selector, Func<T, T> fallbackSelector)
-        {
-            if (!(Vector.IsHardwareAccelerated && Vector<T>.IsSupported))
-            {
-                throw new Exception(); // todo:...
-            }
-
-            // TODO: destination size check
-
-
-            ref var pointer = ref MemoryMarshal.GetReference(source);
-            ref var end = ref Unsafe.Add(ref pointer, source.Length);
-
-            ref var dest = ref MemoryMarshal.GetReference(destination);
-
-
-            if (source.Length >= Vector<T>.Count)
-            {
-                ref var to = ref Unsafe.Subtract(ref end, Vector<int>.Count);
-                do
-                {
-                    var vector = Vector.LoadUnsafe(ref pointer);
-                    var projected = selector(vector);
-
-                    projected.StoreUnsafe(ref dest);
-                    pointer = ref Unsafe.Add(ref pointer, Vector<T>.Count);
-                    dest = ref Unsafe.Add(ref dest, Vector<T>.Count);
-                } while (!Unsafe.IsAddressGreaterThan(ref pointer, ref to));
-            }
-
-            while (Unsafe.IsAddressLessThan(ref pointer, ref end))
-            {
-                dest = fallbackSelector(pointer);
-                pointer = ref Unsafe.Add(ref pointer, 1);
-                dest = ref Unsafe.Add(ref dest, 1);
-            }
-        }
-
-        public void VectorizedSelectCopyTo2(Span<T> destination, VectorSelector<T> selector, Func<T, T> fallbackSelector)
-        {
-            if (!(Vector.IsHardwareAccelerated && Vector<T>.IsSupported))
-            {
-                throw new Exception(); // todo:...
-            }
-
-            // TODO: destination size check
-
-
-            ref var pointer = ref MemoryMarshal.GetReference(source);
-            ref var end = ref Unsafe.Add(ref pointer, source.Length);
-
-            ref var dest = ref MemoryMarshal.GetReference(destination);
-
-
-            if (source.Length >= Vector<T>.Count)
-            {
-                ref var to = ref Unsafe.Subtract(ref end, Vector<int>.Count);
-                do
-                {
-                    var vector = Vector.LoadUnsafe(ref pointer);
-
-                    var projected = selector(ref vector);
-                    projected.StoreUnsafe(ref dest);
-                    pointer = ref Unsafe.Add(ref pointer, Vector<T>.Count);
-                    dest = ref Unsafe.Add(ref dest, Vector<T>.Count);
-                } while (!Unsafe.IsAddressGreaterThan(ref pointer, ref to));
-            }
-
-            while (Unsafe.IsAddressLessThan(ref pointer, ref end))
-            {
-                dest = fallbackSelector(pointer);
-                pointer = ref Unsafe.Add(ref pointer, 1);
-                dest = ref Unsafe.Add(ref dest, 1);
-            }
-        }
-        public unsafe void VectorizedSelectCopyTo3(Span<T> destination, delegate* managed<Vector<T>, Vector<T>> selector, Func<T, T> fallbackSelector)
-        {
-            if (!(Vector.IsHardwareAccelerated && Vector<T>.IsSupported))
-            {
-                throw new Exception(); // todo:...
-            }
-
-            // TODO: destination size check
-
-
-            ref var pointer = ref MemoryMarshal.GetReference(source);
-            ref var end = ref Unsafe.Add(ref pointer, source.Length);
-
-            ref var dest = ref MemoryMarshal.GetReference(destination);
-
-
-            if (source.Length >= Vector<T>.Count)
-            {
-                ref var to = ref Unsafe.Subtract(ref end, Vector<int>.Count);
-                do
-                {
-                    var vector = Vector.LoadUnsafe(ref pointer);
-                    var projected = selector(vector);
-
-                    projected.StoreUnsafe(ref dest);
-                    pointer = ref Unsafe.Add(ref pointer, Vector<T>.Count);
-                    dest = ref Unsafe.Add(ref dest, Vector<T>.Count);
-                } while (!Unsafe.IsAddressGreaterThan(ref pointer, ref to));
-            }
-
-            while (Unsafe.IsAddressLessThan(ref pointer, ref end))
-            {
-                dest = fallbackSelector(pointer);
-                pointer = ref Unsafe.Add(ref pointer, 1);
-                dest = ref Unsafe.Add(ref dest, 1);
-            }
-        }
     }
-
 #endif
 }
