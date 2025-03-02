@@ -185,7 +185,7 @@ namespace ZLinq.Linq
 
         public Lookup<TKey, TElement> BuildAndClear()
         {
-            return new Lookup<TKey, TElement>(ref groupingBuilder, lastGroupingIndex, groupCount);
+            return new Lookup<TKey, TElement>(ref buckets, lastAddIndex, groupCount);
         }
     }
 
@@ -225,15 +225,21 @@ namespace ZLinq.Linq
 
     internal sealed class Lookup<TKey, TElement> : ILookup<TKey, TElement>
     {
-        Grouping<TKey, TElement>?[] values;
+        Grouping<TKey, TElement>?[] groups;
         Grouping<TKey, TElement>? last;
         int count;
 
-        public Lookup(ref GroupingBuilder<TKey, TElement>[]? groupingBuilder, int lastGroupingIndex, int count)
+        public Lookup(ref GroupingBuilder<TKey, TElement>[]? groupingBuilders, int lastGroupingIndex, int count)
         {
             // for space efficiency, re-hash is best, however for creation performance, don't do re-hash.
 
-            var grouping = new Grouping<TKey, TElement>?[groupingBuilder.Length];
+            if (groupingBuilders is null)
+            {
+                count = 0;
+                return;
+            }
+
+            var grouping = new Grouping<TKey, TElement>?[groupingBuilders.Length];
             for (int i = 0; i < grouping.Length; i++)
             {
                 grouping[i++] = groupingBuilder[i].BuildAndClear();
