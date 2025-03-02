@@ -20,7 +20,9 @@ var z = array.AsValueEnumerable().Contains("874");
 Console.WriteLine(z);
 
 
-var yes = ValueEnumerable.Range(1, 100)
+var yes = array
+    .AsValueEnumerable()
+    .Select(x => int.Parse(x))
     .Select(x => x * x)
     .Where(x => x % 2 == 0)
     .Prepend(10000)
@@ -107,7 +109,7 @@ namespace ZLinq.AutoInstrument
 {
     public static class AutoInstrumentLinq
     {
-        public static SelectValueEnumerable<ArrayValueEnumerable<TSource>, TSource, TResult> Select<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector)
+        public static SelectValueEnumerable<FromArray<TSource>, TSource, TResult> Select<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector)
         {
             return source.AsValueEnumerable().Select(selector);
         }

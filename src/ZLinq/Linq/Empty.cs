@@ -2,7 +2,7 @@
 {
     public static partial class ValueEnumerable
     {
-        public static EmptyValueEnumerable<T> Empty<T>()
+        public static Empty<T> Empty<T>()
         {
             return default;
         }
@@ -13,9 +13,9 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct EmptyValueEnumerable<T> : IValueEnumerable<T>
+    public struct Empty<T> : IValueEnumerable<T>
     {
-        public ValueEnumerator<EmptyValueEnumerable<T>, T> GetEnumerator()
+        public ValueEnumerator<Empty<T>, T> GetEnumerator()
         {
             return new(this);
         }

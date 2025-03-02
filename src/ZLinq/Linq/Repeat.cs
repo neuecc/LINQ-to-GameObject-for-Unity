@@ -2,7 +2,7 @@
 {
     public static partial class ValueEnumerable
     {
-        public static RepeatValueEnumerable<T> Repeat<T>(T element, int count)
+        public static Repeat<T> Repeat<T>(T element, int count)
         {
             if (count < 0)
             {
@@ -18,11 +18,11 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct RepeatValueEnumerable<T>(T _element, int _count) : IValueEnumerable<T>
+    public struct Repeat<T>(T _element, int _count) : IValueEnumerable<T>
     {
         int index;
 
-        public ValueEnumerator<RepeatValueEnumerable<T>, T> GetEnumerator()
+        public ValueEnumerator<Repeat<T>, T> GetEnumerator()
         {
             return new(this);
         }

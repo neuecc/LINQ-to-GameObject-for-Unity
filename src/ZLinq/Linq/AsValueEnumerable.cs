@@ -7,74 +7,76 @@ using System.Numerics;
 
 namespace ZLinq
 {
+    // TODO: +FrozenCollections
+
     public static partial class ValueEnumerable
     {
-        public static EnumerableValueEnumerable<T> AsValueEnumerable<T>(this IEnumerable<T> source)
+        public static FromEnumerable<T> AsValueEnumerable<T>(this IEnumerable<T> source)
         {
             return new(source);
         }
 
-        public static ArrayValueEnumerable<T> AsValueEnumerable<T>(this T[] source)
+        public static FromArray<T> AsValueEnumerable<T>(this T[] source)
         {
             return new(source);
         }
 
-        public static ListValueEnumerable<T> AsValueEnumerable<T>(this List<T> source)
+        public static FromList<T> AsValueEnumerable<T>(this List<T> source)
         {
             return new(source);
         }
 
-        public static MemoryValueEnumerable<T> AsValueEnumerable<T>(this ArraySegment<T> source)
+        public static FromMemory<T> AsValueEnumerable<T>(this ArraySegment<T> source)
         {
             return new(source);
         }
 
-        public static MemoryValueEnumerable<T> AsValueEnumerable<T>(this Memory<T> source)
+        public static FromMemory<T> AsValueEnumerable<T>(this Memory<T> source)
         {
             return new(source);
         }
 
-        public static MemoryValueEnumerable<T> AsValueEnumerable<T>(this ReadOnlyMemory<T> source)
+        public static FromMemory<T> AsValueEnumerable<T>(this ReadOnlyMemory<T> source)
         {
             return new(source);
         }
 
-        public static ReadOnlySequenceValueEnumerable<T> AsValueEnumerable<T>(this ReadOnlySequence<T> source)
+        public static FromReadOnlySequence<T> AsValueEnumerable<T>(this ReadOnlySequence<T> source)
         {
             return new(source);
         }
 
         // for System.Collections.Generic
 
-        public static DictionaryValueEnumerable<TKey, TValue> AsValueEnumerable<TKey, TValue>(this Dictionary<TKey, TValue> source)
+        public static FromDictionary<TKey, TValue> AsValueEnumerable<TKey, TValue>(this Dictionary<TKey, TValue> source)
             where TKey : notnull
         {
             return new(source);
         }
 
-        public static QueueValueEnumerable<T> AsValueEnumerable<T>(this Queue<T> source)
+        public static FromQueue<T> AsValueEnumerable<T>(this Queue<T> source)
         {
             return new(source);
         }
 
-        public static StackValueEnumerable<T> AsValueEnumerable<T>(this Stack<T> source)
+        public static FromStack<T> AsValueEnumerable<T>(this Stack<T> source)
         {
             return new(source);
         }
 
-        public static LinkedListValueEnumerable<T> AsValueEnumerable<T>(this LinkedList<T> source)
+        public static FromLinkedList<T> AsValueEnumerable<T>(this LinkedList<T> source)
         {
             return new(source);
         }
 
-        public static HashSetValueEnumerable<T> AsValueEnumerable<T>(this HashSet<T> source)
+        public static FromHashSet<T> AsValueEnumerable<T>(this HashSet<T> source)
         {
             return new(source);
         }
 
 #if NET8_0_OR_GREATER
 
-        public static ImmutableArrayValueEnumerable<T> AsValueEnumerable<T>(this ImmutableArray<T> source)
+        public static FromImmutableArray<T> AsValueEnumerable<T>(this ImmutableArray<T> source)
         {
             return new(source);
         }
@@ -83,12 +85,12 @@ namespace ZLinq
 
 #if NET9_0_OR_GREATER
 
-        public static SpanValueEnumerable<T> AsValueEnumerable<T>(this Span<T> source)
+        public static FromSpan<T> AsValueEnumerable<T>(this Span<T> source)
         {
             return new(source);
         }
 
-        public static SpanValueEnumerable<T> AsValueEnumerable<T>(this ReadOnlySpan<T> source)
+        public static FromSpan<T> AsValueEnumerable<T>(this ReadOnlySpan<T> source)
         {
             return new(source);
         }
@@ -102,11 +104,11 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct EnumerableValueEnumerable<T>(IEnumerable<T> source) : IValueEnumerable<T>
+    public struct FromEnumerable<T>(IEnumerable<T> source) : IValueEnumerable<T>
     {
         IEnumerator<T>? enumerator = null;
 
-        public ValueEnumerator<EnumerableValueEnumerable<T>, T> GetEnumerator()
+        public ValueEnumerator<FromEnumerable<T>, T> GetEnumerator()
         {
             return new(this);
         }
@@ -178,11 +180,11 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct ArrayValueEnumerable<T>(T[] source) : IValueEnumerable<T>
+    public struct FromArray<T>(T[] source) : IValueEnumerable<T>
     {
         int index;
 
-        public ValueEnumerator<ArrayValueEnumerable<T>, T> GetEnumerator()
+        public ValueEnumerator<FromArray<T>, T> GetEnumerator()
         {
             return new(this);
         }
@@ -222,7 +224,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct MemoryValueEnumerable<T>(ReadOnlyMemory<T> source) : IValueEnumerable<T>
+    struct FromMemory<T>(ReadOnlyMemory<T> source) : IValueEnumerable<T>
     {
 #if NET9_0_OR_GREATER
         ReadOnlySpan<T> source = source.Span;
@@ -230,7 +232,7 @@ namespace ZLinq.Linq
 
         int index;
 
-        public ValueEnumerator<MemoryValueEnumerable<T>, T> GetEnumerator()
+        public ValueEnumerator<FromMemory<T>, T> GetEnumerator()
         {
             return new(this);
         }
@@ -274,12 +276,12 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct ListValueEnumerable<T>(List<T> source) : IValueEnumerable<T>
+    public struct FromList<T>(List<T> source) : IValueEnumerable<T>
     {
         bool isInit = false;
         List<T>.Enumerator enumerator;
 
-        public ValueEnumerator<ListValueEnumerable<T>, T> GetEnumerator()
+        public ValueEnumerator<FromList<T>, T> GetEnumerator()
         {
             return new(this);
         }
@@ -325,13 +327,13 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct DictionaryValueEnumerable<TKey, TValue>(Dictionary<TKey, TValue> source) : IValueEnumerable<KeyValuePair<TKey, TValue>>
+    public struct FromDictionary<TKey, TValue>(Dictionary<TKey, TValue> source) : IValueEnumerable<KeyValuePair<TKey, TValue>>
         where TKey : notnull
     {
         bool isInit = false;
         Dictionary<TKey, TValue>.Enumerator enumerator;
 
-        public ValueEnumerator<DictionaryValueEnumerable<TKey, TValue>, KeyValuePair<TKey, TValue>> GetEnumerator()
+        public ValueEnumerator<FromDictionary<TKey, TValue>, KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             return new(this);
         }
@@ -382,13 +384,13 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct ReadOnlySequenceValueEnumerable<T>(ReadOnlySequence<T> source) : IValueEnumerable<T>
+    struct FromReadOnlySequence<T>(ReadOnlySequence<T> source) : IValueEnumerable<T>
     {
         bool isInit = false;
         ReadOnlySequence<T>.Enumerator sequenceEnumerator;
-        ValueEnumerator<MemoryValueEnumerable<T>, T> enumerator;
+        ValueEnumerator<FromMemory<T>, T> enumerator;
 
-        public ValueEnumerator<ReadOnlySequenceValueEnumerable<T>, T> GetEnumerator()
+        public ValueEnumerator<FromReadOnlySequence<T>, T> GetEnumerator()
         {
             return new(this);
         }
@@ -428,7 +430,7 @@ namespace ZLinq.Linq
 
             if (sequenceEnumerator.MoveNext())
             {
-                enumerator = sequenceEnumerator.Current.AsValueEnumerable().GetEnumerator<MemoryValueEnumerable<T>, T>();
+                enumerator = sequenceEnumerator.Current.AsValueEnumerable().GetEnumerator<FromMemory<T>, T>();
                 goto MOVE_NEXT;
             }
 
@@ -447,12 +449,12 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct QueueValueEnumerable<T>(Queue<T> source) : IValueEnumerable<T>
+    public struct FromQueue<T>(Queue<T> source) : IValueEnumerable<T>
     {
         bool isInit;
         Queue<T>.Enumerator enumerator;
 
-        public ValueEnumerator<QueueValueEnumerable<T>, T> GetEnumerator()
+        public ValueEnumerator<FromQueue<T>, T> GetEnumerator()
         {
             return new(this);
         }
@@ -498,12 +500,12 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct StackValueEnumerable<T>(Stack<T> source) : IValueEnumerable<T>
+    public struct FromStack<T>(Stack<T> source) : IValueEnumerable<T>
     {
         bool isInit;
         Stack<T>.Enumerator enumerator;
 
-        public ValueEnumerator<StackValueEnumerable<T>, T> GetEnumerator()
+        public ValueEnumerator<FromStack<T>, T> GetEnumerator()
         {
             return new(this);
         }
@@ -549,12 +551,12 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct LinkedListValueEnumerable<T>(LinkedList<T> source) : IValueEnumerable<T>
+    public struct FromLinkedList<T>(LinkedList<T> source) : IValueEnumerable<T>
     {
         bool isInit;
         LinkedList<T>.Enumerator enumerator;
 
-        public ValueEnumerator<LinkedListValueEnumerable<T>, T> GetEnumerator()
+        public ValueEnumerator<FromLinkedList<T>, T> GetEnumerator()
         {
             return new(this);
         }
@@ -600,12 +602,12 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct HashSetValueEnumerable<T>(HashSet<T> source) : IValueEnumerable<T>
+    public struct FromHashSet<T>(HashSet<T> source) : IValueEnumerable<T>
     {
         bool isInit;
         HashSet<T>.Enumerator enumerator;
 
-        public ValueEnumerator<HashSetValueEnumerable<T>, T> GetEnumerator()
+        public ValueEnumerator<FromHashSet<T>, T> GetEnumerator()
         {
             return new(this);
         }
@@ -653,12 +655,12 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct ImmutableArrayValueEnumerable<T>(ImmutableArray<T> source) : IValueEnumerable<T>
+    public struct FromImmutableArray<T>(ImmutableArray<T> source) : IValueEnumerable<T>
     {
         bool isInit = false;
         ImmutableArray<T>.Enumerator enumerator;
 
-        public ValueEnumerator<ImmutableArrayValueEnumerable<T>, T> GetEnumerator()
+        public ValueEnumerator<FromImmutableArray<T>, T> GetEnumerator()
         {
             return new(this);
         }
@@ -704,12 +706,12 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public ref struct SpanValueEnumerable<T>(ReadOnlySpan<T> source) : IValueEnumerable<T>
+    public ref struct FromSpan<T>(ReadOnlySpan<T> source) : IValueEnumerable<T>
     {
         ReadOnlySpan<T> source = source;
         int index;
 
-        public ValueEnumerator<SpanValueEnumerable<T>, T> GetEnumerator()
+        public ValueEnumerator<FromSpan<T>, T> GetEnumerator()
         {
             return new(this);
         }

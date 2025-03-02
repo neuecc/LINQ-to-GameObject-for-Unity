@@ -2,9 +2,7 @@
 
 partial class ValueEnumerableExtensions
 {
-    // others(Span, etc...)
-
-    public static int CopyTo<TEnumerable, T>(this TEnumerable source, List<T> list)
+    public static void CopyTo<TEnumerable, T>(this TEnumerable source, List<T> list)
         where TEnumerable : struct, IValueEnumerable<T>
 #if NET9_0_OR_GREATER
     , allows ref struct
@@ -15,7 +13,7 @@ partial class ValueEnumerableExtensions
 #if NET8_0_OR_GREATER
             CollectionsMarshal.SetCount(list, span.Length);
             span.CopyTo(CollectionsMarshal.AsSpan(list));
-            return span.Length;
+            return;
 
 #else
             // NETSTANDARD2_1 has no SetCount(Count + Grow)
@@ -26,9 +24,10 @@ partial class ValueEnumerableExtensions
                 if (list.Count < span.Length)
                 {
                     CollectionsMarshal.UnsafeSetCount(list, span.Length);
+                    listSpan.Slice(span.Length).Clear(); // clear rest
                 }
                 span.CopyTo(listSpan);
-                return span.Length;
+                ;
             }
 #endif
         }
@@ -43,14 +42,15 @@ partial class ValueEnumerableExtensions
             {
                 listSpan[i++] = current;
             }
-            return i;
+            return;
 #else
             var listSpan = CollectionsMarshal.AsSpan(list);
-            if (span.Length < listSpan.Length)
+            if (length < listSpan.Length)
             {
-                if (list.Count < span.Length)
+                if (list.Count < length)
                 {
-                    CollectionsMarshal.UnsafeSetCount(list, span.Length);
+                    CollectionsMarshal.UnsafeSetCount(list, length);
+                    listSpan.Slice(length).Clear(); // clear rest
                 }
 
                 var i = 0;
@@ -58,7 +58,7 @@ partial class ValueEnumerableExtensions
                 {
                     listSpan[i++] = current;
                 }
-                return i;
+                return;
             }
 #endif
         }
@@ -76,7 +76,8 @@ partial class ValueEnumerableExtensions
                     }
                     else
                     {
-                        return i;
+                        list.RemoveRange(i, count - i);
+                        return;
                     }
                 }
 
@@ -85,7 +86,7 @@ partial class ValueEnumerableExtensions
                     i++;
                     list.Add(item);
                 }
-                return i;
+                return;
             }
             finally
             {

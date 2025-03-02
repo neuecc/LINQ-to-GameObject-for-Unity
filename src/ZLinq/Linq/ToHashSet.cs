@@ -1,4 +1,4 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -8,7 +8,7 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
+            return ToHashSet<TEnumerable, TSource>(source, null!);
         }
 
         public static HashSet<TSource> ToHashSet<TEnumerable, TSource>(this TEnumerable source, IEqualityComparer<TSource> comparer)
@@ -17,8 +17,26 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
+            if (source.TryGetSpan(out var span))
+            {
+                var hashSet = new HashSet<TSource>(span.Length, comparer);
+                foreach (var item in span)
+                {
+                    hashSet.Add(item);
+                }
+                return hashSet;
+            }
+            else
+            {
+                var hashSet = source.TryGetNonEnumeratedCount(out var count)
+                    ? new HashSet<TSource>(count, comparer)
+                    : new HashSet<TSource>(comparer);
+                while (source.TryGetNext(out var item))
+                {
+                    hashSet.Add(item);
+                }
+                return hashSet;
+            }
         }
-
     }
 }
