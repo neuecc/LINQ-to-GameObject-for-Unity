@@ -7,9 +7,9 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source);
+            => new(source, null!);
 
-        public static Distinct2<TEnumerable, TSource> Distinct<TEnumerable, TSource>(this TEnumerable source, IEqualityComparer<TSource> comparer)
+        public static Distinct<TEnumerable, TSource> Distinct<TEnumerable, TSource>(this TEnumerable source, IEqualityComparer<TSource> comparer)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Distinct<TEnumerable, TSource>(TEnumerable source)
+    struct Distinct<TEnumerable, TSource>(TEnumerable source, IEqualityComparer<TSource>? comparer)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -36,80 +36,69 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
+        IEqualityComparer<TSource> comparer = comparer ?? EqualityComparer<TSource>.Default;
+        HashSet<TSource>? set;
 
         public ValueEnumerator<Distinct<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
-            throw new NotImplementedException();
-            // return source.TryGetNonEnumeratedCount(count);
-            // count = 0;
-            // return false;
+            count = 0;
+            return false;
         }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            span = default;
+            return false;
         }
 
         public bool TryGetNext(out TSource current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+            if (set == null)
+            {
+                set = new HashSet<TSource>(comparer);
+            }
+
+            if (source.TryGetNext(out var value) && set.Add(value))
+            {
+                current = value;
+                return true;
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
         }
 
         public void Dispose()
         {
             source.Dispose();
         }
-    }
 
-    [StructLayout(LayoutKind.Auto)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-#if NET9_0_OR_GREATER
-    public ref
-#else
-    public
-#endif
-    struct Distinct2<TEnumerable, TSource>(TEnumerable source, IEqualityComparer<TSource> comparer)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-        , allows ref struct
-#endif
-    {
-        TEnumerable source = source;
+        // Optimize
 
-        public ValueEnumerator<Distinct2<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
-
-        public bool TryGetNonEnumeratedCount(out int count)
+        public TSource[] ToArray()
         {
-            throw new NotImplementedException();
-            // return source.TryGetNonEnumeratedCount(count);
-            // count = 0;
-            // return false;
+            var set = new HashSet<TSource>(comparer);
+            while (source.TryGetNext(out var value) && set.Add(value))
+            {
+            }
+            return set.ToArray();
         }
 
-        public bool TryGetSpan(out ReadOnlySpan<TSource> span)
+        public List<TSource> ToList()
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            return ListMarshal.AsList(ToArray());
         }
 
-        public bool TryGetNext(out TSource current)
+        public int CopyTo(TSource[] dest)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
-        }
-
-        public void Dispose()
-        {
-            source.Dispose();
+            var set = new HashSet<TSource>(comparer);
+            while (source.TryGetNext(out var value) && set.Add(value))
+            {
+            }
+            set.CopyTo(dest);
+            return set.Count;
         }
     }
 
