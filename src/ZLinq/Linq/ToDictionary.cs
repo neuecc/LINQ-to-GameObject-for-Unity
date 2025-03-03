@@ -74,7 +74,7 @@
                     : new Dictionary<TKey, TSource>(comparer);
                 while (source.TryGetNext(out var item))
                 {
-                    dict.Add(keySelector(item), item))
+                    dict.Add(keySelector(item), item);
                 }
                 return dict;
             }

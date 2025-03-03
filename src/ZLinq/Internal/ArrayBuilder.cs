@@ -2,14 +2,17 @@
 
 namespace ZLinq.Internal;
 
-// Add Only
+// Add Only, when Freeze(), You can keep use of this type.
 
 internal struct ArrayBuilder<T>
 {
     public static int MaxLength => 0X7FFFFFC7; // Array.MaxLength
 
-    T[]? array;
+    private T[]? array;
     int count;
+
+    public int Count => count;
+    public ArraySegment<T> Array => array == null ? [] : new(array, 0, count);
 
     public void Add(T value)
     {
@@ -17,8 +20,7 @@ internal struct ArrayBuilder<T>
         {
             array = ArrayPool<T>.Shared.Rent(4);
         }
-
-        if (array.Length == count)
+        else if (array.Length == count)
         {
             Grow();
         }
@@ -33,23 +35,33 @@ internal struct ArrayBuilder<T>
 
         var newArray = ArrayPool<T>.Shared.Rent(newCapacity);
 
-        Array.Copy(array, newArray, array.Length);
-        array = newArray;
-
-        // return
+        System.Array.Copy(array, newArray, array.Length);
         ArrayPool<T>.Shared.Return(array, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
+
+        array = newArray;
     }
 
     public T[] BuildAndClear()
     {
         if (array == null)
         {
-            return Array.Empty<T>();
+            return System.Array.Empty<T>();
         }
 
         var result = GC.AllocateUninitializedArray<T>(count);
-        Array.Copy(array, result, count);
+        System.Array.Copy(array, result, count);
         ArrayPool<T>.Shared.Return(array, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
+        array = null;
         return result;
+    }
+
+    public void Freeze()
+    {
+        if (array == null) return;
+
+        var result = GC.AllocateUninitializedArray<T>(count);
+        System.Array.Copy(array, result, count);
+        ArrayPool<T>.Shared.Return(array, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
+        array = result;
     }
 }

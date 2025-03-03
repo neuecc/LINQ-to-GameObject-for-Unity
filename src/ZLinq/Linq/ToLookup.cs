@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Buffers;
+using System.Collections;
 using System.Diagnostics;
 
 namespace ZLinq
@@ -11,7 +12,7 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
+            return ToLookup(source, keySelector, null!);
         }
 
         public static ILookup<TKey, TSource> ToLookup<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
@@ -20,7 +21,27 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
+            var lookupBuilder = new LookupBuilder<TKey, TSource>(comparer ?? EqualityComparer<TKey>.Default);
+
+            if (source.TryGetSpan(out var span))
+            {
+                foreach (var item in span)
+                {
+                    lookupBuilder.Add(keySelector(item), item);
+                }
+            }
+            else
+            {
+                using (source)
+                {
+                    while (source.TryGetNext(out var item))
+                    {
+                        lookupBuilder.Add(keySelector(item), item);
+                    }
+                }
+            }
+
+            return lookupBuilder.BuildAndClear();
         }
 
         public static ILookup<TKey, TElement> ToLookup<TEnumerable, TSource, TKey, TElement>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
@@ -29,7 +50,7 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
+            return ToLookup(source, keySelector, elementSelector, null!);
         }
 
         public static ILookup<TKey, TElement> ToLookup<TEnumerable, TSource, TKey, TElement>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
@@ -38,47 +59,50 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
+            var lookupBuilder = new LookupBuilder<TKey, TElement>(comparer ?? EqualityComparer<TKey>.Default);
+
             if (source.TryGetSpan(out var span))
             {
-                var lookupBuilder = new LookupBuilder<TKey, TElement>(comparer);
-
                 foreach (var item in span)
                 {
                     lookupBuilder.Add(keySelector(item), elementSelector(item));
                 }
-
-                return lookupBuilder.BuildAndClear();
             }
             else
             {
-                throw new NotImplementedException();
+                using (source)
+                {
+                    while (source.TryGetNext(out var item))
+                    {
+                        lookupBuilder.Add(keySelector(item), elementSelector(item));
+                    }
+                }
             }
+
+            return lookupBuilder.BuildAndClear();
         }
     }
 }
 
-
 namespace ZLinq.Linq
 {
+    [StructLayout(LayoutKind.Auto)]
     internal struct LookupBuilder<TKey, TElement>
     {
-        // open addressing with quadratic-probing hash-table
-        const int MinimumPrime = 7;
+        const int MinimumSize = 16; // minimum arraypool size
+        const double LoadFactor = 0.72;
 
-        GroupingBuilder<TKey, TElement>[]? buckets;
         readonly IEqualityComparer<TKey> comparer;
-        int lastAddIndex;
+
+        Grouping<TKey, TElement>[]? buckets;
+        int bucketsLength;
+
+        Grouping<TKey, TElement>? last;
         int groupCount;
-        ulong fastModMultiplier;
 
         public LookupBuilder(IEqualityComparer<TKey>? comparer)
         {
-            var size = MinimumPrime;
-            if (IntPtr.Size == 8)
-            {
-                this.fastModMultiplier = HashHelpers.GetFastModMultiplier((uint)size);
-            }
-            this.lastAddIndex = -1;
+            this.last = null;
             this.groupCount = 0;
             this.comparer = comparer ?? EqualityComparer<TKey>.Default;
         }
@@ -86,175 +110,199 @@ namespace ZLinq.Linq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         int GetBucketIndex(uint hashCode)
         {
-            var buckets = this.buckets;
             Debug.Assert(buckets is not null);
-
-            if (IntPtr.Size == 8)
-            {
-                return (int)HashHelpers.FastMod(hashCode, (uint)buckets.Length, fastModMultiplier);
-            }
-            else
-            {
-                return (int)(hashCode % buckets.Length);
-            }
+            return (int)(hashCode & (bucketsLength - 1));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         uint InternalGetHashCode(TKey key)
         {
+            // allows null
             return (uint)((key is null) ? 0 : comparer.GetHashCode(key) & 0x7FFFFFFF);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        int QuadraticProbe(int step)
-        {
-            return step * step;
         }
 
         public void Add(TKey key, TElement value)
         {
             if (buckets == null)
             {
-                buckets = new GroupingBuilder<TKey, TElement>[MinimumPrime]; // TODO: from pool
+                buckets = ArrayPool<Grouping<TKey, TElement>>.Shared.Rent(MinimumSize);
+                bucketsLength = buckets.Length;
             }
 
             var hash = InternalGetHashCode(key);
             var index = GetBucketIndex(hash);
             ref var bucket = ref buckets[index];
 
-            if (bucket.IsNull) // new slot
+            if (bucket == null) // new slot
             {
-                bucket = new GroupingBuilder<TKey, TElement>(key, value);
-                groupCount++;
-                goto NEW_GROUP_ADD;
-            }
-            else
-            {
-                if (comparer.Equals(bucket.key, key))
+                if (groupCount != 0)
                 {
-                    bucket.Add(value);
-                    return; // add existing group chain
-                }
-
-                // conflict, try next 
-                while (bucket.HasNext)
-                {
-                    var nextIndex = bucket.next;
-                    bucket = ref buckets[nextIndex];
-
-                    if (!bucket.IsNull && comparer.Equals(bucket.key, key))
+                    if ((double)groupCount / bucketsLength > LoadFactor)
                     {
-                        bucket.Add(value);
-                        return; // add existing group chain
+                        ResizeAndRehash();
+                        bucket = ref buckets[GetBucketIndex(hash)]!;
                     }
                 }
 
-                // try to find empty slot
-
-                // TODO: resize
-
-                var step = 1;
-                var bucketIndex = 0;
-                do
+                bucket = new Grouping<TKey, TElement>(key, hash) { value };
+                groupCount++;
+                if (last != null)
                 {
-                    bucketIndex = (index + QuadraticProbe(step)) % buckets.Length;
-                    step++;
-                    if (step > buckets.Length) throw new InvalidOperationException("hashtable is full.");
-                    bucket = ref buckets[bucketIndex];
+                    bucket.NextGroupInAddOrder = last.NextGroupInAddOrder;
+                    last.NextGroupInAddOrder = bucket;
                 }
-                while (bucket.IsNull);
-
-                index = bucketIndex;
-                goto NEW_GROUP_ADD;
-            }
-
-        NEW_GROUP_ADD:
-            groupCount++;
-
-            if (lastAddIndex != -1)
-            {
-                ref var previous = ref buckets[lastAddIndex];
-                bucket.next = previous.next; // as first
-                previous.next = index;
+                else
+                {
+                    bucket.NextGroupInAddOrder = bucket;
+                }
+                last = bucket;
             }
             else
             {
-                bucket.next = index; // register first
+                if (comparer.Equals(bucket.Key, key))
+                {
+                    bucket.Add(value);
+                    return; // added existing group
+                }
+
+                // conflict, try next chain
+                var previous = bucket;
+                var next = bucket.NextGroupInSameHashCode;
+                while (next != null)
+                {
+                    if (comparer.Equals(next.Key, key))
+                    {
+                        next.Add(value);
+                        return; // added existing group
+                    }
+                    previous = next;
+                    next = next.NextGroupInSameHashCode;
+                }
+
+                // create new and chain
+                var newGroup = new Grouping<TKey, TElement>(key, hash) { value };
+                previous.NextGroupInSameHashCode = newGroup;
+
+                groupCount++;
+                if (last != null)
+                {
+                    newGroup.NextGroupInAddOrder = last.NextGroupInAddOrder;
+                    last.NextGroupInAddOrder = newGroup;
+                }
+                else
+                {
+                    newGroup.NextGroupInAddOrder = newGroup;
+                }
+                last = newGroup;
             }
         }
 
-        public Lookup<TKey, TElement> BuildAndClear()
+        public ILookup<TKey, TElement> BuildAndClear()
         {
-            return new Lookup<TKey, TElement>(ref buckets, lastAddIndex, groupCount);
-        }
-    }
-
-    internal struct GroupingBuilder<TKey, TElement>
-    {
-        ArrayBuilder<TElement> arrayBuilder;
-        public TKey key;
-        public int next;
-        bool notNull;
-        public bool HasNext => next != -1;
-        public bool IsNull => !notNull;
-
-        public GroupingBuilder(TKey key, TElement element)
-        {
-            this.key = key;
-            this.arrayBuilder.Add(element);
-            this.next = -1;
-            this.notNull = true;
-        }
-
-        public void Add(TElement value)
-        {
-            arrayBuilder.Add(value);
-        }
-
-        public Grouping<TKey, TElement>? BuildAndClear()
-        {
-            if (!notNull)
+            if (groupCount == 0 || buckets is null)
             {
-                return new Grouping<TKey, TElement>(key, arrayBuilder.BuildAndClear());
+                return Lookup<TKey, TElement>.Empty;
             }
+
+            var groups = buckets.AsSpan(0, bucketsLength).ToArray();
+            ArrayPool<Grouping<TKey, TElement>>.Shared.Return(buckets, clearArray: true);
+            return new Lookup<TKey, TElement>(groups, last, groupCount, comparer);
+        }
+
+        void ResizeAndRehash()
+        {
+            Debug.Assert(buckets is not null);
+            if (last is null) return;
+            var group = last.NextGroupInAddOrder; // as first.
+            if (group is null)
             {
-                return null;
+                return;
             }
+
+            var newSize = System.Numerics.BitOperations.RoundUpToPowerOf2((uint)(bucketsLength * 2));
+            ArrayPool<Grouping<TKey, TElement>>.Shared.Return(buckets, clearArray: true);
+
+            var newBuckets = ArrayPool<Grouping<TKey, TElement>>.Shared.Rent((int)newSize);
+            buckets = newBuckets;
+            bucketsLength = newBuckets.Length;
+
+            var first = group;
+            do
+            {
+                group.NextGroupInSameHashCode = null;
+                ref var bucket = ref newBuckets[GetBucketIndex(group.HashCode)];
+                if (bucket == null)
+                {
+                    bucket = group;
+                }
+                else
+                {
+                    var next = bucket;
+                    while (true)
+                    {
+                        if (next.NextGroupInSameHashCode == null)
+                        {
+                            next.NextGroupInSameHashCode = group;
+                            break;
+                        }
+                        next = next.NextGroupInSameHashCode;
+                    }
+                }
+
+                group = group.NextGroupInAddOrder;
+            } while (group != null && group != first);
+
+            buckets = newBuckets;
         }
     }
 
     internal sealed class Lookup<TKey, TElement> : ILookup<TKey, TElement>
     {
-        Grouping<TKey, TElement>?[] groups;
-        Grouping<TKey, TElement>? last;
-        int count;
+        internal static readonly ILookup<TKey, TElement> Empty = new Lookup<TKey, TElement>();
 
-        public Lookup(ref GroupingBuilder<TKey, TElement>[]? groupingBuilders, int lastGroupingIndex, int count)
+        readonly Grouping<TKey, TElement>?[]? groups;
+        readonly Grouping<TKey, TElement>? last;
+        readonly int count;
+        readonly IEqualityComparer<TKey> comparer;
+
+        public Lookup() // for empty
         {
-            // for space efficiency, re-hash is best, however for creation performance, don't do re-hash.
+            this.groups = null;
+            this.last = null;
+            this.count = 0;
+            this.comparer = null!;
+        }
 
-            if (groupingBuilders is null)
+        public Lookup(Grouping<TKey, TElement>[]? groupings, Grouping<TKey, TElement>? last, int count, IEqualityComparer<TKey> comparer)
+        {
+            if (groupings == null)
             {
-                count = 0;
+                this.groups = null;
+                this.last = null;
+                this.count = 0;
+                this.comparer = comparer;
                 return;
             }
 
-            var grouping = new Grouping<TKey, TElement>?[groupingBuilders.Length];
-            for (int i = 0; i < grouping.Length; i++)
+            foreach (var item in groupings)
             {
-                grouping[i++] = groupingBuilder[i].BuildAndClear();
+                item?.Freeze();
             }
 
-            this.values = grouping;
+            this.groups = groupings;
             this.count = count;
-            this.last = grouping[lastGroupingIndex];
+            this.last = last;
+            this.comparer = comparer;
         }
 
         public IEnumerable<TElement> this[TKey key]
         {
             get
             {
-                throw new NotImplementedException();
+                var group = GetGroup(key);
+                return (group is null)
+                    ? Array.Empty<TElement>()
+                    : group;
             }
         }
 
@@ -262,30 +310,147 @@ namespace ZLinq.Linq
 
         public bool Contains(TKey key)
         {
-            throw new NotImplementedException();
+            return GetGroup(key) is not null;
+        }
+
+        IGrouping<TKey, TElement>? GetGroup(TKey key)
+        {
+            if (groups is null) return null;
+
+            var hashCode = InternalGetHashCode(key);
+            var index = GetBucketIndex((uint)hashCode);
+
+            var group = groups[index];
+            while (group is not null)
+            {
+                if (comparer.Equals(group.Key, key))
+                {
+                    return group;
+                }
+                else
+                {
+                    group = group.NextGroupInSameHashCode;
+                }
+            }
+
+            return null;
         }
 
         public IEnumerator<IGrouping<TKey, TElement>> GetEnumerator()
         {
-            throw new NotImplementedException();
+            if (last is null) yield break;
+
+            var group = last.NextGroupInAddOrder; // as first.
+            if (group is null) yield break;
+
+            var first = group;
+            do
+            {
+                yield return group;
+                group = group.NextGroupInAddOrder;
+            } while (group != null && group != first);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        int GetBucketIndex(uint hashCode)
+        {
+            var buckets = this.groups;
+            Debug.Assert(buckets is not null);
+            return (int)(hashCode & (buckets.Length - 1));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        uint InternalGetHashCode(TKey key)
+        {
+            // allows null.
+            return (uint)((key is null) ? 0 : comparer.GetHashCode(key) & 0x7FFFFFFF);
+        }
     }
 
-    internal sealed class Grouping<TKey, TElement>(TKey key, TElement[] elements) : IGrouping<TKey, TElement>
+    [DebuggerDisplay("Key = {Key}, ({Count})")]
+    internal sealed class Grouping<TKey, TElement>(TKey key, uint hashCode) : IGrouping<TKey, TElement>, IList<TElement>, IReadOnlyList<TElement>
     {
         public TKey Key => key;
+        public uint HashCode => hashCode;
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public int Count => elements.Length;
+        ArrayBuilder<TElement> elements; // in consturction phase as builder, after feezed it represents T[]
+
+        public int Count => elements.Count;
+
+        // mutable in construction, but readonly in public surface
+
+        public Grouping<TKey, TElement>? NextGroupInAddOrder;  // to gurantees add order
+        public Grouping<TKey, TElement>? NextGroupInSameHashCode; // linked-list node for chaining
+
+        public void Add(TElement value)
+        {
+            elements.Add(value);
+        }
+
+        public void Freeze()
+        {
+            elements.Freeze();
+        }
+
+        // we needs IList implementation for Sytem.Linq internal optimization usage
+
+        public bool IsReadOnly => true;
+
+        public TElement this[int index]
+        {
+            get => elements.Array[index];
+            set => throw new NotSupportedException();
+        }
 
         public IEnumerator<TElement> GetEnumerator()
         {
-            return elements.AsEnumerable().GetEnumerator();
+            return elements.Array.GetEnumerator();
+        }
+
+        public int IndexOf(TElement item)
+        {
+            return ((IList<TElement>)elements.Array).IndexOf(item);
+        }
+
+        public void Insert(int index, TElement item)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void RemoveAt(int index)
+        {
+            throw new NotSupportedException();
+        }
+
+        void ICollection<TElement>.Add(TElement item)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void Clear()
+        {
+            throw new NotSupportedException();
+        }
+
+        public bool Contains(TElement item)
+        {
+            return ((ICollection<TElement>)elements.Array).Contains(item);
+        }
+
+        public void CopyTo(TElement[] array, int arrayIndex)
+        {
+            ((ICollection<TElement>)elements.Array).CopyTo(array, arrayIndex);
+        }
+
+        public bool Remove(TElement item)
+        {
+            throw new NotSupportedException();
         }
     }
 }

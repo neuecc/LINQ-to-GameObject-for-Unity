@@ -11,24 +11,15 @@ using System.Numerics;
 //Span<int> xs = stackalloc int[255];
 
 // caseof bool, char, decimal, nint...
-var array = Enumerable.Range(1, 1000).Select(_ => _.ToString()).ToArray();
-
-array.AsSpan().Contains("874");
 
 
-var z = array.AsValueEnumerable().Contains("874");
-Console.WriteLine(z);
+for (int i = 0; i < 2; i++)
+{
+    int[] src = Enumerable.Range(1, 10000).Select(_ => Random.Shared.Next(0, 32)).ToArray();
 
+    var l2 = src.AsValueEnumerable().ToLookup(x => x);
+}
 
-var yes = array
-    .AsValueEnumerable()
-    .Select(x => int.Parse(x))
-    .Select(x => x * x)
-    .Where(x => x % 2 == 0)
-    .Prepend(10000)
-    .Chunk(100)
-    .Skip(2000)
-    .ElementAt(9);
 
 
 //var json = JsonNode.Parse("""
@@ -109,10 +100,10 @@ namespace ZLinq.AutoInstrument
 {
     public static class AutoInstrumentLinq
     {
-        public static SelectValueEnumerable<FromArray<TSource>, TSource, TResult> Select<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector)
-        {
-            return source.AsValueEnumerable().Select(selector);
-        }
+        //public static SelectValueEnumerable<FromArray<TSource>, TSource, TResult> Select<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector)
+        //{
+        //    return source.AsValueEnumerable().Select(selector);
+        //}
 
         //public static ConcatValueEnumerable2<RangeValueEnumerable, int, ArrayValueEnumerable<int>> Concat2(this RangeValueEnumerable source, ArrayValueEnumerable<int> second)
         //{
