@@ -2,7 +2,7 @@
 {
     public static partial class ValueEnumerable
     {
-        public static Repeat<T> Repeat<T>(T element, int count)
+        public static FromRepeat<T> Repeat<T>(T element, int count)
         {
             if (count < 0)
             {
@@ -18,11 +18,11 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct Repeat<T>(T _element, int _count) : IValueEnumerable<T>
+    public struct FromRepeat<T>(T _element, int _count) : IValueEnumerable<T>
     {
         int index;
 
-        public ValueEnumerator<Repeat<T>, T> GetEnumerator()
+        public ValueEnumerator<FromRepeat<T>, T> GetEnumerator()
         {
             return new(this);
         }
@@ -39,6 +39,13 @@ namespace ZLinq.Linq
             return false;
         }
 
+        public bool TryCopyTo(Span<T> dest)
+        {
+            // TODO: range validation?
+            dest.Slice(0, _count).Fill(_element);
+            return true;
+        }
+
         public bool TryGetNext(out T current)
         {
             if (index++ < _count)
@@ -53,24 +60,6 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
-        }
-
-        public T[] ToArray()
-        {
-            var array = GC.AllocateUninitializedArray<T>(_count);
-            array.AsSpan().Fill(_element); // vectorize fill
-            return array;
-        }
-
-        public List<T> ToList()
-        {
-            return ListMarshal.AsList(ToArray());
-        }
-
-        public int CopyTo(Span<T> dest)
-        {
-            dest.Slice(0, _count).Fill(_element);
-            return _count;
         }
     }
 }

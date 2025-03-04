@@ -47,6 +47,20 @@ namespace ZLinq.Linq
             return false;
         }
 
+        public bool TryCopyTo(Span<TSource> destination)
+        {
+            if (source.TryGetNonEnumeratedCount(out var count) && count <= destination.Length)
+            {
+                if (source.TryCopyTo(destination))
+                {
+                    RandomShared.Shuffle(destination.Slice(0, count));
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public bool TryGetNext(out TSource current)
         {
             if (temp == null)
@@ -68,30 +82,6 @@ namespace ZLinq.Linq
         public void Dispose()
         {
             source.Dispose();
-        }
-
-        public TSource[] ToArray()
-        {
-            var array = source.ToArray<TEnumerable, TSource>();
-            RandomShared.Shuffle(array);
-            return array;
-        }
-
-        public List<TSource> ToList()
-        {
-            return ListMarshal.AsList(ToArray());
-        }
-
-        public int CopyTo(Span<TSource> dest)
-        {
-            var (array, size) = source.ToArrayPool<TEnumerable, TSource>(); // ok to use pool
-
-            var src = array.AsSpan(0, size);
-            RandomShared.Shuffle(src);
-            src.CopyTo(dest);
-
-            ArrayPool<TSource>.Shared.Return(array, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<TSource>());
-            return size;
         }
     }
 }

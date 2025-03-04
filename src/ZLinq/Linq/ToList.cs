@@ -26,8 +26,16 @@
                     CollectionsMarshal.UnsafeSetCount(list, count);
 #endif
                     var dest = CollectionsMarshal.AsSpan(list);
-                    UnsafeSlowCopyTo(ref source, ref MemoryMarshal.GetReference(dest));
-                    return list;
+
+                    if (source.TryCopyTo(dest))
+                    {
+                        return list;
+                    }
+                    else
+                    {
+                        UnsafeSlowCopyTo(ref source, ref MemoryMarshal.GetReference(dest));
+                        return list;
+                    }
                 }
 
                 var arrayBuilder = new SegmentedArrayBuilder<TSource>();

@@ -53,6 +53,8 @@ namespace ZLinq.Linq
             return false;
         }
 
+        public bool TryCopyTo(Span<TSource> destination) => false;
+
         public bool TryGetNext(out TSource current)
         {
             while (source.TryGetNext(out var value))
@@ -112,6 +114,8 @@ namespace ZLinq.Linq
             return false;
         }
 
+        public bool TryCopyTo(Span<TSource> destination) => false;
+
         public bool TryGetNext(out TSource current)
         {
             while (source.TryGetNext(out var value))
@@ -165,6 +169,8 @@ namespace ZLinq.Linq
             span = default;
             return false;
         }
+
+        public bool TryCopyTo(Span<TResult> destination) => false;
 
         public bool TryGetNext(out TResult current)
         {

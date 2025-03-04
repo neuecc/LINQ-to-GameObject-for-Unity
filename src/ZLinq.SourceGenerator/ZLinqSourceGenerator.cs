@@ -87,6 +87,8 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                         var enumerableType = methodSymbol.TypeArguments[0]; // TEnumerable
                         if (!TryGetValueEnumerableSourceType(enumerableType, out var sourceType)) continue; // TSource
 
+                        if (sourceType.TypeKind == TypeKind.TypeParameter) continue; // can't resolve
+
                         var extensionMethod = methodSymbol.ReducedFrom; // reduced code to original extension method
                         if (extensionMethod == null) continue;
 

@@ -49,5 +49,10 @@ namespace ZLinq
         {
             source.Dispose();
         }
+
+        public bool TryCopyTo(Span<TComponent> destination)
+        {
+            return false;
+        }
     }
 }

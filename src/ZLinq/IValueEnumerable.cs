@@ -4,12 +4,12 @@
 // to achives copy-cost for performance and reduce assembly size
 public interface IValueEnumerable<T> : IDisposable
 {
-    bool TryGetNonEnumeratedCount(out int count);
-    bool TryGetSpan(out ReadOnlySpan<T> span);
     bool TryGetNext(out T current); // as MoveNext + Current
 
-    // can't do like this(some operator needs ref field but it can't support lower target platforms)
-    // ref T TryGetNext(out bool success);
+    // Optimize series
+    bool TryGetNonEnumeratedCount(out int count);
+    bool TryGetSpan(out ReadOnlySpan<T> span);
+    bool TryCopyTo(Span<T> destination);
 }
 
 // generic implementation of enumerator

@@ -94,6 +94,8 @@ namespace ZLinq.Linq
             return false;
         }
 
+        public bool TryCopyTo(Span<IGrouping<TKey, TSource>> dest) => false;
+
         public bool TryGetNext(out IGrouping<TKey, TSource> current)
         {
             // note: can improvement without GetEnumerator

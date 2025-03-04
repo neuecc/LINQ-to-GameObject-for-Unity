@@ -12,13 +12,12 @@ using System.Numerics;
 
 // caseof bool, char, decimal, nint...
 
+var hoge = ValueEnumerable.Range(1, 10000).Shuffle();
 
-foreach (var item in ValueEnumerable.Range(1, 1000).Shuffle())
-{
-    Console.WriteLine(item);
-}
+var xs = new int[100001];
+hoge.TryCopyTo(xs);
 
-
+//Console.WriteLine(hoge.Length);
 
 
 //var json = JsonNode.Parse("""

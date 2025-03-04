@@ -19,6 +19,8 @@ public struct BeforeSelfEnumerable<TTraversable, T>(TTraversable traversable, bo
         return false;
     }
 
+    public bool TryCopyTo(Span<T> dest) => false;
+
     public bool TryGetNext(out T current)
     {
         if (iterateCompleted)

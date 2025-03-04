@@ -19,6 +19,8 @@ public struct DescendantsEnumerable<TTraversable, T>(TTraversable traversable, b
         return false;
     }
 
+    public bool TryCopyTo(Span<T> dest) => false;
+
     public bool TryGetNext(out T current)
     {
         // IsDisposed

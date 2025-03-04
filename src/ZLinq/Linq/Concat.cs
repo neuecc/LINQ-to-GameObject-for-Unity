@@ -52,6 +52,9 @@ namespace ZLinq.Linq
             return false;
         }
 
+        // TODO: true?
+        public bool TryCopyTo(Span<TSource> dest) => false;
+
         public bool TryGetNext(out TSource current)
         {
             if (!firstCompleted)

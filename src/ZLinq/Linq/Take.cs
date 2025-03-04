@@ -71,6 +71,8 @@ namespace ZLinq.Linq
         {
             source.Dispose();
         }
+
+        public bool TryCopyTo(Span<TSource> destination) => false;
     }
 
     [StructLayout(LayoutKind.Auto)]
@@ -97,6 +99,8 @@ namespace ZLinq.Linq
             // span = default;
             // return false;
         }
+
+        public bool TryCopyTo(Span<TSource> destination) => false;
 
         public bool TryGetNext(out TSource current)
         {
