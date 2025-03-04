@@ -2,7 +2,7 @@
 
 partial class ValueEnumerableExtensions
 {
-    public static TSource[] ToArray<TEnumerable, TSource>(this TEnumerable source)
+     public static TSource[] ToArray<TEnumerable, TSource>(this TEnumerable source)
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct

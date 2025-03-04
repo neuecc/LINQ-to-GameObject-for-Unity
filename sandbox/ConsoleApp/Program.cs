@@ -13,12 +13,11 @@ using System.Numerics;
 // caseof bool, char, decimal, nint...
 
 
-for (int i = 0; i < 2; i++)
+foreach (var item in ValueEnumerable.Range(1, 1000).Shuffle())
 {
-    int[] src = Enumerable.Range(1, 10000).Select(_ => Random.Shared.Next(0, 32)).ToArray();
-
-    var l2 = src.AsValueEnumerable().ToLookup(x => x);
+    Console.WriteLine(item);
 }
+
 
 
 
