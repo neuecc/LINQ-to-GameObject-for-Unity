@@ -1,25 +1,25 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using ZLinq;
-using ZLinq.Linq;
-using ZLinq.AutoInstrument;
-using System.Runtime.InteropServices;
-using System.Numerics;
+﻿using ZLinq;
 
 
 //Span<int> xs = stackalloc int[255];
 
 // caseof bool, char, decimal, nint...
 
+// var xs = new[] { 1, 2, 3, 4, 5 };
 
-for (int i = 0; i < 2; i++)
+Span<int> xs = [1, 2, 3, 4, 5];
+
+
+var dict = xs.AsValueEnumerable().ToDictionary(x => x);
+
+foreach (var item in dict)
 {
-    int[] src = Enumerable.Range(1, 10000).Select(_ => Random.Shared.Next(0, 32)).ToArray();
-
-    var l2 = src.AsValueEnumerable().ToLookup(x => x);
+    Console.WriteLine(item);
 }
 
+
+
+//Console.WriteLine(hoge.Length);
 
 
 //var json = JsonNode.Parse("""

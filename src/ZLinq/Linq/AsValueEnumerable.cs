@@ -152,6 +152,25 @@ namespace ZLinq.Linq
             }
         }
 
+        public bool TryCopyTo(Span<T> destination)
+        {
+            // TODO: length validation
+            if (source.GetType() == typeof(T[]))
+            {
+                Unsafe.As<T[]>(source).CopyTo(destination);
+                return true;
+            }
+            else if (source.GetType() == typeof(List<T>))
+            {
+                CollectionsMarshal.AsSpan(Unsafe.As<List<T>>(source)).CopyTo(destination);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public bool TryGetNext(out T current)
         {
             if (enumerator == null)
@@ -200,6 +219,13 @@ namespace ZLinq.Linq
             return true;
         }
 
+        public bool TryCopyTo(Span<T> destination)
+        {
+            // TODO: length validation
+            source.CopyTo(destination);
+            return true;
+        }
+
         public bool TryGetNext(out T current)
         {
             if (index < source.Length)
@@ -240,6 +266,18 @@ namespace ZLinq.Linq
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Length;
+            return true;
+        }
+
+        public bool TryCopyTo(Span<T> destination)
+        {
+#if NET9_0_OR_GREATER
+            var span = source;
+#else
+            var span = source.Span;
+#endif
+            // TODO: length validation
+            span.CopyTo(destination);
             return true;
         }
 
@@ -298,6 +336,13 @@ namespace ZLinq.Linq
             return true;
         }
 
+        public bool TryCopyTo(Span<T> destination)
+        {
+            // TODO: length validation
+            CollectionsMarshal.AsSpan(source).CopyTo(destination);
+            return true;
+        }
+
         public bool TryGetNext(out T current)
         {
             if (!isInit)
@@ -349,6 +394,8 @@ namespace ZLinq.Linq
             span = default;
             return false;
         }
+
+        public bool TryCopyTo(Span<KeyValuePair<TKey, TValue>> destination) => false;
 
         public bool TryGetNext(out KeyValuePair<TKey, TValue> current)
         {
@@ -413,6 +460,18 @@ namespace ZLinq.Linq
             return false;
         }
 
+        public bool TryCopyTo(Span<T> destination)
+        {
+            if (source.IsSingleSegment)
+            {
+                // TODO: length validation
+                var span = source.First.Span;
+                span.CopyTo(destination);
+                return true;
+            }
+            return false;
+        }
+
         public bool TryGetNext(out T current)
         {
             if (!isInit)
@@ -471,6 +530,8 @@ namespace ZLinq.Linq
             return false;
         }
 
+        public bool TryCopyTo(Span<T> destination) => false;
+
         public bool TryGetNext(out T current)
         {
             if (!isInit)
@@ -521,6 +582,8 @@ namespace ZLinq.Linq
             span = default;
             return false;
         }
+
+        public bool TryCopyTo(Span<T> destination) => false;
 
         public bool TryGetNext(out T current)
         {
@@ -573,6 +636,8 @@ namespace ZLinq.Linq
             return false;
         }
 
+        public bool TryCopyTo(Span<T> destination) => false;
+
         public bool TryGetNext(out T current)
         {
             if (!isInit)
@@ -623,6 +688,8 @@ namespace ZLinq.Linq
             span = default;
             return false;
         }
+
+        public bool TryCopyTo(Span<T> destination) => false;
 
         public bool TryGetNext(out T current)
         {
@@ -677,6 +744,13 @@ namespace ZLinq.Linq
             return true;
         }
 
+        public bool TryCopyTo(Span<T> destination)
+        {
+            // TODO:length validation
+            source.AsSpan().CopyTo(destination);
+            return true;
+        }
+
         public bool TryGetNext(out T current)
         {
             if (!isInit)
@@ -725,6 +799,13 @@ namespace ZLinq.Linq
         public bool TryGetSpan(out ReadOnlySpan<T> span)
         {
             span = source;
+            return true;
+        }
+
+        public bool TryCopyTo(Span<T> destination)
+        {
+            // TODO:length validation
+            source.CopyTo(destination);
             return true;
         }
 

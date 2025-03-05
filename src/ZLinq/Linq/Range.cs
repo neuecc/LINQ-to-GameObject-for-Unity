@@ -6,7 +6,7 @@ namespace ZLinq
 {
     public static partial class ValueEnumerable
     {
-        public static _Range Range(int start, int count)
+        public static FromRange Range(int start, int count)
         {
             long max = ((long)start) + count - 1;
             if (count < 0 || max > int.MaxValue)
@@ -21,17 +21,16 @@ namespace ZLinq
 
 namespace ZLinq.Linq
 {
-    // `Range` is ambiguous with System.Range so use `_Range`
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct _Range(int start, int count) : IValueEnumerable<int>
+    public struct FromRange(int start, int count) : IValueEnumerable<int>
     {
         readonly int count = count;
         readonly int start = start;
         readonly int to = start + count;
         int value = start;
 
-        public ValueEnumerator<_Range, int> GetEnumerator()
+        public ValueEnumerator<FromRange, int> GetEnumerator()
         {
             return new(this);
         }
@@ -48,6 +47,17 @@ namespace ZLinq.Linq
             return false;
         }
 
+        public bool TryCopyTo(Span<int> dest)
+        {
+            if (count > dest.Length)
+            {
+                return false;
+            }
+
+            FillIncremental(dest.Slice(0, count), start);
+            return true;
+        }
+
         public bool TryGetNext(out int current)
         {
             if (value < to)
@@ -62,24 +72,6 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
-        }
-
-        public int[] ToArray()
-        {
-            var array = GC.AllocateUninitializedArray<int>(count);
-            FillIncremental(array, start);
-            return array;
-        }
-
-        public List<int> ToList()
-        {
-            return ListMarshal.AsList(ToArray());
-        }
-
-        public int CopyTo(Span<int> dest)
-        {
-            FillIncremental(dest.Slice(0, count), start);
-            return count;
         }
 
         // borrowed from .NET Enumerable.Range vectorized fill, originally implemented by @neon-sunset.

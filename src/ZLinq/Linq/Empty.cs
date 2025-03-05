@@ -2,7 +2,7 @@
 {
     public static partial class ValueEnumerable
     {
-        public static Empty<T> Empty<T>()
+        public static FromEmpty<T> Empty<T>()
         {
             return default;
         }
@@ -13,9 +13,9 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct Empty<T> : IValueEnumerable<T>
+    public struct FromEmpty<T> : IValueEnumerable<T>
     {
-        public ValueEnumerator<Empty<T>, T> GetEnumerator()
+        public ValueEnumerator<FromEmpty<T>, T> GetEnumerator()
         {
             return new(this);
         }
@@ -31,6 +31,8 @@ namespace ZLinq.Linq
             span = [];
             return true;
         }
+
+        public bool TryCopyTo(Span<T> dest) => true;
 
         public bool TryGetNext(out T current)
         {

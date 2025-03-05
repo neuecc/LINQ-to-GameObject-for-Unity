@@ -92,6 +92,8 @@ namespace ZLinq.Linq
             return false;
         }
 
+        public bool TryCopyTo(Span<TResult> destination) => false;
+
         public bool TryGetNext(out TResult current)
         {
         BEGIN:
@@ -152,6 +154,8 @@ namespace ZLinq.Linq
             // return false;
         }
 
+        public bool TryCopyTo(Span<TResult> destination) => false;
+
         public bool TryGetNext(out TResult current)
         {
             throw new NotImplementedException();
@@ -190,6 +194,8 @@ namespace ZLinq.Linq
             // return false;
         }
 
+        public bool TryCopyTo(Span<TResult> destination) => false;
+
         public bool TryGetNext(out TResult current)
         {
             throw new NotImplementedException();
@@ -227,6 +233,8 @@ namespace ZLinq.Linq
             // span = default;
             // return false;
         }
+
+        public bool TryCopyTo(Span<TResult> destination) => false;
 
         public bool TryGetNext(out TResult current)
         {

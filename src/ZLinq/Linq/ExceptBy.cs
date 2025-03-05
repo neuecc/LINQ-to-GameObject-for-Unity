@@ -61,6 +61,8 @@ namespace ZLinq.Linq
             // return false;
         }
 
+        public bool TryCopyTo(Span<TSource> dest) => false;
+
         public void Dispose()
         {
             source.Dispose();
@@ -99,6 +101,8 @@ namespace ZLinq.Linq
             // span = default;
             // return false;
         }
+
+        public bool TryCopyTo(Span<TSource> dest) => false;
 
         public bool TryGetNext(out TSource current)
         {

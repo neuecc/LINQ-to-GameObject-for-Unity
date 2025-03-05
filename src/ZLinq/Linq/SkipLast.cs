@@ -47,6 +47,8 @@ namespace ZLinq.Linq
             // return false;
         }
 
+        public bool TryCopyTo(Span<TSource> destination) => false;
+
         public bool TryGetNext(out TSource current)
         {
             throw new NotImplementedException();

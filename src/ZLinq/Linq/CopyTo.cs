@@ -27,7 +27,7 @@ partial class ValueEnumerableExtensions
                     listSpan.Slice(span.Length).Clear(); // clear rest
                 }
                 span.CopyTo(listSpan);
-                ;
+                return;
             }
 #endif
         }
@@ -37,6 +37,11 @@ partial class ValueEnumerableExtensions
 #if NET8_0_OR_GREATER
             CollectionsMarshal.SetCount(list, length);
             var listSpan = CollectionsMarshal.AsSpan(list);
+            if (source.TryCopyTo(listSpan))
+            {
+                return;
+            }
+
             var i = 0;
             while (source.TryGetNext(out var current))
             {
@@ -51,6 +56,11 @@ partial class ValueEnumerableExtensions
                 {
                     CollectionsMarshal.UnsafeSetCount(list, length);
                     listSpan.Slice(length).Clear(); // clear rest
+                }
+
+                if (source.TryCopyTo(listSpan))
+                {
+                    return;
                 }
 
                 var i = 0;
@@ -106,10 +116,15 @@ partial class ValueEnumerableExtensions
             src.CopyTo(dest);
             return src.Length;
         }
-        else
+        else if (source.TryGetNonEnumeratedCount(out var count))
         {
-            return SlowCopyTo(ref source, dest);
+            if (source.TryCopyTo(dest.Slice(0, count)))
+            {
+                return count;
+            }
         }
+
+        return SlowCopyTo(ref source, dest);
     }
 
     /// <summary>

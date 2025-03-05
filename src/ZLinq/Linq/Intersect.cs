@@ -54,6 +54,8 @@ namespace ZLinq.Linq
             // return false;
         }
 
+        public bool TryCopyTo(Span<TSource> dest) => false;
+
         public bool TryGetNext(out TSource current)
         {
             throw new NotImplementedException();
@@ -92,6 +94,8 @@ namespace ZLinq.Linq
             // count = 0;
             // return false;
         }
+
+        public bool TryCopyTo(Span<TSource> dest) => false;
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {

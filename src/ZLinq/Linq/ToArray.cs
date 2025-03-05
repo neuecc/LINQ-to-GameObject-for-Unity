@@ -3,7 +3,7 @@
 partial class ValueEnumerableExtensions
 {
     public static TSource[] ToArray<TEnumerable, TSource>(this TEnumerable source)
-        where TEnumerable : struct, IValueEnumerable<TSource>
+       where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
@@ -23,6 +23,11 @@ partial class ValueEnumerableExtensions
 
                 var i = 0;
                 var array = GC.AllocateUninitializedArray<TSource>(count);
+
+                if (source.TryCopyTo(array.AsSpan()))
+                {
+                    return array;
+                }
 
                 while (source.TryGetNext(out var item))
                 {

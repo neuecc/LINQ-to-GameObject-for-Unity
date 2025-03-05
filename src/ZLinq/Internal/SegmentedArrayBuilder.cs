@@ -118,6 +118,8 @@ internal ref struct SegmentedArrayBuilder<T>
 
     public void CopyTo(Span<T> dest)
     {
+        if (count == 0) return;
+
         for (int i = 0; i <= segmentIndex; i++)
         {
             T[] segment = default!;
@@ -178,6 +180,8 @@ internal ref struct SegmentedArrayBuilder<T>
 
     public void Dispose()
     {
+        if (currentSegment == null) return;
+
         for (int i = 0; i <= segmentIndex; i++)
         {
             ref T[]? segment = ref currentSegment;

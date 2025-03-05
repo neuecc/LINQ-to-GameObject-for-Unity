@@ -1,4 +1,4 @@
-namespace ZLinq.Tests.Linq;
+﻿namespace ZLinq.Tests.Linq;
 
 public class FirstOrDefaultTest
 {
@@ -6,64 +6,39 @@ public class FirstOrDefaultTest
     public void Empty()
     {
         var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        xs.AsValueEnumerable().FirstOrDefault().ShouldBe(default(int));
+        xs.ToIterableValueEnumerable().FirstOrDefault().ShouldBe(default(int));
     }
 
     [Fact]
     public void NonEmpty()
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        xs.AsValueEnumerable().FirstOrDefault().ShouldBe(1);
+        xs.ToIterableValueEnumerable().FirstOrDefault().ShouldBe(1);
     }
 
     [Fact]
-    public void Empty2()
+    public void WithDefaultValue()
     {
         var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        xs.AsValueEnumerable().FirstOrDefault(42).ShouldBe(42);
+        xs.ToIterableValueEnumerable().FirstOrDefault(42).ShouldBe(42);
     }
 
     [Fact]
-    public void NonEmpty2()
+    public void WithPredicate()
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        xs.AsValueEnumerable().FirstOrDefault(x => x > 3).ShouldBe(4);
+        xs.ToIterableValueEnumerable().FirstOrDefault(x => x > 3).ShouldBe(4);
     }
 
     [Fact]
-    public void Empty3()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty3()
+    public void WithPredicateAndDefaultValue()
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        xs.AsValueEnumerable().FirstOrDefault(x => x > 5, 42).ShouldBe(42);
+        xs.ToIterableValueEnumerable().FirstOrDefault(x => x > 5, 42).ShouldBe(42);
     }
-
-    [Fact]
-    public void Empty4()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty4()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
 }

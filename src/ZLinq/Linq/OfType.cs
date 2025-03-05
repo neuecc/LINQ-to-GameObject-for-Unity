@@ -46,6 +46,8 @@ namespace ZLinq.Linq
             return false;
         }
 
+        public bool TryCopyTo(Span<TResult> dest) => false;
+
         public bool TryGetNext(out TResult current)
         {
             while (source.TryGetNext(out var value))

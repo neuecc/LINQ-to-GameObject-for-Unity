@@ -28,6 +28,11 @@ partial class ValueEnumerableExtensions
                 var i = 0;
                 var array = ArrayPool<TSource>.Shared.Rent(count);
 
+                if (source.TryCopyTo(array.AsSpan(0, count)))
+                {
+                    return (array, i);
+                }
+
                 while (source.TryGetNext(out var item))
                 {
                     array[i++] = item;

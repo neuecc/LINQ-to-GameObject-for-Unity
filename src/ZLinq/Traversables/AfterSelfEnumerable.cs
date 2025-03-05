@@ -17,6 +17,8 @@ public struct AfterSelfEnumerable<TTraversable, T>(TTraversable traversable, boo
         return false;
     }
 
+    public bool TryCopyTo(Span<T> dest) => false;
+
     public bool TryGetNext(out T current)
     {
         if (withSelf)
