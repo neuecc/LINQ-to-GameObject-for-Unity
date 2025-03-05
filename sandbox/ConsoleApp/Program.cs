@@ -12,14 +12,16 @@ Span<int> xs = [1, 2, 3, 4, 5];
 
 var dict = xs.AsValueEnumerable().ToDictionary(x => x);
 
-var takoyakix = xs.AsValueEnumerable().Select(x =>x.ToString()).Where(x => x == "foo").Take(100);
-
+var takoyakix = xs.AsValueEnumerable().Select(x => x.ToString()).Where(x => x == "foo").Take(100);
+// Enumerable.Range(1,10).OrderBy
 foreach (var item in takoyakix)
 {
     Console.WriteLine(item);
 }
+xs.AsValueEnumerable().Where(x => x == 0).Select(x => x * x);
 
 
+xs.AsValueEnumerable().Select(x => (float)x).ToDictionary(x => x);
 
 //Console.WriteLine(hoge.Length);
 

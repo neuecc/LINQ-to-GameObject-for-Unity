@@ -39,9 +39,6 @@ public class TraversableTest
         origin.AfterSelf().AsEnumerable().Select(x => x.gameObject.name).ShouldBe(["C3", "C4"]);
 
 
-
-        var array = new int[] { 1, 2, 3 };
-        var span = array.AsSpan();
     }
 }
 

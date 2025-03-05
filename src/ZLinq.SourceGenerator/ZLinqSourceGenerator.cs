@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Text;
 
 namespace ZLinq.SourceGenerator;
@@ -21,6 +22,7 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
 
         public void UpdateCompilation(string code, CancellationToken cancellationToken)
         {
+            // parse all-lines everytime(When overlapping only the differences, for some reason it didn't work properly.)
             this.Compilation = originalCompilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(code, options: (CSharpParseOptions)parseOptions, cancellationToken: cancellationToken));
         }
     }
@@ -53,9 +55,11 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
             .Combine(compilationProvider)
             .SelectMany((tuple, cancellationToken) =>
             {
+                // NOTE: this pipeline is heavy, needs cache with incremental generator pipeline? but how?
+
                 var (providedNode, pipelineContext) = tuple;
 
-                List<string>? list = null;
+                List<string>? newLines = null;
                 var newResolved = false;
                 // .Select().Where() calls Where -> Select but Failure is most children node so we need to analyze to parent node.
                 foreach (var node in providedNode.AncestorsAndSelf().OfType<InvocationExpressionSyntax>())
@@ -109,7 +113,12 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                         var fullTypeArguments = string.Join(", ", constructedMethod.TypeArguments.Select(x => x.ToDisplayString(NullableFlowState.MaybeNull, SymbolDisplayFormat.FullyQualifiedFormat))).SurroundIfNotEmpty("<", ">");
                         var parameterNames = string.Join(", ", constructedMethod.Parameters.Select(x => x.Name));
 
-                        var formattedSignature = $"        public static {formattedReturnType} {constructedMethod.Name}{formattedTypeArguments}({formattedParameters}) => {className}.{methodName}{fullTypeArguments}({parameterNames});";
+#if DEBUG
+                        var timestamp = $"/* {DateTime.Now.ToString()} */";
+#else
+                        var timestamp = "";
+#endif
+                        var formattedSignature = $"        {timestamp}public static {formattedReturnType} {constructedMethod.Name}{formattedTypeArguments}({formattedParameters}) => {className}.{methodName}{fullTypeArguments}({parameterNames});";
                         formattedSignature = formattedSignature // extra alloc but easy to read
                             .Replace("global::ZLinq.Linq.", "")
                             .Replace("global::ZLinq.ValueEnumerableExtensions.", "ValueEnumerableExtensions.")
@@ -119,11 +128,11 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                         if (pipelineContext.MethodLines.Add(formattedSignature))
                         {
                             addedNewLine = true;
-                            if (list == null)
+                            if (newLines == null)
                             {
-                                list = new();
+                                newLines = new();
                             }
-                            list.Add(formattedSignature);
+                            newLines.Add(formattedSignature);
                         }
                     }
 
@@ -135,7 +144,7 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                     }
                 }
 
-                return list ?? (IEnumerable<string>)[];
+                return newLines ?? (IEnumerable<string>)[];
             })
             .Collect();
 
