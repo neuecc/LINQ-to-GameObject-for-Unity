@@ -7,21 +7,25 @@
 
 // var xs = new[] { 1, 2, 3, 4, 5 };
 
-Span<int> xs = [1, 2, 3, 4, 5];
+V[] values = new V[]
+{
+    new V("a", 5, 2, 33),
+    new V("b", 4, 1, 66),
+    new V("c", 7, 2, 33)
+};
 
 
-var dict = xs.AsValueEnumerable().ToDictionary(x => x);
+var seq = values.AsValueEnumerable()
+    .OrderBy(x => x.y)
+    .ThenBy(x => x.z)
+    .ToArray();
 
-var takoyakix = xs.AsValueEnumerable().Select(x => x.ToString()).Where(x => x == "foo").Take(100);
-// Enumerable.Range(1,10).OrderBy
-foreach (var item in takoyakix)
+foreach (var item in seq)
 {
     Console.WriteLine(item);
 }
-xs.AsValueEnumerable().Where(x => x == 0).Select(x => x * x);
 
-
-xs.AsValueEnumerable().Select(x => (float)x).ToDictionary(x => x);
+public record V(string name, int x, int y, int z);
 
 //Console.WriteLine(hoge.Length);
 

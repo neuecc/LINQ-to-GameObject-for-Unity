@@ -1,4 +1,7 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
+
+// TODO: descending
 
 namespace ZLinq
 {
@@ -22,7 +25,7 @@ namespace ZLinq
 
 namespace ZLinq.Linq
 {
-    // OrderBy has ThenBy/ThenByDescending methods.
+    // OrderBy has ThenBy/ThenByDescending instance methods.
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -31,7 +34,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct OrderBy<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer, IOrderByComparer<TSource>? thenBy)
+    struct OrderBy<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer, IOrderByComparable<TSource>? parent)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -39,8 +42,12 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
-        OrderBySortContext<TSource, TKey> sortContext = new (keySelector, comparer ?? Comparer<TKey>.Default, null); // TODO: is thenby null?
+        OrderByComparable<TSource, TKey> comparable = new(keySelector, comparer, parent);
 
+        public ValueEnumerator<OrderBy<TEnumerable, TSource, TKey>, TSource> GetEnumerator()
+        {
+            return new(this);
+        }
 
         public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
 
@@ -60,11 +67,12 @@ namespace ZLinq.Linq
                 // faster(using SIMD) index map creation
                 var indexMap = ValueEnumerable.Range(0, count).ToArray<FromRange, int>();
 
-                sortContext.Initialize(dest);
+                using var comparer = comparable.GetComparer(dest, null!);
+
 
 #if NET8_0_OR_GREATER
                 // TODO: for netstandard, create polyfill
-                indexMap.AsSpan().Sort(dest, sortContext);
+                indexMap.AsSpan().Sort(dest, comparer);
 #endif
 
                 return true;
@@ -84,55 +92,62 @@ namespace ZLinq.Linq
             source.Dispose();
         }
 
-        // my js implementation: https://github.com/mihaifm/linq/blob/master/linq.js#L2535-L2624
-
-        public OrderBy<TEnumerable, TSource, TSecondKey> ThenBy<TSecondKey>(Func<TSource, TSecondKey> keySelector, IComparer<TSecondKey>? comparer)
+        public OrderBy<TEnumerable, TSource, TSecondKey> ThenBy<TSecondKey>(Func<TSource, TSecondKey> keySelector, IComparer<TSecondKey>? comparer = null)
         {
-            var childContext = new OrderBySortContext<TSource, TSecondKey>(keySelector, comparer ?? Comparer<TSecondKey>.Default, this);
-
-            return new OrderBy<TEnumerable, TSource, TSecondKey>(source, keySelector, comparer, childContext);
-
-            // throw new NotImplementedException();
+            return new OrderBy<TEnumerable, TSource, TSecondKey>(source, keySelector, comparer, this.comparable);
         }
     }
 
-    public interface IOrderByComparer<TSource> : IComparer<int>
+    public interface IOrderByComparable<TSource>
     {
-        void Initialize(ReadOnlySpan<TSource> source);
+        IOrderByComparer GetComparer(ReadOnlySpan<TSource> source, IOrderByComparer? childComparer);
     }
 
-    internal sealed class OrderBySortContext<TSource, TKey>(Func<TSource, TKey> keySelector, IComparer<TKey> comparer, IOrderByComparer<TSource>? parentComparer) : IComparer<int>, IDisposable
+    public interface IOrderByComparer : IComparer<int>, IDisposable
+    {
+    }
+
+    internal sealed class OrderByComparable<TSource, TKey>(Func<TSource, TKey> keySelector, IComparer<TKey>? comparer, IOrderByComparable<TSource>? parent) : IOrderByComparable<TSource>
+    {
+        IComparer<TKey> comparer = comparer ?? Comparer<TKey>.Default;
+
+        public IOrderByComparer GetComparer(ReadOnlySpan<TSource> source, IOrderByComparer? childComparer)
+        {
+            var nextComparer = new OrderByComparer<TSource, TKey>(source, keySelector, comparer, childComparer);
+            return parent?.GetComparer(source, nextComparer) ?? nextComparer;
+        }
+    }
+
+    internal sealed class OrderByComparer<TSource, TKey> : IOrderByComparer
     {
         TKey[] keys = default!; // must call Initialize before Compare
+        IComparer<TKey> comparer;
+        IOrderByComparer? childComparer;
 
-        public void Initialize(ReadOnlySpan<TSource> source)
+        public OrderByComparer(ReadOnlySpan<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer, IOrderByComparer? childComparer)
         {
             var tempArray = ArrayPool<TKey>.Shared.Rent(source.Length);
             for (var i = 0; i < source.Length; i++)
             {
                 tempArray[i] = keySelector(source[i]);
             }
-            keys = tempArray; // Compare range is [0, source.Length).
-
-            parentComparer?.Initialize(source); // initialize to root
+            this.keys = tempArray; // Compare range is [0, source.Length).
+            this.comparer = comparer;
+            this.childComparer = childComparer;
         }
 
         public int Compare(int x, int y)
         {
-            // first, compare self key
-            // first, compare by root
-
             var result = comparer.Compare(keys[x], keys[y]);
             if (result != 0) return result;
 
-            // second, thenby key
-            if (thenByComparer != null)
-            {
-                return thenByComparer.Compare(x, y);
-            }
+            result = childComparer?.Compare(x, y) ?? 0;
+            if (result != 0) return result;
 
-            // finally compare index
-            return x > y ? 0 : -1; // TODO: compare
+            // finally compare index to ensure stable sort
+            return (x == y) ? 0
+                : (x > y) ? 1
+                : -1;
         }
 
         public void Dispose()
@@ -141,6 +156,11 @@ namespace ZLinq.Linq
             {
                 ArrayPool<TKey>.Shared.Return(keys, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<TKey>());
                 keys = null!;
+                if (childComparer != null)
+                {
+                    childComparer.Dispose();
+                    childComparer = null;
+                }
             }
         }
     }
