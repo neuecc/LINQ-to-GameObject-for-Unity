@@ -1,21 +1,23 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using ZLinq;
-using ZLinq.Linq;
-using ZLinq.AutoInstrument;
-using System.Runtime.InteropServices;
-using System.Numerics;
+﻿using ZLinq;
 
 
 //Span<int> xs = stackalloc int[255];
 
 // caseof bool, char, decimal, nint...
 
-var hoge = ValueEnumerable.Range(1, 10000).Shuffle();
+// var xs = new[] { 1, 2, 3, 4, 5 };
 
-var xs = new int[100001];
-hoge.TryCopyTo(xs);
+Span<int> xs = [1, 2, 3, 4, 5];
+
+
+var dict = xs.AsValueEnumerable().ToDictionary(x => x);
+
+foreach (var item in dict)
+{
+    Console.WriteLine(item);
+}
+
+
 
 //Console.WriteLine(hoge.Length);
 
