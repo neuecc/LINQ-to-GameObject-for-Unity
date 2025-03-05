@@ -1,4 +1,6 @@
-﻿namespace ZLinq.Tests;
+﻿using ZLinq.Linq;
+
+namespace ZLinq.Tests;
 
 public static class TestUtil
 {
@@ -19,5 +21,19 @@ public static class TestUtil
     public static IEnumerable<int> Empty()
     {
         yield break;
+    }
+
+    // hide source type to avoid Span optimization
+    public static FromEnumerable<T> ToIterableValueEnumerable<T>(this IEnumerable<T> source)
+    {
+        static IEnumerable<T> Core(IEnumerable<T> source)
+        {
+            foreach (var item in source)
+            {
+                yield return item;
+            }
+        }
+
+        return Core(source).AsValueEnumerable();
     }
 }

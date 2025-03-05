@@ -21,7 +21,6 @@ namespace ZLinq
 
 namespace ZLinq.Linq
 {
-    // `Range` is ambiguous with System.Range so use `_Range`
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public struct FromRange(int start, int count) : IValueEnumerable<int>
@@ -50,7 +49,11 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<int> dest)
         {
-            // TODO: size validation
+            if (count > dest.Length)
+            {
+                return false;
+            }
+
             FillIncremental(dest.Slice(0, count), start);
             return true;
         }
