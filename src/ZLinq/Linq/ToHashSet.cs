@@ -1,4 +1,6 @@
-﻿namespace ZLinq
+﻿#nullable disable
+
+namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {

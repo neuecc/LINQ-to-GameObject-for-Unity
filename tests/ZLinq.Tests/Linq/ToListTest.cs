@@ -1,21 +1,34 @@
-﻿// TODO
-//namespace ZLinq.Tests.Linq;
+﻿using ZLinq.Linq;
 
-//public class ToListTest
-//{
-//    [Fact]
-//    public void Empty()
-//    {
-//        var xs = new int[0];
-//        var actual = xs.AsValueEnumerable().ToList();
-//        Assert.Empty(actual);
-//    }
+namespace ZLinq.Tests.Linq;
 
-//    [Fact]
-//    public void NonEmpty()
-//    {
-//        var xs = new int[] { 1, 2, 3, 4, 5 };
-//        var actual = xs.AsValueEnumerable().ToList();
-//        Assert.Equal(xs, actual);
-//    }
-//}
+public class ToListTest
+{
+    // 4 pattern,
+    // Span = Array
+    // EnumeratedCount + TryCopyTo = Range
+    // EnumeatedCount Only = Select
+    // Iterator
+
+    [Fact]
+    public void Empty()
+    {
+        var xs = new int[0];
+
+        xs.AsValueEnumerable().ToList().ShouldBeEmpty();
+        ValueEnumerable.Range(0, 0).ToList().ShouldBeEmpty();
+        xs.AsValueEnumerable().Select(x => x).ToList().ShouldBeEmpty();
+        xs.ToIterableValueEnumerable().ToList().ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void NonEmpty()
+    {
+        var xs = new int[] { 1, 2, 3, 4, 5 };
+
+        xs.AsValueEnumerable().ToList().ShouldBe(xs);
+        ValueEnumerable.Range(1, 5).ToList().ShouldBe(xs);
+        xs.AsValueEnumerable().Select(x => x).ToList().ShouldBe(xs);
+        xs.ToIterableValueEnumerable().ToList().ShouldBe(xs);
+    }
+}

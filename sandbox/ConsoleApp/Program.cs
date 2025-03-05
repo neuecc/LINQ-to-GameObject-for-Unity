@@ -12,7 +12,9 @@ Span<int> xs = [1, 2, 3, 4, 5];
 
 var dict = xs.AsValueEnumerable().ToDictionary(x => x);
 
-foreach (var item in dict)
+var takoyakix = xs.AsValueEnumerable().Select(x =>x.ToString()).Where(x => x == "foo").Take(100);
+
+foreach (var item in takoyakix)
 {
     Console.WriteLine(item);
 }
