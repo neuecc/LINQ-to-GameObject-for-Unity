@@ -7,14 +7,14 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, keySelector);
+            => new(source, keySelector, null!);
 
-        //        public static GroupBy2<TEnumerable, TSource, TKey> GroupBy<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
-        //            where TEnumerable : struct, IValueEnumerable<TSource>
-        //#if NET9_0_OR_GREATER
-        //            , allows ref struct
-        //#endif
-        //            => new(source, keySelector, comparer);
+        public static GroupBy<TEnumerable, TSource, TKey> GroupBy<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+            where TEnumerable : struct, IValueEnumerable<TSource>
+#if NET9_0_OR_GREATER
+                    , allows ref struct
+#endif
+            => new(source, keySelector, comparer);
 
         //        public static GroupBy3<TEnumerable, TSource, TKey, TElement> GroupBy<TEnumerable, TSource, TKey, TElement>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
         //            where TEnumerable : struct, IValueEnumerable<TSource>
@@ -70,7 +70,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct GroupBy<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector)
+    struct GroupBy<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
         : IValueEnumerable<IGrouping<TKey, TSource>>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -78,7 +78,9 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
-        IEnumerator<IGrouping<TKey, TSource>>? enumerator;
+        bool init;
+        Grouping<TKey, TSource>? rootGrouping;
+        Grouping<TKey, TSource>? currentGrouping;
 
         public ValueEnumerator<GroupBy<TEnumerable, TSource, TKey>, IGrouping<TKey, TSource>> GetEnumerator() => new(this);
 
@@ -96,29 +98,60 @@ namespace ZLinq.Linq
 
         public bool TryGetNext(out IGrouping<TKey, TSource> current)
         {
-            // note: can improvement without GetEnumerator
-            if (enumerator == null)
+            if (!init)
             {
-                var lookup = source.ToLookup<TEnumerable, TSource, TKey>(keySelector);
-                enumerator = lookup.GetEnumerator();
+                init = true;
+                rootGrouping = BuildRoot();
+                if (rootGrouping != null)
+                {
+                    current = rootGrouping;
+                    currentGrouping = rootGrouping;
+                    return true;
+                }
             }
 
-            if (enumerator.MoveNext())
-            {
-                current = enumerator.Current;
-                return true;
-            }
-            else
+            currentGrouping = currentGrouping?.NextGroupInAddOrder;
+
+            if (currentGrouping == null || currentGrouping == rootGrouping)
             {
                 current = default!;
                 return false;
+            }
+            else
+            {
+                current = currentGrouping;
+                return true;
             }
         }
 
         public void Dispose()
         {
-            enumerator?.Dispose();
             source.Dispose();
+        }
+
+        Grouping<TKey, TSource>? BuildRoot()
+        {
+            var lookupBuilder = new LookupBuilder<TKey, TSource>(comparer ?? EqualityComparer<TKey>.Default);
+
+            if (source.TryGetSpan(out var span))
+            {
+                foreach (var item in span)
+                {
+                    lookupBuilder.Add(keySelector(item), item);
+                }
+            }
+            else
+            {
+                using (source)
+                {
+                    while (source.TryGetNext(out var item))
+                    {
+                        lookupBuilder.Add(keySelector(item), item);
+                    }
+                }
+            }
+
+            return lookupBuilder.GetRootGroupAndClear();
         }
     }
 

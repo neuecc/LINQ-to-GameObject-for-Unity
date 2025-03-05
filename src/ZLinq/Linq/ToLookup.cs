@@ -209,6 +209,23 @@ namespace ZLinq.Linq
             return new Lookup<TKey, TElement>(groups, last, groupCount, comparer);
         }
 
+        // GroupBy only needs root group.
+        internal Grouping<TKey, TElement>? GetRootGroupAndClear()
+        {
+            if (groupCount == 0 || buckets is null)
+            {
+                return null;
+            }
+
+            foreach (var item in buckets)
+            {
+                item?.Freeze();
+            }
+            ArrayPool<Grouping<TKey, TElement>>.Shared.Return(buckets, clearArray: true);
+
+            return last?.NextGroupInAddOrder; // as first.
+        }
+
         void ResizeAndRehash()
         {
             Debug.Assert(buckets is not null);
