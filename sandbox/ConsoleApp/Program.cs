@@ -11,14 +11,15 @@ V[] values = new V[]
 {
     new V("a", 5, 2, 33),
     new V("b", 4, 1, 66),
-    new V("c", 7, 2, 33)
+    new V("c", 7, 2, 43)
 };
 
 
 var seq = values.AsValueEnumerable()
-    .OrderBy(x => x.y)
+    .OrderBy(x => x.x)
     .ThenBy(x => x.z)
-    .ToArray();
+    //.ToArray()
+    ;
 
 foreach (var item in seq)
 {

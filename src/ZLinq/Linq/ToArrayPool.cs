@@ -30,7 +30,7 @@ partial class ValueEnumerableExtensions
 
                 if (source.TryCopyTo(array.AsSpan(0, count)))
                 {
-                    return (array, i);
+                    return (array, count);
                 }
 
                 while (source.TryGetNext(out var item))
