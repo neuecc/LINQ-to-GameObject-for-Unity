@@ -7,21 +7,21 @@
 
 // var xs = new[] { 1, 2, 3, 4, 5 };
 
-V[] values = new V[]
+
+
+var xs = Enumerable.Range(1, 100).ToArray();
+Random.Shared.Shuffle(xs);
+
+foreach (var item in xs)
 {
-    new V("a", 5, 2, 33),
-    new V("b", 4, 1, 66),
-    new V("c", 7, 2, 43)
-};
+    Console.WriteLine(item);
+}
 
+Console.WriteLine("---");
 
-var seq = values.AsValueEnumerable()
-    .OrderBy(x => x.x)
-    .ThenBy(x => x.z)
-    //.ToArray()
-    ;
+var foo = xs.AsValueEnumerable().OrderDescending().ToArray();
 
-foreach (var item in seq)
+foreach (var item in foo)
 {
     Console.WriteLine(item);
 }
