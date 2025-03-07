@@ -36,7 +36,6 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
-        IEqualityComparer<TSource> comparer = comparer ?? EqualityComparer<TSource>.Default;
         HashSet<TSource>? set;
 
         public ValueEnumerator<Distinct<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
@@ -53,13 +52,16 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> dest) => false;
+        public bool TryCopyTo(Span<TSource> dest)
+        {
+            return false;
+        }
 
         public bool TryGetNext(out TSource current)
         {
             if (set == null)
             {
-                set = new HashSet<TSource>(comparer);
+                set = new HashSet<TSource>(comparer ?? EqualityComparer<TSource>.Default);
             }
 
             if (source.TryGetNext(out var value) && set.Add(value))
@@ -75,32 +77,6 @@ namespace ZLinq.Linq
         public void Dispose()
         {
             source.Dispose();
-        }
-
-        // Optimize
-
-        public TSource[] ToArray()
-        {
-            var set = new HashSet<TSource>(comparer);
-            while (source.TryGetNext(out var value) && set.Add(value))
-            {
-            }
-            return set.ToArray();
-        }
-
-        public List<TSource> ToList()
-        {
-            return ListMarshal.AsList(ToArray());
-        }
-
-        public int CopyTo(TSource[] dest)
-        {
-            var set = new HashSet<TSource>(comparer);
-            while (source.TryGetNext(out var value) && set.Add(value))
-            {
-            }
-            set.CopyTo(dest);
-            return set.Count;
         }
     }
 

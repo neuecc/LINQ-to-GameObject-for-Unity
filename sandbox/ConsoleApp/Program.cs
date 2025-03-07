@@ -1,4 +1,5 @@
-﻿using ZLinq;
+﻿using System.Reflection;
+using ZLinq;
 
 
 //Span<int> xs = stackalloc int[255];
@@ -12,10 +13,10 @@
 var source = new[] { 1, 2, 3, 4, 5, 6 };
 
 var actual = source.AsValueEnumerable()
-        //.CountBy(x => x % 2 == 1, null)   // Key selector: odd/even
-        .AggregateBy(x => x, 10, (x, y) => x + y)
-        .ToDictionary(x => x.Key, x => x.Value);
+    .Select(x => x * 100)
+    .ToArray();
 
+Console.WriteLine(actual.Length);
 
 
 class Person

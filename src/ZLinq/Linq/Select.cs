@@ -51,7 +51,10 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TResult> destination) => false;
+        public bool TryCopyTo(Span<TResult> destination)
+        {
+            return false;
+        }
 
         public bool TryGetNext(out TResult current)
         {
@@ -105,6 +108,7 @@ namespace ZLinq.Linq
             return false;
         }
 
+        // TODO: Optimize
         public bool TryCopyTo(Span<TResult> destination) => false;
 
         public bool TryGetNext(out TResult current)
@@ -177,9 +181,5 @@ namespace ZLinq.Linq
             source.Dispose();
         }
     }
-   
-
-
-
 
 }

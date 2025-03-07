@@ -52,8 +52,14 @@ namespace ZLinq.Linq
             return false;
         }
 
-        // TODO: true?
-        public bool TryCopyTo(Span<TSource> dest) => false;
+        public bool TryCopyTo(Span<TSource> dest)
+        {
+            // return false because source1 succeeded but source2 failed, it is high-cost operation
+            // Also, if source1 succeeds and source2 fails, there is a possibility that source1's TryCopyTo completes and TryGetNext stops working.
+            // ZLinq's semantics do not guarantee the operation of other operations if TryCopyTo succeeds.
+            // Therefore, it must be set to false.
+            return false;
+        }
 
         public bool TryGetNext(out TSource current)
         {

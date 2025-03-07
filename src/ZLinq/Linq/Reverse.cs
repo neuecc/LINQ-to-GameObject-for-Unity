@@ -29,31 +29,53 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
+        TSource[]? array;
+        int index;
 
         public ValueEnumerator<Reverse<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
-            throw new NotImplementedException();
-            // return source.TryGetNonEnumeratedCount(count);
-            // count = 0;
-            // return false;
+            return source.TryGetNonEnumeratedCount(out count);
         }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            span = default;
+            return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination) => false;
+        public bool TryCopyTo(Span<TSource> destination)
+        {
+            if (source.TryGetNonEnumeratedCount(out var count) && count <= destination.Length)
+            {
+                if (source.TryCopyTo(destination))
+                {
+                    destination.Slice(0, count).Reverse();
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         public bool TryGetNext(out TSource current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+            if (array == null)
+            {
+                array = source.ToArray<TEnumerable, TSource>();
+                Array.Reverse(array);
+            }
+
+            if (index < array.Length)
+            {
+                current = array[index];
+                index++;
+                return true;
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
         }
 
         public void Dispose()

@@ -7,9 +7,9 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, second);
+            => new(source, second, null);
 
-        public static Intersect2<TEnumerable, TSource> Intersect<TEnumerable, TSource>(this TEnumerable source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer)
+        public static Intersect<TEnumerable, TSource> Intersect<TEnumerable, TSource>(this TEnumerable source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Intersect<TEnumerable, TSource>(TEnumerable source, IEnumerable<TSource> second)
+    struct Intersect<TEnumerable, TSource>(TEnumerable source, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -36,79 +36,39 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
+        HashSet<TSource>? set;
 
         public ValueEnumerator<Intersect<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
-            throw new NotImplementedException();
-            // return source.TryGetNonEnumeratedCount(count);
-            // count = 0;
-            // return false;
+            count = 0;
+            return false;
         }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            span = default;
+            return false;
         }
 
         public bool TryCopyTo(Span<TSource> dest) => false;
 
         public bool TryGetNext(out TSource current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
-        }
+            if (set == null)
+            {
+                set = new HashSet<TSource>(second, comparer ?? EqualityComparer<TSource>.Default);
+            }
 
-        public void Dispose()
-        {
-            source.Dispose();
-        }
-    }
+            if (source.TryGetNext(out var value) && set.Remove(value))
+            {
+                current = value;
+                return true;
+            }
 
-    [StructLayout(LayoutKind.Auto)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-#if NET9_0_OR_GREATER
-    public ref
-#else
-    public
-#endif
-    struct Intersect2<TEnumerable, TSource>(TEnumerable source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-        , allows ref struct
-#endif
-    {
-        TEnumerable source = source;
-
-        public ValueEnumerator<Intersect2<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
-
-        public bool TryGetNonEnumeratedCount(out int count)
-        {
-            throw new NotImplementedException();
-            // return source.TryGetNonEnumeratedCount(count);
-            // count = 0;
-            // return false;
-        }
-
-        public bool TryCopyTo(Span<TSource> dest) => false;
-
-        public bool TryGetSpan(out ReadOnlySpan<TSource> span)
-        {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
-        }
-
-        public bool TryGetNext(out TSource current)
-        {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+            Unsafe.SkipInit(out current);
+            return false;
         }
 
         public void Dispose()

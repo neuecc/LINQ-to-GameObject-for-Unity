@@ -29,35 +29,65 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
+        byte state;
 
         public ValueEnumerator<Append<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
-            throw new NotImplementedException();
-            // return source.TryGetNonEnumeratedCount(count);
-            // count = 0;
-            // return false;
+            if (source.TryGetNonEnumeratedCount(out count))
+            {
+                count++;
+                return true;
+            }
+            count = 0;
+            return false;
         }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            span = default;
+            return false;
         }
 
-        public bool TryCopyTo(Span<TSource> dest) => false;
+        public bool TryCopyTo(Span<TSource> dest)
+        {
+            if (!source.TryGetNonEnumeratedCount(out var srcCount)) return false;
+            if (srcCount + 1 > dest.Length) return false;
+
+            if (!source.TryCopyTo(dest))
+            {
+                return false;
+            }
+            dest[srcCount] = element;
+            return true;
+        }
 
         public bool TryGetNext(out TSource current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+            if (state == 0)
+            {
+                if (source.TryGetNext(out current))
+                {
+                    return true;
+                }
+                state = 1;
+            }
+
+            if (state == 1)
+            {
+                current = element;
+                state = 2;
+                return true;
+            }
+
+            current = default!;
+            return false;
         }
 
         public void Dispose()
         {
+            state = 2;
             source.Dispose();
         }
     }

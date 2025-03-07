@@ -1,4 +1,4 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -8,8 +8,31 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
-        }
+            using (source)
+            {
+                if (source.TryGetSpan(out var span))
+                {
+                    foreach (var item in span)
+                    {
+                        if (!predicate(item))
+                        {
+                            return false;
+                        }
+                    }
+                }
+                else
+                {
+                    while (source.TryGetNext(out var item))
+                    {
+                        if (!predicate(item))
+                        {
+                            return false;
+                        }
+                    }
+                }
 
+                return true;
+            }
+        }
     }
 }

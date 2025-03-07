@@ -1,4 +1,4 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -8,7 +8,20 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
+            using (source)
+            {
+                if (source.TryGetNonEnumeratedCount(out var count))
+                {
+                    return count;
+                }
+
+                var longCount = 0L;
+                while (source.TryGetNext(out _))
+                {
+                    checked { longCount++; }
+                }
+                return longCount;
+            }
         }
 
         public static Int64 LongCount<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
@@ -17,7 +30,23 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
+            using (source)
+            {
+                if (source.TryGetNonEnumeratedCount(out var count))
+                {
+                    return count;
+                }
+
+                var longCount = 0L;
+                while (source.TryGetNext(out var current))
+                {
+                    if (predicate(current))
+                    {
+                        checked { longCount++; }
+                    }
+                }
+                return count;
+            }
         }
 
     }

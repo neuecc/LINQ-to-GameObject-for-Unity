@@ -1,4 +1,4 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -8,7 +8,15 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
+            using (source)
+            {
+                if (source.TryGetNonEnumeratedCount(out var count))
+                {
+                    return count > 0;
+                }
+
+                return source.TryGetNext(out _);
+            }
         }
 
         public static Boolean Any<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
@@ -17,8 +25,31 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
-        }
+            using (source)
+            {
+                if (source.TryGetSpan(out var span))
+                {
+                    foreach (var item in span)
+                    {
+                        if (predicate(item))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    while (source.TryGetNext(out var item))
+                    {
+                        if (predicate(item))
+                        {
+                            return true;
+                        }
+                    }
+                }
 
+                return false;
+            }
+        }
     }
 }
