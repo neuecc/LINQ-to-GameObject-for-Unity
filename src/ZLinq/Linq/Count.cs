@@ -8,24 +8,20 @@
             , allows ref struct
 #endif
         {
-            if (source.TryGetNonEnumeratedCount(out var count))
+            using (source)
             {
-                return count;
-            }
+                if (source.TryGetNonEnumeratedCount(out var count))
+                {
+                    return count;
+                }
 
-            count = 0;
-            try
-            {
+                count = 0;
                 while (source.TryGetNext(out _))
                 {
-                    count++;
+                    checked { count++; }
                 }
+                return count;
             }
-            finally
-            {
-                source.Dispose();
-            }
-            return count;
         }
 
         public static Int32 Count<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
@@ -34,27 +30,30 @@
             , allows ref struct
 #endif
         {
-            if (source.TryGetNonEnumeratedCount(out var count))
+            using (source)
             {
-                return count;
-            }
-
-            count = 0;
-            try
-            {
-                while (source.TryGetNext(out var current))
+                if (source.TryGetNonEnumeratedCount(out var count))
                 {
-                    if (predicate(current))
+                    return count;
+                }
+
+                count = 0;
+                try
+                {
+                    while (source.TryGetNext(out var current))
                     {
-                        count++;
+                        if (predicate(current))
+                        {
+                            count++;
+                        }
                     }
                 }
+                finally
+                {
+                    source.Dispose();
+                }
+                return count;
             }
-            finally
-            {
-                source.Dispose();
-            }
-            return count;
         }
 
     }
