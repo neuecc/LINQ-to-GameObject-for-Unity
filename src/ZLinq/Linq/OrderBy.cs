@@ -1,29 +1,7 @@
-﻿using System;
-using System.Buffers;
-using System.Xml.Linq;
+﻿using System.Buffers;
 
 namespace ZLinq
 {
-    static class UnsafeFunctions<T, U>
-    {
-        public static readonly Func<T, U> Identity = static x => Unsafe.As<T, U>(ref x);
-    }
-
-    class DescendingDefaultComparer<T> : IComparer<T>
-    {
-        public static IComparer<T> Default = new DescendingDefaultComparer<T>();
-
-        DescendingDefaultComparer()
-        {
-
-        }
-
-        public int Compare(T? x, T? y)
-        {
-            return Comparer<T?>.Default.Compare(y, x);
-        }
-    }
-
     partial class ValueEnumerableExtensions
     {
         public static OrderBy<TEnumerable, TSource, TSource> Order<TEnumerable, TSource>(this TEnumerable source)
@@ -239,6 +217,8 @@ namespace ZLinq.Linq
         }
     }
 
+    // my previously implementation in js: https://github.com/neuecc/linq.js/blob/v3/linq.js#L2672-L2760
+
     public interface IOrderByComparable<TSource>
     {
         IOrderByComparer GetComparer(ReadOnlySpan<TSource> source, IOrderByComparer? childComparer);
@@ -279,23 +259,30 @@ namespace ZLinq.Linq
             this.descending = descending;
         }
 
-        public int Compare(int x, int y)
+        // index based sorting
+        public int Compare(int index1, int index2)
         {
-            var result = comparer.Compare(keys[x], keys[y]);
-            if (result != 0) return descending ? -result : result;
+            var compareResult = comparer.Compare(keys[index1], keys[index2]);
+            if (compareResult != 0)
+            {
+                return descending ? -compareResult : compareResult;
+            }
 
-            result = childComparer?.Compare(x, y) ?? 0;
-            if (result != 0) return descending ? -result : result;
+            // same result => thenBy
+            if (childComparer != null)
+            {
+                return childComparer.Compare(index1, index2);
+            }
 
             // finally compare index to ensure stable sort
-            if (x == y) return 0;
+            if (index1 == index2) return 0;
             if (descending)
             {
-                return (x > y) ? -1 : 1;
+                return (index1 > index2) ? -1 : 1;
             }
             else
             {
-                return (x > y) ? 1 : -1;
+                return (index1 > index2) ? 1 : -1;
             }
         }
 
@@ -311,6 +298,26 @@ namespace ZLinq.Linq
                     childComparer = null;
                 }
             }
+        }
+    }
+
+    file static class UnsafeFunctions<T, U>
+    {
+        public static readonly Func<T, U> Identity = static x => Unsafe.As<T, U>(ref x);
+    }
+
+    file class DescendingDefaultComparer<T> : IComparer<T>
+    {
+        public static IComparer<T> Default = new DescendingDefaultComparer<T>();
+
+        DescendingDefaultComparer()
+        {
+
+        }
+
+        public int Compare(T? x, T? y)
+        {
+            return Comparer<T?>.Default.Compare(y, x);
         }
     }
 }

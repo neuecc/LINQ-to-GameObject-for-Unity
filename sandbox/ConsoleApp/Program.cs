@@ -8,25 +8,34 @@
 // var xs = new[] { 1, 2, 3, 4, 5 };
 
 
+var xs = new int[] { 5, 2, 8, 1, 9 };
 
-var xs = Enumerable.Range(1, 100).ToArray();
-Random.Shared.Shuffle(xs);
+// Custom comparer that orders by the remainder when divided by 3
+var customComparer = Comparer<int>.Create((x, y) =>
+    (x % 3).CompareTo(y % 3));
 
-foreach (var item in xs)
+var ordered = xs.AsValueEnumerable().OrderBy(x => x, customComparer);
+ordered.ToArray();
+
+foreach (var item in ordered)
 {
     Console.WriteLine(item);
 }
 
-Console.WriteLine("---");
 
-var foo = xs.AsValueEnumerable().OrderDescending().ToArray();
-
-foreach (var item in foo)
+class Person
 {
-    Console.WriteLine(item);
-}
+    public string FirstName { get; }
+    public string LastName { get; }
+    public int Age { get; }
 
-public record V(string name, int x, int y, int z);
+    public Person(string firstName, string lastName, int age)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        Age = age;
+    }
+}
 
 //Console.WriteLine(hoge.Length);
 
