@@ -8,19 +8,14 @@
 // var xs = new[] { 1, 2, 3, 4, 5 };
 
 
-var xs = new int[] { 5, 2, 8, 1, 9 };
 
-// Custom comparer that orders by the remainder when divided by 3
-var customComparer = Comparer<int>.Create((x, y) =>
-    (x % 3).CompareTo(y % 3));
+var source = new[] { 1, 2, 3, 4, 5, 6 };
 
-var ordered = xs.AsValueEnumerable().OrderBy(x => x, customComparer);
-ordered.ToArray();
+var actual = source.AsValueEnumerable()
+        //.CountBy(x => x % 2 == 1, null)   // Key selector: odd/even
+        .AggregateBy(x => x, 10, (x, y) => x + y)
+        .ToDictionary(x => x.Key, x => x.Value);
 
-foreach (var item in ordered)
-{
-    Console.WriteLine(item);
-}
 
 
 class Person

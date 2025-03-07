@@ -4,7 +4,8 @@
 		<RootNamespace>ZLinq.Tests</RootNamespace>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		<!--<TargetFrameworks>net8.0;net9.0</TargetFrameworks>-->
+		<TargetFrameworks>net9.0</TargetFrameworks>
 		<LangVersion>13</LangVersion>
 
 		<!-- Microsoft.Testing.Platform Support -->

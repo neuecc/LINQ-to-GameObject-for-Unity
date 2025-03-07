@@ -1,4 +1,4 @@
-namespace ZLinq
+﻿namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -8,7 +8,36 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
+            if (source.TryGetSpan(out var span))
+            {
+                if (span.Length == 0)
+                {
+                    return Internal.Throws.NoElementsException<TSource>();
+                }
+
+                var result = span[0];
+                for (int i = 1; i < span.Length; i++)
+                {
+                    result = func(result, span[i]);
+                }
+                
+                return result;
+            }
+
+            using (source)
+            {
+                if (!source.TryGetNext(out var result))
+                {
+                    return Internal.Throws.NoElementsException<TSource>();
+                }
+
+                while (source.TryGetNext(out var current))
+                {
+                    result = func(result, current);
+                }
+
+                return result;
+            }
         }
 
         public static TAccumulate Aggregate<TEnumerable, TSource, TAccumulate>(this TEnumerable source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func)
@@ -17,7 +46,27 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
+            if (source.TryGetSpan(out var span))
+            {
+                var result = seed;
+                foreach (var item in span)
+                {
+                    result = func(result, item);
+                }
+                
+                return result;
+            }
+
+            using (source)
+            {
+                var result = seed;
+                while (source.TryGetNext(out var current))
+                {
+                    result = func(result, current);
+                }
+
+                return result;
+            }
         }
 
         public static TResult Aggregate<TEnumerable, TSource, TAccumulate, TResult>(this TEnumerable source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, Func<TAccumulate, TResult> resultSelector)
@@ -26,8 +75,27 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            throw new NotImplementedException();
-        }
+            if (source.TryGetSpan(out var span))
+            {
+                var result = seed;
+                foreach (var item in span)
+                {
+                    result = func(result, item);
+                }
+                
+                return resultSelector(result);
+            }
 
+            using (source)
+            {
+                var result = seed;
+                while (source.TryGetNext(out var current))
+                {
+                    result = func(result, current);
+                }
+
+                return resultSelector(result);
+            }
+        }
     }
 }

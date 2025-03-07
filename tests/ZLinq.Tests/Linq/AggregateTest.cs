@@ -1,13 +1,23 @@
-namespace ZLinq.Tests.Linq;
+﻿namespace ZLinq.Tests.Linq;
 
 public class AggregateTest
 {
+    // Tests for Aggregate<TEnumerable, TSource>(this TEnumerable source, Func<TSource, TSource, TSource> func)
     [Fact]
     public void Empty()
     {
         var xs = new int[0];
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        // Both implementations should throw when the source is empty
+        TestUtil.Throws<InvalidOperationException>(
+            () => xs.Aggregate((x, y) => x + y),
+            () => xs.AsValueEnumerable().Aggregate((x, y) => x + y)
+        );
+
+        TestUtil.Throws<InvalidOperationException>(
+            () => xs.Aggregate((x, y) => x + y),
+            () => xs.ToIterableValueEnumerable().Aggregate((x, y) => x + y)
+        );
     }
 
     [Fact]
@@ -15,39 +25,152 @@ public class AggregateTest
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        // Both implementations should return the same result when aggregating
+        xs.AsValueEnumerable().Aggregate((x, y) => x + y).ShouldBe(xs.Aggregate((x, y) => x + y));
+        xs.ToIterableValueEnumerable().Aggregate((x, y) => x + y).ShouldBe(xs.Aggregate((x, y) => x + y));
+
+        // Test with different aggregation function
+        xs.AsValueEnumerable().Aggregate((x, y) => x * y).ShouldBe(xs.Aggregate((x, y) => x * y));
+        xs.ToIterableValueEnumerable().Aggregate((x, y) => x * y).ShouldBe(xs.Aggregate((x, y) => x * y));
     }
 
     [Fact]
-    public void Empty2()
+    public void SingleElement()
+    {
+        var xs = new int[] { 42 };
+
+        // Should return the single element without calling the function
+        xs.AsValueEnumerable().Aggregate((x, y) => throw new Exception("Should not be called")).ShouldBe(42);
+        xs.ToIterableValueEnumerable().Aggregate((x, y) => throw new Exception("Should not be called")).ShouldBe(42);
+    }
+
+    // Tests for Aggregate<TEnumerable, TSource, TAccumulate>(this TEnumerable source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func)
+    [Fact]
+    public void EmptyWithSeed()
     {
         var xs = new int[0];
+        var seed = 10;
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        // Should return the seed when source is empty
+        xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc + x).ShouldBe(seed);
+        xs.ToIterableValueEnumerable().Aggregate(seed, (acc, x) => acc + x).ShouldBe(seed);
     }
 
     [Fact]
-    public void NonEmpty2()
+    public void NonEmptyWithSeed()
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
+        var seed = 10;
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        // Both implementations should return the same result when aggregating with seed
+        xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc + x).ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x));
+        xs.ToIterableValueEnumerable().Aggregate(seed, (acc, x) => acc + x).ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x));
+
+        // Test with different aggregation function
+        xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc * x).ShouldBe(xs.Aggregate(seed, (acc, x) => acc * x));
+        xs.ToIterableValueEnumerable().Aggregate(seed, (acc, x) => acc * x).ShouldBe(xs.Aggregate(seed, (acc, x) => acc * x));
     }
 
     [Fact]
-    public void Empty3()
+    public void WithComplexSeed()
+    {
+        var xs = new string[] { "Apple", "Banana", "Cherry" };
+        var seed = new Dictionary<char, int>();
+
+        // Count occurrences of first character in each string
+        var expected = xs.Aggregate(
+            seed,
+            (dict, str) => {
+                if (str.Length > 0) {
+                    var firstChar = str[0];
+                    dict[firstChar] = dict.TryGetValue(firstChar, out var count) ? count + 1 : 1;
+                }
+                return dict;
+            }
+        );
+
+        var actual = xs.AsValueEnumerable().Aggregate(
+            new Dictionary<char, int>(),
+            (dict, str) => {
+                if (str.Length > 0) {
+                    var firstChar = str[0];
+                    dict[firstChar] = dict.TryGetValue(firstChar, out var count) ? count + 1 : 1;
+                }
+                return dict;
+            }
+        );
+
+        actual.Count.ShouldBe(expected.Count);
+        foreach (var kvp in expected)
+        {
+            actual.ContainsKey(kvp.Key).ShouldBeTrue();
+            actual[kvp.Key].ShouldBe(kvp.Value);
+        }
+    }
+
+    // Tests for Aggregate<TEnumerable, TSource, TAccumulate, TResult>(this TEnumerable source, TAccumulate seed, 
+    // Func<TAccumulate, TSource, TAccumulate> func, Func<TAccumulate, TResult> resultSelector)
+    [Fact]
+    public void EmptyWithSeedAndResultSelector()
     {
         var xs = new int[0];
+        var seed = 10;
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        // Should apply the result selector to the seed when source is empty
+        xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
+            .ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x, acc => acc * 2));
+            
+        xs.ToIterableValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
+            .ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x, acc => acc * 2));
     }
 
     [Fact]
-    public void NonEmpty3()
+    public void NonEmptyWithSeedAndResultSelector()
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
+        var seed = 10;
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        // Both implementations should return the same result
+        xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
+            .ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x, acc => acc * 2));
+            
+        xs.ToIterableValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
+            .ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x, acc => acc * 2));
+
+        // Test with different aggregation and result selector functions
+        xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc * x, acc => $"Result: {acc}")
+            .ShouldBe(xs.Aggregate(seed, (acc, x) => acc * x, acc => $"Result: {acc}"));
+            
+        xs.ToIterableValueEnumerable().Aggregate(seed, (acc, x) => acc * x, acc => $"Result: {acc}")
+            .ShouldBe(xs.Aggregate(seed, (acc, x) => acc * x, acc => $"Result: {acc}"));
     }
 
+    [Fact]
+    public void WithComplexResult()
+    {
+        var xs = new int[] { 1, 2, 3, 4, 5 };
+        
+        // Get sum and count, then calculate average as result
+        var expected = xs.Aggregate(
+            (Sum: 0, Count: 0),
+            (acc, x) => (Sum: acc.Sum + x, Count: acc.Count + 1),
+            acc => acc.Count > 0 ? (double)acc.Sum / acc.Count : 0
+        );
+
+        var actual = xs.AsValueEnumerable().Aggregate(
+            (Sum: 0, Count: 0),
+            (acc, x) => (Sum: acc.Sum + x, Count: acc.Count + 1),
+            acc => acc.Count > 0 ? (double)acc.Sum / acc.Count : 0
+        );
+
+        actual.ShouldBe(expected);
+        
+        actual = xs.ToIterableValueEnumerable().Aggregate(
+            (Sum: 0, Count: 0),
+            (acc, x) => (Sum: acc.Sum + x, Count: acc.Count + 1),
+            acc => acc.Count > 0 ? (double)acc.Sum / acc.Count : 0
+        );
+
+        actual.ShouldBe(expected);
+    }
 }
