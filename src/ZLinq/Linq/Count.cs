@@ -38,19 +38,12 @@
                 }
 
                 count = 0;
-                try
+                while (source.TryGetNext(out var current))
                 {
-                    while (source.TryGetNext(out var current))
+                    if (predicate(current))
                     {
-                        if (predicate(current))
-                        {
-                            count++;
-                        }
+                        checked { count++; }
                     }
-                }
-                finally
-                {
-                    source.Dispose();
                 }
                 return count;
             }
