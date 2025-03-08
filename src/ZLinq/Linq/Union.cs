@@ -83,9 +83,10 @@ namespace ZLinq.Linq
 
                 while (secondEnumerator.MoveNext())
                 {
-                    if (set!.Add(secondEnumerator.Current))
+                    var v = secondEnumerator.Current;
+                    if (set!.Add(v))
                     {
-                        current = secondEnumerator.Current;
+                        current = v;
                         return true;
                     }
                 }

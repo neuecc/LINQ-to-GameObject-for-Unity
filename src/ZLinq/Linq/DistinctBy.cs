@@ -7,9 +7,9 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, keySelector);
+            => new(source, keySelector, null);
 
-        public static DistinctBy2<TEnumerable, TSource, TKey> DistinctBy<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+        public static DistinctBy<TEnumerable, TSource, TKey> DistinctBy<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct DistinctBy<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector)
+    struct DistinctBy<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -36,31 +36,39 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
+        HashSet<TKey>? set;
 
         public ValueEnumerator<DistinctBy<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
-            throw new NotImplementedException();
-            // return source.TryGetNonEnumeratedCount(count);
-            // count = 0;
-            // return false;
+            count = 0;
+            return false;
         }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            span = default;
+            return false;
         }
 
         public bool TryCopyTo(Span<TSource> dest) => false;
 
         public bool TryGetNext(out TSource current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+            if (set == null)
+            {
+                set = new HashSet<TKey>(comparer ?? EqualityComparer<TKey>.Default);
+            }
+
+            if (source.TryGetNext(out var value) && set.Add(keySelector(value)))
+            {
+                current = value;
+                return true;
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
         }
 
         public void Dispose()
@@ -68,53 +76,4 @@ namespace ZLinq.Linq
             source.Dispose();
         }
     }
-
-    [StructLayout(LayoutKind.Auto)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-#if NET9_0_OR_GREATER
-    public ref
-#else
-    public
-#endif
-    struct DistinctBy2<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-        , allows ref struct
-#endif
-    {
-        TEnumerable source = source;
-
-        public ValueEnumerator<DistinctBy2<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
-
-        public bool TryGetNonEnumeratedCount(out int count)
-        {
-            throw new NotImplementedException();
-            // return source.TryGetNonEnumeratedCount(count);
-            // count = 0;
-            // return false;
-        }
-
-        public bool TryGetSpan(out ReadOnlySpan<TSource> span)
-        {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
-        }
-
-        public bool TryCopyTo(Span<TSource> dest) => false;
-
-        public bool TryGetNext(out TSource current)
-        {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
-        }
-
-        public void Dispose()
-        {
-            source.Dispose();
-        }
-    }
-
 }

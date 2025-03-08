@@ -7,9 +7,9 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, second, keySelector);
+            => new(source, second, keySelector, null);
 
-        public static IntersectBy2<TEnumerable, TSource, TKey> IntersectBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+        public static IntersectBy<TEnumerable, TSource, TKey> IntersectBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct IntersectBy<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector)
+    struct IntersectBy<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
@@ -36,79 +36,39 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
+        HashSet<TKey>? set;
 
         public ValueEnumerator<IntersectBy<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
-            throw new NotImplementedException();
-            // return source.TryGetNonEnumeratedCount(count);
-            // count = 0;
-            // return false;
+            count = 0;
+            return false;
         }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            span = default;
+            return false;
         }
 
         public bool TryCopyTo(Span<TSource> dest) => false;
 
         public bool TryGetNext(out TSource current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
-        }
+            if (set == null)
+            {
+                set = new HashSet<TKey>(second, comparer ?? EqualityComparer<TKey>.Default);
+            }
 
-        public void Dispose()
-        {
-            source.Dispose();
-        }
-    }
+            if (source.TryGetNext(out var value) && set.Remove(keySelector(value)))
+            {
+                current = value;
+                return true;
+            }
 
-    [StructLayout(LayoutKind.Auto)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-#if NET9_0_OR_GREATER
-    public ref
-#else
-    public
-#endif
-    struct IntersectBy2<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-        , allows ref struct
-#endif
-    {
-        TEnumerable source = source;
-
-        public ValueEnumerator<IntersectBy2<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
-
-        public bool TryGetNonEnumeratedCount(out int count)
-        {
-            throw new NotImplementedException();
-            // return source.TryGetNonEnumeratedCount(count);
-            // count = 0;
-            // return false;
-        }
-
-        public bool TryGetSpan(out ReadOnlySpan<TSource> span)
-        {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
-        }
-
-        public bool TryCopyTo(Span<TSource> dest) => false;
-
-        public bool TryGetNext(out TSource current)
-        {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+            Unsafe.SkipInit(out current);
+            return false;
         }
 
         public void Dispose()
