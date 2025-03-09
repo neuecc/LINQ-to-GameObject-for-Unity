@@ -84,6 +84,46 @@ namespace ZLinq
 
 namespace ZLinq.Linq
 {
+    internal static class Lookup
+    {
+        // Enumerable.Join operation ignores null key
+        public static Lookup<TKey, TSource> CreateForJoin<TEnumerable, TSource, TKey>(TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
+            where TEnumerable : struct, IValueEnumerable<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+        {
+            var lookupBuilder = new LookupBuilder<TKey, TSource>(comparer ?? EqualityComparer<TKey>.Default);
+            using (source)
+            {
+                if (source.TryGetSpan(out var span))
+                {
+                    foreach (var item in span)
+                    {
+                        var key = keySelector(item);
+                        if (key is not null)
+                        {
+                            lookupBuilder.Add(key, item);
+                        }
+                    }
+                }
+                else
+                {
+                    while (source.TryGetNext(out var item))
+                    {
+                        var key = keySelector(item);
+                        if (key is not null)
+                        {
+                            lookupBuilder.Add(key, item);
+                        }
+                    }
+                }
+
+                return lookupBuilder.BuildAndClear();
+            }
+        }
+    }
+
     [StructLayout(LayoutKind.Auto)]
     internal struct LookupBuilder<TKey, TElement>
     {

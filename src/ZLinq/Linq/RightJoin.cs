@@ -2,14 +2,14 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Join<TEnumerable, TOuter, TInner, TKey, TResult> Join<TEnumerable, TOuter, TInner, TKey, TResult>(this TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector)
+        public static RightJoin<TEnumerable, TOuter, TInner, TKey, TResult> RightJoin<TEnumerable, TOuter, TInner, TKey, TResult>(this TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector)
             where TEnumerable : struct, IValueEnumerable<TOuter>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, inner, outerKeySelector, innerKeySelector, resultSelector, null);
 
-        public static Join<TEnumerable, TOuter, TInner, TKey, TResult> Join<TEnumerable, TOuter, TInner, TKey, TResult>(this TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer)
+        public static RightJoin<TEnumerable, TOuter, TInner, TKey, TResult> RightJoin<TEnumerable, TOuter, TInner, TKey, TResult>(this TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer)
             where TEnumerable : struct, IValueEnumerable<TOuter>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Join<TEnumerable, TOuter, TInner, TKey, TResult>(TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey>? comparer)
+    struct RightJoin<TEnumerable, TOuter, TInner, TKey, TResult>(TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector, IEqualityComparer<TKey>? comparer)
         : IValueEnumerable<TResult>
         where TEnumerable : struct, IValueEnumerable<TOuter>
 #if NET9_0_OR_GREATER
@@ -36,13 +36,14 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
+        FromEnumerable<TInner> innerEnumerable;
 
-        Lookup<TKey, TInner>? innerLookup;
-        Grouping<TKey, TInner>? currentGroup;
+        Lookup<TKey, TOuter>? outerLookup;
+        Grouping<TKey, TOuter>? currentGroup;
         int currentGroupIndex;
-        TOuter currentOuter = default!;
+        TInner currentInner = default!;
 
-        public ValueEnumerator<Join<TEnumerable, TOuter, TInner, TKey, TResult>, TResult> GetEnumerator() => new(this);
+        public ValueEnumerator<RightJoin<TEnumerable, TOuter, TInner, TKey, TResult>, TResult> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -60,14 +61,10 @@ namespace ZLinq.Linq
 
         public bool TryGetNext(out TResult current)
         {
-            if (innerLookup == null)
+            if (outerLookup == null)
             {
-                innerLookup = Lookup.CreateForJoin(inner.AsValueEnumerable(), innerKeySelector, comparer);
-            }
-
-            if (innerLookup.Count == 0)
-            {
-                goto END;
+                outerLookup = Lookup.CreateForJoin(source, outerKeySelector, comparer);
+                innerEnumerable = inner.AsValueEnumerable();
             }
 
         // iterating group
@@ -76,7 +73,7 @@ namespace ZLinq.Linq
             {
                 if (currentGroupIndex < currentGroup.Count)
                 {
-                    current = resultSelector(currentOuter, currentGroup[currentGroupIndex]);
+                    current = resultSelector(currentGroup[currentGroupIndex], currentInner);
                     currentGroupIndex++;
                     return true;
                 }
@@ -86,15 +83,20 @@ namespace ZLinq.Linq
                 }
             }
 
-            while (source.TryGetNext(out var value))
+            while (innerEnumerable.TryGetNext(out var value))
             {
-                var key = outerKeySelector(value);
-                if (key is not null) // Enumerable.Join ignores null keys
+                var key = innerKeySelector(value);
+                if (key is null)
                 {
-                    var group = innerLookup.GetGroup(key);
+                    current = resultSelector(default, value);
+                    return true;
+                }
+                else
+                {
+                    var group = outerLookup.GetGroup(key);
                     if (group != null)
                     {
-                        currentOuter = value;
+                        currentInner = value;
                         currentGroup = group;
                         currentGroupIndex = 0;
                         goto ITERATE;
@@ -102,13 +104,13 @@ namespace ZLinq.Linq
                 }
             }
 
-        END:
             Unsafe.SkipInit(out current);
             return false;
         }
 
         public void Dispose()
         {
+            innerEnumerable.Dispose();
             source.Dispose();
         }
     }
