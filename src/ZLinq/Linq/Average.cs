@@ -1,4 +1,46 @@
-﻿//namespace ZLinq
+﻿using System.Numerics;
+
+//namespace ZLinq
+//{
+//#if NET8_0_OR_GREATER
+
+//    partial class ValueEnumerableExtensions
+//    {
+//        public static Double Average<TEnumerable, TNumber>(this TEnumerable source)
+//            where TEnumerable : struct, IValueEnumerable<TNumber>
+//#if NET9_0_OR_GREATER
+//            , allows ref struct
+//#endif
+//            where TNumber : INumber<TNumber>
+//        {
+//            double count = 0;
+//            var sum = TNumber.Zero;
+//            while (source.TryGetNext(out var value))
+//            {
+//                sum += value;
+//                count++;
+//            }
+
+//            // var a = sum / count;
+
+//            // Sum / Count
+//            // return T.CreateChecked(SumCore(source)) / T.CreateChecked(source.Length);
+
+//            if (source.TryGetSpan(out var span))
+//            {
+
+//                // Enumerable.Range(1, 10).Average();
+
+//            }
+
+//            throw new NotImplementedException();
+//        }
+//    }
+//}
+
+//#endif
+
+//namespace ZLinq
 //{
 //    partial class ValueEnumerableExtensions
 //    {
