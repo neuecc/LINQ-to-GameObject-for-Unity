@@ -22,26 +22,25 @@ namespace ZLinq
 #endif
         {
             var lookupBuilder = new LookupBuilder<TKey, TSource>(comparer ?? EqualityComparer<TKey>.Default);
-
-            if (source.TryGetSpan(out var span))
+            using (source)
             {
-                foreach (var item in span)
+                if (source.TryGetSpan(out var span))
                 {
-                    lookupBuilder.Add(keySelector(item), item);
+                    foreach (var item in span)
+                    {
+                        lookupBuilder.Add(keySelector(item), item);
+                    }
                 }
-            }
-            else
-            {
-                using (source)
+                else
                 {
                     while (source.TryGetNext(out var item))
                     {
                         lookupBuilder.Add(keySelector(item), item);
                     }
                 }
-            }
 
-            return lookupBuilder.BuildAndClear();
+                return lookupBuilder.BuildAndClear();
+            }
         }
 
         public static ILookup<TKey, TElement> ToLookup<TEnumerable, TSource, TKey, TElement>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
@@ -60,26 +59,25 @@ namespace ZLinq
 #endif
         {
             var lookupBuilder = new LookupBuilder<TKey, TElement>(comparer ?? EqualityComparer<TKey>.Default);
-
-            if (source.TryGetSpan(out var span))
+            using (source)
             {
-                foreach (var item in span)
+                if (source.TryGetSpan(out var span))
                 {
-                    lookupBuilder.Add(keySelector(item), elementSelector(item));
+                    foreach (var item in span)
+                    {
+                        lookupBuilder.Add(keySelector(item), elementSelector(item));
+                    }
                 }
-            }
-            else
-            {
-                using (source)
+                else
                 {
                     while (source.TryGetNext(out var item))
                     {
                         lookupBuilder.Add(keySelector(item), elementSelector(item));
                     }
                 }
-            }
 
-            return lookupBuilder.BuildAndClear();
+                return lookupBuilder.BuildAndClear();
+            }
         }
     }
 }
@@ -197,7 +195,7 @@ namespace ZLinq.Linq
             }
         }
 
-        public ILookup<TKey, TElement> BuildAndClear()
+        public Lookup<TKey, TElement> BuildAndClear()
         {
             if (groupCount == 0 || buckets is null)
             {
@@ -275,7 +273,7 @@ namespace ZLinq.Linq
 
     internal sealed class Lookup<TKey, TElement> : ILookup<TKey, TElement>
     {
-        internal static readonly ILookup<TKey, TElement> Empty = new Lookup<TKey, TElement>();
+        internal static readonly Lookup<TKey, TElement> Empty = new Lookup<TKey, TElement>();
 
         readonly Grouping<TKey, TElement>?[]? groups;
         readonly Grouping<TKey, TElement>? last;
@@ -330,7 +328,7 @@ namespace ZLinq.Linq
             return GetGroup(key) is not null;
         }
 
-        IGrouping<TKey, TElement>? GetGroup(TKey key)
+        internal Grouping<TKey, TElement>? GetGroup(TKey key)
         {
             if (groups is null) return null;
 
