@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿using System.Numerics;
+using System.Reflection;
 using ZLinq;
+using ZLinq.Linq;
 
 
 //Span<int> xs = stackalloc int[255];
@@ -8,15 +10,18 @@ using ZLinq;
 
 // var xs = new[] { 1, 2, 3, 4, 5 };
 
+//byte.MaxValue
+// 2147483647
+
+Span<float> array = new float[] { 1, 10, 10.3420f, 9999, 1, 1, 1, 1, 11, 1, 1, 1 };
 
 
-var source = new[] { 1, 2, 3, 4, 5, 6 };
+var r = array.AsValueEnumerable().Sum();
 
-var actual = source.AsValueEnumerable()
-    .Select(x => x * 100)
-    .ToArray();
+var g = array.ToArray().Sum();
 
-Console.WriteLine(actual.Length);
+Console.WriteLine(r);
+Console.WriteLine(g);
 
 
 class Person
@@ -122,6 +127,14 @@ namespace ZLinq.AutoInstrument
         //public static ConcatValueEnumerable2<RangeValueEnumerable, int, ArrayValueEnumerable<int>> Concat2(this RangeValueEnumerable source, ArrayValueEnumerable<int> second)
         //{
         //    return ValueEnumerableExtensions.Concat2<RangeValueEnumerable, int, ArrayValueEnumerable<int>>(source, second);
+        //}
+    }
+
+    internal static partial class ZLinqTypeInferenceHelper
+    {
+        //public static TResult Sum<TResult>(this Select<FromArray<int>, int, int?> source, Func<int?, TResult> selector) where TResult : struct, INumber<TResult>
+        //{
+        //    return ValueEnumerableExtensions.Sum<Select<FromArray<int>, int, int?>, int?, TResult>(source, selector);
         //}
     }
 }

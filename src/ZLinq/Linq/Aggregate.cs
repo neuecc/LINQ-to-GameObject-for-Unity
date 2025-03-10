@@ -12,7 +12,7 @@
             {
                 if (span.Length == 0)
                 {
-                    return Internal.Throws.NoElementsException<TSource>();
+                    return Internal.Throws.NoElements<TSource>();
                 }
 
                 var result = span[0];
@@ -28,7 +28,7 @@
             {
                 if (!source.TryGetNext(out var result))
                 {
-                    return Internal.Throws.NoElementsException<TSource>();
+                    return Internal.Throws.NoElements<TSource>();
                 }
 
                 while (source.TryGetNext(out var current))

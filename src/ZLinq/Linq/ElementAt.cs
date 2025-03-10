@@ -10,7 +10,7 @@
         {
             return TryGetElementAt<TEnumerable, TSource>(ref source, index, out var value)
                 ? value
-                : Throws.ArgumentOutOfRangeException<TSource>(nameof(index));
+                : Throws.ArgumentOutOfRange<TSource>(nameof(index));
         }
 
 
@@ -22,7 +22,7 @@
         {
             return TryGetElementAt<TEnumerable, TSource>(ref source, index, out var value)
                 ? value
-                : Throws.ArgumentOutOfRangeException<TSource>(nameof(index));
+                : Throws.ArgumentOutOfRange<TSource>(nameof(index));
         }
 
         public static TSource ElementAtOrDefault<TEnumerable, TSource>(this TEnumerable source, Int32 index)

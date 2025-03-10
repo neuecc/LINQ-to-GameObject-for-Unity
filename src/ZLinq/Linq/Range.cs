@@ -11,7 +11,7 @@ namespace ZLinq
             long max = ((long)start) + count - 1;
             if (count < 0 || max > int.MaxValue)
             {
-                Throws.ArgumentOutOfRangeException(nameof(count));
+                Throws.ArgumentOutOfRange(nameof(count));
             }
 
             return new(start, count);
@@ -77,8 +77,8 @@ namespace ZLinq.Linq
         // borrowed from .NET Enumerable.Range vectorized fill, originally implemented by @neon-sunset.
         static void FillIncremental(Span<int> span, int start)
         {
-            ref var pointer = ref MemoryMarshal.GetReference(span);
-            ref var end = ref Unsafe.Add(ref pointer, span.Length);
+            ref var current = ref MemoryMarshal.GetReference(span);
+            ref var end = ref Unsafe.Add(ref current, span.Length);
 
 #if NET8_0_OR_GREATER
             if (Vector.IsHardwareAccelerated
@@ -99,23 +99,23 @@ namespace ZLinq.Linq
                 ref var to = ref Unsafe.Subtract(ref end, Vector<int>.Count);
                 do
                 {
-                    data.StoreUnsafe(ref pointer);                              // copy vectorized data to Span pointer
+                    data.StoreUnsafe(ref current);                              // copy vectorized data to Span pointer
                     data += increment;                                          // <13, 14, 15, 16, 17, 18, 19, 20>...
-                    pointer = ref Unsafe.Add(ref pointer, Vector<int>.Count);   // move pointer++
+                    current = ref Unsafe.Add(ref current, Vector<int>.Count);   // move pointer++
 
                     // available space for vectorized copy
-                    // (pointer <= to) -> !(pointer > to)
-                } while (!Unsafe.IsAddressGreaterThan(ref pointer, ref to));
+                    // (current <= to) -> !(current > to)
+                } while (!Unsafe.IsAddressGreaterThan(ref current, ref to));
 
                 start = data[0]; // next value for fill
             }
 #endif
 
             // fill rest
-            while (Unsafe.IsAddressLessThan(ref pointer, ref end))
+            while (Unsafe.IsAddressLessThan(ref current, ref end))
             {
-                pointer = start++; // reuse local variable
-                pointer = ref Unsafe.Add(ref pointer, 1);
+                current = start++; // reuse local variable
+                current = ref Unsafe.Add(ref current, 1);
             }
         }
     }

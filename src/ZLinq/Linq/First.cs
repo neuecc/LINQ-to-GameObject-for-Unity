@@ -10,7 +10,7 @@
         {
             return TryGetFirst<TEnumerable, TSource>(ref source, out var value)
                 ? value
-                : Throws.NoElementsException<TSource>();
+                : Throws.NoElements<TSource>();
         }
 
         public static TSource First<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
@@ -21,7 +21,7 @@
         {
             return TryGetFirst<TEnumerable, TSource>(ref source, predicate, out var value)
                 ? value
-                : Throws.NoMatchException<TSource>();
+                : Throws.NoMatch<TSource>();
         }
 
         public static TSource FirstOrDefault<TEnumerable, TSource>(this TEnumerable source)

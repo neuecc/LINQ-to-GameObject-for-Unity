@@ -8,7 +8,7 @@
             , allows ref struct
 #endif
         {
-            if (size < 1) Throws.ArgumentOutOfRangeException(nameof(size));
+            if (size < 1) Throws.ArgumentOutOfRange(nameof(size));
 
             return new(source, size);
         }

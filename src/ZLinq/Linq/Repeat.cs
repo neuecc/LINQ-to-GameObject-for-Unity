@@ -6,7 +6,7 @@
         {
             if (count < 0)
             {
-                Throws.ArgumentOutOfRangeException(nameof(count));
+                Throws.ArgumentOutOfRange(nameof(count));
             }
 
             return new(element, count);

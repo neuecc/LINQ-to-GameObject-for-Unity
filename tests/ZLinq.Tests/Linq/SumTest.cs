@@ -1,325 +1,218 @@
-namespace ZLinq.Tests.Linq;
+﻿namespace ZLinq.Tests.Linq;
 
 public class SumTest
 {
+    // Tests for empty collections
     [Fact]
-    public void Empty()
+    public void EmptyInt()
     {
-        var xs = new int[0];
+        var xs = Array.Empty<int>();
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        xs.AsValueEnumerable().Sum().ShouldBe(xs.Sum());
+        xs.ToIterableValueEnumerable().Sum().ShouldBe(xs.Sum());
     }
 
     [Fact]
-    public void NonEmpty()
+    public void EmptyFloat()
     {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
+        var xs = Array.Empty<float>();
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        xs.AsValueEnumerable().Sum().ShouldBe(xs.Sum());
+        xs.ToIterableValueEnumerable().Sum().ShouldBe(xs.Sum());
     }
 
     [Fact]
-    public void Empty2()
+    public void EmptyDouble()
     {
-        var xs = new int[0];
+        var xs = Array.Empty<double>();
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        xs.AsValueEnumerable().Sum().ShouldBe(xs.Sum());
+        xs.ToIterableValueEnumerable().Sum().ShouldBe(xs.Sum());
+    }
+
+    // Tests for different numeric types
+    [Fact]
+    public void SumIntegers()
+    {
+        var ints = new[] { 1, 2, 3, 4, 5 };
+        ints.AsValueEnumerable().Sum().ShouldBe(ints.Sum());
+        ints.ToIterableValueEnumerable().Sum().ShouldBe(ints.Sum());
+
+        var bytes = new byte[] { 1, 2, 3, 4, 5 };
+        bytes.AsValueEnumerable().Sum().ShouldBe((byte)bytes.Sum(x => (int)x));
+        bytes.ToIterableValueEnumerable().Sum().ShouldBe((byte)bytes.Sum(x => (int)x));
+
+        var shorts = new short[] { 1, 2, 3, 4, 5 };
+        shorts.AsValueEnumerable().Sum().ShouldBe((short)shorts.Sum(x => (short)x));
+        shorts.ToIterableValueEnumerable().Sum().ShouldBe((short)shorts.Sum(x => (short)x));
+
+        var longs = new long[] { 1, 2, 3, 4, 5 };
+        longs.AsValueEnumerable().Sum().ShouldBe(longs.Sum());
+        longs.ToIterableValueEnumerable().Sum().ShouldBe(longs.Sum());
     }
 
     [Fact]
-    public void NonEmpty2()
+    public void SumFloatingPoints()
     {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
+        var floats = new[] { 1.5f, 2.5f, 3.5f, 4.5f, 5.5f };
+        floats.AsValueEnumerable().Sum().ShouldBe(floats.Sum());
+        floats.ToIterableValueEnumerable().Sum().ShouldBe(floats.Sum());
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        var doubles = new[] { 1.5, 2.5, 3.5, 4.5, 5.5 };
+        doubles.AsValueEnumerable().Sum().ShouldBe(doubles.Sum());
+        doubles.ToIterableValueEnumerable().Sum().ShouldBe(doubles.Sum());
+
+        var decimals = new[] { 1.5m, 2.5m, 3.5m, 4.5m, 5.5m };
+        decimals.AsValueEnumerable().Sum().ShouldBe(decimals.Sum());
+        decimals.ToIterableValueEnumerable().Sum().ShouldBe(decimals.Sum());
     }
 
     [Fact]
-    public void Empty3()
+    public void SumLargeCollection()
     {
-        var xs = new int[0];
+        // Large enough to test SIMD path on supported platforms
+        var ints = Enumerable.Range(1, 1000).ToArray();
+        ints.AsValueEnumerable().Sum().ShouldBe(ints.Sum());
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        var doubles = Enumerable.Range(1, 1000).Select(i => (double)i).ToArray();
+        doubles.AsValueEnumerable().Sum().ShouldBe(doubles.Sum());
+    }
+
+    // Test for floating point precision
+    [Fact]
+    public void FloatPrecision()
+    {
+        // Float calculations can have precision issues
+        var floats = new[] { 1e7f, 1f, -1e7f, 1f };
+
+        // Should match standard implementation behavior
+        floats.AsValueEnumerable().Sum().ShouldBe(floats.Sum());
+        floats.ToIterableValueEnumerable().Sum().ShouldBe(floats.Sum());
     }
 
     [Fact]
-    public void NonEmpty3()
+    public void DoublePrecision()
     {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
+        var doubles = new[] { 1e15, 1, -1e15, 1 };
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        doubles.AsValueEnumerable().Sum().ShouldBe(doubles.Sum());
+        doubles.ToIterableValueEnumerable().Sum().ShouldBe(doubles.Sum());
+    }
+
+    // Overflow tests
+    [Fact]
+    public void IntOverflow()
+    {
+        var values = new[] { int.MaxValue, 1 };
+
+        // Should throw overflow exception when using checked operations
+        TestUtil.Throws<OverflowException>(
+            () => values.Sum(),
+            () => values.AsValueEnumerable().Sum());
     }
 
     [Fact]
-    public void Empty4()
+    public void LongOverflow()
     {
-        var xs = new int[0];
+        var values = new[] { long.MaxValue, 1L };
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        // Should throw overflow exception when using checked operations
+        TestUtil.Throws<OverflowException>(
+            () => values.Sum(),
+            () => values.AsValueEnumerable().Sum());
+    }
+
+#if NET8_0_OR_GREATER
+    // Tests for SumUnchecked (available in .NET 8+)
+    [Fact]
+    public void SumUnchecked()
+    {
+        var ints = new[] { 1, 2, 3, 4, 5 };
+        var expected = 15;
+
+        ints.AsValueEnumerable().SumUnchecked().ShouldBe(expected);
+        ints.ToIterableValueEnumerable().SumUnchecked().ShouldBe(expected);
     }
 
     [Fact]
-    public void NonEmpty4()
+    public void SumUncheckedWithOverflow()
     {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
+        var values = new[] { int.MaxValue, 1 };
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        // Should not throw with unchecked operations
+        // The result will be int.MinValue + some value due to overflow
+        values.AsValueEnumerable().SumUnchecked().ShouldBe(unchecked(int.MaxValue + 1));
+    }
+
+    // Test for SIMD optimizations
+    [Fact]
+    public void SimdOptimization()
+    {
+        // Create array large enough to trigger SIMD path
+        var length = 1000;
+        var ints = new int[length];
+        var expected = 0;
+
+        for (int i = 0; i < length; i++)
+        {
+            ints[i] = i + 1;
+            expected += i + 1;
+        }
+
+        ints.AsValueEnumerable().Sum().ShouldBe(expected);
     }
 
     [Fact]
-    public void Empty5()
+    public void SimdOptimizationLong()
     {
-        var xs = new int[0];
+        // Large array for longs to test SIMD path
+        var length = 1000;
+        var longs = new long[length];
+        var expected = 0L;
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        for (int i = 0; i < length; i++)
+        {
+            longs[i] = i + 1;
+            expected += i + 1;
+        }
+
+        longs.AsValueEnumerable().Sum().ShouldBe(expected);
     }
 
     [Fact]
-    public void NonEmpty5()
+    public void SimdOptimizationDouble()
     {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
+        // Double uses unchecked operations
+        var length = 1000;
+        var doubles = new double[length];
+        var expected = 0.0;
 
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        for (int i = 0; i < length; i++)
+        {
+            doubles[i] = i + 0.5;
+            expected += i + 0.5;
+        }
+
+        doubles.AsValueEnumerable().Sum().ShouldBe(expected);
+    }
+#endif
+
+    // Edge case handling
+    [Fact]
+    public void SingleElementSum()
+    {
+        var ints = new[] { 42 };
+        ints.AsValueEnumerable().Sum().ShouldBe(42);
+
+        var doubles = new[] { 42.5 };
+        doubles.AsValueEnumerable().Sum().ShouldBe(42.5);
     }
 
     [Fact]
-    public void Empty6()
+    public void NegativeAndPositiveSum()
     {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
+        var ints = new[] { -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5 };
+        ints.AsValueEnumerable().Sum().ShouldBe(0);
+        ints.ToIterableValueEnumerable().Sum().ShouldBe(0);
     }
-
-    [Fact]
-    public void NonEmpty6()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty7()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty7()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty8()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty8()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty9()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty9()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty10()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty10()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty11()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty11()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty12()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty12()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty13()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty13()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty14()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty14()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty15()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty15()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty16()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty16()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty17()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty17()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty18()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty18()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty19()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty19()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void Empty20()
-    {
-        var xs = new int[0];
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
-    [Fact]
-    public void NonEmpty20()
-    {
-        var xs = new int[] { 1, 2, 3, 4, 5 };
-
-        var actual = xs.AsValueEnumerable(); // TODO:Do
-    }
-
 }
