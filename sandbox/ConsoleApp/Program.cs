@@ -13,16 +13,14 @@ using ZLinq.Linq;
 //byte.MaxValue
 // 2147483647
 
-Span<float> array = new float[] { 1, 10, 10.3420f, 9999, 1, 1, 1, 1, 11, 1, 1, 1 };
+var doubles = new[] { 1.5, 2.5, 3.5, 4.5, 5.5 };
+var a = doubles.ToIterableValueEnumerable().Average();
+var b = doubles.Average();
 
+Console.WriteLine(a);
+Console.WriteLine(b);
 
-var r = array.AsValueEnumerable().Sum();
-
-var g = array.ToArray().Sum();
-
-Console.WriteLine(r);
-Console.WriteLine(g);
-
+Console.WriteLine(a == b);
 
 class Person
 {
@@ -115,7 +113,7 @@ class Person
 // je.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object
 
 
-namespace ZLinq.AutoInstrument
+namespace ZLinq
 {
     public static class AutoInstrumentLinq
     {
@@ -136,5 +134,21 @@ namespace ZLinq.AutoInstrument
         //{
         //    return ValueEnumerableExtensions.Sum<Select<FromArray<int>, int, int?>, int?, TResult>(source, selector);
         //}
+    }
+
+    public static class Test
+    {
+        public static FromEnumerable<T> ToIterableValueEnumerable<T>(this IEnumerable<T> source)
+        {
+            static IEnumerable<T> Core(IEnumerable<T> source)
+            {
+                foreach (var item in source)
+                {
+                    yield return item;
+                }
+            }
+
+            return Core(source).AsValueEnumerable();
+        }
     }
 }

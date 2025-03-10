@@ -231,7 +231,7 @@ partial class ValueEnumerableExtensions
 
 #if NET8_0_OR_GREATER
 
-    static TSource SumSpan<TSource>(ReadOnlySpan<TSource> span)
+    internal static TSource SumSpan<TSource>(ReadOnlySpan<TSource> span)
         where TSource : struct, INumber<TSource>
     {
         // SIMD Support: sbyte, short, int, long, double

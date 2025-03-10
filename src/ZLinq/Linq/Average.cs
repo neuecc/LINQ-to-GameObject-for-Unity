@@ -1,228 +1,353 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 
-//namespace ZLinq
-//{
-//#if NET8_0_OR_GREATER
+// System.Linq, int32 Average is specialized
+// other than same as Sum, supports  int/long/float/double/decimal and nullable + selector
+// ZLinq doesn't support theres but supports INumber.
+// returns only double
 
-//    partial class ValueEnumerableExtensions
-//    {
-//        public static Double Average<TEnumerable, TNumber>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<TNumber>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//            where TNumber : INumber<TNumber>
-//        {
-//            double count = 0;
-//            var sum = TNumber.Zero;
-//            while (source.TryGetNext(out var value))
-//            {
-//                sum += value;
-//                count++;
-//            }
+namespace ZLinq;
 
-//            // var a = sum / count;
+partial class ValueEnumerableExtensions
+{
+    // System.Linq returns float -> float, decimal -> decimal, others(int, long, double) -> double
+    // Due to limitations with overloads, generics, and where constraints, the return value is restricted to double only.
+    public static double Average<TEnumerable, TSource>(this TEnumerable source)
+        where TEnumerable : struct, IValueEnumerable<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TSource : struct
+#if NET8_0_OR_GREATER
+        , INumber<TSource>
+#endif
+    {
+#if NET8_0_OR_GREATER
+        using (source)
+        {
+            if (source.TryGetSpan(out var span))
+            {
+                if (span.Length == 0)
+                {
+                    Throws.NoElements();
+                }
 
-//            // Sum / Count
-//            // return T.CreateChecked(SumCore(source)) / T.CreateChecked(source.Length);
+                if (typeof(TSource) == typeof(int))
+                {
+                    return AverageIntSimd(UnsafeSpanBitCast<TSource, int>(span));
+                }
+                else
+                {
+                    var sum = SumSpan(span);
+                    return double.CreateChecked(sum) / (double)span.Length;
+                }
+            }
+            else
+            {
+                if (!source.TryGetNext(out var sum)) // store first value
+                {
+                    Throws.NoElements();
+                }
 
-//            if (source.TryGetSpan(out var span))
-//            {
+                long count = 1;
+                while (source.TryGetNext(out var current))
+                {
+                    checked { sum += TSource.CreateChecked(current); }
+                    count++;
+                }
 
-//                // Enumerable.Range(1, 10).Average();
+                return double.CreateChecked(sum) / (double)count;
+            }
+        }
+#else
+        #region generate from FileGen.Commands.Average
+        if (typeof(TSource) == typeof(byte))
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
 
-//            }
+                byte sum = Unsafe.As<TSource, byte>(ref current);
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += Unsafe.As<TSource, byte>(ref current); }
+                    count++;
+                }
 
-//            throw new NotImplementedException();
-//        }
-//    }
-//}
+                return (double)sum / (double)count;
+            }
+        }
+        else if (typeof(TSource) == typeof(sbyte))
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
 
-//#endif
+                sbyte sum = Unsafe.As<TSource, sbyte>(ref current);
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += Unsafe.As<TSource, sbyte>(ref current); }
+                    count++;
+                }
 
-//namespace ZLinq
-//{
-//    partial class ValueEnumerableExtensions
-//    {
-//        public static Double Average<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Int32>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                return (double)sum / (double)count;
+            }
+        }
+        else if (typeof(TSource) == typeof(short))
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
 
-//        public static Double Average<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Int64>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                short sum = Unsafe.As<TSource, short>(ref current);
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += Unsafe.As<TSource, short>(ref current); }
+                    count++;
+                }
 
-//        public static Single Average<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Single>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                return (double)sum / (double)count;
+            }
+        }
+        else if (typeof(TSource) == typeof(ushort))
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
 
-//        public static Double Average<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Double>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                ushort sum = Unsafe.As<TSource, ushort>(ref current);
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += Unsafe.As<TSource, ushort>(ref current); }
+                    count++;
+                }
 
-//        public static Decimal Average<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Decimal>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                return (double)sum / (double)count;
+            }
+        }
+        else if (typeof(TSource) == typeof(int))
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
 
-//        public static Nullable<Double> Average<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Nullable`1[System.Int32]>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                int sum = Unsafe.As<TSource, int>(ref current);
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += Unsafe.As<TSource, int>(ref current); }
+                    count++;
+                }
 
-//        public static Nullable<Double> Average<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Nullable`1[System.Int64]>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                return (double)sum / (double)count;
+            }
+        }
+        else if (typeof(TSource) == typeof(uint))
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
 
-//        public static Nullable<Single> Average<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Nullable`1[System.Single]>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                uint sum = Unsafe.As<TSource, uint>(ref current);
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += Unsafe.As<TSource, uint>(ref current); }
+                    count++;
+                }
 
-//        public static Nullable<Double> Average<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Nullable`1[System.Double]>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                return (double)sum / (double)count;
+            }
+        }
+        else if (typeof(TSource) == typeof(long))
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
 
-//        public static Nullable<Decimal> Average<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Nullable`1[System.Decimal]>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                long sum = Unsafe.As<TSource, long>(ref current);
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += Unsafe.As<TSource, long>(ref current); }
+                    count++;
+                }
 
-//        public static Double Average<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Int32> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                return (double)sum / (double)count;
+            }
+        }
+        else if (typeof(TSource) == typeof(ulong))
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
 
-//        public static Double Average<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Int64> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                ulong sum = Unsafe.As<TSource, ulong>(ref current);
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += Unsafe.As<TSource, ulong>(ref current); }
+                    count++;
+                }
 
-//        public static Single Average<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Single> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                return (double)sum / (double)count;
+            }
+        }
+        else if (typeof(TSource) == typeof(double))
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
 
-//        public static Double Average<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Double> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                double sum = Unsafe.As<TSource, double>(ref current);
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += Unsafe.As<TSource, double>(ref current); }
+                    count++;
+                }
 
-//        public static Decimal Average<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Decimal> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                return (double)sum / (double)count;
+            }
+        }
+        else if (typeof(TSource) == typeof(decimal))
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
 
-//        public static Nullable<Double> Average<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Nullable<Int32>> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                decimal sum = Unsafe.As<TSource, decimal>(ref current);
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += Unsafe.As<TSource, decimal>(ref current); }
+                    count++;
+                }
 
-//        public static Nullable<Double> Average<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Nullable<Int64>> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                return (double)sum / (double)count;
+            }
+        }
+        else if (typeof(TSource) == typeof(nint))
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
 
-//        public static Nullable<Single> Average<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Nullable<Single>> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                nint sum = Unsafe.As<TSource, nint>(ref current);
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += Unsafe.As<TSource, nint>(ref current); }
+                    count++;
+                }
 
-//        public static Nullable<Double> Average<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Nullable<Double>> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                return (double)sum / (double)count;
+            }
+        }
+        else if (typeof(TSource) == typeof(nuint))
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
 
-//        public static Nullable<Decimal> Average<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Nullable<Decimal>> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                nuint sum = Unsafe.As<TSource, nuint>(ref current);
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += Unsafe.As<TSource, nuint>(ref current); }
+                    count++;
+                }
 
-//    }
-//}
+                return (double)sum / (double)count;
+            }
+        }
+        #endregion
+        else
+        {
+            Throws.NotSupportedType(typeof(TSource));
+            return default!;
+        }
+#endif
+    }
+
+#if NET8_0_OR_GREATER
+
+    public static double AverageIntSimd(ReadOnlySpan<int> span)
+    {
+        // based on SimdSumNumberUnchecked<T>
+        // int[int.MaxValue] { int.MaxValue... }.Sum() is lower than long.MaxValue
+        // so Sum as long without overflow check is safe.
+
+        ref var current = ref MemoryMarshal.GetReference(span);
+        ref var end = ref Unsafe.Add(ref current, span.Length);
+        ref var to = ref Unsafe.Subtract(ref end, Vector<int>.Count);
+
+        var sum = 0L;
+
+        if (Vector.IsHardwareAccelerated && span.Length >= Vector<int>.Count)
+        {
+            var vectorSum = Vector<long>.Zero; // <0, 0, 0, 0> : Vector<long>
+            do
+            {
+                var data = Vector.LoadUnsafe(ref current);     // <1, 2, 3, 4, 5, 6, 7, 8>   : Vector<int>
+                Vector.Widen(data, out var low, out var high); // <1, 2, 3, 4>, <5, 6, 7, 8> : Vector<long>
+                vectorSum += low;  // add low  <1, 2, 3, 4>
+                vectorSum += high; // and high <6, 8, 10, 12>
+                current = ref Unsafe.Add(ref current, Vector<int>.Count);
+            } while (!Unsafe.IsAddressGreaterThan(ref current, ref to)); // (current <= to) -> !(current > to) 
+
+            sum = Vector.Sum(vectorSum);
+        }
+
+        // fill rest
+        while (Unsafe.IsAddressLessThan(ref current, ref end))
+        {
+            unchecked { sum += current; } // use unchecked
+            current = ref Unsafe.Add(ref current, 1);
+        }
+
+        return (double)sum / span.Length;
+    }
+
+#endif
+}

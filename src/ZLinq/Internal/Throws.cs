@@ -17,6 +17,9 @@ internal static class Throws
     public static void MoreThanOneMatch() => throw new InvalidOperationException("Sequence contains more than one matching element"); // for single with predicate
 
     [DoesNotReturn]
+    public static void NoElements() => throw new InvalidOperationException("Sequence contains no elements");
+
+    [DoesNotReturn]
     public static T NoElements<T>() => throw new InvalidOperationException("Sequence contains no elements");
 
     [DoesNotReturn]

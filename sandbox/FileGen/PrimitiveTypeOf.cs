@@ -56,6 +56,40 @@ public partial class Commands
         sb.AppendLine("#endregion");
 
         Console.WriteLine(sb.ToString());
+    }
 
+    public void Average()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("#region generate from FileGen.Commands.Average");
+        foreach (var type in PrimitiveNumbersWithoutFloat)
+        {
+            var code = $$"""
+        else if (typeof(TSource) == typeof({{type}}))
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
+
+                {{type}} sum = Unsafe.As<TSource, {{type}}>(ref current);
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += Unsafe.As<TSource, {{type}}>(ref current); }
+                    count++;
+                }
+
+                return (double)sum / (double)count;
+            }
+        }
+""";
+            sb.AppendLine(code);
+        }
+        sb.AppendLine("#endregion");
+
+        Console.WriteLine(sb.ToString());
     }
 }
