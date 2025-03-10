@@ -30,4 +30,7 @@ internal static class Throws
 
     [DoesNotReturn]
     public static void NotSupportedType(Type type) => throw new NotSupportedException(type.Name);
+
+    [DoesNotReturn]
+    public static void VectorSmallOverlap<T>() where T : struct => throw new ArgumentException($"Span length must be at least {System.Numerics.Vector<T>.Count} for OverlapOrThrow mode");
 }

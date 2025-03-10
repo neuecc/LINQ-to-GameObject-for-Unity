@@ -7,40 +7,41 @@ namespace Benchmark;
 
 [ShortRunJob]
 [MemoryDiagnoser]
-[Orderer(SummaryOrderPolicy.FastestToSlowest)]
+[Orderer(SummaryOrderPolicy.Method)]
+[GroupBenchmarksBy(BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule.ByParams)]
 public class SimdSum
 {
-    // [Params(32, 128, 1024, 8192, 16384)]
-    [Params(100000)]
+    [Params(32, 128, 1024, 8192, 16384)]
     public int N;
 
-    int[] src;
+    int[] src = default!;
 
-    public SimdSum()
+    [BenchmarkDotNet.Attributes.GlobalSetup]
+    public void Setup()
     {
-        src = Enumerable.Range(0, N).ToArray();
+        src = Enumerable.Range(1, N).ToArray();
     }
 
     [Benchmark]
-    public int For()
+    public int ForLoop()
     {
         return ForImpl(src);
     }
 
     [Benchmark]
-    public int SystemLinq()
+    public int SystemLinqSum()
     {
         return src.Sum();
     }
 
     [Benchmark]
-    public int ZLinq()
+    public int ZLinqSum()
     {
         return src.AsValueEnumerable().Sum();
     }
 
     [Benchmark]
-    public int ZLinqUnchecked()
+    public int ZLinqSumUnchecked()
     {
         return src.AsValueEnumerable().SumUnchecked();
     }
@@ -49,6 +50,59 @@ public class SimdSum
     static int ForImpl(int[] src)
     {
         var sum = 0;
+        for (int i = 0; i < src.Length; i++)
+        {
+            checked { sum += src[i]; }
+        }
+        return sum;
+    }
+}
+
+[ShortRunJob]
+[MemoryDiagnoser]
+[Orderer(SummaryOrderPolicy.Method)]
+[GroupBenchmarksBy(BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule.ByParams)]
+public class SimdSumUnsigned
+{
+    [Params(32, 128, 1024, 8192, 16384)]
+    public int N;
+
+    uint[] src = default!;
+
+    [BenchmarkDotNet.Attributes.GlobalSetup]
+    public void Setup()
+    {
+        src = Enumerable.Range(1, N).Select(x => (uint)x).ToArray();
+    }
+
+    [Benchmark]
+    public uint ForLoop()
+    {
+        return ForImpl(src);
+    }
+
+    //[Benchmark]
+    //public int SystemLinqSum()
+    //{
+    //    return src.Sum();
+    //}
+
+    [Benchmark]
+    public uint ZLinqSum()
+    {
+        return src.AsValueEnumerable().Sum();
+    }
+
+    [Benchmark]
+    public uint ZLinqSumUnchecked()
+    {
+        return src.AsValueEnumerable().SumUnchecked();
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+    static uint ForImpl(uint[] src)
+    {
+        uint sum = 0;
         for (int i = 0; i < src.Length; i++)
         {
             checked { sum += src[i]; }

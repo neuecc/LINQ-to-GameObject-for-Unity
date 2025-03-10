@@ -19,7 +19,11 @@ using Benchmark;
 //BenchmarkRunner.Run<LookupBattle>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
 // BenchmarkRunner.Run<CopyBattle>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
 
-BenchmarkRunner.Run<SimdSum>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default), args);
+// BenchmarkRunner.Run<SimdSum>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default), args);
+//BenchmarkRunner.Run<SimdSumUnsigned>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default), args);
+
+BenchmarkRunner.Run<SimdAny>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default), args);
+
 #else
 
 BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);

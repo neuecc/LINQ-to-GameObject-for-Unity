@@ -234,7 +234,9 @@ partial class ValueEnumerableExtensions
     internal static TSource SumSpan<TSource>(ReadOnlySpan<TSource> span)
         where TSource : struct, INumber<TSource>
     {
-        // SIMD Support: sbyte, short, int, long, double
+        // SIMD Support: sbyte, short, int, long, byte, ushort, uint, ulong, double
+
+        // Signed
         if (typeof(TSource) == typeof(int))
         {
             var sum = SimdSumSignedNumberChecked(UnsafeSpanBitCast<TSource, int>(span));
@@ -255,6 +257,28 @@ partial class ValueEnumerableExtensions
             var sum = SimdSumSignedNumberChecked(UnsafeSpanBitCast<TSource, short>(span));
             return Unsafe.As<short, TSource>(ref sum);
         }
+        // Unsigned
+        else if (typeof(TSource) == typeof(byte))
+        {
+            var sum = SimdSumUnsignedNumberChecked(UnsafeSpanBitCast<TSource, byte>(span));
+            return Unsafe.As<byte, TSource>(ref sum);
+        }
+        else if (typeof(TSource) == typeof(ushort))
+        {
+            var sum = SimdSumUnsignedNumberChecked(UnsafeSpanBitCast<TSource, ushort>(span));
+            return Unsafe.As<ushort, TSource>(ref sum);
+        }
+        else if (typeof(TSource) == typeof(uint))
+        {
+            var sum = SimdSumUnsignedNumberChecked(UnsafeSpanBitCast<TSource, uint>(span));
+            return Unsafe.As<uint, TSource>(ref sum);
+        }
+        else if (typeof(TSource) == typeof(ulong))
+        {
+            var sum = SimdSumUnsignedNumberChecked(UnsafeSpanBitCast<TSource, ulong>(span));
+            return Unsafe.As<ulong, TSource>(ref sum);
+        }
+        // double
         else if (typeof(TSource) == typeof(double))
         {
             // double uses unchecked operation
@@ -284,7 +308,7 @@ partial class ValueEnumerableExtensions
     }
 
     public static T SimdSumSignedNumberChecked<T>(ReadOnlySpan<T> span)
-        where T : struct, ISignedNumber<T>, IMinMaxValue<T>
+        where T : struct, ISignedNumber<T>, IMinMaxValue<T>, IBinaryInteger<T>
     {
         ref var current = ref MemoryMarshal.GetReference(span);
         ref var end = ref Unsafe.Add(ref current, span.Length);
@@ -305,8 +329,6 @@ partial class ValueEnumerableExtensions
                 // This technique uses the same checks as described in Hacker's Delight.
                 // sum = a + b;
                 // overflow = (sum ^ a) & (sum ^ b);
-                // Unsigned check is detected using `sum < a` with Vector.GreaterThan.
-                // This is too large as an additional cost, so unsigned support for Sum will not be implemented.
                 var overflow = (sum ^ vectorSum) & (sum ^ data);
                 if ((overflow & overflowTest) != Vector<T>.Zero)
                 {
@@ -316,6 +338,52 @@ partial class ValueEnumerableExtensions
                 vectorSum = sum;
                 current = ref Unsafe.Add(ref current, Vector<T>.Count);
             } while (!Unsafe.IsAddressGreaterThan(ref current, ref to)); // (current <= to) -> !(current > to) 
+
+            // Perform the final addition using checked. 
+            // Do not use Vector.Sum as it does not check for overflow.
+            for (int i = 0; i < Vector<T>.Count; i++)
+            {
+                checked { result += vectorSum[i]; }
+            }
+        }
+
+        // fill rest
+        while (Unsafe.IsAddressLessThan(ref current, ref end))
+        {
+            checked { result += current; }
+            current = ref Unsafe.Add(ref current, 1);
+        }
+
+        return result;
+    }
+
+    public static T SimdSumUnsignedNumberChecked<T>(ReadOnlySpan<T> span)
+        where T : struct, IUnsignedNumber<T>, IMinMaxValue<T>, IBinaryInteger<T>
+    {
+        ref var current = ref MemoryMarshal.GetReference(span);
+        ref var end = ref Unsafe.Add(ref current, span.Length);
+        ref var to = ref Unsafe.Subtract(ref end, Vector<T>.Count);
+
+        var result = T.Zero;
+
+        if (Vector.IsHardwareAccelerated && span.Length >= Vector<T>.Count)
+        {
+            var vectorSum = Vector<T>.Zero;
+            do
+            {
+                var data = Vector.LoadUnsafe(ref current);
+                var sum = vectorSum + data;
+
+                // overflow check: sum < vectorSum
+                var overflow = Vector.LessThan(sum, vectorSum);
+                if (Vector.GreaterThanAny(overflow, Vector<T>.Zero))
+                {
+                    Throws.Overflow();
+                }
+
+                vectorSum = sum;
+                current = ref Unsafe.Add(ref current, Vector<T>.Count);
+            } while (!Unsafe.IsAddressGreaterThan(ref current, ref to));
 
             // Perform the final addition using checked. 
             // Do not use Vector.Sum as it does not check for overflow.
