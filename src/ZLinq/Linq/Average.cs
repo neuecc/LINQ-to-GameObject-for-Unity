@@ -60,8 +60,28 @@ partial class ValueEnumerableExtensions
             }
         }
 #else
+        if (typeof(TSource) == typeof(float)) // float is hand-written
+        {
+            using (source)
+            {
+                if (!source.TryGetNext(out var current))
+                {
+                    Throws.NoElements();
+                }
+
+                double sum = (double)Unsafe.As<TSource, float>(ref current); // calc as double
+                long count = 1;
+                while (source.TryGetNext(out current))
+                {
+                    checked { sum += (double)Unsafe.As<TSource, float>(ref current); }
+                    count++;
+                }
+
+                return sum / (double)count;
+            }
+        }
         #region generate from FileGen.Commands.Average
-        if (typeof(TSource) == typeof(byte))
+        else if (typeof(TSource) == typeof(byte))
         {
             using (source)
             {
