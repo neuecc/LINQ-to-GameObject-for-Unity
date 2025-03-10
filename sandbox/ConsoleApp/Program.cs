@@ -2,6 +2,7 @@
 using System.Reflection;
 using ZLinq;
 using ZLinq.Linq;
+using ZLinq.Simd;
 
 
 //Span<int> xs = stackalloc int[255];
@@ -13,14 +14,25 @@ using ZLinq.Linq;
 //byte.MaxValue
 // 2147483647
 
-var doubles = new[] { 1.5, 2.5, 3.5, 4.5, 5.5 };
-var a = doubles.ToIterableValueEnumerable().Average();
-var b = doubles.Average();
+var span = Enumerable.Range(1, 10000).ToArray().AsSpan();
 
-Console.WriteLine(a);
-Console.WriteLine(b);
 
-Console.WriteLine(a == b);
+
+var foo = Enumerable.Range(1, 10).ToArray()
+    .AsVectorizable()
+    .All(Vector.Create(5), (x, state) => Vector.LessThanAll(x, state), x => x < 100);
+
+
+
+
+
+Console.WriteLine(foo);
+
+
+//Console.WriteLine(a);
+//Console.WriteLine(b);
+
+//Console.WriteLine(a == b);
 
 class Person
 {
