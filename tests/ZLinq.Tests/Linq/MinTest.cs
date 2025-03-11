@@ -85,7 +85,7 @@ public class MinTest
         stringsWithNull.ToIterableValueEnumerable().Min().ShouldBe(stringsWithNull.Min());
 
         // All nulls should return null
-        var allNulls = new string[] { null, null, null };
+        var allNulls = new string?[] { null, null, null };
         allNulls.AsValueEnumerable().Min().ShouldBeNull();
         allNulls.ToIterableValueEnumerable().Min().ShouldBeNull();
     }
