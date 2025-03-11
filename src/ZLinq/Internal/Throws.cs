@@ -5,6 +5,9 @@ namespace ZLinq.Internal;
 internal static class Throws
 {
     [DoesNotReturn]
+    public static T Argument<T>(string paramName) => throw new ArgumentException(paramName);
+
+    [DoesNotReturn]
     public static void ArgumentOutOfRange(string paramName) => throw new ArgumentOutOfRangeException(paramName);
 
     [DoesNotReturn]

@@ -31,6 +31,31 @@ public enum VectorBoundaryMode
     OverlapOrThrow,
 }
 
+public interface IVectorComparer<T>
+{
+    CompareKind Kind { get; }
+    T Right { get; }
+    Vector<T> VectorRight { get; }
+}
+
+public enum CompareKind
+{
+    GreaterThan
+}
+
+public static class VectorComparer
+{
+    /// <summary>x => x > {right}</summary>
+    public static GreaterThan<T> GreaterThan<T>(T right) => new GreaterThan<T>(right);
+}
+
+public struct GreaterThan<T>(T right) : IVectorComparer<T>
+{
+    public CompareKind Kind => CompareKind.GreaterThan;
+    public T Right => right;
+    public Vector<T> VectorRight => new(right);
+}
+
 public ref struct Vectorizable<T>(ReadOnlySpan<T> span)
     where T : unmanaged
 {
@@ -95,6 +120,52 @@ public ref struct Vectorizable<T>(ReadOnlySpan<T> span)
             {
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    public bool Any<TCompare>(TCompare comparer)
+        where TCompare : IVectorComparer<T>
+    {
+        if (span.Length == 0) return false;
+
+        return comparer.Kind switch
+        {
+            CompareKind.GreaterThan => CompareGreaterThanAny(span, comparer.VectorRight, comparer.Right),
+            _ => Throws.Argument<bool>(nameof(comparer) + "." + nameof(comparer.Kind))
+        };
+    }
+
+    static bool CompareGreaterThanAny(ReadOnlySpan<T> span, Vector<T> vectorRight, T right)
+    {
+        ref var head = ref MemoryMarshal.GetReference(span);
+
+        nuint elementOffset = 0;
+        if (Vector.IsHardwareAccelerated && span.Length >= Vector<T>.Count)
+        {
+            nuint oneVectorAwayFromEnd = (nuint)(span.Length - Vector<T>.Count);
+            if (span.Length >= Vector<T>.Count)
+            {
+                for (; elementOffset <= oneVectorAwayFromEnd; elementOffset += (nuint)Vector<T>.Count)
+                {
+                    var data = Vector.LoadUnsafe(ref head, elementOffset);
+                    if (Vector.GreaterThanAny(data, vectorRight))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // remaining
+        while (elementOffset < (nuint)span.Length)
+        {
+            if (Comparer<T>.Default.Compare(span[(int)elementOffset], right) < 0) // TODO: which?
+            {
+                return true;
+            }
+            elementOffset++;
         }
 
         return false;

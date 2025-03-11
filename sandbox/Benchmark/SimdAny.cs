@@ -26,11 +26,11 @@ public class SimdAny
         src = Enumerable.Range(1, 10000).ToArray();
     }
 
-    //[Benchmark]
-    //public bool ForInline()
-    //{
-    //    return AnyFor(src.AsSpan());
-    //}
+    [Benchmark]
+    public bool ForInline()
+    {
+        return AnyFor(src.AsSpan());
+    }
 
     //[Benchmark]
     //public bool ForPredicate()
@@ -38,11 +38,11 @@ public class SimdAny
     //    return AnyForPredicate(src.AsSpan(), x => x > 9800);
     //}
 
-    //[Benchmark]
-    //public bool SimdInline()
-    //{
-    //    return AnySimd<int>(src.AsSpan());
-    //}
+    [Benchmark]
+    public bool SimdInline()
+    {
+        return AnySimd<int>(src.AsSpan());
+    }
 
     //[Benchmark]
     //public bool SystemLinqAny()
@@ -68,6 +68,13 @@ public class SimdAny
     {
         return src.AsVectorizable()
             .Any(x => Vector.GreaterThanAny(x, new(9800)), VectorBoundaryMode.ZeroPadding);
+    }
+
+    [Benchmark]
+    public bool ZLinqAsVectorizableOp()
+    {
+        return src.AsVectorizable()
+            .Any(VectorComparer.GreaterThan(9800));
     }
 
     //[Benchmark]
