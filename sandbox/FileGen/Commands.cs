@@ -12,6 +12,7 @@ public partial class Commands
     readonly static string[] PrimitiveTypesPlusString = [.. PrimitiveTypes, "string"];
     readonly static string[] PrimitiveNumbers = ["byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double", "decimal", "nint", "nuint"];
     readonly static string[] PrimitiveNumbersWithoutFloat = ["byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "double", "decimal", "nint", "nuint"];
+    readonly static string[] PrimitivesForMinMax = ["byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "nint", "nuint", "Int128", "UInt128", "char"];
 
     public void TypeOfContains()
     {
@@ -84,6 +85,27 @@ public partial class Commands
 
                 return (double)sum / (double)count;
             }
+        }
+""";
+            sb.AppendLine(code);
+        }
+        sb.AppendLine("#endregion");
+
+        Console.WriteLine(sb.ToString());
+    }
+
+    public void Min()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("#region generate from FileGen.Commands.Min");
+        foreach (var type in PrimitivesForMinMax)
+        {
+            var code = $$"""
+        else if (typeof(TSource) == typeof({{type}}))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, {{type}}>(span));
+            return Unsafe.As<{{type}}, TSource>(ref result);
         }
 """;
             sb.AppendLine(code);

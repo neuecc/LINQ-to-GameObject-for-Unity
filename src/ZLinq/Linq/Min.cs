@@ -1,213 +1,303 @@
-﻿//namespace ZLinq
-//{
-//    partial class ValueEnumerableExtensions
-//    {
-//        public static Int32 Min<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Int32>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+﻿using System.Collections.Generic;
+using System.Numerics;
 
-//        public static Int64 Min<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Int64>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+namespace ZLinq;
 
-//        public static Nullable<Int32> Min<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Nullable`1[System.Int32]>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+partial class ValueEnumerableExtensions
+{
+    // Due to type inference considerations, there are no overloads for selector.
 
-//        public static Nullable<Int64> Min<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Nullable`1[System.Int64]>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+    public static TSource? Min<TEnumerable, TSource>(this TEnumerable source)
+        where TEnumerable : struct, IValueEnumerable<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    {
+        return Min<TEnumerable, TSource>(source, null);
+    }
 
-//        public static Single Min<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Single>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+    public static TSource? Min<TEnumerable, TSource>(this TEnumerable source, IComparer<TSource>? comparer)
+        where TEnumerable : struct, IValueEnumerable<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    {
+        comparer ??= Comparer<TSource>.Default;
 
-//        public static Nullable<Single> Min<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Nullable`1[System.Single]>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+        using (source)
+        {
+#if NET8_0_OR_GREATER
+            if (source.TryGetSpan(out var span))
+            {
+                return MinSpan(span, comparer);
+            }
+#endif
+            TSource? value = default;
+            if (value is null)
+            {
+                // reference type, allows return null
+                // We will compare both left and right as non-null using a Comparer.
+                // Therefore, We will first loop until right(value) becomes non-null.
+                do
+                {
+                    if (!source.TryGetNext(out var current))
+                    {
+                        return value;
+                    }
+                    value = current;
+                }
+                while (value is null);
 
-//        public static Double Min<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Double>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                while (source.TryGetNext(out var current))
+                {
+                    // compare both(left, right) non-null
+                    if (current is not null && comparer.Compare(current, value) < 0)
+                    {
+                        value = current;
+                    }
+                }
+                return value;
+            }
+            else
+            {
+                // value type
+                if (!source.TryGetNext(out value))
+                {
+                    Throws.NoElements();
+                }
 
-//        public static Nullable<Double> Min<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Nullable`1[System.Double]>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                // optimize for default comparer
+                if (comparer == Comparer<TSource>.Default)
+                {
+                    while (source.TryGetNext(out var current))
+                    {
+                        if (Comparer<TSource>.Default.Compare(current, value) < 0)
+                        {
+                            value = current;
+                        }
+                    }
 
-//        public static Decimal Min<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Decimal>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                    return value;
+                }
+                else
+                {
+                    while (source.TryGetNext(out var current))
+                    {
+                        if (comparer.Compare(current, value) < 0)
+                        {
+                            value = current;
+                        }
+                    }
 
-//        public static Nullable<Decimal> Min<TEnumerable>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<System.Nullable`1[System.Decimal]>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                    return value;
+                }
+            }
+        }
+    }
 
-//        public static TSource Min<TEnumerable, TSource>(this TEnumerable source)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+#if NET8_0_OR_GREATER
 
-//        public static TSource Min<TEnumerable, TSource>(this TEnumerable source, IComparer<TSource> comparer)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+    static TSource? MinSpan<TSource>(ReadOnlySpan<TSource> span, IComparer<TSource> comparer)
+    {
+        #region generate from FileGen.Commands.Min
+        if (typeof(TSource) == typeof(byte))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, byte>(span));
+            return Unsafe.As<byte, TSource>(ref result);
+        }
+        else if (typeof(TSource) == typeof(sbyte))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, sbyte>(span));
+            return Unsafe.As<sbyte, TSource>(ref result);
+        }
+        else if (typeof(TSource) == typeof(short))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, short>(span));
+            return Unsafe.As<short, TSource>(ref result);
+        }
+        else if (typeof(TSource) == typeof(ushort))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, ushort>(span));
+            return Unsafe.As<ushort, TSource>(ref result);
+        }
+        else if (typeof(TSource) == typeof(int))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, int>(span));
+            return Unsafe.As<int, TSource>(ref result);
+        }
+        else if (typeof(TSource) == typeof(uint))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, uint>(span));
+            return Unsafe.As<uint, TSource>(ref result);
+        }
+        else if (typeof(TSource) == typeof(long))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, long>(span));
+            return Unsafe.As<long, TSource>(ref result);
+        }
+        else if (typeof(TSource) == typeof(ulong))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, ulong>(span));
+            return Unsafe.As<ulong, TSource>(ref result);
+        }
+        else if (typeof(TSource) == typeof(nint))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, nint>(span));
+            return Unsafe.As<nint, TSource>(ref result);
+        }
+        else if (typeof(TSource) == typeof(nuint))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, nuint>(span));
+            return Unsafe.As<nuint, TSource>(ref result);
+        }
+        else if (typeof(TSource) == typeof(Int128))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, Int128>(span));
+            return Unsafe.As<Int128, TSource>(ref result);
+        }
+        else if (typeof(TSource) == typeof(UInt128))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, UInt128>(span));
+            return Unsafe.As<UInt128, TSource>(ref result);
+        }
+        else if (typeof(TSource) == typeof(char))
+        {
+            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
+            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, char>(span));
+            return Unsafe.As<char, TSource>(ref result);
+        }
+        #endregion
+        else
+        {
+            return MinSpanComparer(span, comparer);
+        }
+    }
 
-//        public static Int32 Min<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Int32> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+    static TSource? MinSpanComparer<TSource>(ReadOnlySpan<TSource> span, IComparer<TSource> comparer)
+    {
+        TSource? value = default;
+        if (value is null)
+        {
+            // reference type
+            var index = 0;
+            do
+            {
+                if (!(index < span.Length))
+                {
+                    return value;
+                }
+                value = span[index++];
+            }
+            while (value is null);
 
-//        public static Nullable<Int32> Min<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Nullable<Int32>> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+            while (index < span.Length)
+            {
+                // compare both(left, right) non-null
+                if (span[index] is not null && comparer.Compare(span[index], value) < 0)
+                {
+                    value = span[index];
+                }
+                index++;
+            }
+            return value;
+        }
+        else
+        {
+            // value type
+            if (span.Length == 0)
+            {
+                Throws.NoElements();
+            }
+            var index = 0;
 
-//        public static Int64 Min<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Int64> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+            // optimize for default comparer
+            if (comparer == Comparer<TSource>.Default)
+            {
+                while (index < span.Length)
+                {
+                    if (Comparer<TSource>.Default.Compare(span[index], value) < 0)
+                    {
+                        value = span[index];
+                    }
+                    index++;
+                }
 
-//        public static Nullable<Int64> Min<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Nullable<Int64>> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                return value;
+            }
+            else
+            {
+                while (index < span.Length)
+                {
+                    if (comparer.Compare(span[index], value) < 0)
+                    {
+                        value = span[index];
+                    }
+                }
 
-//        public static Single Min<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Single> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+                return value;
+            }
+        }
+    }
 
-//        public static Nullable<Single> Min<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Nullable<Single>> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+    static T SimdMinBinaryInteger<T>(ReadOnlySpan<T> span)
+        where T : struct, IBinaryInteger<T>
+    {
+        if (span.Length == 0) Throws.NoElements();
 
-//        public static Double Min<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Double> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+        ref var current = ref MemoryMarshal.GetReference(span);
+        ref var end = ref Unsafe.Add(ref current, span.Length);
+        ref var to = ref Unsafe.Subtract(ref end, Vector<T>.Count);
 
-//        public static Nullable<Double> Min<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Nullable<Double>> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+        if (Vector.IsHardwareAccelerated && span.Length >= Vector<T>.Count)
+        {
+            var vectorResult = Vector.LoadUnsafe(ref current);
+            current = ref Unsafe.Add(ref current, Vector<T>.Count);
+            while (Unsafe.IsAddressLessThan(ref current, ref to)) // exclude last
+            {
+                var data = Vector.LoadUnsafe(ref current);
+                vectorResult = Vector.Min(data, vectorResult);
+                current = ref Unsafe.Add(ref current, Vector<T>.Count);
+            }
 
-//        public static Decimal Min<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Decimal> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+            // overlap load
+            var lastOverlap = Vector.LoadUnsafe(ref to);
+            vectorResult = Vector.Min(lastOverlap, vectorResult);
 
-//        public static Nullable<Decimal> Min<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Nullable<Decimal>> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
+            var result = vectorResult[0];
+            for (int i = 1; i < Vector<T>.Count; i++)
+            {
+                if (vectorResult[i] < result)
+                {
+                    result = vectorResult[i];
+                }
+            }
+            return result;
+        }
+        else
+        {
+            var result = span[0];
+            for (int i = 1; i < span.Length; i++)
+            {
+                if (span[i] < result)
+                {
+                    result = span[i];
+                }
+            }
+            return result;
+        }
+    }
 
-//        public static TResult Min<TEnumerable, TSource, TResult>(this TEnumerable source, Func<TSource, TResult> selector)
-//            where TEnumerable : struct, IValueEnumerable<TSource>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            throw new NotImplementedException();
-//        }
-
-//    }
-//}
+#endif
+}

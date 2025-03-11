@@ -307,8 +307,8 @@ partial class ValueEnumerableExtensions
 #endif
     }
 
-    public static T SimdSumSignedNumberChecked<T>(ReadOnlySpan<T> span)
-        where T : struct, ISignedNumber<T>, IMinMaxValue<T>, IBinaryInteger<T>
+    static T SimdSumSignedNumberChecked<T>(ReadOnlySpan<T> span)
+       where T : struct, ISignedNumber<T>, IMinMaxValue<T>, IBinaryInteger<T>
     {
         ref var current = ref MemoryMarshal.GetReference(span);
         ref var end = ref Unsafe.Add(ref current, span.Length);
@@ -357,7 +357,7 @@ partial class ValueEnumerableExtensions
         return result;
     }
 
-    public static T SimdSumUnsignedNumberChecked<T>(ReadOnlySpan<T> span)
+    static T SimdSumUnsignedNumberChecked<T>(ReadOnlySpan<T> span)
         where T : struct, IUnsignedNumber<T>, IMinMaxValue<T>, IBinaryInteger<T>
     {
         ref var current = ref MemoryMarshal.GetReference(span);
@@ -403,8 +403,8 @@ partial class ValueEnumerableExtensions
         return result;
     }
 
-    public static T SimdSumNumberUnchecked<T>(ReadOnlySpan<T> span)
-        where T : struct, INumberBase<T>
+    static T SimdSumNumberUnchecked<T>(ReadOnlySpan<T> span)
+       where T : struct, INumberBase<T>
     {
         ref var current = ref MemoryMarshal.GetReference(span);
         ref var end = ref Unsafe.Add(ref current, span.Length);

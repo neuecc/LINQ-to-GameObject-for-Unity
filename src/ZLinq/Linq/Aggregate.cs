@@ -8,35 +8,37 @@
             , allows ref struct
 #endif
         {
-            if (source.TryGetSpan(out var span))
-            {
-                if (span.Length == 0)
-                {
-                    return Internal.Throws.NoElements<TSource>();
-                }
-
-                var result = span[0];
-                for (int i = 1; i < span.Length; i++)
-                {
-                    result = func(result, span[i]);
-                }
-                
-                return result;
-            }
-
             using (source)
             {
-                if (!source.TryGetNext(out var result))
+                if (source.TryGetSpan(out var span))
                 {
-                    return Internal.Throws.NoElements<TSource>();
-                }
+                    if (span.Length == 0)
+                    {
+                        return Internal.Throws.NoElements<TSource>();
+                    }
 
-                while (source.TryGetNext(out var current))
+                    var result = span[0];
+                    for (int i = 1; i < span.Length; i++)
+                    {
+                        result = func(result, span[i]);
+                    }
+
+                    return result;
+                }
+                else
                 {
-                    result = func(result, current);
-                }
+                    if (!source.TryGetNext(out var result))
+                    {
+                        return Internal.Throws.NoElements<TSource>();
+                    }
 
-                return result;
+                    while (source.TryGetNext(out var current))
+                    {
+                        result = func(result, current);
+                    }
+
+                    return result;
+                }
             }
         }
 
@@ -46,26 +48,29 @@
             , allows ref struct
 #endif
         {
-            if (source.TryGetSpan(out var span))
-            {
-                var result = seed;
-                foreach (var item in span)
-                {
-                    result = func(result, item);
-                }
-                
-                return result;
-            }
-
             using (source)
             {
-                var result = seed;
-                while (source.TryGetNext(out var current))
+                if (source.TryGetSpan(out var span))
                 {
-                    result = func(result, current);
-                }
+                    var result = seed;
+                    foreach (var item in span)
+                    {
+                        result = func(result, item);
+                    }
 
-                return result;
+                    return result;
+                }
+                else
+                {
+
+                    var result = seed;
+                    while (source.TryGetNext(out var current))
+                    {
+                        result = func(result, current);
+                    }
+
+                    return result;
+                }
             }
         }
 
@@ -75,26 +80,28 @@
             , allows ref struct
 #endif
         {
-            if (source.TryGetSpan(out var span))
-            {
-                var result = seed;
-                foreach (var item in span)
-                {
-                    result = func(result, item);
-                }
-                
-                return resultSelector(result);
-            }
-
             using (source)
             {
-                var result = seed;
-                while (source.TryGetNext(out var current))
+                if (source.TryGetSpan(out var span))
                 {
-                    result = func(result, current);
-                }
+                    var result = seed;
+                    foreach (var item in span)
+                    {
+                        result = func(result, item);
+                    }
 
-                return resultSelector(result);
+                    return resultSelector(result);
+                }
+                else
+                {
+                    var result = seed;
+                    while (source.TryGetNext(out var current))
+                    {
+                        result = func(result, current);
+                    }
+
+                    return resultSelector(result);
+                }
             }
         }
     }

@@ -13,25 +13,18 @@ using ZLinq.Simd;
 
 //byte.MaxValue
 // 2147483647
-var src = Enumerable.Range(1, 10000).ToArray();
-
-var huga = src.AsVectorizable()
-    .Any(VectorComparer.GreaterThan(9800));
-var va = new Vector<int>(10);
-var vb = new Vector<int>(10);
+int[] src = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 
 
+var z = src.AsValueEnumerable().Min();
+
+var aaa = Enumerable.Range(1, 10).Min(Comparer<int>.Default);
+
+var m = src.AsValueEnumerable().Min();
 
 
-var rrr = src.AsVectorizable()
-    .Any(x => Vector.GreaterThanAny(x, new(9800)), VectorBoundaryMode.ZeroPadding);
-var xs = Enumerable.Range(1, 3).ToArray();
 
-var r = xs.AsVectorizable()
-    .Any(x => Vector.GreaterThanAll(x, new(15)), VectorBoundaryMode.OverlapOrZeroPadding);
-
-
-Console.WriteLine(r);
+Console.WriteLine(m);
 
 
 
