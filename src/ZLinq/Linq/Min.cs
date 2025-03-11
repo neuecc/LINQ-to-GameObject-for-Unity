@@ -220,7 +220,9 @@ partial class ValueEnumerableExtensions
             {
                 Throws.NoElements();
             }
-            var index = 0;
+
+            var index = 1;
+            value = span[0];
 
             // optimize for default comparer
             if (comparer == Comparer<TSource>.Default)
