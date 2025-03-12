@@ -1,4 +1,6 @@
-﻿namespace ZLinq
+﻿using System;
+
+namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -8,28 +10,13 @@
             , allows ref struct
 #endif
             => new(source, count);
-            
-        public static ValueEnumerator<Take<TEnumerable, TSource>, TSource> GetEnumerator<TEnumerable, TSource>(this Take<TEnumerable, TSource> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
 
-        public static Take2<TEnumerable, TSource> Take<TEnumerable, TSource>(this TEnumerable source, Range range)
+        public static TakeRange<TEnumerable, TSource> Take<TEnumerable, TSource>(this TEnumerable source, Range range)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, range);
-            
-        public static ValueEnumerator<Take2<TEnumerable, TSource>, TSource> GetEnumerator<TEnumerable, TSource>(this Take2<TEnumerable, TSource> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
-
     }
 }
 
@@ -50,29 +37,60 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
+        readonly int takeCount = (count < 0) ? 0 : count; // allows negative count
+        int index;
 
-        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+        public ValueEnumerator<Take<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            if (source.TryGetNonEnumeratedCount(out count))
+            {
+                count = Math.Min(count, takeCount); // take smaller
+                return true;
+            }
+
+            count = default;
+            return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            if (source.TryGetSpan(out span))
+            {
+                span = span.Slice(0, Math.Min(span.Length, takeCount));
+                return true;
+            }
+
+            span = default;
+            return false;
+        }
+
+        public bool TryCopyTo(Span<TSource> destination)
+        {
+            if (TryGetSpan(out var span) && span.Length <= destination.Length)
+            {
+                span.CopyTo(destination);
+                return true;
+            }
+            return false;
         }
 
         public bool TryGetNext(out TSource current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+            if (index++ < takeCount && source.TryGetNext(out current))
+            {
+                return true;
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
         }
 
         public void Dispose()
         {
             source.Dispose();
         }
-
-        public bool TryCopyTo(Span<TSource> destination) => false;
     }
 
     [StructLayout(LayoutKind.Auto)]
@@ -82,168 +100,220 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Take2<TEnumerable, TSource>(TEnumerable source, Range range)
+    struct TakeRange<TEnumerable, TSource>
         : IValueEnumerable<TSource>
         where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerable source;
+        readonly Range range;
 
-        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+        int index;
+        int remains;
+        readonly int skipIndex;
+        readonly int fromEndQueueCount; // 0 is not use q
+        ValueQueue<TSource> q;
+
+        public TakeRange(TEnumerable source, Range range)
+        {
+            // initialize before run.
+            this.source = source;
+            this.range = range;
+            this.fromEndQueueCount = 0;
+            this.remains = -1; // unknown
+
+            if (source.TryGetNonEnumeratedCount(out var count))
+            {
+                var start = Math.Max(0, range.Start.GetOffset(count));
+                var end = Math.Min(count, range.End.GetOffset(count));
+
+                this.skipIndex = start;
+                this.remains = end - start;
+                if (remains < 0)
+                {
+                    this.remains = 0; // isEmpty
+                }
+            }
+            else
+            {
+                if (!range.Start.IsFromEnd && !range.End.IsFromEnd) // both fromstart
+                {
+                    this.skipIndex = range.Start.Value;
+                    this.remains = range.End.Value - range.Start.Value;
+                    if (remains < 0)
+                    {
+                        this.remains = 0; // isEmpty
+                    }
+                }
+                else if (!range.Start.IsFromEnd && range.End.IsFromEnd) // end-fromend
+                {
+                    // unknown remains
+                    this.skipIndex = range.Start.Value;
+                    if (range.End.Value == 0)
+                    {
+                        this.remains = int.MaxValue; // get all
+                        return;
+                    }
+
+                    this.fromEndQueueCount = int.MaxValue; // unknown queue count
+                    this.q = new(4);
+                }
+                else if (range.Start.IsFromEnd && !range.End.IsFromEnd) // start-fromend
+                {
+                    // unknown skipIndex and remains
+                    this.skipIndex = 0;
+                    this.fromEndQueueCount = range.Start.Value; //queue size is fixed from end-of-start
+                    if (this.fromEndQueueCount == 0) fromEndQueueCount = 1;
+                    this.q = new(4);
+                }
+                else if (range.Start.IsFromEnd && range.End.IsFromEnd) // both fromend
+                {
+                    // unknown skipIndex and remains but maxCount can calc
+                    this.skipIndex = 0;
+                    var maxCount = range.Start.Value - range.End.Value; // maxCount but remains is unknown.
+                    if (maxCount <= 0)
+                    {
+                        // empty
+                        this.remains = 0;
+                        return;
+                    }
+                    this.fromEndQueueCount = range.Start.Value;
+                    if (this.fromEndQueueCount == 0) fromEndQueueCount = 1;
+                    this.q = new(4);
+                }
+            }
+        }
+
+        public ValueEnumerator<TakeRange<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            if (source.TryGetNonEnumeratedCount(out _))
+            {
+                count = remains;
+                return true;
+            }
+            count = default;
+            return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            if (source.TryGetSpan(out span))
+            {
+                span = span.Slice(skipIndex, remains);
+                return true;
+            }
+
+            span = default;
+            return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination) => false;
+        public bool TryCopyTo(Span<TSource> destination)
+        {
+            if (TryGetSpan(out var span) && span.Length <= destination.Length) // get self Span
+            {
+                span.CopyTo(destination);
+                return true;
+            }
+
+            return false;
+        }
 
         public bool TryGetNext(out TSource current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+            if (remains == 0)
+            {
+                goto END;
+            }
+
+        DEQUEUE:
+            if (q.Count != 0)
+            {
+                if (remains == -1)
+                {
+                    // calculate remains
+                    var count = index;
+                    var start = Math.Max(0, range.Start.GetOffset(count));
+                    var end = Math.Min(count, range.End.GetOffset(count));
+
+                    this.remains = end - start;
+                    if (remains < 0)
+                    {
+                        goto END;
+                    }
+
+                    // q.Count is fromEnd
+                    var offset = count - q.Count;
+                    var skipIndex = Math.Max(0, start - offset);
+                    while (skipIndex > 0)
+                    {
+                        q.Dequeue();
+                        skipIndex--;
+                    }
+                }
+
+                if (remains-- > 0)
+                {
+                    current = q.Dequeue();
+                    return true;
+                }
+                else
+                {
+                    goto END;
+                }
+            }
+
+            while (source.TryGetNext(out current))
+            {
+                if (fromEndQueueCount == 0)
+                {
+                    if (index++ < skipIndex)
+                    {
+                        continue; // skip
+                    }
+
+                    // take
+                    if (remains > 0)
+                    {
+                        remains--;
+                        return true;
+                    }
+                    return false;
+                }
+                else
+                {
+                    // from-last
+                    if (index++ < skipIndex)
+                    {
+                        continue;
+                    }
+
+                    if (q.Count == fromEndQueueCount)
+                    {
+                        q.Dequeue();
+                    }
+                    q.Enqueue(current);
+                }
+            }
+
+            if (q.Count != 0)
+            {
+                goto DEQUEUE;
+            }
+
+        END:
+            this.remains = 0;
+            Unsafe.SkipInit(out current);
+            return false;
         }
 
         public void Dispose()
         {
+            q.Dispose();
             source.Dispose();
         }
     }
-
 }
-
-
-//using System.Collections;
-//using System.Dynamic;
-
-//// TODO: impl test(not-checked)
-
-//namespace ZLinq
-//{
-//    partial class ValueEnumerableExtensions
-//    {
-//        public static Take<TEnumerable, T> Take<TEnumerable, T>(this TEnumerable source, int count)
-//            where TEnumerable : struct, IValueEnumerable<T>
-//#if NET9_0_OR_GREATER
-//            , allows ref struct
-//#endif
-//        {
-//            return new(source, count);
-//        }
-
-//        //        public static StructEnumerator<Take<TEnumerable, T>> GetEnumerator<TEnumerable, T>(
-//        //            this Take<TEnumerable, T> source)
-//        //            where TEnumerable : struct, IValueEnumerable<T>
-//        //#if NET9_0_OR_GREATER
-//        //            , allows ref struct
-//        //#endif
-//        //        {
-//        //            return new(source);
-//        //        }
-//    }
-//}
-
-//namespace ZLinq.Linq
-//{
-//    [StructLayout(LayoutKind.Auto)]
-//    [EditorBrowsable(EditorBrowsableState.Never)]
-//#if NET9_0_OR_GREATER
-//    public ref
-//#else
-//    public
-//#endif
-//    struct Take<TEnumerable, T>(TEnumerable source, int takeCount) : IValueEnumerable<T>
-//        where TEnumerable : struct, IValueEnumerable<T>
-//#if NET9_0_OR_GREATER
-//        , allows ref struct
-//#endif
-//    {
-//        TEnumerable source = source;
-//        int rest = takeCount;
-
-//#if NET9_0_OR_GREATER
-//        BitBool flags;
-//        ReadOnlySpan<T> currentSpan;
-//#endif
-
-//        public bool TryGetNonEnumeratedCount(out int count)
-//        {
-//            if (source.TryGetNonEnumeratedCount(out var sourceCount))
-//            {
-//                count = Math.Min(takeCount, sourceCount);
-//                return true;
-//            }
-//            count = default;
-//            return false;
-//        }
-
-//        public bool TryGetSpan(out ReadOnlySpan<T> span)
-//        {
-//            if (source.TryGetSpan(out var sourceSpan))
-//            {
-//                var length = Math.Min(takeCount, sourceSpan.Length);
-//                span = sourceSpan.Slice(0, length);
-//                return true;
-//            }
-
-//            span = default;
-//            return false;
-//        }
-
-//        public bool TryGetNext(out T current)
-//        {
-
-//#if NET9_0_OR_GREATER
-//            if (flags.IsZero) // init
-//            {
-//                if (TryGetSpan(out currentSpan))
-//                {
-//                    flags.SetTrueToBit1();
-//                    rest = Math.Min(takeCount, currentSpan.Length);
-//                }
-//                else
-//                {
-//                    flags.SetTrueToBit8(); // set dummy, IsZero and Bit1 is false
-//                    rest = takeCount;
-//                }
-//            }
-
-//            if (flags.IsBit1) // use Span
-//            {
-//                if (rest-- != 0)
-//                {
-//                    current = currentSpan[rest];
-//                    return true;
-//                }
-//                else
-//                {
-//                    Unsafe.SkipInit(out current);
-//                    return false;
-//                }
-//            }
-//#endif
-
-//            if (source.TryGetNext(out var value))
-//            {
-//                if (rest-- != 0)
-//                {
-//                    current = value;
-//                    return true;
-//                }
-//            }
-
-//            Unsafe.SkipInit(out current);
-//            return false;
-//        }
-
-//        public void Dispose()
-//        {
-//            source.Dispose();
-//        }
-//    }
-//}

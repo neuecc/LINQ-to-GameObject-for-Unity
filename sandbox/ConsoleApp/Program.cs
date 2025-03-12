@@ -13,19 +13,26 @@ using ZLinq.Simd;
 
 //byte.MaxValue
 // 2147483647
-int[] src = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+var xs = Iterate(Enumerable.Range(1, 10)).AsValueEnumerable();
+
+Enumerable.Range(1, 10).Take(1..10);
+
+var ichigo = xs.Take(^3..20).ToArray();
+
+Console.WriteLine("Length:" + ichigo.Length);
+foreach (var item in ichigo)
+{
+    Console.WriteLine(item);
+}
 
 
-var z = src.AsValueEnumerable().Min();
-
-var aaa = Enumerable.Range(1, 10).Min(Comparer<int>.Default);
-
-var m = src.AsValueEnumerable().Min();
-
-
-
-Console.WriteLine(m);
-
+static IEnumerable<T> Iterate<T>(IEnumerable<T> source)
+{
+    foreach (var item in source)
+    {
+        yield return item;
+    }
+}
 
 
 //Console.WriteLine(a);
