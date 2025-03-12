@@ -29,31 +29,80 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerable source = source;
+        readonly int takeCount = Math.Max(0, count);
+        Queue<TSource>? q;
 
         public ValueEnumerator<TakeLast<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
-            throw new NotImplementedException();
-            // return source.TryGetNonEnumeratedCount(count);
-            // count = 0;
-            // return false;
+            if (source.TryGetNonEnumeratedCount(out count))
+            {
+                count = Math.Min(count, takeCount);
+                return true;
+            }
+
+            count = 0;
+            return false;
         }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            if (source.TryGetSpan(out span))
+            {
+                if (span.Length > takeCount)
+                {
+                    span = span[^takeCount..];
+                }
+                return true;
+            }
+            span = default;
+            return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination) => false;
+        public bool TryCopyTo(Span<TSource> destination)
+        {
+            if (TryGetSpan(out var span) && span.Length <= destination.Length)
+            {
+                span.CopyTo(destination);
+                return true;
+            }
+            return false;
+        }
 
         public bool TryGetNext(out TSource current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+            if (takeCount == 0)
+            {
+                Unsafe.SkipInit(out current);
+                return false;
+            }
+
+            if (q == null)
+            {
+                q = new Queue<TSource>();
+            }
+
+        DEQUEUE:
+            if (q.Count != 0)
+            {
+                current = q.Dequeue();
+                return true;
+            }
+
+            while (source.TryGetNext(out current))
+            {
+                if (q.Count == takeCount)
+                {
+                    q.Dequeue();
+                }
+                q.Enqueue(current);
+            }
+
+            if (q.Count != 0) goto DEQUEUE;
+
+            Unsafe.SkipInit(out current);
+            return false;
         }
 
         public void Dispose()
@@ -61,5 +110,4 @@ namespace ZLinq.Linq
             source.Dispose();
         }
     }
-
 }

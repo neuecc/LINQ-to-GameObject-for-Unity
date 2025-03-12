@@ -13,26 +13,21 @@ using ZLinq.Simd;
 
 //byte.MaxValue
 // 2147483647
-var xs = Iterate(Enumerable.Range(1, 10)).AsValueEnumerable();
 
-Enumerable.Range(1, 10).Take(1..10);
-
-var ichigo = xs.Take(^3..20).ToArray();
-
-Console.WriteLine("Length:" + ichigo.Length);
-foreach (var item in ichigo)
+foreach (var item in Enumerable.Range(1, 10).ToArray().AsValueEnumerable().TakeLast(3).ToArray())
 {
     Console.WriteLine(item);
 }
 
 
-static IEnumerable<T> Iterate<T>(IEnumerable<T> source)
-{
-    foreach (var item in source)
-    {
-        yield return item;
-    }
-}
+
+//static IEnumerable<T> Iterate<T>(IEnumerable<T> source)
+//{
+//    foreach (var item in source)
+//    {
+//        yield return item;
+//    }
+//}
 
 
 //Console.WriteLine(a);

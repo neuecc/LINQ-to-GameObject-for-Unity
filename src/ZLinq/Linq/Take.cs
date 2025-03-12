@@ -114,7 +114,7 @@ namespace ZLinq.Linq
         int remains;
         readonly int skipIndex;
         readonly int fromEndQueueCount; // 0 is not use q
-        ValueQueue<TSource> q;
+        Queue<TSource>? q;
 
         public TakeRange(TEnumerable source, Range range)
         {
@@ -158,7 +158,7 @@ namespace ZLinq.Linq
                     }
 
                     this.fromEndQueueCount = int.MaxValue; // unknown queue count
-                    this.q = new(4);
+                    this.q = new();
                 }
                 else if (range.Start.IsFromEnd && !range.End.IsFromEnd) // start-fromend
                 {
@@ -166,7 +166,7 @@ namespace ZLinq.Linq
                     this.skipIndex = 0;
                     this.fromEndQueueCount = range.Start.Value; //queue size is fixed from end-of-start
                     if (this.fromEndQueueCount == 0) fromEndQueueCount = 1;
-                    this.q = new(4);
+                    this.q = new();
                 }
                 else if (range.Start.IsFromEnd && range.End.IsFromEnd) // both fromend
                 {
@@ -181,7 +181,7 @@ namespace ZLinq.Linq
                     }
                     this.fromEndQueueCount = range.Start.Value;
                     if (this.fromEndQueueCount == 0) fromEndQueueCount = 1;
-                    this.q = new(4);
+                    this.q = new();
                 }
             }
         }
@@ -230,7 +230,7 @@ namespace ZLinq.Linq
             }
 
         DEQUEUE:
-            if (q.Count != 0)
+            if (q != null && q.Count != 0)
             {
                 if (remains == -1)
                 {
@@ -268,7 +268,7 @@ namespace ZLinq.Linq
 
             while (source.TryGetNext(out current))
             {
-                if (fromEndQueueCount == 0)
+                if (q == null)
                 {
                     if (index++ < skipIndex)
                     {
@@ -299,7 +299,7 @@ namespace ZLinq.Linq
                 }
             }
 
-            if (q.Count != 0)
+            if (q != null && q.Count != 0)
             {
                 goto DEQUEUE;
             }
@@ -312,7 +312,6 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
-            q.Dispose();
             source.Dispose();
         }
     }
