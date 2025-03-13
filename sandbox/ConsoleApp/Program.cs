@@ -3,7 +3,7 @@ using System.Reflection;
 using ZLinq;
 using ZLinq.Linq;
 using ZLinq.Simd;
-
+using ZLinq.Traversables;
 
 //Span<int> xs = stackalloc int[255];
 
@@ -14,12 +14,24 @@ using ZLinq.Simd;
 //byte.MaxValue
 // 2147483647
 
-foreach (var item in Enumerable.Range(1, 10).ToArray().AsValueEnumerable().TakeLast(3).ToArray())
+
+var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
+
+var allDlls = root
+    .AsTraversable()
+    .Descendants()
+    .OfType(default(FileInfo))
+    .Where(x => x.Extension == ".dll");
+
+var groupByName = allDlls
+    .GroupBy(x => x.Name)
+    .Select(x => (FileName: x.Key, Count: x.Count()))
+    .OrderByDescending(x => x.Count);
+
+foreach (var item in groupByName)
 {
     Console.WriteLine(item);
 }
-
-
 
 //static IEnumerable<T> Iterate<T>(IEnumerable<T> source)
 //{

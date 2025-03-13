@@ -1,21 +1,162 @@
-LINQ to GameObject
+ZLinq
 ===
+Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree(FileSystem, GameObject, etc...) for all .NET platforms and Unity.
 
-> v3 working now.
+> [!IMPORTANT]
+> このライブラリーは現在プレビューです。ほとんどのメソッドが実装されていますが、一部はまだNotImplementedExceptionをthrowします。
 
------
+* .NET 10のLINQ to Objectsとの99%の互換性(Shuffle, RightJoin, LeftJoinを含む)
+* `IValueEnumerable`によるstructベースのEnumerableにより基本的なチェーンはアロケーションフリー
+* Source Generatorにより型推論を補完するハイブリッドデザイン
+* .NET 9/C# 13の`allows ref struct`によるSpanのLINQ化のフル対応
+* ツリー構造のオブジェクトを拡張するLINQ to Tree(ビルトインでFileSystem, JSON(for System.Text.json), GameObject(for Unity))
+* SIMD化可能な箇所の自動適用と任意の処理を記述できるLINQ to SIMD
+* 過去のLINQ実装(linq.js, [LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object), UniRx, R3)とゼロアロケーションシリーズ(ZString, ZLogger)の融合
 
-LINQ to GameObject is GameObject extensions for Unity that allows traverse hierarchy and append GameObject. The design aims both to get the power of LINQ and **performance** of iteration.
+実験的なライブラリではなく、実用的なライブラリを目指しました。また、ゲームのような高負荷な要求にも耐えられるよう設計しています。
 
-You can install from [Unity Asset Store - LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object) as FREE. Unity Forums support thread, ask me any questions - [http://forum.unity3d.com/threads/linq-to-gameobject.292611/](http://forum.unity3d.com/threads/linq-to-gameobject.292611/)
+NuGetからインストール可能です。Unityでの利用はUnityセクションを参照してください。
 
-Axis
+> dotnet add ZLinq
+
+ZLinqのチェーンは基本的に以下のインターフェイスを内部的に用いています。
+
+```csharp
+// struct version of IEnumerable<T> and IEnumerator<T>
+public interface IValueEnumerable<T> : IDisposable
+{
+    bool TryGetNext(out T current); // as MoveNext + Current
+
+    // Optimize options
+    bool TryGetNonEnumeratedCount(out int count);
+    bool TryGetSpan(out ReadOnlySpan<T> span);
+    bool TryCopyTo(Span<T> destination);
+}
+```
+
+strcutベースに変更したこと以外に、MoveNextとCurrentを一体化したことによりイテレーターの呼び出し回数を削減しています。また、structであることにより内部の状態を自動的にコピーするため、EnumerableとEnumeratorを一体化することにより、型の複雑化を減少しています。
+
+```csharp
+public static Where<TEnumerable, TSource> Where<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
+    where TEnumerable : struct, IValueEnumerable<TSource>, allows ref struct
+````
+
+オペレーターはこのようなメソッドシグネチャになりますが、C#はジェネリクスの制約から型を推論する(この場合はTSourceの型をTEnumerableから決定する)ことが出来ません([dotnet/csharplang#6930](https://github.com/dotnet/csharplang/discussions/6930))。そのため、従来のStruct LINQのアプローチは、インスタンスメソッドに全てのオペレーターの組み合わせを実装する、結果として100000近くのメソッドや巨大なアセンブリサイズを引き起こしていました。
+
+ZLinqではSource Generatorにより、部分的に利用箇所に応じてTEnumerableを具象型に変換した拡張メソッドを生成するというハイブリッドなアプローチを採用することにより、必要最小限のアセンブリサイズに留めることに成功しました。
+
+<details><summary>Generated Inference Helper Code</summary>
+
+![](Images/typeinference.jpg)
+
+</details>
+
+構造体ベースのLINQは、ジェネリクスが連鎖するため、型名が非常に読みにくくなります、例えばLinqAFの場合はこのような型となります。
+
+<details><summary>LinqAf IntelliSense</summary>
+
+![](Images/linqaf_intellisense.jpg)
+
+</details>
+
+ZLinqでは生成される型にも気を使って、限りなくリーダブルなものになるように設計しています。
+
+<details><summary>ZLinq IntelliSense</summary>
+
+![](Images/ZLinqIntellisense.jpg)
+
+</details>
+
+また、`TryGetNonEnumeratedCount(out int count)`, `TryGetSpan(out ReadOnlySpan<T> span)`, `TryCopyTo(Span<T> destination)` がインターフェイス自体に定義されることにより、柔軟な最適化を可能にしています。例えばTake+Skipは全てSpanのSliceで表現できるため、元のソースがSpanに変換できるものであれば、TryGetSpanの連鎖でSpanのSliceが送られます。ToArrayでは、シーケンスの値が算出可能な場合は、事前に固定長の配列を用意し、さらにTryCopyToで最終配列へ直接書き込み可能なオペレーターであれば、直接書き込むような最適化が入ります。
+
+Gettting Started
 ---
-The concept of LINQ to GameObject is axis on tree.
+`using ZLinq;`し、イテレート可能な型から`AsValueEnumerable()`を呼ぶと、ZLinqによるゼロアロケーションのLINQが利用できます。また、`Range`, `Repeat`, `Empty`は`ValueEnumerbale`に定義されています。
+
+```csharp
+using ZLinq;
+
+var source = new int[] { 1, 2, 3, 4, 5 };
+
+// AsValueEnumerableを呼び出すことでZLinqが適用される
+var seq1 = source.AsValueEnumerable().Where(x => x % 2 == 0);
+
+// Spanにも問題なく適用可能(allows ref structが利用可能な.NET 9/C# 13環境のみ)
+Span<int> span = stackalloc int[5] { 1, 2, 3, 4, 5 };
+var seq2 = span.AsValueEnumerable().Select(x => x * x);
+```
+
+> Source Generatorが生成完了するまで一時的に入力補完が止まることがあります。最近のVisual StudioはSource Generatorの実行タイミングが保存時となっているため、明示的に保存したり、動作が停止している際はコンパイルする必要があります。また、現状はSource Generatorの負担がかなり重たいため、コンパイル時間の増大に繋がる可能性があります。コードエディタに支障を感じる場合は、通常のLINQで記述した後に、AsValueEnumerable()を加えることでスムーズに書くことも可能です。メソッドのシグネチャはほぼ完全な互換があります。
+
+LINQ to Tree
+---
+LINQ to XMLによって、軸を中心にクエリするという概念がC#にもたらされました。XMLを使うことがなくても、同様のAPIはRoslynにも搭載され、SyntaxTreeの探索に有効活用されています。ZLinqではこの概念を拡張可能にし、あらゆるTreeとみなせるものに`Ancestors`, `Children`, `Descendants`, `BeforeSelf`, `AfterSelf`が適用可能になります。
 
 ![](Images/axis.jpg)
 
-Every traverse method returns `IEnumerable<GameObject>` and deferred exectuion. For example
+具体的には以下のインターフェイスを実装したstructを定義することで、イテレート可能になります。
+
+```csharp
+public interface ITraversable<TTraversable, T> : IDisposable
+    where TTraversable : struct, ITraversable<TTraversable, T> // self
+{
+    T Origin { get; }
+    TTraversable ConvertToTraversable(T next); // for Descendants
+    bool TryGetHasChild(out bool hasChild); // optional: optimize use for Descendants
+    bool TryGetChildCount(out int count);   // optional: optimize use for Children
+    bool TryGetParent(out T parent); // for Ancestors
+    bool TryGetNextChild(out T child); // for Children | Descendants
+    bool TryGetNextSibling(out T next); // for AfterSelf
+    bool TryGetPreviousSibling(out T previous); // BeforeSelf
+}
+```
+
+標準でパッケージとしてFileSystemInfoとJsonNodeに適用したものを用意してあります。また、Unity向けにはGameObjectとTransformに適用可能です。
+
+### FileSystem
+
+> dotnet add ZLinq.FileSystem
+
+```csharp
+using ZLinq;
+
+var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
+
+// FileSystemInfo(FileInfo/DirectoryInfo) can call `Ancestors`, `Children`, `Descendants`, `BeforeSelf`, `AfterSelf`
+var allDlls = root.Descendants()
+    .OfType(default(FileInfo))
+    .Where(x => x.Extension == ".dll");
+
+var groupByName = allDlls
+    .GroupBy(x => x.Name)
+    .Select(x => (FileName: x.Key, Count: x.Count()))
+    .OrderByDescending(x => x.Count);
+
+foreach (var item in groupByName)
+{
+    Console.WriteLine(item);
+}
+```
+
+
+### JSON(System.Text.Json)
+
+> dotnet add ZLinq.Json
+
+
+### GameObject/Transfrom(Unity)
+
+see: [unity](#unity) section.
+
+LINQ to SIMD
+---
+WIP
+
+Unity
+---
+
+![](Images/axis.jpg)
+
 
 ```csharp
 origin.Ancestors();   // Container, Root
@@ -25,189 +166,16 @@ origin.BeforeSelf(); // C1, C2
 origin.AfterSelf();  // C3, C4
 ```
 
+
 You can chain query(LINQ to Objects) and use some specified methods(`Destroy`, `OfComponent` and others).
 
 ```csharp
-// destroy all filtered(tag == "foobar") objects
-root.Descendants().Where(x => x.tag == "foobar").Destroy();
-
-// destroy all cloned objects
-origin.transform.root.gameObject
-    .Descendants()
-    .Where(x => x.name.EndsWith("(Clone)"))
-    .Destroy();
+// all filtered(tag == "foobar") objects
+var foobars = root.Descendants().Where(x => x.tag == "foobar");
 
 // get FooScript under self childer objects and self
 var fooScripts = root.ChildrenAndSelf().OfComponent<FooScript>(); 
 ```
-
-> Note: LINQ to GameObject is optimized for iteration, returns struct enumerable and struct enumerator instead of `IEnumerable<GameObject>`. More details, see the [Peformance Tips](https://github.com/neuecc/LINQ-to-GameObject-for-Unity#performance-tips) section.
-
-How to use
----
-Import LINQ to GameObject from Unity Asset Store - [http://u3d.as/content/neuecc/linq-to-game-object](http://u3d.as/content/neuecc/linq-to-game-object).
-
-All methods are extension of GameObject, using `Unity.Linq` then you can use all extension methods.
-
-```csharp
-using Unity.Linq;
-```
-![](Images/using.jpg)
-
-Operate
----
-LINQ to GameObject have several operate methods, append child(`Add`, `AddFirst`, `AddBeforeSelf`, `AddAfterSelf`), append multiple objects(`AddRange`, `AddFirstRange`, `AddBeforeSelfRange`, `AddAfterSelfRange`) and destroy object(`Destroy`).
-
-![image](https://cloud.githubusercontent.com/assets/46207/17275579/e5f4d4ba-5747-11e6-900f-30193a4ef7b4.png)
-
-```csharp
-var root = GameObject.Find("root"); 
-var cube = Resources.Load("Prefabs/PrefabCube") as GameObject; 
-
-// add do attach parent, set same layer and fix localPosition/Scale/Rotation.
-// added child is cloned and returns child object.
-var clone = root.Add(cube);
-
-// choose sibling position and allow append multiple objects.
-var clones = root.AddAfterSelfRange(new[] { cube, cube, cube });  
-
-// destroy do check null.
-root.Destroy();
-```
-
-Add method's child is cloned. It is useful for instantiate prefab scenario. If you want to move only child, you can use(`MoveToLast`, `MoveToFirst`, `MoveToBeforeSelf`, `MoveToAfterSelf`) and (`MoveToLastRange`, `MoveToFirstRange`, `MoveToBeforeSelfRange`, `MoveToAfterSelfRange`) instead of Add.
-
-All operate methods are extension methods of GameObject, too. You need `using Unity.Linq`.
-
-Reference : Traverse
----
-All traverse methods can find inactive object. If not found, return type is `GameObject` methods return null, return type is `IEnumerable<GameObject>` methods return empty sequence.
-
-Method | Description 
--------| -----------
-Parent|Gets the parent GameObject of this GameObject. If this GameObject has no parent, returns null.
-Child|Gets the first child GameObject with the specified name. If there is no GameObject with the speficided name, returns null.
-Children|Returns a collection of the child GameObjects.
-ChildrenAndSelf|Returns a collection of GameObjects that contain this GameObject, and the child GameObjects.
-Ancestors|Returns a collection of the ancestor GameObjects of this GameObject.
-AncestorsAndSelf|Returns a collection of GameObjects that contain this element, and the ancestors of this GameObject.
-Descendants|Returns a collection of the descendant GameObjects.
-DescendantsAndSelf|Returns a collection of GameObjects that contain this GameObject, and all descendant GameObjects of this GameObject.
-BeforeSelf|Returns a collection of the sibling GameObjects before this GameObject.
-BeforeSelfAndSelf|Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects before this GameObject.
-AfterSelf|Returns a collection of the sibling GameObjects after this GameObject.
-AfterSelfAndSelf|Returns a collection of GameObjects that contain this GameObject, and the sibling GameObjects after this GameObject.
-
-`Descendants` has `descendIntoChildren` overload, it stops traverse children when does not match condition.
-
-Reference : Operate
----
-Operate methods have four optional parameter. `cloneType` configure cloned child GameObject's localPosition/Scale/Rotation, default copies original local transform. `setActive` configure activates/deactivates child GameObject. If null, doesn't set specified value. `specifiedName` configure set name of child GameObject. If null, doesn't set specified value. `setLayer` configure set child GameObject's layer same with parent, default doesn't set layer.
-
-Method | Description 
--------| -----------
-Add|Adds the GameObject/Component as children of this GameObject. Target is cloned.
-AddRange|Adds the GameObject/Component as children of this GameObject. Target is cloned.
-AddFirst|Adds the GameObject/Component as the first children of this GameObject. Target is cloned.
-AddFirstRange|Adds the GameObject/Component as the first children of this GameObject. Target is cloned.
-AddBeforeSelf|Adds the GameObject/Component before this GameObject. Target is cloned.
-AddBeforeSelfRange|Adds the GameObject/Component before this GameObject. Target is cloned.
-AddAfterSelf|Adds the GameObject/Component after this GameObject. Target is cloned.
-AddAfterSelfRange|Adds the GameObject/Component after this GameObject. Target is cloned.
-Destroy|Destroy this GameObject safety(check null).
-
-There are `TransformCloneType` that used Add methods.
-
-> If target is `RectTransform` always use `SetParent(parent, false)` and ignores `TransformCloneType`
-
-Value|Description
--------| -----------
-KeepOriginal|Set to same as Original. This is default of Add methods.
-FollowParent|Set to same as Parent.
-Origin|Set to Position = zero, Scale = one, Rotation = identity.
-DoNothing|Position/Scale/Rotation as is.
-
-MoveTo methods similar with Add but don't clone target.
-
-Method | Description 
--------| -----------
-MoveToLast|Move the GameObject/Component as children of this GameObject. 
-MoveToLastRange|Move the GameObject/Component as children of this GameObject. 
-MoveToFirst|Move the GameObject/Component as the first children of this GameObject. 
-MoveToFirstRange|Move the GameObject/Component as the first children of this GameObject. 
-MoveToBeforeSelf|Move the GameObject/Component before this GameObject. 
-MoveToBeforeSelfRange|Move the GameObject/Component before this GameObject. 
-MoveToAfterSelf|Move the GameObject/Component after this GameObject. 
-MoveToAfterSelfRange|Move the GameObject/Component after this GameObject. 
-
-There are `TransformMoveType` that used MoveTo methods.
-
-> If target is `RectTransform` always use `SetParent(parent, false)` and ignores `TransformMoveType`
-
-Value|Description
--------| -----------
-FollowParent|Set to same as Parent.
-Origin|Set to Position = zero, Scale = one, Rotation = identity.
-DoNothing|Position/Scale/Rotation as is. This is default of MoveTo methods.          
-
-Reference : Extensions
----
-`IEnumerable<GameObject>` Extensions. If multiple GameObjects in the source collection have the same GameObject will be included multiple times in the result collection. To avoid this, use the `Distinct`(LINQ to Objects) method.
-
-Method|Description
--------|-----------
-Ancestors|Returns a collection of GameObjects that contains the ancestors of every GameObject in the source collection.
-AncestorsAndSelf|Returns a collection of GameObjects that contains every GameObject in the source collection, and the ancestors of every GameObject in the source collection.
-Descendants|Returns a collection of GameObjects that contains the descendant GameObjects of every GameObject in the source collection.
-DescendantsAndSelf|Returns a collection of GameObjects that contains every GameObject in the source collection, and the descendent GameObjects of every GameObject in the source collection.
-Children|Returns a filtered collection of the child GameObjects of every GameObject in the source collection. Only GameObjects that have a matching name are included in the collection.
-ChildrenAndSelf|Returns a collection of GameObjects that contains every GameObject in the source collection, and the child GameObjects of every GameObject in the source collection.
-Destroy|Destroy every GameObject in the source collection safety(check null).
-OfComponent|Returns a collection of specified component in the source collection.
-
-Performance Tips
----
-LINQ to GameObject is optimized heavily. Traverse methods returns hand optimized struct enumerator so it can avoid garbage when enumerate.
-
-> Unity compiler has bugs so can not avoid IDisposable boxing cost. But Unity 5.5 upgrade compiler and it was fixed, yeah!
-
-Some LINQ methods are optimized. `First`, `FirstOrDefault`, `ToArray` path through the optimized path.
-
-LINQ to GameObject also provides `ToArrayNonAlloc`. It is like `Physics.RaycastNonAlloc` or `void GetComponentsInChildren<T>(List<T> results)` and reuse `List<T>`. You can reuse array for no garbage.
-
-```csharp
-GameObject[] array = new GameObject[0];
-
-// travese on every update but no allocate memory
-void Update()
-{
-    var size = origin.Children().ToArrayNonAlloc(ref array);
-    for (int i = 0; i < size; i++)
-    {
-        var element = array[i];
-    }
-}
-```
-
-`ToArray` and `ToArrayNonAlloc` have five overloads. `()`, `(Func<GameObject, T> selector)`, `(Func<GameObject, bool> filter)`, `(Func<GameObject, bool> filter, Func<GameObject, T> selector)`, `(Func<GameObject, TState> let, Func<TState, bool> filter, Func<TState, T> selector)` for Optimize `Where().Select().ToArray()` pattern.
-
-If you use simple iteration or use `ForEach` or `ToArrayNonAlloc`, LINQ to GameObject guarantees no gc allocate and performance is very fast.
-
-If you use `DescendantsAndSelf().OfComponent<T>()`, it may possible to substitude `GetComponentsInChildren<T>` that is always fast than LINQ traverse(because LINQ traverse can not have native magics). So you can substitude native methods, use it. If you needs other query, use LINQ.
-
-> Descendants(AndSelf) returns single Component on each GameObject, GetComponentsInChildren returns multiple Component on each GameObject, so behaviour is different. LINQ to GameObject's Descendants is heavily optimized, internal iterator of `ForEach` and `ToArray` is specialize tuned.
- 
-Author Info
----
-Yoshifumi Kawai(a.k.a. neuecc) is software developer in Japan.  
-He is Director/CTO at Grani, Inc.  
-Grani is top social game developer in Japan.   
-He awarded Microsoft MVP for Visual C# since 2011.  
-He is known by creator of [linq.js](http://linqjs.codeplex.com/)(LINQ to Objects for JavaScript) and [UniRx](https://github.com/neuecc/UniRx)(Reactive Extensions for Unity)
-
-Blog: https://medium.com/@neuecc (ENG)   
-Blog: http://neue.cc/ (JPN)  
-Twitter: https://twitter.com/neuecc (JPN)
 
 License
 ---

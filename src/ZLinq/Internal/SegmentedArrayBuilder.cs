@@ -217,8 +217,11 @@ internal ref struct SegmentedArrayBuilder<T>
                 default: break;
             }
 
-            ArrayPool<T>.Shared.Return(segment!, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
-            segment = null;
+            if (segment != null)
+            {
+                ArrayPool<T>.Shared.Return(segment!, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
+                segment = null;
+            }
         }
 
         currentSegment = null;
