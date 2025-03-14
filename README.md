@@ -1,25 +1,25 @@
 ZLinq
 ===
-Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree(FileSystem, GameObject, etc...) for all .NET platforms and Unity.
+Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree (FileSystem, GameObject, etc.) for all .NET platforms and Unity.
 
 > [!IMPORTANT]
-> このライブラリーは現在プレビューです。ほとんどのメソッドが実装されていますが、一部はまだNotImplementedExceptionをthrowします。
+> This library is currently in preview. Most methods are implemented, but some still throw NotImplementedException.
 
-* .NET 10のLINQ to Objectsとの99%の互換性(Shuffle, RightJoin, LeftJoinを含む)
-* `IValueEnumerable`によるstructベースのEnumerableにより基本的なチェーンはアロケーションフリー
-* Source Generatorにより型推論を補完するハイブリッドデザイン
-* .NET 9/C# 13の`allows ref struct`によるSpanのLINQ化のフル対応
-* ツリー構造のオブジェクトを拡張するLINQ to Tree(ビルトインでFileSystem, JSON(for System.Text.json), GameObject(for Unity))
-* SIMD化可能な箇所の自動適用と任意の処理を記述できるLINQ to SIMD
-* 過去の私のLINQ実装(linq.js, [LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object), SimdLinq, UniRx, R3)とゼロアロケーションシリーズ(ZString, ZLogger)の融合
+* 99% compatibility with .NET 10's LINQ to Objects (including Shuffle, RightJoin, LeftJoin)
+* Zero allocation for method chains through struct-based Enumerable via `IValueEnumerable`
+* Hybrid design with Source Generator to complement type inference
+* Full support for LINQ operations on Span using .NET 9/C# 13's `allows ref struct`
+* LINQ to Tree to extend tree-structured objects (built-in support for FileSystem, JSON (for System.Text.Json), GameObject (for Unity))
+* Automatic application of SIMD where possible and customizable LINQ to SIMD for arbitrary operations
+* Fusion of my past LINQ implementations ([linq.js](https://github.com/neuecc/linq.js/), [LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object), [SimdLinq](https://github.com/Cysharp/SimdLinq/), [UniRx](https://github.com/neuecc/UniRx), [R3](https://github.com/Cysharp/R3)) and zero allocation series ([ZString](https://github.com/Cysharp/ZString), [ZLogger](https://github.com/Cysharp/ZLogger))
 
-実験的なライブラリではなく、実用的なライブラリを目指しました。また、ゲームのような高負荷な要求にも耐えられるよう設計しています。
+I aimed to create not just an experimental library but a practical one. It's also designed to handle high-load requirements, such as those found in games.
 
-NuGetからインストール可能です。Unityでの利用はUnityセクションを参照してください。
+You can install it from [NuGet/ZLinq](https://www.nuget.org/packages/ZLinq). For Unity usage, refer to the [Unity section](#unity).
 
 > dotnet add ZLinq
 
-ZLinqのチェーンは基本的に以下のインターフェイスを内部的に用いています。
+ZLinq chains internally use the following interface:
 
 ```csharp
 // struct version of IEnumerable<T> and IEnumerator<T>
@@ -34,16 +34,16 @@ public interface IValueEnumerable<T> : IDisposable
 }
 ```
 
-strcutベースに変更したこと以外に、MoveNextとCurrentを一体化したことによりイテレーターの呼び出し回数を削減しています。また、structであることにより内部の状態を自動的にコピーするため、EnumerableとEnumeratorを一体化することにより、型の複雑化を減少しています。
+Besides changing to a struct-based approach, we've integrated MoveNext and Current to reduce the number of iterator calls. Also, since structs automatically copy internal state, we've simplified the type complexity by unifying Enumerable and Enumerator.
 
 ```csharp
 public static Where<TEnumerable, TSource> Where<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
     where TEnumerable : struct, IValueEnumerable<TSource>, allows ref struct
 ````
 
-オペレーターはこのようなメソッドシグネチャになりますが、C#はジェネリクスの制約から型を推論する(この場合はTSourceの型をTEnumerableから決定する)ことが出来ません([dotnet/csharplang#6930](https://github.com/dotnet/csharplang/discussions/6930))。そのため、従来のStruct LINQのアプローチは、インスタンスメソッドに全てのオペレーターの組み合わせを実装する、結果として100000近くのメソッドや巨大なアセンブリサイズを引き起こしていました。
+Operators have this method signature, but C# cannot infer types from generic constraints (in this case, determining TSource type from TEnumerable) ([dotnet/csharplang#6930](https://github.com/dotnet/csharplang/discussions/6930)). Therefore, the traditional Struct LINQ approach required implementing all operator combinations as instance methods, resulting in nearly 100,000 methods and massive assembly sizes.
 
-ZLinqではSource Generatorにより、部分的に利用箇所に応じてTEnumerableを具象型に変換した拡張メソッドを生成するというハイブリッドなアプローチを採用することにより、必要最小限のアセンブリサイズに留めることに成功しました。
+ZLinq adopts a hybrid approach using Source Generator to partially convert TEnumerable to concrete types for extension methods based on usage, successfully keeping the assembly size to the minimum necessary.
 
 <details><summary>Generated Inference Helper Code</summary>
 
@@ -51,7 +51,7 @@ ZLinqではSource Generatorにより、部分的に利用箇所に応じてTEnum
 
 </details>
 
-構造体ベースのLINQは、ジェネリクスが連鎖するため、型名が非常に読みにくくなります、例えばLinqAFの場合はこのような型となります。
+Struct-based LINQ leads to very unreadable type names due to chained generics. For example, with [LinqAf](https://github.com/kevin-montrose/LinqAF), types look like this:
 
 <details><summary>LinqAf IntelliSense</summary>
 
@@ -59,7 +59,7 @@ ZLinqではSource Generatorにより、部分的に利用箇所に応じてTEnum
 
 </details>
 
-ZLinqでは生成される型にも気を使って、限りなくリーダブルなものになるように設計しています。
+ZLinq has been designed with readable generated types in mind:
 
 <details><summary>ZLinq IntelliSense</summary>
 
@@ -67,36 +67,36 @@ ZLinqでは生成される型にも気を使って、限りなくリーダブル
 
 </details>
 
-また、`TryGetNonEnumeratedCount(out int count)`, `TryGetSpan(out ReadOnlySpan<T> span)`, `TryCopyTo(Span<T> destination)` がインターフェイス自体に定義されることにより、柔軟な最適化を可能にしています。例えばTake+Skipは全てSpanのSliceで表現できるため、元のソースがSpanに変換できるものであれば、TryGetSpanの連鎖でSpanのSliceが送られます。ToArrayでは、シーケンスの値が算出可能な場合は、事前に固定長の配列を用意し、さらにTryCopyToで最終配列へ直接書き込み可能なオペレーターであれば、直接書き込むような最適化が入ります。一部のメソッドではSpanが取得可能な場合はSIMDを使った高速化も自動で行います。
+Additionally, `TryGetNonEnumeratedCount(out int count)`, `TryGetSpan(out ReadOnlySpan<T> span)`, and `TryCopyTo(Span<T> destination)` defined in the interface itself enable flexible optimizations. For example, Take+Skip can be expressed entirely as Span slices, so if the original source can be converted to a Span, Span slices are passed through TryGetSpan chains. For ToArray, if the sequence length can be calculated, a fixed-length array is prepared in advance, and operators that can write directly to the final array via TryCopyTo will do so. Some methods automatically use SIMD-based optimization if a Span can be obtained.
 
 Gettting Started
 ---
-`using ZLinq;`し、イテレート可能な型から`AsValueEnumerable()`を呼ぶと、ZLinqによるゼロアロケーションのLINQが利用できます。また、`Range`, `Repeat`, `Empty`は`ValueEnumerbale`に定義されています。
+Use `using ZLinq;` and call `AsValueEnumerable()` on any iterable type to use ZLinq's zero-allocation LINQ. Also, `Range`, `Repeat`, and `Empty` are defined in `ValueEnumerable`.
 
 ```csharp
 using ZLinq;
 
 var source = new int[] { 1, 2, 3, 4, 5 };
 
-// AsValueEnumerableを呼び出すことでZLinqが適用される
+// Call AsValueEnumerable to apply ZLinq
 var seq1 = source.AsValueEnumerable().Where(x => x % 2 == 0);
 
-// Spanにも問題なく適用可能(allows ref structが利用可能な.NET 9/C# 13環境のみ)
+// Can also be applied to Span (only in .NET 9/C# 13 environments that support allows ref struct)
 Span<int> span = stackalloc int[5] { 1, 2, 3, 4, 5 };
 var seq2 = span.AsValueEnumerable().Select(x => x * x);
 ```
 
-> Source Generatorが生成完了するまで一時的に入力補完が止まることがあります。最近のVisual StudioはSource Generatorの実行タイミングが保存時となっているため、明示的に保存したり、動作が停止している際はコンパイルする必要があります。コードエディタに支障を感じる場合は、通常のLINQで記述した後に、AsValueEnumerable()を加えることでスムーズに書くことも可能です。メソッドのシグネチャはほぼ完全な互換があります。
+> Auto-completion may temporarily stop until the Source Generator completes generation. Recent versions of Visual Studio run Source Generators on save, so you may need to explicitly save or compile when operations stop. If you experience issues with the code editor, you can write in normal LINQ first, then add AsValueEnumerable(). Method signatures are almost completely compatible.
 
-> Source Generatorの制限として、コード解析起動のトリガーの都合上、メソッドチェーンを一時変数に置いて継続することはできません。foreachを除き、全てのオペレーターはメソッドチェーン上に書く必要があります。
+> Due to Source Generator limitations and code analysis trigger constraints, you cannot place method chains in temporary variables and continue. Except for foreach, all operators must be written in the method chain.
 
 LINQ to Tree
 ---
-LINQ to XMLによって、軸を中心にクエリするという概念がC#にもたらされました。XMLを使うことがなくても、同様のAPIはRoslynにも搭載され、SyntaxTreeの探索に有効活用されています。ZLinqではこの概念を拡張可能にし、あらゆるTreeとみなせるものに`Ancestors`, `Children`, `Descendants`, `BeforeSelf`, `AfterSelf`が適用可能になります。
+LINQ to XML introduced the concept of querying around axes to C#. Even if you don't use XML, similar APIs are incorporated into Roslyn and effectively used for exploring SyntaxTrees. ZLinq extends this concept to make it applicable to anything that can be considered a Tree, allowing `Ancestors`, `Children`, `Descendants`, `BeforeSelf`, and `AfterSelf` to be applied.
 
 ![](Images/axis.jpg)
 
-具体的には以下のインターフェイスを実装したstructを定義することで、イテレート可能になります。
+Specifically, by defining a struct that implements the following interface, it becomes iterable:
 
 ```csharp
 public interface ITraversable<TTraversable, T> : IDisposable
@@ -113,7 +113,7 @@ public interface ITraversable<TTraversable, T> : IDisposable
 }
 ```
 
-標準でパッケージとしてFileSystemInfoとJsonNodeに適用したものを用意してあります。また、Unity向けにはGameObjectとTransformに適用可能です。
+Standard packages are available for FileSystemInfo and JsonNode. For Unity, it's applicable to GameObject and Transform.
 
 ### FileSystem
 
@@ -224,7 +224,7 @@ Open Window from NuGet -> Manage NuGet Packages, Search "ZLinq" and Press Instal
 2. Install the `ZLinq.Unity` package by referencing the git URL  
 > https://github.com/Cysharp/ZLinq.git?path=src/ZLinq.Unity/Assets/ZLinq.Unity
 
-Unityパッケージの補助により、通常のZLinqの他に、GameObject/Transformに対して探索が行えるLINQ to GameObject機能が有効になります。
+With the help of the Unity package, in addition to the standard ZLinq, LINQ to GameObject functionality becomes available for exploring GameObject/Transform.
 
 ![](Images/axis.jpg)
 
@@ -255,7 +255,7 @@ public class SampleScript : MonoBehaviour
 }
 ```
 
-You can chain query(LINQ to Objects). また、`OfComponent<T>`ヘルパーによりコンポーネントでフィルタリングできます。
+You can chain query(LINQ to Objects). Also, you can filter by component using the `OfComponent<T>` helper.
 
 ```csharp
 // all filtered(tag == "foobar") objects
