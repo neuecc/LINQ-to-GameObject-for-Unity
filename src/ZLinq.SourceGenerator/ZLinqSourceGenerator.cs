@@ -1,12 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Linq.Expressions;
 using System.Text;
-using System.Threading;
 
 namespace ZLinq.SourceGenerator;
 
@@ -22,13 +18,13 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
 
         public ImmutableArray<InvocationExpressionSyntax[]> Nodes => nodes;
 
-        public StringBuilder LineBuilder { get; } = new StringBuilder(); // reusable string buffer
         public HashSet<string> MethodLines { get; } = new HashSet<string>();
         public Compilation Compilation { get; private set; } = compilation;
 
         public void UpdateCompilation(string code, CancellationToken cancellationToken)
         {
             // parse all-lines everytime(When overlapping only the differences, for some reason it didn't work properly.)
+            // According to the profiler, this isn't a major bottleneck, so there's no need to optimize it.
             this.Compilation = originalCompilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(code, options: (CSharpParseOptions)parseOptions, cancellationToken: cancellationToken));
         }
 
@@ -127,11 +123,16 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
 
     static void Emit(SourceProductionContext sourceProductionContext, UpdatablePipelineContext pipelineContext)
     {
+        var builder = new StringBuilder();
         foreach (var providedNodeInfo in pipelineContext.Nodes)
         {
             foreach (var node in providedNodeInfo)
             {
                 var semanticModel = pipelineContext.Compilation.GetSemanticModel(node.SyntaxTree);
+
+                // Profiler shows this one-line is super heavy(GetSymbolInfo is toooooo slow!)
+                // I need to determine beforehand whether a node is not an OverloadResolutionFailure node.
+                // If this can be done, performance can be improved, but I haven't found a method for this yet.
                 var symbolInfo = semanticModel.GetSymbolInfo(node);
 
                 if (symbolInfo.CandidateReason != CandidateReason.OverloadResolutionFailure || symbolInfo.CandidateSymbols.Length == 0)
@@ -174,12 +175,12 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
 #else
                     var timestamp = "";
 #endif
-                    var builder = pipelineContext.LineBuilder;
-                    builder.Clear();
+                    builder.Clear(); // reuse builder buffer
 
                     builder.Append($"        {timestamp}public static {formattedReturnType} {constructedMethod.Name}{formattedTypeArguments}({formattedParameters}) => {className}.{methodName}{fullTypeArguments}({parameterNames});");
                     builder = builder
                         .Replace("global::ZLinq.Linq.", "")
+                        .Replace("global::ZLinq.Traversables.", "")
                         .Replace("global::ZLinq.ValueEnumerableExtensions.", "ValueEnumerableExtensions.")
                         .Replace("global::System.Func", "Func")
                         .Replace("global::System.Action", "Action");
@@ -218,6 +219,7 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
             
 using System;
 using ZLinq.Linq;
+using ZLinq.Traversables;
 
 namespace ZLinq
 {

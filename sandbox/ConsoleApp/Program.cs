@@ -1,5 +1,7 @@
 ﻿using System.Numerics;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using ZLinq;
 using ZLinq.Linq;
 using ZLinq.Simd;
@@ -15,21 +17,9 @@ using ZLinq.Traversables;
 // 2147483647
 
 
-var sequence = Enumerable.Range(1, 10).ToArray();
-
-var expected = sequence.TakeWhile((x, i) => i >= 0).ToArray();
-var actual1 = sequence.AsValueEnumerable().TakeWhile((x, i) => i >= 0);
+var xs = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
 
 
-var foo = Enumerable.Range(1, 10).Select(x => x * 100);
-
-//foo.AsValueEnumerable().Where(x => x % 2 == 0).Select(x => x * x);
-
-foo.AsValueEnumerable().Where(x => x % 2 == 0).Select(x => x * x);
-
-foo.AsValueEnumerable().Select(x => x.ToString()).Where(x => x == "");
-
-//_ = foo.AsValueEnumerable().Where(x => x % 2 == 0).Select(x => x * 1000);
 
 
 var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
@@ -62,6 +52,67 @@ foreach (var item in allDlls)
 
 //Console.WriteLine(a == b);
 
+
+// System.Text.Json's JsonNode is the target of LINQ to JSON(not JsonDocument/JsonElement).
+
+var json = JsonNode.Parse("""
+{
+    "nesting": {
+      "level1": {
+        "description": "First level of nesting",
+        "value": 100,
+        "level2": {
+          "description": "Second level of nesting",
+          "flags": [true, false, true],
+          "level3": {
+            "description": "Third level of nesting",
+            "coordinates": {
+              "x": 10.5,
+              "y": 20.75,
+              "z": -5.0
+            },
+            "level4": {
+              "description": "Fourth level of nesting",
+              "metadata": {
+                "created": "2025-02-15T14:30:00Z",
+                "modified": null,
+                "version": 2.1
+              },
+              "level5": {
+                "description": "Fifth level of nesting",
+                "settings": {
+                  "enabled": true,
+                  "threshold": 0.85,
+                  "options": ["fast", "accurate", "balanced"],
+                  "config": {
+                    "timeout": 30000,
+                    "retries": 3,
+                    "deepSetting": {
+                      "algorithm": "advanced",
+                      "parameters": [1, 1, 2, 3, 5, 8, 13]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+}
+""");
+
+// JsonNode
+var origin = json!["nesting"]!["level1"]!["level2"]!;
+
+// JsonNode axis, Children, Descendants, Anestors, BeforeSelf, AfterSelf and ***Self.
+foreach (var item in origin.Descendants().Select(x => x.Node).OfType(default(JsonArray)))
+{
+    // [truem false, true], ["fast", "accurate", "balanced"], [1, 1, 2, 3, 5, 8, 13]
+    Console.WriteLine(item!.ToJsonString(JsonSerializerOptions.Web));
+}
+
+
 class Person
 {
     public string FirstName { get; }
@@ -79,60 +130,6 @@ class Person
 //Console.WriteLine(hoge.Length);
 
 
-//var json = JsonNode.Parse("""
-//{
-//    "nesting": {
-//      "level1": {
-//        "description": "First level of nesting",
-//        "value": 100,
-//        "level2": {
-//          "description": "Second level of nesting",
-//          "flags": [true, false, true],
-//          "level3": {
-//            "description": "Third level of nesting",
-//            "coordinates": {
-//              "x": 10.5,
-//              "y": 20.75,
-//              "z": -5.0
-//            },
-//            "level4": {
-//              "description": "Fourth level of nesting",
-//              "metadata": {
-//                "created": "2025-02-15T14:30:00Z",
-//                "modified": null,
-//                "version": 2.1
-//              },
-//              "level5": {
-//                "description": "Fifth level of nesting",
-//                "settings": {
-//                  "enabled": true,
-//                  "threshold": 0.85,
-//                  "options": ["fast", "accurate", "balanced"],
-//                  "config": {
-//                    "timeout": 30000,
-//                    "retries": 3,
-//                    "deepSetting": {
-//                      "algorithm": "advanced",
-//                      "parameters": [1, 1, 2, 3, 5, 8, 13]
-//                    }
-//                  }
-//                }
-//              }
-//            }
-//          }
-//        }
-//      }
-//    }
-//}
-//""");
-
-
-//var origin = json!["nesting"]!["level1"]!["level2"]!;
-
-//foreach (var item in origin.Descendants().Select(x => x.Node).OfType(default(JsonArray)))
-//{
-//    Console.WriteLine(item);
-//}
 
 
 

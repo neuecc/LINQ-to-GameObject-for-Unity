@@ -11,7 +11,7 @@ Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree(FileSystem, GameOb
 * .NET 9/C# 13の`allows ref struct`によるSpanのLINQ化のフル対応
 * ツリー構造のオブジェクトを拡張するLINQ to Tree(ビルトインでFileSystem, JSON(for System.Text.json), GameObject(for Unity))
 * SIMD化可能な箇所の自動適用と任意の処理を記述できるLINQ to SIMD
-* 過去のLINQ実装(linq.js, [LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object), UniRx, R3)とゼロアロケーションシリーズ(ZString, ZLogger)の融合
+* 過去の私のLINQ実装(linq.js, [LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object), SimdLinq, UniRx, R3)とゼロアロケーションシリーズ(ZString, ZLogger)の融合
 
 実験的なライブラリではなく、実用的なライブラリを目指しました。また、ゲームのような高負荷な要求にも耐えられるよう設計しています。
 
@@ -67,7 +67,7 @@ ZLinqでは生成される型にも気を使って、限りなくリーダブル
 
 </details>
 
-また、`TryGetNonEnumeratedCount(out int count)`, `TryGetSpan(out ReadOnlySpan<T> span)`, `TryCopyTo(Span<T> destination)` がインターフェイス自体に定義されることにより、柔軟な最適化を可能にしています。例えばTake+Skipは全てSpanのSliceで表現できるため、元のソースがSpanに変換できるものであれば、TryGetSpanの連鎖でSpanのSliceが送られます。ToArrayでは、シーケンスの値が算出可能な場合は、事前に固定長の配列を用意し、さらにTryCopyToで最終配列へ直接書き込み可能なオペレーターであれば、直接書き込むような最適化が入ります。
+また、`TryGetNonEnumeratedCount(out int count)`, `TryGetSpan(out ReadOnlySpan<T> span)`, `TryCopyTo(Span<T> destination)` がインターフェイス自体に定義されることにより、柔軟な最適化を可能にしています。例えばTake+Skipは全てSpanのSliceで表現できるため、元のソースがSpanに変換できるものであれば、TryGetSpanの連鎖でSpanのSliceが送られます。ToArrayでは、シーケンスの値が算出可能な場合は、事前に固定長の配列を用意し、さらにTryCopyToで最終配列へ直接書き込み可能なオペレーターであれば、直接書き込むような最適化が入ります。一部のメソッドではSpanが取得可能な場合はSIMDを使った高速化も自動で行います。
 
 Gettting Started
 ---
@@ -86,7 +86,9 @@ Span<int> span = stackalloc int[5] { 1, 2, 3, 4, 5 };
 var seq2 = span.AsValueEnumerable().Select(x => x * x);
 ```
 
-> Source Generatorが生成完了するまで一時的に入力補完が止まることがあります。最近のVisual StudioはSource Generatorの実行タイミングが保存時となっているため、明示的に保存したり、動作が停止している際はコンパイルする必要があります。また、現状はSource Generatorの負担がかなり重たいため、コンパイル時間の増大に繋がる可能性があります。コードエディタに支障を感じる場合は、通常のLINQで記述した後に、AsValueEnumerable()を加えることでスムーズに書くことも可能です。メソッドのシグネチャはほぼ完全な互換があります。
+> Source Generatorが生成完了するまで一時的に入力補完が止まることがあります。最近のVisual StudioはSource Generatorの実行タイミングが保存時となっているため、明示的に保存したり、動作が停止している際はコンパイルする必要があります。コードエディタに支障を感じる場合は、通常のLINQで記述した後に、AsValueEnumerable()を加えることでスムーズに書くことも可能です。メソッドのシグネチャはほぼ完全な互換があります。
+
+> Source Generatorの制限として、コード解析起動のトリガーの都合上、メソッドチェーンを一時変数に置いて継続することはできません。foreachを除き、全てのオペレーターはメソッドチェーン上に書く必要があります。
 
 LINQ to Tree
 ---
@@ -123,11 +125,9 @@ using ZLinq;
 var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
 
 // FileSystemInfo(FileInfo/DirectoryInfo) can call `Ancestors`, `Children`, `Descendants`, `BeforeSelf`, `AfterSelf`
-var allDlls = root.Descendants()
+var groupByName = root.Descendants()
     .OfType(default(FileInfo))
-    .Where(x => x.Extension == ".dll");
-
-var groupByName = allDlls
+    .Where(x => x.Extension == ".dll")
     .GroupBy(x => x.Name)
     .Select(x => (FileName: x.Key, Count: x.Count()))
     .OrderByDescending(x => x.Count);
@@ -138,11 +138,71 @@ foreach (var item in groupByName)
 }
 ```
 
-
 ### JSON(System.Text.Json)
 
 > dotnet add ZLinq.Json
 
+```csharp
+using ZLinq;
+
+// System.Text.Json's JsonNode is the target of LINQ to JSON(not JsonDocument/JsonElement).
+var json = JsonNode.Parse("""
+{
+    "nesting": {
+      "level1": {
+        "description": "First level of nesting",
+        "value": 100,
+        "level2": {
+          "description": "Second level of nesting",
+          "flags": [true, false, true],
+          "level3": {
+            "description": "Third level of nesting",
+            "coordinates": {
+              "x": 10.5,
+              "y": 20.75,
+              "z": -5.0
+            },
+            "level4": {
+              "description": "Fourth level of nesting",
+              "metadata": {
+                "created": "2025-02-15T14:30:00Z",
+                "modified": null,
+                "version": 2.1
+              },
+              "level5": {
+                "description": "Fifth level of nesting",
+                "settings": {
+                  "enabled": true,
+                  "threshold": 0.85,
+                  "options": ["fast", "accurate", "balanced"],
+                  "config": {
+                    "timeout": 30000,
+                    "retries": 3,
+                    "deepSetting": {
+                      "algorithm": "advanced",
+                      "parameters": [1, 1, 2, 3, 5, 8, 13]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+}
+""");
+
+// JsonNode
+var origin = json!["nesting"]!["level1"]!["level2"]!;
+
+// JsonNode axis, Children, Descendants, Anestors, BeforeSelf, AfterSelf and ***Self.
+foreach (var item in origin.Descendants().Select(x => x.Node).OfType(default(JsonArray)))
+{
+    // [truem false, true], ["fast", "accurate", "balanced"], [1, 1, 2, 3, 5, 8, 13]
+    Console.WriteLine(item!.ToJsonString(JsonSerializerOptions.Web));
+}
+```
 
 ### GameObject/Transfrom(Unity)
 
