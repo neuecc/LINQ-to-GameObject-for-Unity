@@ -205,7 +205,7 @@ var origin = json!["nesting"]!["level1"]!["level2"]!;
 // JsonNode axis, Children, Descendants, Anestors, BeforeSelf, AfterSelf and ***Self.
 foreach (var item in origin.Descendants().Select(x => x.Node).OfType(default(JsonArray)))
 {
-    // [truem false, true], ["fast", "accurate", "balanced"], [1, 1, 2, 3, 5, 8, 13]
+    // [true, false, true], ["fast", "accurate", "balanced"], [1, 1, 2, 3, 5, 8, 13]
     Console.WriteLine(item!.ToJsonString(JsonSerializerOptions.Web));
 }
 ```
