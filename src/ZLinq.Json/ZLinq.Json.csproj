@@ -4,6 +4,10 @@
 		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+
+		<!-- NuGet Packaging -->
+		<PackageTags>linq</PackageTags>
+		<Description>LINQ to Json; JsonNode(System.Text.Json) extensions of ZLinq's LINQ to Tree.</Description>
 	</PropertyGroup>
 
 	<ItemGroup>
