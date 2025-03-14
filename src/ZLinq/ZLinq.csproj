@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>ZLinq</RootNamespace>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<NoWarn>1701;1702;9124</NoWarn>
+		<LangVersion>13</LangVersion>
+		<TargetFrameworks>netstandard2.1;net8.0;net9.0</TargetFrameworks>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+		<!-- SourceGenerator Packaging configs... -->
+		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
+	</PropertyGroup>
+
+	<ItemGroup Condition="$(TargetFramework) == 'netstandard2.1'">
+		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="ZLinq" />
+		<Using Include="ZLinq.Internal" />
+		<Using Include="ZLinq.Traversables" />
+		<Using Include="ZLinq.Linq" />
+		<Using Include="System.Runtime.CompilerServices" />
+		<Using Include="System.Runtime.InteropServices" />
+		<Using Include="System.ComponentModel" />
+	</ItemGroup>
+
+	<!-- for nuget publish -->
+	<Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
+		<ItemGroup>
+			<TfmSpecificPackageFile Include="$(TargetDir)\ZLinq.SourceGenerator.dll" PackagePath="analyzers\dotnet\cs" />
+			<TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\dotnet\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
+		</ItemGroup>
+	</Target>
+
+	<!-- We don't consume the analyzers in this library itself,
+         but we reference the project to add a package dependency so users of this library will automatically get the analyzers. -->
+	<ItemGroup>
+		<ProjectReference Include="..\ZLinq.SourceGenerator\ZLinq.SourceGenerator.csproj"
+						  PrivateAssets="all" />
+	</ItemGroup>
+
+</Project>

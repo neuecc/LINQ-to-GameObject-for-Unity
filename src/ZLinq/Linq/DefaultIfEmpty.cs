@@ -1,0 +1,113 @@
+﻿namespace ZLinq
+{
+    partial class ValueEnumerableExtensions
+    {
+        public static DefaultIfEmpty<TEnumerable, TSource> DefaultIfEmpty<TEnumerable, TSource>(this TEnumerable source)
+            where TEnumerable : struct, IValueEnumerable<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(source, default!);
+
+        public static DefaultIfEmpty<TEnumerable, TSource> DefaultIfEmpty<TEnumerable, TSource>(this TEnumerable source, TSource defaultValue)
+            where TEnumerable : struct, IValueEnumerable<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(source, defaultValue);
+
+    }
+}
+
+namespace ZLinq.Linq
+{
+    [StructLayout(LayoutKind.Auto)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+#if NET9_0_OR_GREATER
+    public ref
+#else
+    public
+#endif
+    struct DefaultIfEmpty<TEnumerable, TSource>(TEnumerable source, TSource defaultValue)
+        : IValueEnumerable<TSource>
+        where TEnumerable : struct, IValueEnumerable<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    {
+        TEnumerable source = source;
+        bool iterateDefault = true;
+
+        public ValueEnumerator<DefaultIfEmpty<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            if (source.TryGetNonEnumeratedCount(out count))
+            {
+                if (count == 0)
+                {
+                    // For empty collection, we'll return 1 item (the default value)
+                    count = 1;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public bool TryGetSpan(out ReadOnlySpan<TSource> span)
+        {
+            if (source.TryGetSpan(out span))
+            {
+                if (span.Length == 0)
+                {
+                    // We can't create a span with custom default value on the fly
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public bool TryCopyTo(Span<TSource> dest)
+        {
+            if (dest.Length == 0) return true;
+
+            if (source.TryGetNonEnumeratedCount(out var sourceCount) && sourceCount == 0 && dest.Length >= 1)
+            {
+                dest[0] = defaultValue;
+                return true;
+            }
+
+            if (source.TryCopyTo(dest))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool TryGetNext(out TSource current)
+        {
+            if (source.TryGetNext(out current))
+            {
+                iterateDefault = false;
+                return true;
+            }
+
+            if (iterateDefault)
+            {
+                iterateDefault = false;
+                current = defaultValue;
+                return true;
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
+        }
+
+        public void Dispose()
+        {
+            source.Dispose();
+        }
+    }
+}

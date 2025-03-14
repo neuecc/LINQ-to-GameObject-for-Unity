@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ZLinq\ZLinq.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="ZLinq" />
+		<Using Include="ZLinq.Internal" />
+		<Using Include="ZLinq.Linq" />
+		<Using Include="System.Runtime.CompilerServices" />
+		<Using Include="System.Runtime.InteropServices" />
+		<Using Include="System.ComponentModel" />
+	</ItemGroup>
+</Project>

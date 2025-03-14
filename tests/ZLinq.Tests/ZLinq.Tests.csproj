@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>ZLinq.Tests</RootNamespace>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<!--<TargetFrameworks>net8.0;net9.0</TargetFrameworks>-->
+		<TargetFrameworks>net9.0</TargetFrameworks>
+		<LangVersion>13</LangVersion>
+		<IsPackable>false</IsPackable>
+
+		<!-- Microsoft.Testing.Platform Support -->
+		<OutputType>Exe</OutputType>
+		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="xunit.v3" Version="1.1.0" />
+		<PackageReference Include="Shouldly" Version="4.3.0" />
+
+		<!-- Some environments still neds this... -->
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.0.2">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\ZLinq.__Unity\ZLinq.__Unity.csproj" />
+		<ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
+		<ProjectReference Include="..\..\src\ZLinq.SourceGenerator\ZLinq.SourceGenerator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="Xunit" />
+		<Using Include="Shouldly" />
+		<Using Include="ZLinq" />
+	</ItemGroup>
+</Project>
