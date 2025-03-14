@@ -90,7 +90,7 @@ var seq2 = span.AsValueEnumerable().Select(x => x * x);
 
 > Auto-completion may temporarily stop until the Source Generator completes generation. Recent versions of Visual Studio run Source Generators on save, so you may need to explicitly save or compile when operations stop. If you experience issues with the code editor, you can write in normal LINQ first, then add AsValueEnumerable(). Method signatures are almost completely compatible.
 
-> Due to Source Generator limitations and code analysis trigger constraints, you cannot place method chains in temporary variables and continue. Except for foreach, all operators must be written in the method chain.
+> Due to Source Generator limitations and code analysis trigger constraints, you cannot place method chains in temporary variables and continue. Except for foreach, all operators must be written in the method chain.  Also, you cannot use private visibility or anonymous types. You need to use ValueTuple or change to public/internal visibility.
 
 LINQ to Tree
 ---
