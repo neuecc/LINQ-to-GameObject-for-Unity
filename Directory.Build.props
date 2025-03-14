@@ -1,0 +1,20 @@
+<Project>
+
+    <PropertyGroup>
+        <!-- NuGet Packaging -->
+        <PackageVersion>$(Version)</PackageVersion>
+        <Company>Cysharp</Company>
+        <Authors>Cysharp</Authors>
+        <Copyright>© Cysharp, Inc.</Copyright>
+        <PackageProjectUrl>https://github.com/Cysharp/ZLinq</PackageProjectUrl>
+        <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>Icon.png</PackageIcon>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../../opensource.snk</AssemblyOriginatorKeyFile>
+        <!-- For BenchmarkDotNet generated project-->
+        <AssemblyOriginatorKeyFile Condition="EXISTS('./../../../../../../opensource.snk')">../../../../../../opensource.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
+</Project>

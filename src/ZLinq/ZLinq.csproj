@@ -13,6 +13,11 @@
 		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<None Include="../../Icon.png" Pack="true" PackagePath="/" />
+		<EmbeddedResource Include="..\..\LICENSE" />
+	</ItemGroup>
+
 	<ItemGroup Condition="$(TargetFramework) == 'netstandard2.1'">
 		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
 	</ItemGroup>
