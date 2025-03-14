@@ -6,6 +6,7 @@
 		<Nullable>enable</Nullable>
 		<TargetFramework>net9.0</TargetFramework>
 		<LangVersion>13</LangVersion>
+		<IsPackable>false</IsPackable>
 
 		<!-- Microsoft.Testing.Platform Support -->
 		<OutputType>Exe</OutputType>

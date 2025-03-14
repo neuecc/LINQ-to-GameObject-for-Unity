@@ -11,6 +11,9 @@
 		<IncludeSymbols>false</IncludeSymbols>
 		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 		<IsRoslynComponent>true</IsRoslynComponent>
+
+		<!-- NuGet packaging including in main proj so non-packable -->
+		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 
 	<ItemGroup>

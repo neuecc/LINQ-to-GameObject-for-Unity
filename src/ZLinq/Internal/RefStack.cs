@@ -6,28 +6,34 @@ namespace ZLinq.Internal;
 internal sealed class RefStack<T> where T : IDisposable
 {
     internal static readonly RefStack<T> DisposeSentinel = new(0);
+    static object gate = new object(); // TODO:change lock-free
 
     static RefStack<T>? Last = null;
 
     RefStack<T>? Prev = null; // pooling property
 
-    // TODO: thread-safe
     public static RefStack<T> Rent()
     {
-        if (Last == null)
+        lock (gate)
         {
-            return new RefStack<T>(4);
+            if (Last == null)
+            {
+                return new RefStack<T>(4);
+            }
+            var rent = Last;
+            Last = Last.Prev;
+            return rent;
         }
-        var rent = Last;
-        Last = Last.Prev;
-        return rent;
     }
 
     public static void Return(RefStack<T> stack)
     {
         stack.Reset();
-        stack.Prev = Last;
-        Last = stack;
+        lock (gate)
+        {
+            stack.Prev = Last;
+            Last = stack;
+        }
     }
 
     // ---

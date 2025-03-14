@@ -214,20 +214,48 @@ WIP
 
 Unity
 ---
+The minimum supported Unity version will be `2022.3.12f1`, as it is necessary to support C# Incremental Source Generator(Compiler Version, 4.3.0).
+
+There are two installation steps required to use it in Unity.
+
+1. Install `ZLinq` from NuGet using [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity)
+Open Window from NuGet -> Manage NuGet Packages, Search "ZLinq" and Press Install. 
+
+2. Install the `ZLinq.Unity` package by referencing the git URL  
+> https://github.com/Cysharp/ZLinq.git?path=src/ZLinq.Unity/Assets/ZLinq.Unity
+
+Unityパッケージの補助により、通常のZLinqの他に、GameObject/Transformに対して探索が行えるLINQ to GameObject機能が有効になります。
 
 ![](Images/axis.jpg)
 
-
 ```csharp
-origin.Ancestors();   // Container, Root
-origin.Children();    // Sphere_A, Sphere_B, Group, Sphere_A, Sphere_B
-origin.Descendants(); // Sphere_A, Sphere_B, Group, P1, Group, Sphere_B, P2, Sphere_A, Sphere_B
-origin.BeforeSelf(); // C1, C2
-origin.AfterSelf();  // C3, C4
+using ZLinq;
+
+public class SampleScript : MonoBehaviour
+{
+    public Transform Origin;
+
+    void Start()
+    {
+        Debug.Log("Ancestors--------------");  // Container, Root
+        foreach (var item in Origin.Ancestors()) Debug.Log(item.name);
+
+        Debug.Log("Children--------------"); // Sphere_A, Sphere_B, Group, Sphere_A, Sphere_B
+        foreach (var item in Origin.Children()) Debug.Log(item.name);
+
+        Debug.Log("Descendants--------------"); // Sphere_A, Sphere_B, Group, P1, Group, Sphere_B, P2, Sphere_A, Sphere_B
+        foreach (var item in Origin.Descendants()) Debug.Log(item.name);
+
+        Debug.Log("BeforeSelf--------------"); // C1, C2
+        foreach (var item in Origin.BeforeSelf()) Debug.Log(item.name);
+
+        Debug.Log("AfterSelf--------------");  // C3, C4
+        foreach (var item in Origin.AfterSelf()) Debug.Log(item.name);
+    }
+}
 ```
 
-
-You can chain query(LINQ to Objects) and use some specified methods(`Destroy`, `OfComponent` and others).
+You can chain query(LINQ to Objects). また、`OfComponent<T>`ヘルパーによりコンポーネントでフィルタリングできます。
 
 ```csharp
 // all filtered(tag == "foobar") objects

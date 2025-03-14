@@ -6,10 +6,11 @@
 		<Nullable>enable</Nullable>
 		<NoWarn>1701;1702;9124</NoWarn>
 		<LangVersion>13</LangVersion>
-		<!-- Support for Unity -->
 		<TargetFrameworks>netstandard2.1;net8.0;net9.0</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<!--<TargetFrameworks>net9.0</TargetFrameworks>-->
+
+		<!-- SourceGenerator Packaging configs... -->
+		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
 	</PropertyGroup>
 
 	<ItemGroup Condition="$(TargetFramework) == 'netstandard2.1'">
@@ -25,4 +26,20 @@
 		<Using Include="System.Runtime.InteropServices" />
 		<Using Include="System.ComponentModel" />
 	</ItemGroup>
+
+	<!-- for nuget publish -->
+	<Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
+		<ItemGroup>
+			<TfmSpecificPackageFile Include="$(TargetDir)\ZLinq.SourceGenerator.dll" PackagePath="analyzers\dotnet\cs" />
+			<TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\dotnet\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
+		</ItemGroup>
+	</Target>
+
+	<!-- We don't consume the analyzers in this library itself,
+         but we reference the project to add a package dependency so users of this library will automatically get the analyzers. -->
+	<ItemGroup>
+		<ProjectReference Include="..\ZLinq.SourceGenerator\ZLinq.SourceGenerator.csproj"
+						  PrivateAssets="all" />
+	</ItemGroup>
+
 </Project>

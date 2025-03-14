@@ -7,6 +7,7 @@
 		<!--<TargetFrameworks>net8.0;net9.0</TargetFrameworks>-->
 		<TargetFrameworks>net9.0</TargetFrameworks>
 		<LangVersion>13</LangVersion>
+		<IsPackable>false</IsPackable>
 
 		<!-- Microsoft.Testing.Platform Support -->
 		<OutputType>Exe</OutputType>

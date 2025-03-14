@@ -119,3 +119,13 @@ nuget/tools/*
 # publish directory
 out/
 *.tsbuildinfo
+
+
+# Unity
+src/ZLinq.Unity/bin/*
+src/ZLinq.Unity/Library/*
+src/ZLinq.Unity/obj/*
+src/ZLinq.Unity/Temp/*
+src/ZLinq.Unity/UserSettings/*
+src/ZLinq.Unity/*.sln
+src/ZLinq.Unity/*.csproj

@@ -202,8 +202,11 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
         }
 
         // Emit result
-        var finalCode = BuildCode(pipelineContext.MethodLines);
-        sourceProductionContext.AddSource("ZLinqTypeInferenceHelper.g.cs", finalCode.ReplaceLineEndings());
+        if (pipelineContext.MethodLines.Count != 0)
+        {
+            var finalCode = BuildCode(pipelineContext.MethodLines);
+            sourceProductionContext.AddSource("ZLinqTypeInferenceHelper.g.cs", finalCode.ReplaceLineEndings());
+        }
     }
 
     static string BuildCode(IEnumerable<string> sources)

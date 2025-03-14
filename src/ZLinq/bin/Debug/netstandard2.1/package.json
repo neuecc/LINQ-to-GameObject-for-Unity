@@ -1,0 +1,12 @@
+{
+    "name": "com.cysharp.zlinq.internal",
+    "displayName": "ZLinq Internal",
+    "author": { "name": "ZLinq", "url": "https://github.com/Cysharp/ZLinq" },
+    "version": "1.0.0",
+    "unity": "2022.3",
+    "description": "Internal Package of ZLinq for development time.",
+    "keywords": [ "LINQ" ],
+    "license": "MIT",
+    "category": "Scripting",
+    "dependencies": {}
+}

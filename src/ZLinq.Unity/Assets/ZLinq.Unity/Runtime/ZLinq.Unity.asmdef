@@ -1,0 +1,16 @@
+{
+    "name": "ZLinq.Unity",
+    "rootNamespace": "ZLinq",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "ZLinq.dll",
+        "System.Runtime.CompilerServices.Unsafe.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "noEngineReferences": false
+}
