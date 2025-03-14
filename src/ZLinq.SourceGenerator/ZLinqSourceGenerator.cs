@@ -1,8 +1,10 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace ZLinq.SourceGenerator;
@@ -27,6 +29,27 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
         }
     }
 
+    class ValueEnumerableNodeInfo(InvocationExpressionSyntax[] expressions) //  : IEquatable<ValueEnumerableNodeInfo>
+    {
+        public ReadOnlySpan<InvocationExpressionSyntax> Expressions => expressions;
+
+        // Equality for Incremental Generator cache(NOTE: when cached, IntelliSense seems broken so currently disable it...
+        public bool Equals(ValueEnumerableNodeInfo other)
+        {
+            var otherExpres = other.Expressions;
+
+            if (expressions.Length != otherExpres.Length) return false;
+
+            for (int i = 0; i < expressions.Length; i++)
+            {
+                var l = (expressions[i].Expression as MemberAccessExpressionSyntax)?.Name?.Identifier.Text;
+                var r = (otherExpres[i].Expression as MemberAccessExpressionSyntax)?.Name?.Identifier.Text;
+                if (l != r) return false;
+            }
+            return true;
+        }
+    }
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var compilationProvider = context.CompilationProvider
@@ -44,43 +67,63 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                     var expr = invocationExpression.Expression as MemberAccessExpressionSyntax;
                     if (expr != null)
                     {
-                        return true;
+                        // ValueEnumerable.Range, Repeat, Empty
+                        if ((expr.Expression as IdentifierNameSyntax)?.Identifier.Text == "ValueEnumerable")
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            // filter only AsValueEnumerable(), AsTraversable() and traversable methods(Children, Descendants, etc...)
+                            var identifier = (expr.Name as IdentifierNameSyntax)?.Identifier.Text;
+                            switch (identifier)
+                            {
+                                case "AsValueEnumerable":
+                                case "AsTraversable":
+                                case "Children":
+                                case "ChildrenAndSelf":
+                                case "Descendants":
+                                case "DescendantsAndSelf":
+                                case "Ancestors":
+                                case "AncestorsAndSelf":
+                                case "BeforeSelf":
+                                case "BeforeSelfAndSelf":
+                                case "AfterSelf":
+                                case "AfterSelfAndSelf":
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }
                     }
 
                     return false;
                 }
 
                 return false;
-            }, (context, cancellationToken) => context.Node)
+            }, (context, cancellationToken) =>
+            {
+                // .AsValueEnumerable().Where().Select() -> ["Where", "Select"]
+                var expressions = context.Node.Ancestors() // first one(Self) always resolved so skip it.
+                    .OfType<InvocationExpressionSyntax>()
+                    .ToArray();
+
+                return new ValueEnumerableNodeInfo(expressions);
+            })
             .Combine(compilationProvider)
             .SelectMany((tuple, cancellationToken) =>
             {
-                // NOTE: this pipeline is heavy, needs cache with incremental generator pipeline? but how?
-
-                var (providedNode, pipelineContext) = tuple;
+                var (providedNodeInfo, pipelineContext) = tuple;
 
                 List<string>? newLines = null;
-                var newResolved = false;
-                // .Select().Where() calls Where -> Select but Failure is most children node so we need to analyze to parent node.
-                foreach (var node in providedNode.AncestorsAndSelf().OfType<InvocationExpressionSyntax>())
+                foreach (var node in providedNodeInfo.Expressions)
                 {
                     var semanticModel = pipelineContext.Compilation.GetSemanticModel(node.SyntaxTree);
                     var symbolInfo = semanticModel.GetSymbolInfo(node);
 
                     if (symbolInfo.CandidateReason != CandidateReason.OverloadResolutionFailure || symbolInfo.CandidateSymbols.Length == 0)
                     {
-                        if (newResolved)
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        newResolved = true;
+                        continue;
                     }
 
                     bool addedNewLine = false;

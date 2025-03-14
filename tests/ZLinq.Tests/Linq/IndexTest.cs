@@ -13,7 +13,7 @@ namespace ZLinq.Tests.Linq
         public void Index_WithEmptyCollection_ShouldReturnEmpty()
         {
             var source = new EmptyEnumerable<int>();
-            var result = source.Index();
+            var result = source.AsValueEnumerable(default(int)).Index();
 
             result.TryGetNonEnumeratedCount(out var count).ShouldBeTrue();
             count.ShouldBe(0);
@@ -25,7 +25,7 @@ namespace ZLinq.Tests.Linq
         public void Index_WithNonEmptyCollection_ShouldReturnIndexedItems()
         {
             var source = new TestEnumerable<int>(new[] { 10, 20, 30 });
-            var result = source.Index();
+            var result = source.AsValueEnumerable(default(int)).Index();
 
             result.TryGetNonEnumeratedCount(out var count).ShouldBeTrue();
             count.ShouldBe(3);
@@ -46,7 +46,7 @@ namespace ZLinq.Tests.Linq
         public void Index_TryGetSpan_ShouldReturnFalse()
         {
             var source = new TestEnumerable<int>(new[] { 10, 20, 30 });
-            var result = source.Index();
+            var result = source.AsValueEnumerable(default(int)).Index();
 
             result.TryGetSpan(out var span).ShouldBeFalse();
             span.IsEmpty.ShouldBeTrue();
@@ -56,7 +56,7 @@ namespace ZLinq.Tests.Linq
         public void Index_TryCopyTo_ShouldReturnFalse()
         {
             var source = new TestEnumerable<int>(new[] { 10, 20, 30 });
-            var result = source.Index();
+            var result = source.AsValueEnumerable(default(int)).Index();
 
             result.TryCopyTo(new Span<(int, int)>()).ShouldBeFalse();
         }

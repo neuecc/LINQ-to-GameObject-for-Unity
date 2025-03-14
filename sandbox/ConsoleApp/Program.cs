@@ -15,20 +15,25 @@ using ZLinq.Traversables;
 // 2147483647
 
 
+var sequence = Enumerable.Range(1, 10).ToArray();
+
+var expected = sequence.TakeWhile((x, i) => i >= 0).ToArray();
+var actual1 = sequence.AsValueEnumerable().TakeWhile((x, i) => i >= 0);
+
+
+
 var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
 
 var allDlls = root
     .AsTraversable()
     .Descendants()
     .OfType(default(FileInfo))
-    .Where(x => x.Extension == ".dll");
-
-var groupByName = allDlls
+    .Where(x => x.Extension == ".dll")
     .GroupBy(x => x.Name)
     .Select(x => (FileName: x.Key, Count: x.Count()))
     .OrderByDescending(x => x.Count);
 
-foreach (var item in groupByName)
+foreach (var item in allDlls)
 {
     Console.WriteLine(item);
 }

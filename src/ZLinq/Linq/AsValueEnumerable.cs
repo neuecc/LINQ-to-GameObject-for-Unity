@@ -7,10 +7,18 @@ using System.Numerics;
 
 namespace ZLinq
 {
-    // TODO: +FrozenCollections
-
     public static partial class ValueEnumerable
     {
+        // Source Generator trigger
+        public static TEnumerable AsValueEnumerable<TEnumerable, TSource>(this TEnumerable source, TSource typeHint)
+            where TEnumerable : struct, IValueEnumerable<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+        {
+            return source;
+        }
+
         public static FromEnumerable<T> AsValueEnumerable<T>(this IEnumerable<T> source)
         {
             return new(source);
