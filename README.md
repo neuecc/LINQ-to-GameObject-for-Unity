@@ -18,7 +18,7 @@ I aimed to create not just an experimental library but a practical one. It's als
 You can install it from [NuGet/ZLinq](https://www.nuget.org/packages/ZLinq). For Unity usage, refer to the [Unity section](#unity).
 
 ```bash
-dotnet add ZLinq
+dotnet add package ZLinq
 ```
 
 ZLinq chains internally use the following interface:
@@ -120,7 +120,7 @@ Standard packages are available for FileSystemInfo and JsonNode. For Unity, it's
 ### FileSystem
 
 ```bash
-dotnet add ZLinq.FileSystem
+dotnet add package ZLinq.FileSystem
 ```
 
 ```csharp
@@ -145,7 +145,7 @@ foreach (var item in groupByName)
 ### JSON(System.Text.Json)
 
 ```bash
-dotnet add ZLinq.Json
+dotnet add package ZLinq.Json
 ```
 
 ```csharp
