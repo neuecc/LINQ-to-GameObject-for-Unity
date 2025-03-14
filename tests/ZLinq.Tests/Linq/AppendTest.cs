@@ -125,9 +125,8 @@ public class AppendTest
         var element = 42;
         
         // Use ToIterableValueEnumerable to avoid Span optimization
-        var enumerable = xs.ToIterableValueEnumerable().Append(element);
         var expected = xs.Append(element).ToArray();
-        
-        enumerable.ToArray().ShouldBe(expected);
+
+        xs.ToValueEnumerable().Append(element).ToArray().ShouldBe(expected);
     }
 }

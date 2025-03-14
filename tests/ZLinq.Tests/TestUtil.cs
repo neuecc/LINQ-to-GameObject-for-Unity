@@ -24,7 +24,7 @@ public static class TestUtil
     }
 
     // hide source type to avoid Span optimization
-    public static FromEnumerable<T> ToIterableValueEnumerable<T>(this IEnumerable<T> source)
+    public static FromEnumerable<T> ToValueEnumerable<T>(this IEnumerable<T> source)
     {
         static IEnumerable<T> Core(IEnumerable<T> source)
         {

@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 
 namespace ZLinq.SourceGenerator;
 
@@ -15,10 +16,13 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
     /// <summary>
     /// Mutable context that allows updating the Compilation reference
     /// </summary>
-    class UpdatablePipelineContext(Compilation compilation, ParseOptions parseOptions)
+    class UpdatablePipelineContext(ImmutableArray<InvocationExpressionSyntax[]> nodes, Compilation compilation, ParseOptions parseOptions) : IEquatable<UpdatablePipelineContext>
     {
         readonly Compilation originalCompilation = compilation;
 
+        public ImmutableArray<InvocationExpressionSyntax[]> Nodes => nodes;
+
+        public StringBuilder LineBuilder { get; } = new StringBuilder(); // reusable string buffer
         public HashSet<string> MethodLines { get; } = new HashSet<string>();
         public Compilation Compilation { get; private set; } = compilation;
 
@@ -27,34 +31,37 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
             // parse all-lines everytime(When overlapping only the differences, for some reason it didn't work properly.)
             this.Compilation = originalCompilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(code, options: (CSharpParseOptions)parseOptions, cancellationToken: cancellationToken));
         }
-    }
 
-    class ValueEnumerableNodeInfo(InvocationExpressionSyntax[] expressions) //  : IEquatable<ValueEnumerableNodeInfo>
-    {
-        public ReadOnlySpan<InvocationExpressionSyntax> Expressions => expressions;
-
-        // Equality for Incremental Generator cache(NOTE: when cached, IntelliSense seems broken so currently disable it...
-        public bool Equals(ValueEnumerableNodeInfo other)
+        // ignore compare compilation
+        public bool Equals(UpdatablePipelineContext other)
         {
-            var otherExpres = other.Expressions;
+            var others = other.Nodes;
+            if (nodes.Length != others.Length) return false;
 
-            if (expressions.Length != otherExpres.Length) return false;
-
-            for (int i = 0; i < expressions.Length; i++)
+            for (int i = 0; i < nodes.Length; i++)
             {
-                var l = (expressions[i].Expression as MemberAccessExpressionSyntax)?.Name?.Identifier.Text;
-                var r = (otherExpres[i].Expression as MemberAccessExpressionSyntax)?.Name?.Identifier.Text;
-                if (l != r) return false;
+                var ls = nodes[i];
+                var rs = others[i];
+
+                if (ls.Length != rs.Length) return false;
+
+                for (int j = 0; j < ls.Length; j++)
+                {
+                    var l = (ls[j].Expression as MemberAccessExpressionSyntax)?.Name?.Identifier.Text;
+                    var r = (rs[j].Expression as MemberAccessExpressionSyntax)?.Name?.Identifier.Text;
+                    if (l != r) return false;
+                }
             }
+
             return true;
         }
     }
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        // with ParseOptions
         var compilationProvider = context.CompilationProvider
-            .Combine(context.ParseOptionsProvider)
-            .Select((tuple, _) => new UpdatablePipelineContext(tuple.Left, tuple.Right));
+            .Combine(context.ParseOptionsProvider);
 
         var resolvedOverloadResolutionFailure = context.SyntaxProvider
             .CreateSyntaxProvider((node, ct) =>
@@ -80,6 +87,7 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                             {
                                 case "AsValueEnumerable":
                                 case "AsTraversable":
+                                case "ToValueEnumerable": // for user define reserved
                                 case "Children":
                                 case "ChildrenAndSelf":
                                 case "Descendants":
@@ -108,90 +116,93 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                     .OfType<InvocationExpressionSyntax>()
                     .ToArray();
 
-                return new ValueEnumerableNodeInfo(expressions);
+                return expressions;
             })
+            .Collect()
             .Combine(compilationProvider)
-            .SelectMany((tuple, cancellationToken) =>
+            .Select((x, _) => new UpdatablePipelineContext(x.Left, x.Right.Left, x.Right.Right)); // Equality
+
+        context.RegisterSourceOutput(resolvedOverloadResolutionFailure, Emit);
+    }
+
+    static void Emit(SourceProductionContext sourceProductionContext, UpdatablePipelineContext pipelineContext)
+    {
+        foreach (var providedNodeInfo in pipelineContext.Nodes)
+        {
+            foreach (var node in providedNodeInfo)
             {
-                var (providedNodeInfo, pipelineContext) = tuple;
+                var semanticModel = pipelineContext.Compilation.GetSemanticModel(node.SyntaxTree);
+                var symbolInfo = semanticModel.GetSymbolInfo(node);
 
-                List<string>? newLines = null;
-                foreach (var node in providedNodeInfo.Expressions)
+                if (symbolInfo.CandidateReason != CandidateReason.OverloadResolutionFailure || symbolInfo.CandidateSymbols.Length == 0)
                 {
-                    var semanticModel = pipelineContext.Compilation.GetSemanticModel(node.SyntaxTree);
-                    var symbolInfo = semanticModel.GetSymbolInfo(node);
+                    continue;
+                }
 
-                    if (symbolInfo.CandidateReason != CandidateReason.OverloadResolutionFailure || symbolInfo.CandidateSymbols.Length == 0)
-                    {
-                        continue;
-                    }
+                bool addedNewLine = false;
+                foreach (var methodSymbol in symbolInfo.CandidateSymbols.OfType<IMethodSymbol>())
+                {
+                    if (methodSymbol.TypeArguments.Length == 0) continue;
 
-                    bool addedNewLine = false;
-                    foreach (var methodSymbol in symbolInfo.CandidateSymbols.OfType<IMethodSymbol>())
-                    {
-                        if (methodSymbol.TypeArguments.Length == 0) continue;
+                    var enumerableType = methodSymbol.TypeArguments[0]; // TEnumerable
+                    if (!TryGetValueEnumerableSourceType(enumerableType, out var sourceType)) continue; // TSource
 
-                        var enumerableType = methodSymbol.TypeArguments[0]; // TEnumerable
-                        if (!TryGetValueEnumerableSourceType(enumerableType, out var sourceType)) continue; // TSource
+                    if (sourceType.TypeKind == TypeKind.TypeParameter) continue; // can't resolve
 
-                        if (sourceType.TypeKind == TypeKind.TypeParameter) continue; // can't resolve
+                    var extensionMethod = methodSymbol.ReducedFrom; // reduced code to original extension method
+                    if (extensionMethod == null) continue;
 
-                        var extensionMethod = methodSymbol.ReducedFrom; // reduced code to original extension method
-                        if (extensionMethod == null) continue;
+                    // IValueEnumerable implementation rule, first is TEnumerable, second is TSource.
+                    ITypeSymbol[] constructTypeArguments = [enumerableType, sourceType, .. methodSymbol.TypeArguments.AsSpan()[2..]];
 
-                        // IValueEnumerable implementation rule, first is TEnumerable, second is TSource.
-                        ITypeSymbol[] constructTypeArguments = [enumerableType, sourceType, .. methodSymbol.TypeArguments.AsSpan()[2..]];
+                    var constructedMethod = extensionMethod.Construct(constructTypeArguments);  // TEnumerable, TSource, others...
 
-                        var constructedMethod = extensionMethod.Construct(constructTypeArguments);  // TEnumerable, TSource, others...
+                    // Since formatting it directly would include the constructed Type in the type arguments as well,
+                    // we need to break it down and build it separately.
+                    // can not use FullMethodSignatureFormat like `constructedMethod.ToDisplayString(FullMethodSignatureFormat)`
 
-                        // Since formatting it directly would include the constructed Type in the type arguments as well,
-                        // we need to break it down and build it separately.
-                        // can not use FullMethodSignatureFormat like `constructedMethod.ToDisplayString(FullMethodSignatureFormat)`
-
-                        var formattedReturnType = constructedMethod.ReturnType.ToDisplayString(NullableFlowState.MaybeNull, SymbolDisplayFormat.FullyQualifiedFormat);
-                        var formattedParameters = string.Join(", ", constructedMethod.Parameters.Select((x, i) => $"{(i == 0 ? "this " : "")}{x.Type.ToDisplayString(NullableFlowState.MaybeNull, SymbolDisplayFormat.FullyQualifiedFormat)} {x.Name}"));
-                        var formattedTypeArguments = string.Join(", ", constructedMethod.TypeArguments.Skip(2).Select(x => x.ToDisplayString(NullableFlowState.MaybeNull, SymbolDisplayFormat.FullyQualifiedFormat))).SurroundIfNotEmpty("<", ">");
-                        var className = constructedMethod.ContainingType.ToDisplayString(NullableFlowState.MaybeNull, SymbolDisplayFormat.FullyQualifiedFormat);
-                        var methodName = constructedMethod.Name;
-                        var fullTypeArguments = string.Join(", ", constructedMethod.TypeArguments.Select(x => x.ToDisplayString(NullableFlowState.MaybeNull, SymbolDisplayFormat.FullyQualifiedFormat))).SurroundIfNotEmpty("<", ">");
-                        var parameterNames = string.Join(", ", constructedMethod.Parameters.Select(x => x.Name));
+                    var formattedReturnType = constructedMethod.ReturnType.ToDisplayString(NullableFlowState.MaybeNull, SymbolDisplayFormat.FullyQualifiedFormat);
+                    var formattedParameters = string.Join(", ", constructedMethod.Parameters.Select((x, i) => $"{(i == 0 ? "this " : "")}{x.Type.ToDisplayString(NullableFlowState.MaybeNull, SymbolDisplayFormat.FullyQualifiedFormat)} {x.Name}"));
+                    var formattedTypeArguments = string.Join(", ", constructedMethod.TypeArguments.Skip(2).Select(x => x.ToDisplayString(NullableFlowState.MaybeNull, SymbolDisplayFormat.FullyQualifiedFormat))).SurroundIfNotEmpty("<", ">");
+                    var className = constructedMethod.ContainingType.ToDisplayString(NullableFlowState.MaybeNull, SymbolDisplayFormat.FullyQualifiedFormat);
+                    var methodName = constructedMethod.Name;
+                    var fullTypeArguments = string.Join(", ", constructedMethod.TypeArguments.Select(x => x.ToDisplayString(NullableFlowState.MaybeNull, SymbolDisplayFormat.FullyQualifiedFormat))).SurroundIfNotEmpty("<", ">");
+                    var parameterNames = string.Join(", ", constructedMethod.Parameters.Select(x => x.Name));
 
 #if DEBUG
-                        var timestamp = $"/* {DateTime.Now.ToString()} */";
+                    var timestamp = $"/* {DateTime.Now.ToString()} */";
 #else
-                        var timestamp = "";
+                    var timestamp = "";
 #endif
-                        var formattedSignature = $"        {timestamp}public static {formattedReturnType} {constructedMethod.Name}{formattedTypeArguments}({formattedParameters}) => {className}.{methodName}{fullTypeArguments}({parameterNames});";
-                        formattedSignature = formattedSignature // extra alloc but easy to read
-                            .Replace("global::ZLinq.Linq.", "")
-                            .Replace("global::ZLinq.ValueEnumerableExtensions.", "ValueEnumerableExtensions.")
-                            .Replace("global::System.Func", "Func")
-                            .Replace("global::System.Action", "Action");
+                    var builder = pipelineContext.LineBuilder;
+                    builder.Clear();
 
-                        if (pipelineContext.MethodLines.Add(formattedSignature))
-                        {
-                            addedNewLine = true;
-                            if (newLines == null)
-                            {
-                                newLines = new();
-                            }
-                            newLines.Add(formattedSignature);
-                        }
-                    }
+                    builder.Append($"        {timestamp}public static {formattedReturnType} {constructedMethod.Name}{formattedTypeArguments}({formattedParameters}) => {className}.{methodName}{fullTypeArguments}({parameterNames});");
+                    builder = builder
+                        .Replace("global::ZLinq.Linq.", "")
+                        .Replace("global::ZLinq.ValueEnumerableExtensions.", "ValueEnumerableExtensions.")
+                        .Replace("global::System.Func", "Func")
+                        .Replace("global::System.Action", "Action");
 
-                    // Create a new Compilation with the current results, generate OverloadResolutionFailure and CandidateSymbols for the following method chain, and continue the exploration
-                    if (addedNewLine)
+                    var formattedSignature = builder.ToString();
+                    if (pipelineContext.MethodLines.Add(formattedSignature)) // Ideally, we would like to compare before ToString
                     {
-                        var code = BuildCode(pipelineContext.MethodLines);
-                        pipelineContext.UpdateCompilation(code, cancellationToken);
+                        addedNewLine = true;
                     }
                 }
 
-                return newLines ?? (IEnumerable<string>)[];
-            })
-            .Collect();
+                // Create a new Compilation with the current results, generate OverloadResolutionFailure and CandidateSymbols for the following method chain, and continue the exploration
+                if (addedNewLine)
+                {
+                    var code = BuildCode(pipelineContext.MethodLines);
+                    pipelineContext.UpdateCompilation(code, sourceProductionContext.CancellationToken);
+                }
+            }
+        }
 
-        context.RegisterSourceOutput(resolvedOverloadResolutionFailure, Emit);
+        // Emit result
+        var finalCode = BuildCode(pipelineContext.MethodLines);
+        sourceProductionContext.AddSource("ZLinqTypeInferenceHelper.g.cs", finalCode.ReplaceLineEndings());
     }
 
     static string BuildCode(IEnumerable<string> sources)
@@ -218,12 +229,6 @@ namespace ZLinq
         sb.AppendLine("}");
 
         return sb.ToString();
-    }
-
-    static void Emit(SourceProductionContext sourceProductionContext, ImmutableArray<string> sources)
-    {
-        var code = BuildCode(sources);
-        sourceProductionContext.AddSource("ZLinqTypeInferenceHelper.g.cs", code.ReplaceLineEndings());
     }
 
     static bool TryGetValueEnumerableSourceType(ITypeSymbol type, out ITypeSymbol sourceType)

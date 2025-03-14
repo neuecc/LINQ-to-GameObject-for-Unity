@@ -8,14 +8,14 @@ public class ToLookupTest
         var xs = new int[0];
         {
             var actual1 = xs.AsValueEnumerable().ToLookup(x => x);
-            var actual2 = xs.ToIterableValueEnumerable().ToLookup(x => x);
+            var actual2 = xs.ToValueEnumerable().ToLookup(x => x);
 
             actual1.Count.ShouldBe(0);
             actual2.Count.ShouldBe(0);
         }
         {
             var actual1 = xs.AsValueEnumerable().ToLookup(x => x, x => x);
-            var actual2 = xs.ToIterableValueEnumerable().ToLookup(x => x, x => x);
+            var actual2 = xs.ToValueEnumerable().ToLookup(x => x, x => x);
 
             actual1.Count.ShouldBe(0);
             actual2.Count.ShouldBe(0);
@@ -28,7 +28,7 @@ public class ToLookupTest
         var xs = new int[] { 1, 2, 3, 4, 5 };
         {
             var actual1 = xs.AsValueEnumerable().ToLookup(x => x);
-            var actual2 = xs.ToIterableValueEnumerable().ToLookup(x => x);
+            var actual2 = xs.ToValueEnumerable().ToLookup(x => x);
             
             actual1.Count.ShouldBe(xs.Length);
             actual2.Count.ShouldBe(xs.Length);
@@ -41,7 +41,7 @@ public class ToLookupTest
         }
         {
             var actual1 = xs.AsValueEnumerable().ToLookup(x => x, x => x * x);
-            var actual2 = xs.ToIterableValueEnumerable().ToLookup(x => x, x => x * x);
+            var actual2 = xs.ToValueEnumerable().ToLookup(x => x, x => x * x);
             
             actual1.Count.ShouldBe(xs.Length);
             actual2.Count.ShouldBe(xs.Length);
@@ -60,7 +60,7 @@ public class ToLookupTest
         var xs = new int[] { 1, 2, 2, 3, 3, 3, 4, 4, 4, 4 };
         {
             var actual1 = xs.AsValueEnumerable().ToLookup(x => x % 3);
-            var actual2 = xs.ToIterableValueEnumerable().ToLookup(x => x % 3);
+            var actual2 = xs.ToValueEnumerable().ToLookup(x => x % 3);
             
             actual1.Count.ShouldBe(3);
             actual2.Count.ShouldBe(3);
@@ -76,7 +76,7 @@ public class ToLookupTest
         }
         {
             var actual1 = xs.AsValueEnumerable().ToLookup(x => x % 3, x => x * 10);
-            var actual2 = xs.ToIterableValueEnumerable().ToLookup(x => x % 3, x => x * 10);
+            var actual2 = xs.ToValueEnumerable().ToLookup(x => x % 3, x => x * 10);
             
             actual1.Count.ShouldBe(3);
             actual2.Count.ShouldBe(3);
@@ -118,7 +118,7 @@ public class ToLookupTest
         var xs = new string?[] { null, "a", null, "b", "c", null };
         
         var lookup1 = xs.AsValueEnumerable().ToLookup(x => x);
-        var lookup2 = xs.ToIterableValueEnumerable().ToLookup(x => x);
+        var lookup2 = xs.ToValueEnumerable().ToLookup(x => x);
         
         lookup1.Count.ShouldBe(4); // null, "a", "b", "c"
         lookup2.Count.ShouldBe(4);

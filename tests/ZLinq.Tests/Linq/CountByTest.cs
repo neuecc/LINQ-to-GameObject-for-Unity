@@ -120,10 +120,7 @@ public class CountByTest
         var source = new List<string> { "a", "b", "a", "c", "b", "a" };
 
         // Use ToIterableValueEnumerable to force the non-span code path
-        var enumerable = source.ToIterableValueEnumerable();
-
-        // Act
-        var actual = enumerable.CountBy(x => x)
+        var actual = source.ToValueEnumerable().CountBy(x => x)
                               .ToDictionary(x => x.Key, x => x.Value);
 
         // Assert

@@ -18,7 +18,7 @@ public class ToListTest
         xs.AsValueEnumerable().ToList().ShouldBeEmpty();
         ValueEnumerable.Range(0, 0).ToList().ShouldBeEmpty();
         xs.AsValueEnumerable().Select(x => x).ToList().ShouldBeEmpty();
-        xs.ToIterableValueEnumerable().ToList().ShouldBeEmpty();
+        xs.ToValueEnumerable().ToList().ShouldBeEmpty();
     }
 
     [Fact]
@@ -29,6 +29,6 @@ public class ToListTest
         xs.AsValueEnumerable().ToList().ShouldBe(xs);
         ValueEnumerable.Range(1, 5).ToList().ShouldBe(xs);
         xs.AsValueEnumerable().Select(x => x).ToList().ShouldBe(xs);
-        xs.ToIterableValueEnumerable().ToList().ShouldBe(xs);
+        xs.ToValueEnumerable().ToList().ShouldBe(xs);
     }
 }

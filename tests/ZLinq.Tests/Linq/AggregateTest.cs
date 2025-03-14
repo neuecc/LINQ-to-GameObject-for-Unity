@@ -16,7 +16,7 @@ public class AggregateTest
 
         TestUtil.Throws<InvalidOperationException>(
             () => xs.Aggregate((x, y) => x + y),
-            () => xs.ToIterableValueEnumerable().Aggregate((x, y) => x + y)
+            () => xs.ToValueEnumerable().Aggregate((x, y) => x + y)
         );
     }
 
@@ -27,11 +27,11 @@ public class AggregateTest
 
         // Both implementations should return the same result when aggregating
         xs.AsValueEnumerable().Aggregate((x, y) => x + y).ShouldBe(xs.Aggregate((x, y) => x + y));
-        xs.ToIterableValueEnumerable().Aggregate((x, y) => x + y).ShouldBe(xs.Aggregate((x, y) => x + y));
+        xs.ToValueEnumerable().Aggregate((x, y) => x + y).ShouldBe(xs.Aggregate((x, y) => x + y));
 
         // Test with different aggregation function
         xs.AsValueEnumerable().Aggregate((x, y) => x * y).ShouldBe(xs.Aggregate((x, y) => x * y));
-        xs.ToIterableValueEnumerable().Aggregate((x, y) => x * y).ShouldBe(xs.Aggregate((x, y) => x * y));
+        xs.ToValueEnumerable().Aggregate((x, y) => x * y).ShouldBe(xs.Aggregate((x, y) => x * y));
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class AggregateTest
 
         // Should return the single element without calling the function
         xs.AsValueEnumerable().Aggregate((x, y) => throw new Exception("Should not be called")).ShouldBe(42);
-        xs.ToIterableValueEnumerable().Aggregate((x, y) => throw new Exception("Should not be called")).ShouldBe(42);
+        xs.ToValueEnumerable().Aggregate((x, y) => throw new Exception("Should not be called")).ShouldBe(42);
     }
 
     // Tests for Aggregate<TEnumerable, TSource, TAccumulate>(this TEnumerable source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func)
@@ -53,7 +53,7 @@ public class AggregateTest
 
         // Should return the seed when source is empty
         xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc + x).ShouldBe(seed);
-        xs.ToIterableValueEnumerable().Aggregate(seed, (acc, x) => acc + x).ShouldBe(seed);
+        xs.ToValueEnumerable().Aggregate(seed, (acc, x) => acc + x).ShouldBe(seed);
     }
 
     [Fact]
@@ -64,11 +64,11 @@ public class AggregateTest
 
         // Both implementations should return the same result when aggregating with seed
         xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc + x).ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x));
-        xs.ToIterableValueEnumerable().Aggregate(seed, (acc, x) => acc + x).ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x));
+        xs.ToValueEnumerable().Aggregate(seed, (acc, x) => acc + x).ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x));
 
         // Test with different aggregation function
         xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc * x).ShouldBe(xs.Aggregate(seed, (acc, x) => acc * x));
-        xs.ToIterableValueEnumerable().Aggregate(seed, (acc, x) => acc * x).ShouldBe(xs.Aggregate(seed, (acc, x) => acc * x));
+        xs.ToValueEnumerable().Aggregate(seed, (acc, x) => acc * x).ShouldBe(xs.Aggregate(seed, (acc, x) => acc * x));
     }
 
     [Fact]
@@ -120,7 +120,7 @@ public class AggregateTest
         xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
             .ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x, acc => acc * 2));
             
-        xs.ToIterableValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
+        xs.ToValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
             .ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x, acc => acc * 2));
     }
 
@@ -134,14 +134,14 @@ public class AggregateTest
         xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
             .ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x, acc => acc * 2));
             
-        xs.ToIterableValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
+        xs.ToValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
             .ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x, acc => acc * 2));
 
         // Test with different aggregation and result selector functions
         xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc * x, acc => $"Result: {acc}")
             .ShouldBe(xs.Aggregate(seed, (acc, x) => acc * x, acc => $"Result: {acc}"));
             
-        xs.ToIterableValueEnumerable().Aggregate(seed, (acc, x) => acc * x, acc => $"Result: {acc}")
+        xs.ToValueEnumerable().Aggregate(seed, (acc, x) => acc * x, acc => $"Result: {acc}")
             .ShouldBe(xs.Aggregate(seed, (acc, x) => acc * x, acc => $"Result: {acc}"));
     }
 
@@ -165,7 +165,7 @@ public class AggregateTest
 
         actual.ShouldBe(expected);
         
-        actual = xs.ToIterableValueEnumerable().Aggregate(
+        actual = xs.ToValueEnumerable().Aggregate(
             (Sum: 0, Count: 0),
             (acc, x) => (Sum: acc.Sum + x, Count: acc.Count + 1),
             acc => acc.Count > 0 ? (double)acc.Sum / acc.Count : 0

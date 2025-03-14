@@ -108,7 +108,7 @@ public class TakeRangeTest(ITestOutputHelper testOutputHelper)
         {
             var expected = sequence.Take(range).ToArray();
             var actual1 = sequence.AsValueEnumerable().Take(range).ToArray();
-            var actual2 = sequence.ToIterableValueEnumerable().Take(range).ToArray();
+            var actual2 = sequence.ToValueEnumerable().Take(range).ToArray();
 
             actual1.ShouldBe(expected);
             actual2.ShouldBe(expected);

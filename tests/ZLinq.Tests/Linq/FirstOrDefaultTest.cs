@@ -7,7 +7,7 @@ public class FirstOrDefaultTest
     {
         var xs = new int[0];
         xs.AsValueEnumerable().FirstOrDefault().ShouldBe(default(int));
-        xs.ToIterableValueEnumerable().FirstOrDefault().ShouldBe(default(int));
+        xs.ToValueEnumerable().FirstOrDefault().ShouldBe(default(int));
     }
 
     [Fact]
@@ -15,7 +15,7 @@ public class FirstOrDefaultTest
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
         xs.AsValueEnumerable().FirstOrDefault().ShouldBe(1);
-        xs.ToIterableValueEnumerable().FirstOrDefault().ShouldBe(1);
+        xs.ToValueEnumerable().FirstOrDefault().ShouldBe(1);
     }
 
     [Fact]
@@ -23,7 +23,7 @@ public class FirstOrDefaultTest
     {
         var xs = new int[0];
         xs.AsValueEnumerable().FirstOrDefault(42).ShouldBe(42);
-        xs.ToIterableValueEnumerable().FirstOrDefault(42).ShouldBe(42);
+        xs.ToValueEnumerable().FirstOrDefault(42).ShouldBe(42);
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public class FirstOrDefaultTest
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
         xs.AsValueEnumerable().FirstOrDefault(x => x > 3).ShouldBe(4);
-        xs.ToIterableValueEnumerable().FirstOrDefault(x => x > 3).ShouldBe(4);
+        xs.ToValueEnumerable().FirstOrDefault(x => x > 3).ShouldBe(4);
     }
 
     [Fact]
@@ -39,6 +39,6 @@ public class FirstOrDefaultTest
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
         xs.AsValueEnumerable().FirstOrDefault(x => x > 5, 42).ShouldBe(42);
-        xs.ToIterableValueEnumerable().FirstOrDefault(x => x > 5, 42).ShouldBe(42);
+        xs.ToValueEnumerable().FirstOrDefault(x => x > 5, 42).ShouldBe(42);
     }
 }

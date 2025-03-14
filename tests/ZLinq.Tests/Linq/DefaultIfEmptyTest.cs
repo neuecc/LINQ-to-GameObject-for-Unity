@@ -108,7 +108,7 @@ public class DefaultIfEmptyTest
     public void ToIterableValueEnumerable_EmptyCollection_ReturnsDefaultValue()
     {
         var xs = new int[0];
-        var result = xs.ToIterableValueEnumerable().DefaultIfEmpty().ToArray();
+        var result = xs.ToValueEnumerable().DefaultIfEmpty().ToArray();
         
         result.Length.ShouldBe(1);
         result[0].ShouldBe(default(int));
@@ -118,7 +118,7 @@ public class DefaultIfEmptyTest
     public void ToIterableValueEnumerable_NonEmptyCollection_ReturnsSameElements()
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
-        var result = xs.ToIterableValueEnumerable().DefaultIfEmpty().ToArray();
+        var result = xs.ToValueEnumerable().DefaultIfEmpty().ToArray();
         
         result.ShouldBe(xs);
     }

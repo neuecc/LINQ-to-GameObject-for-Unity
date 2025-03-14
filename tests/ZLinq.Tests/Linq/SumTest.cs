@@ -9,7 +9,7 @@ public class SumTest
         var xs = Array.Empty<int>();
 
         xs.AsValueEnumerable().Sum().ShouldBe(xs.Sum());
-        xs.ToIterableValueEnumerable().Sum().ShouldBe(xs.Sum());
+        xs.ToValueEnumerable().Sum().ShouldBe(xs.Sum());
     }
 
     [Fact]
@@ -18,7 +18,7 @@ public class SumTest
         var xs = Array.Empty<float>();
 
         xs.AsValueEnumerable().Sum().ShouldBe(xs.Sum());
-        xs.ToIterableValueEnumerable().Sum().ShouldBe(xs.Sum());
+        xs.ToValueEnumerable().Sum().ShouldBe(xs.Sum());
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public class SumTest
         var xs = Array.Empty<double>();
 
         xs.AsValueEnumerable().Sum().ShouldBe(xs.Sum());
-        xs.ToIterableValueEnumerable().Sum().ShouldBe(xs.Sum());
+        xs.ToValueEnumerable().Sum().ShouldBe(xs.Sum());
     }
 
     // Tests for different numeric types
@@ -36,19 +36,19 @@ public class SumTest
     {
         var ints = new[] { 1, 2, 3, 4, 5 };
         ints.AsValueEnumerable().Sum().ShouldBe(ints.Sum());
-        ints.ToIterableValueEnumerable().Sum().ShouldBe(ints.Sum());
+        ints.ToValueEnumerable().Sum().ShouldBe(ints.Sum());
 
         var bytes = new byte[] { 1, 2, 3, 4, 5 };
         bytes.AsValueEnumerable().Sum().ShouldBe((byte)bytes.Sum(x => (int)x));
-        bytes.ToIterableValueEnumerable().Sum().ShouldBe((byte)bytes.Sum(x => (int)x));
+        bytes.ToValueEnumerable().Sum().ShouldBe((byte)bytes.Sum(x => (int)x));
 
         var shorts = new short[] { 1, 2, 3, 4, 5 };
         shorts.AsValueEnumerable().Sum().ShouldBe((short)shorts.Sum(x => (short)x));
-        shorts.ToIterableValueEnumerable().Sum().ShouldBe((short)shorts.Sum(x => (short)x));
+        shorts.ToValueEnumerable().Sum().ShouldBe((short)shorts.Sum(x => (short)x));
 
         var longs = new long[] { 1, 2, 3, 4, 5 };
         longs.AsValueEnumerable().Sum().ShouldBe(longs.Sum());
-        longs.ToIterableValueEnumerable().Sum().ShouldBe(longs.Sum());
+        longs.ToValueEnumerable().Sum().ShouldBe(longs.Sum());
     }
 
     [Fact]
@@ -56,15 +56,15 @@ public class SumTest
     {
         var floats = new[] { 1.5f, 2.5f, 3.5f, 4.5f, 5.5f };
         floats.AsValueEnumerable().Sum().ShouldBe(floats.Sum());
-        floats.ToIterableValueEnumerable().Sum().ShouldBe(floats.Sum());
+        floats.ToValueEnumerable().Sum().ShouldBe(floats.Sum());
 
         var doubles = new[] { 1.5, 2.5, 3.5, 4.5, 5.5 };
         doubles.AsValueEnumerable().Sum().ShouldBe(doubles.Sum());
-        doubles.ToIterableValueEnumerable().Sum().ShouldBe(doubles.Sum());
+        doubles.ToValueEnumerable().Sum().ShouldBe(doubles.Sum());
 
         var decimals = new[] { 1.5m, 2.5m, 3.5m, 4.5m, 5.5m };
         decimals.AsValueEnumerable().Sum().ShouldBe(decimals.Sum());
-        decimals.ToIterableValueEnumerable().Sum().ShouldBe(decimals.Sum());
+        decimals.ToValueEnumerable().Sum().ShouldBe(decimals.Sum());
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class SumTest
 
         // Should match standard implementation behavior
         floats.AsValueEnumerable().Sum().ShouldBe(floats.Sum());
-        floats.ToIterableValueEnumerable().Sum().ShouldBe(floats.Sum());
+        floats.ToValueEnumerable().Sum().ShouldBe(floats.Sum());
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class SumTest
         var doubles = new[] { 1e15, 1, -1e15, 1 };
 
         doubles.AsValueEnumerable().Sum().ShouldBe(doubles.Sum());
-        doubles.ToIterableValueEnumerable().Sum().ShouldBe(doubles.Sum());
+        doubles.ToValueEnumerable().Sum().ShouldBe(doubles.Sum());
     }
 
     // Overflow tests
@@ -131,7 +131,7 @@ public class SumTest
         var expected = 15;
 
         ints.AsValueEnumerable().SumUnchecked().ShouldBe(expected);
-        ints.ToIterableValueEnumerable().SumUnchecked().ShouldBe(expected);
+        ints.ToValueEnumerable().SumUnchecked().ShouldBe(expected);
     }
 
     [Fact]
@@ -213,6 +213,6 @@ public class SumTest
     {
         var ints = new[] { -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5 };
         ints.AsValueEnumerable().Sum().ShouldBe(0);
-        ints.ToIterableValueEnumerable().Sum().ShouldBe(0);
+        ints.ToValueEnumerable().Sum().ShouldBe(0);
     }
 }

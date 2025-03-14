@@ -12,7 +12,7 @@ public class TakeWhileTest
         
         var expected = empty.TakeWhile(x => x < 5).ToArray();
         var actual1 = empty.AsValueEnumerable().TakeWhile(x => x < 5).ToArray();
-        var actual2 = empty.ToIterableValueEnumerable().TakeWhile(x => x < 5).ToArray();
+        var actual2 = empty.ToValueEnumerable().TakeWhile(x => x < 5).ToArray();
 
         actual1.ShouldBe(expected);
         actual2.ShouldBe(expected);
@@ -25,7 +25,7 @@ public class TakeWhileTest
         
         var expected = sequence.TakeWhile(x => x < 0).ToArray();
         var actual1 = sequence.AsValueEnumerable().TakeWhile(x => x < 0).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().TakeWhile(x => x < 0).ToArray();
+        var actual2 = sequence.ToValueEnumerable().TakeWhile(x => x < 0).ToArray();
 
         actual1.ShouldBe(expected); // Should be empty
         actual2.ShouldBe(expected); // Should be empty
@@ -38,7 +38,7 @@ public class TakeWhileTest
         
         var expected = sequence.TakeWhile(x => x < 5).ToArray();
         var actual1 = sequence.AsValueEnumerable().TakeWhile(x => x < 5).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().TakeWhile(x => x < 5).ToArray();
+        var actual2 = sequence.ToValueEnumerable().TakeWhile(x => x < 5).ToArray();
 
         actual1.ShouldBe(expected); // Should be [1,2,3,4]
         actual2.ShouldBe(expected); // Should be [1,2,3,4]
@@ -51,7 +51,7 @@ public class TakeWhileTest
         
         var expected = sequence.TakeWhile(x => x > 0).ToArray();
         var actual1 = sequence.AsValueEnumerable().TakeWhile(x => x > 0).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().TakeWhile(x => x > 0).ToArray();
+        var actual2 = sequence.ToValueEnumerable().TakeWhile(x => x > 0).ToArray();
 
         actual1.ShouldBe(expected); // Should be all elements
         actual2.ShouldBe(expected); // Should be all elements
@@ -64,7 +64,7 @@ public class TakeWhileTest
         
         var expected = sequence.TakeWhile((x, i) => i < 5).ToArray();
         var actual1 = sequence.AsValueEnumerable().TakeWhile((x, i) => i < 5).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().TakeWhile((x, i) => i < 5).ToArray();
+        var actual2 = sequence.ToValueEnumerable().TakeWhile((x, i) => i < 5).ToArray();
 
         actual1.ShouldBe(expected); // Should be [1,2,3,4,5]
         actual2.ShouldBe(expected); // Should be [1,2,3,4,5]
@@ -77,7 +77,7 @@ public class TakeWhileTest
         
         var expected = sequence.TakeWhile((x, i) => i >= 0).ToArray();
         var actual1 = sequence.AsValueEnumerable().TakeWhile((x, i) => i >= 0).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().TakeWhile((x, i) => i >= 0).ToArray();
+        var actual2 = sequence.ToValueEnumerable().TakeWhile((x, i) => i >= 0).ToArray();
 
         actual1.ShouldBe(expected); // Should be all elements
         actual2.ShouldBe(expected); // Should be all elements

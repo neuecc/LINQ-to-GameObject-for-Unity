@@ -21,6 +21,16 @@ var expected = sequence.TakeWhile((x, i) => i >= 0).ToArray();
 var actual1 = sequence.AsValueEnumerable().TakeWhile((x, i) => i >= 0);
 
 
+var foo = Enumerable.Range(1, 10).Select(x => x * 100);
+
+//foo.AsValueEnumerable().Where(x => x % 2 == 0).Select(x => x * x);
+
+foo.AsValueEnumerable().Where(x => x % 2 == 0).Select(x => x * x);
+
+foo.AsValueEnumerable().Select(x => x.ToString()).Where(x => x == "");
+
+//_ = foo.AsValueEnumerable().Where(x => x % 2 == 0).Select(x => x * 1000);
+
 
 var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
 

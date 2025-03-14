@@ -12,7 +12,7 @@ public class TakeTest
         
         var expected = empty.Take(5).ToArray();
         var actual1 = empty.AsValueEnumerable().Take(5).ToArray();
-        var actual2 = empty.ToIterableValueEnumerable().Take(5).ToArray();
+        var actual2 = empty.ToValueEnumerable().Take(5).ToArray();
 
         actual1.ShouldBe(expected);
         actual2.ShouldBe(expected);
@@ -25,7 +25,7 @@ public class TakeTest
         
         var expected = sequence.Take(0).ToArray();
         var actual1 = sequence.AsValueEnumerable().Take(0).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().Take(0).ToArray();
+        var actual2 = sequence.ToValueEnumerable().Take(0).ToArray();
 
         actual1.ShouldBe(expected); // Should be empty
         actual2.ShouldBe(expected); // Should be empty
@@ -38,7 +38,7 @@ public class TakeTest
         
         var expected = sequence.Take(-5).ToArray();
         var actual1 = sequence.AsValueEnumerable().Take(-5).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().Take(-5).ToArray();
+        var actual2 = sequence.ToValueEnumerable().Take(-5).ToArray();
 
         actual1.ShouldBe(expected); // Should be empty
         actual2.ShouldBe(expected); // Should be empty
@@ -51,7 +51,7 @@ public class TakeTest
         
         var expected = sequence.Take(5).ToArray();
         var actual1 = sequence.AsValueEnumerable().Take(5).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().Take(5).ToArray();
+        var actual2 = sequence.ToValueEnumerable().Take(5).ToArray();
 
         actual1.ShouldBe(expected); // Should be [1,2,3,4,5]
         actual2.ShouldBe(expected); // Should be [1,2,3,4,5]
@@ -64,7 +64,7 @@ public class TakeTest
         
         var expected = sequence.Take(20).ToArray();
         var actual1 = sequence.AsValueEnumerable().Take(20).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().Take(20).ToArray();
+        var actual2 = sequence.ToValueEnumerable().Take(20).ToArray();
 
         actual1.ShouldBe(expected); // Should return all elements
         actual2.ShouldBe(expected); // Should return all elements
@@ -77,7 +77,7 @@ public class TakeTest
         
         var expected = sequence.Take(10).ToArray();
         var actual1 = sequence.AsValueEnumerable().Take(10).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().Take(10).ToArray();
+        var actual2 = sequence.ToValueEnumerable().Take(10).ToArray();
 
         actual1.ShouldBe(expected); // Should return all elements
         actual2.ShouldBe(expected); // Should return all elements

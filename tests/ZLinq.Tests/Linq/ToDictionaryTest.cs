@@ -14,7 +14,7 @@ public class ToDictionaryTest
         {
             var actual1 = xs.AsValueEnumerable().ToDictionary(x => x);
             var actual2 = xs.AsValueEnumerable().Select(x => x).ToDictionary(x => x);
-            var actual3 = xs.ToIterableValueEnumerable().ToDictionary(x => x);
+            var actual3 = xs.ToValueEnumerable().ToDictionary(x => x);
 
             actual1.Count.ShouldBe(0);
             actual2.Count.ShouldBe(0);
@@ -23,7 +23,7 @@ public class ToDictionaryTest
         {
             var actual1 = xs.AsValueEnumerable().ToDictionary(x => x, x => x);
             var actual2 = xs.AsValueEnumerable().Select(x => x).ToDictionary(x => x, x => x);
-            var actual3 = xs.ToIterableValueEnumerable().ToDictionary(x => x, x => x);
+            var actual3 = xs.ToValueEnumerable().ToDictionary(x => x, x => x);
 
             actual1.Count.ShouldBe(0);
             actual2.Count.ShouldBe(0);
@@ -38,7 +38,7 @@ public class ToDictionaryTest
         {
             var actual1 = xs.AsValueEnumerable().ToDictionary(x => x);
             var actual2 = xs.AsValueEnumerable().Select(x => x).ToDictionary(x => x);
-            var actual3 = xs.ToIterableValueEnumerable().ToDictionary(x => x);
+            var actual3 = xs.ToValueEnumerable().ToDictionary(x => x);
             Assert.Equal(xs.Length, actual1.Count);
             Assert.Equal(xs.Length, actual2.Count);
             Assert.Equal(xs.Length, actual3.Count);
@@ -52,7 +52,7 @@ public class ToDictionaryTest
         {
             var actual1 = xs.AsValueEnumerable().ToDictionary(x => x, x => x * x);
             var actual2 = xs.AsValueEnumerable().Select(x => x).ToDictionary(x => x, x => x * x);
-            var actual3 = xs.ToIterableValueEnumerable().ToDictionary(x => x, x => x * x);
+            var actual3 = xs.ToValueEnumerable().ToDictionary(x => x, x => x * x);
             Assert.Equal(xs.Length, actual1.Count);
             Assert.Equal(xs.Length, actual2.Count);
             Assert.Equal(xs.Length, actual3.Count);

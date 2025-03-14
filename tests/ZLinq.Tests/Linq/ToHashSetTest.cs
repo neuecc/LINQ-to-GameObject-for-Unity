@@ -14,7 +14,7 @@ public class ToHashSetTest
         
         var actual1 = xs.AsValueEnumerable().ToHashSet();
         var actual2 = xs.AsValueEnumerable().Select(x => x).ToHashSet();
-        var actual3 = xs.ToIterableValueEnumerable().ToHashSet();
+        var actual3 = xs.ToValueEnumerable().ToHashSet();
 
         actual1.Count.ShouldBe(0);
         actual2.Count.ShouldBe(0);
@@ -28,7 +28,7 @@ public class ToHashSetTest
         
         var actual1 = xs.AsValueEnumerable().ToHashSet();
         var actual2 = xs.AsValueEnumerable().Select(x => x).ToHashSet();
-        var actual3 = xs.ToIterableValueEnumerable().ToHashSet();
+        var actual3 = xs.ToValueEnumerable().ToHashSet();
         
         Assert.Equal(xs.Length, actual1.Count);
         Assert.Equal(xs.Length, actual2.Count);

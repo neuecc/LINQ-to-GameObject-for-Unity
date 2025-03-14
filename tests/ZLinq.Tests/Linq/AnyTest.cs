@@ -13,7 +13,7 @@ public class AnyTest
 
         // ZLinq implementations
         xs.AsValueEnumerable().Any().ShouldBe(expected);
-        xs.ToIterableValueEnumerable().Any().ShouldBe(expected);
+        xs.ToValueEnumerable().Any().ShouldBe(expected);
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public class AnyTest
 
         // ZLinq implementations
         xs.AsValueEnumerable().Any().ShouldBe(expected);
-        xs.ToIterableValueEnumerable().Any().ShouldBe(expected);
+        xs.ToValueEnumerable().Any().ShouldBe(expected);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class AnyTest
 
         // ZLinq implementations
         xs.AsValueEnumerable().Any(x => x > 3).ShouldBe(expected);
-        xs.ToIterableValueEnumerable().Any(x => x > 3).ShouldBe(expected);
+        xs.ToValueEnumerable().Any(x => x > 3).ShouldBe(expected);
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class AnyTest
 
         // ZLinq implementations
         xs.AsValueEnumerable().Any(x => x > 10).ShouldBe(expected);
-        xs.ToIterableValueEnumerable().Any(x => x > 10).ShouldBe(expected);
+        xs.ToValueEnumerable().Any(x => x > 10).ShouldBe(expected);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class AnyTest
 
         // ZLinq implementations
         xs.AsValueEnumerable().Any(x => x > 3).ShouldBe(expected);
-        xs.ToIterableValueEnumerable().Any(x => x > 3).ShouldBe(expected);
+        xs.ToValueEnumerable().Any(x => x > 3).ShouldBe(expected);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class AnyTest
 
         // ZLinq implementations
         xs.AsValueEnumerable().Any(x => x > 0).ShouldBe(expected);
-        xs.ToIterableValueEnumerable().Any(x => x > 0).ShouldBe(expected);
+        xs.ToValueEnumerable().Any(x => x > 0).ShouldBe(expected);
     }
 
     [Fact]

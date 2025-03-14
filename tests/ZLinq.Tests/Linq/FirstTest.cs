@@ -7,7 +7,7 @@ public class FirstTest
     {
         var xs = new int[0];
         Assert.Throws<InvalidOperationException>(() => xs.AsValueEnumerable().First());
-        Assert.Throws<InvalidOperationException>(() => xs.ToIterableValueEnumerable().First());
+        Assert.Throws<InvalidOperationException>(() => xs.ToValueEnumerable().First());
     }
 
     [Fact]
@@ -15,7 +15,7 @@ public class FirstTest
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
         xs.AsValueEnumerable().First().ShouldBe(1);
-        xs.ToIterableValueEnumerable().First().ShouldBe(1);
+        xs.ToValueEnumerable().First().ShouldBe(1);
     }
 
     [Fact]
@@ -23,7 +23,7 @@ public class FirstTest
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
         xs.AsValueEnumerable().First(x => x > 3).ShouldBe(4);
-        xs.ToIterableValueEnumerable().First(x => x > 3).ShouldBe(4);
+        xs.ToValueEnumerable().First(x => x > 3).ShouldBe(4);
     }
 
     [Fact]
@@ -31,6 +31,6 @@ public class FirstTest
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
         Assert.Throws<InvalidOperationException>(() => xs.AsValueEnumerable().First(x => x > 5));
-        Assert.Throws<InvalidOperationException>(() => xs.ToIterableValueEnumerable().First(x => x > 5));
+        Assert.Throws<InvalidOperationException>(() => xs.ToValueEnumerable().First(x => x > 5));
     }
 }

@@ -9,11 +9,11 @@ public class OrderByTest
     {
         var xs = new int[0];
 
-        var ordered = xs.AsValueEnumerable().OrderBy(x => x);
-        ordered.ToArray().ShouldBeEmpty();
+        var ordered = xs.AsValueEnumerable().OrderBy(x => x).ToArray();
+        ordered.ShouldBeEmpty();
 
-        var iterableOrdered = xs.ToIterableValueEnumerable().OrderBy(x => x);
-        iterableOrdered.ToArray().ShouldBeEmpty();
+        var iterableOrdered = xs.ToValueEnumerable().OrderBy(x => x).ToArray();
+        iterableOrdered.ShouldBeEmpty();
     }
 
     [Fact]
@@ -21,11 +21,11 @@ public class OrderByTest
     {
         var xs = new int[] { 5, 2, 8, 1, 9 };
 
-        var ordered = xs.AsValueEnumerable().OrderBy(x => x);
-        ordered.ToArray().ShouldBe(new[] { 1, 2, 5, 8, 9 });
+        var ordered = xs.AsValueEnumerable().OrderBy(x => x).ToArray();
+        ordered.ShouldBe(new[] { 1, 2, 5, 8, 9 });
 
-        var iterableOrdered = xs.ToIterableValueEnumerable().OrderBy(x => x);
-        iterableOrdered.ToArray().ShouldBe(new[] { 1, 2, 5, 8, 9 });
+        var iterableOrdered = xs.ToValueEnumerable().OrderBy(x => x).ToArray();
+        iterableOrdered.ShouldBe(new[] { 1, 2, 5, 8, 9 });
     }
 
     [Fact]
@@ -33,11 +33,11 @@ public class OrderByTest
     {
         var xs = new int[0];
 
-        var ordered = xs.AsValueEnumerable().Order();
-        ordered.ToArray().ShouldBeEmpty();
+        var ordered = xs.AsValueEnumerable().Order().ToArray();
+        ordered.ShouldBeEmpty();
 
-        var iterableOrdered = xs.ToIterableValueEnumerable().Order();
-        iterableOrdered.ToArray().ShouldBeEmpty();
+        var iterableOrdered = xs.ToValueEnumerable().Order().ToArray();
+        iterableOrdered.ShouldBeEmpty();
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class OrderByTest
         var ordered = xs.AsValueEnumerable().Order();
         ordered.ToArray().ShouldBe(new[] { 1, 2, 5, 8, 9 });
 
-        var iterableOrdered = xs.ToIterableValueEnumerable().Order();
+        var iterableOrdered = xs.ToValueEnumerable().Order();
         iterableOrdered.ToArray().ShouldBe(new[] { 1, 2, 5, 8, 9 });
     }
 

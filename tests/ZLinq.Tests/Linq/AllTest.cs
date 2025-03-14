@@ -13,7 +13,7 @@ public class AllTest
 
         // ZLinq implementation
         xs.AsValueEnumerable().All(x => x > 0).ShouldBe(expected);
-        xs.ToIterableValueEnumerable().All(x => x > 0).ShouldBe(expected);
+        xs.ToValueEnumerable().All(x => x > 0).ShouldBe(expected);
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public class AllTest
 
         // ZLinq implementation
         xs.AsValueEnumerable().All(x => x % 2 == 0).ShouldBe(expected);
-        xs.ToIterableValueEnumerable().All(x => x % 2 == 0).ShouldBe(expected);
+        xs.ToValueEnumerable().All(x => x % 2 == 0).ShouldBe(expected);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class AllTest
 
         // ZLinq implementation
         xs.AsValueEnumerable().All(x => x % 2 == 0).ShouldBe(expected);
-        xs.ToIterableValueEnumerable().All(x => x % 2 == 0).ShouldBe(expected);
+        xs.ToValueEnumerable().All(x => x % 2 == 0).ShouldBe(expected);
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class AllTest
 
         // ZLinq implementation
         xs.AsValueEnumerable().All(x => x % 2 == 0).ShouldBe(expected);
-        xs.ToIterableValueEnumerable().All(x => x % 2 == 0).ShouldBe(expected);
+        xs.ToValueEnumerable().All(x => x % 2 == 0).ShouldBe(expected);
     }
 
     [Fact]
@@ -91,12 +91,12 @@ public class AllTest
     public void EnumeratorPathWorks()
     {
         // Use TestUtil to create a non-span enumerable
-        var xs = TestUtil.ToIterableValueEnumerable(new int[] { 2, 4, 6, 8, 10 });
+        var xs = TestUtil.ToValueEnumerable(new int[] { 2, 4, 6, 8, 10 });
 
         var actual = xs.All(x => x % 2 == 0);
         actual.ShouldBeTrue();
 
-        var ys = TestUtil.ToIterableValueEnumerable(new int[] { 1, 3, 5, 7, 9 });
+        var ys = TestUtil.ToValueEnumerable(new int[] { 1, 3, 5, 7, 9 });
 
         var actual2 = ys.All(x => x % 2 == 0);
         actual2.ShouldBeFalse();

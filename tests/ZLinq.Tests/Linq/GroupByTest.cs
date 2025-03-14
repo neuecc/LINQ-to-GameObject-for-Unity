@@ -10,7 +10,7 @@ public class GroupByTest
         // Basic overload
         {
             var actual1 = xs.AsValueEnumerable().GroupBy(x => x).ToArray();
-            var actual2 = xs.ToIterableValueEnumerable().GroupBy(x => x).ToArray();
+            var actual2 = xs.ToValueEnumerable().GroupBy(x => x).ToArray();
 
             actual1.Length.ShouldBe(0);
             actual2.Length.ShouldBe(0);
@@ -19,7 +19,7 @@ public class GroupByTest
         // With element selector
         {
             var actual1 = xs.AsValueEnumerable().GroupBy(x => x, x => x * 2).ToArray();
-            var actual2 = xs.ToIterableValueEnumerable().GroupBy(x => x, x => x * 2).ToArray();
+            var actual2 = xs.ToValueEnumerable().GroupBy(x => x, x => x * 2).ToArray();
 
             actual1.Length.ShouldBe(0);
             actual2.Length.ShouldBe(0);
@@ -32,7 +32,7 @@ public class GroupByTest
                 (key, elements) => (Key: key, Count: elements.Count())
             ).ToArray();
 
-            var actual2 = xs.ToIterableValueEnumerable().GroupBy(
+            var actual2 = xs.ToValueEnumerable().GroupBy(
                 x => x,
                 (key, elements) => (Key: key, Count: elements.Count())
             ).ToArray();
@@ -49,7 +49,7 @@ public class GroupByTest
                 (key, elements) => (Key: key, Sum: elements.Sum())
             ).ToArray();
 
-            var actual2 = xs.ToIterableValueEnumerable().GroupBy(
+            var actual2 = xs.ToValueEnumerable().GroupBy(
                 x => x,
                 x => x * 2,
                 (key, elements) => (Key: key, Sum: elements.Sum())
@@ -66,7 +66,7 @@ public class GroupByTest
         var xs = new[] { 1, 2, 3, 4, 5, 6 };
 
         var actual1 = xs.AsValueEnumerable().GroupBy(x => x % 3).ToArray();
-        var actual2 = xs.ToIterableValueEnumerable().GroupBy(x => x % 3).ToArray();
+        var actual2 = xs.ToValueEnumerable().GroupBy(x => x % 3).ToArray();
 
         actual1.Length.ShouldBe(3);
         actual2.Length.ShouldBe(3);
@@ -98,7 +98,7 @@ public class GroupByTest
         var xs = new[] { 1, 2, 3, 4, 5, 6 };
 
         var actual1 = xs.AsValueEnumerable().GroupBy(x => x % 3, x => x * 10).ToArray();
-        var actual2 = xs.ToIterableValueEnumerable().GroupBy(x => x % 3, x => x * 10).ToArray();
+        var actual2 = xs.ToValueEnumerable().GroupBy(x => x % 3, x => x * 10).ToArray();
 
         actual1.Length.ShouldBe(3);
         actual2.Length.ShouldBe(3);
@@ -124,7 +124,7 @@ public class GroupByTest
             (key, elements) => (Key: key, Sum: elements.Sum(), Count: elements.Count())
         ).ToArray();
 
-        var actual2 = xs.ToIterableValueEnumerable().GroupBy(
+        var actual2 = xs.ToValueEnumerable().GroupBy(
             x => x % 3,
             (key, elements) => (Key: key, Sum: elements.Sum(), Count: elements.Count())
         ).ToArray();
@@ -157,7 +157,7 @@ public class GroupByTest
             (key, elements) => (Key: key, Sum: elements.Sum())
         ).ToArray();
 
-        var actual2 = xs.ToIterableValueEnumerable().GroupBy(
+        var actual2 = xs.ToValueEnumerable().GroupBy(
             x => x % 3,
             x => x * x,
             (key, elements) => (Key: key, Sum: elements.Sum())

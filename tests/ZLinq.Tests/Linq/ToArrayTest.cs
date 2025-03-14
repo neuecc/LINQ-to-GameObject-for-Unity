@@ -18,7 +18,7 @@ public class ToArrayTest
         xs.AsValueEnumerable().ToArray().ShouldBeEmpty();
         ValueEnumerable.Range(0, 0).ToArray().ShouldBeEmpty();
         xs.AsValueEnumerable().Select(x => x).ToArray().ShouldBeEmpty();
-        xs.ToIterableValueEnumerable().ToArray().ShouldBeEmpty();
+        xs.ToValueEnumerable().ToArray().ShouldBeEmpty();
     }
 
     [Fact]
@@ -29,6 +29,6 @@ public class ToArrayTest
         xs.AsValueEnumerable().ToArray().ShouldBe(xs);
         ValueEnumerable.Range(1, 5).ToArray().ShouldBe(xs);
         xs.AsValueEnumerable().Select(x => x).ToArray().ShouldBe(xs);
-        xs.ToIterableValueEnumerable().ToArray().ShouldBe(xs);
+        xs.ToValueEnumerable().ToArray().ShouldBe(xs);
     }
 }

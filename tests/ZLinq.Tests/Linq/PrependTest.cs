@@ -125,9 +125,8 @@ public class PrependTest
         var element = 42;
         
         // Use ToIterableValueEnumerable to avoid Span optimization
-        var enumerable = xs.ToIterableValueEnumerable().Prepend(element);
         var expected = xs.Prepend(element).ToArray();
-        
-        enumerable.ToArray().ShouldBe(expected);
+
+        xs.ToValueEnumerable().Prepend(element).ToArray().ShouldBe(expected);
     }
 }

@@ -16,7 +16,7 @@ public class MinTest
 
         TestUtil.Throws<InvalidOperationException>(
             () => empty.Min(),
-            () => empty.ToIterableValueEnumerable().Min());
+            () => empty.ToValueEnumerable().Min());
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class MinTest
 
         empty.Min().ShouldBeNull();
         empty.AsValueEnumerable().Min().ShouldBeNull();
-        empty.ToIterableValueEnumerable().Min().ShouldBeNull();
+        empty.ToValueEnumerable().Min().ShouldBeNull();
     }
 
     // Test basic functionality with different numeric types
@@ -35,19 +35,19 @@ public class MinTest
     {
         var ints = new[] { 5, 3, 8, 2, 10 };
         ints.AsValueEnumerable().Min().ShouldBe(ints.Min());
-        ints.ToIterableValueEnumerable().Min().ShouldBe(ints.Min());
+        ints.ToValueEnumerable().Min().ShouldBe(ints.Min());
 
         var bytes = new byte[] { 5, 3, 8, 2, 10 };
         bytes.AsValueEnumerable().Min().ShouldBe(bytes.Min());
-        bytes.ToIterableValueEnumerable().Min().ShouldBe(bytes.Min());
+        bytes.ToValueEnumerable().Min().ShouldBe(bytes.Min());
 
         var shorts = new short[] { 5, 3, 8, 2, 10 };
         shorts.AsValueEnumerable().Min().ShouldBe(shorts.Min());
-        shorts.ToIterableValueEnumerable().Min().ShouldBe(shorts.Min());
+        shorts.ToValueEnumerable().Min().ShouldBe(shorts.Min());
 
         var longs = new long[] { 5, 3, 8, 2, 10 };
         longs.AsValueEnumerable().Min().ShouldBe(longs.Min());
-        longs.ToIterableValueEnumerable().Min().ShouldBe(longs.Min());
+        longs.ToValueEnumerable().Min().ShouldBe(longs.Min());
     }
 
     [Fact]
@@ -57,15 +57,15 @@ public class MinTest
         var a = doubles.AsValueEnumerable().Min();
         var b = doubles.Min();
         a.ShouldBe(b);
-        doubles.ToIterableValueEnumerable().Min().ShouldBe(doubles.Min());
+        doubles.ToValueEnumerable().Min().ShouldBe(doubles.Min());
 
         var floats = new[] { 5.5f, 3.3f, 8.8f, 2.2f, 10.1f };
         floats.AsValueEnumerable().Min().ShouldBe(floats.Min());
-        floats.ToIterableValueEnumerable().Min().ShouldBe(floats.Min());
+        floats.ToValueEnumerable().Min().ShouldBe(floats.Min());
 
         var decimals = new[] { 5.5m, 3.3m, 8.8m, 2.2m, 10.1m };
         decimals.AsValueEnumerable().Min().ShouldBe(decimals.Min());
-        decimals.ToIterableValueEnumerable().Min().ShouldBe(decimals.Min());
+        decimals.ToValueEnumerable().Min().ShouldBe(decimals.Min());
     }
 
     // Test reference types
@@ -74,7 +74,7 @@ public class MinTest
     {
         var strings = new[] { "banana", "apple", "cherry", "date" };
         strings.AsValueEnumerable().Min().ShouldBe(strings.Min());
-        strings.ToIterableValueEnumerable().Min().ShouldBe(strings.Min());
+        strings.ToValueEnumerable().Min().ShouldBe(strings.Min());
     }
 
     [Fact]
@@ -82,12 +82,12 @@ public class MinTest
     {
         var stringsWithNull = new[] { "banana", null, "apple", "cherry", null };
         stringsWithNull.AsValueEnumerable().Min().ShouldBe(stringsWithNull.Min());
-        stringsWithNull.ToIterableValueEnumerable().Min().ShouldBe(stringsWithNull.Min());
+        stringsWithNull.ToValueEnumerable().Min().ShouldBe(stringsWithNull.Min());
 
         // All nulls should return null
         var allNulls = new string?[] { null, null, null };
         allNulls.AsValueEnumerable().Min().ShouldBeNull();
-        allNulls.ToIterableValueEnumerable().Min().ShouldBeNull();
+        allNulls.ToValueEnumerable().Min().ShouldBeNull();
     }
 
     // Test custom comparer
@@ -99,7 +99,7 @@ public class MinTest
 
         // With case-insensitive comparison, "APPLE" should be the min value
         strings.AsValueEnumerable().Min(comparer).ShouldBe(strings.Min(comparer));
-        strings.ToIterableValueEnumerable().Min(comparer).ShouldBe(strings.Min(comparer));
+        strings.ToValueEnumerable().Min(comparer).ShouldBe(strings.Min(comparer));
     }
 
     // Test edge cases
@@ -108,11 +108,11 @@ public class MinTest
     {
         var singleInt = new[] { 42 };
         singleInt.AsValueEnumerable().Min().ShouldBe(42);
-        singleInt.ToIterableValueEnumerable().Min().ShouldBe(42);
+        singleInt.ToValueEnumerable().Min().ShouldBe(42);
 
         var singleString = new[] { "hello" };
         singleString.AsValueEnumerable().Min().ShouldBe("hello");
-        singleString.ToIterableValueEnumerable().Min().ShouldBe("hello");
+        singleString.ToValueEnumerable().Min().ShouldBe("hello");
     }
 
     [Fact]
@@ -120,7 +120,7 @@ public class MinTest
     {
         var mixed = new[] { -5, -10, 0, 5, 10 };
         mixed.AsValueEnumerable().Min().ShouldBe(-10);
-        mixed.ToIterableValueEnumerable().Min().ShouldBe(-10);
+        mixed.ToValueEnumerable().Min().ShouldBe(-10);
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public class MinTest
     {
         var duplicates = new[] { 5, 2, 5, 2, 1, 1, 5 };
         duplicates.AsValueEnumerable().Min().ShouldBe(1);
-        duplicates.ToIterableValueEnumerable().Min().ShouldBe(1);
+        duplicates.ToValueEnumerable().Min().ShouldBe(1);
     }
 
 #if NET8_0_OR_GREATER
@@ -181,7 +181,7 @@ public class MinTest
             var expected = data.Min();
 
             var min1 = data.AsValueEnumerable().Min();
-            var min2 = data.ToIterableValueEnumerable().Min();
+            var min2 = data.ToValueEnumerable().Min();
 
             min1.ShouldBe(expected);
             min2.ShouldBe(expected);
@@ -194,7 +194,7 @@ public class MinTest
             var expected = data.Min();
 
             var min1 = data.AsValueEnumerable().Min();
-            var min2 = data.ToIterableValueEnumerable().Min();
+            var min2 = data.ToValueEnumerable().Min();
 
             min1.ShouldBe(expected);
             min2.ShouldBe(expected);
@@ -210,6 +210,6 @@ public class MinTest
         // NaN is not considered in Min for standard LINQ
         var expected = values.Min();
         values.AsValueEnumerable().Min().ShouldBe(expected);
-        values.ToIterableValueEnumerable().Min().ShouldBe(expected);
+        values.ToValueEnumerable().Min().ShouldBe(expected);
     }
 }

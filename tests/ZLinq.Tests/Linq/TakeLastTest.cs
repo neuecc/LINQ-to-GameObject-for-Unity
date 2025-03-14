@@ -12,7 +12,7 @@ public class TakeLastTest
         
         var expected = empty.TakeLast(5).ToArray();
         var actual1 = empty.AsValueEnumerable().TakeLast(5).ToArray();
-        var actual2 = empty.ToIterableValueEnumerable().TakeLast(5).ToArray();
+        var actual2 = empty.ToValueEnumerable().TakeLast(5).ToArray();
 
         actual1.ShouldBe(expected);
         actual2.ShouldBe(expected);
@@ -25,7 +25,7 @@ public class TakeLastTest
         
         var expected = sequence.TakeLast(0).ToArray();
         var actual1 = sequence.AsValueEnumerable().TakeLast(0).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().TakeLast(0).ToArray();
+        var actual2 = sequence.ToValueEnumerable().TakeLast(0).ToArray();
 
         actual1.ShouldBe(expected); // Should be empty
         actual2.ShouldBe(expected); // Should be empty
@@ -38,7 +38,7 @@ public class TakeLastTest
         
         var expected = sequence.TakeLast(-5).ToArray();
         var actual1 = sequence.AsValueEnumerable().TakeLast(-5).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().TakeLast(-5).ToArray();
+        var actual2 = sequence.ToValueEnumerable().TakeLast(-5).ToArray();
 
         actual1.ShouldBe(expected); // Should be empty
         actual2.ShouldBe(expected); // Should be empty
@@ -51,7 +51,7 @@ public class TakeLastTest
         
         var expected = sequence.TakeLast(5).ToArray();
         var actual1 = sequence.AsValueEnumerable().TakeLast(5).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().TakeLast(5).ToArray();
+        var actual2 = sequence.ToValueEnumerable().TakeLast(5).ToArray();
 
         actual1.ShouldBe(expected); // Should be [6,7,8,9,10]
         actual2.ShouldBe(expected); // Should be [6,7,8,9,10]
@@ -64,7 +64,7 @@ public class TakeLastTest
         
         var expected = sequence.TakeLast(20).ToArray();
         var actual1 = sequence.AsValueEnumerable().TakeLast(20).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().TakeLast(20).ToArray();
+        var actual2 = sequence.ToValueEnumerable().TakeLast(20).ToArray();
 
         actual1.ShouldBe(expected); // Should return all elements
         actual2.ShouldBe(expected); // Should return all elements
@@ -77,7 +77,7 @@ public class TakeLastTest
         
         var expected = sequence.TakeLast(10).ToArray();
         var actual1 = sequence.AsValueEnumerable().TakeLast(10).ToArray();
-        var actual2 = sequence.ToIterableValueEnumerable().TakeLast(10).ToArray();
+        var actual2 = sequence.ToValueEnumerable().TakeLast(10).ToArray();
 
         actual1.ShouldBe(expected); // Should return all elements
         actual2.ShouldBe(expected); // Should return all elements
@@ -139,7 +139,7 @@ public class TakeLastTest
     public void TakeLast_EnumerationImplementation()
     {
         var sequence = Enumerable.Range(1, 5).ToArray();
-        var takeLast = sequence.ToIterableValueEnumerable().TakeLast(3);
+        var takeLast = sequence.ToValueEnumerable().TakeLast(3);
         
         // Test the implementation of TryGetNext which uses the Queue logic
         var result = new List<int>();
