@@ -9,7 +9,10 @@
 	<ItemGroup>
 		<ProjectReference Include="..\ZLinq\ZLinq.csproj" />
 	</ItemGroup>
-
+	<ItemGroup>
+		<None Include="../../Icon.png" Pack="true" PackagePath="/" />
+		<EmbeddedResource Include="..\..\LICENSE" />
+	</ItemGroup>
 	<ItemGroup>
 		<Using Include="ZLinq" />
 		<Using Include="ZLinq.Internal" />

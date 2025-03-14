@@ -1,14 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ZLinq\ZLinq.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\ZLinq\ZLinq.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="../../Icon.png" Pack="true" PackagePath="/" />
+		<EmbeddedResource Include="..\..\LICENSE" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<Using Include="ZLinq" />
