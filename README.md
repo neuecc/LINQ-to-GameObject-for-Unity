@@ -1,6 +1,6 @@
 ZLinq
 ===
-Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree (FileSystem, GameObject, etc.) for all .NET platforms and Unity.
+Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree (FileSystem, Json, GameObject, etc.) for all .NET platforms and Unity.
 
 > [!IMPORTANT]
 > This library is currently in preview. Most methods are implemented, but some still throw NotImplementedException.
