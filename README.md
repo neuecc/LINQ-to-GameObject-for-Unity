@@ -3,15 +3,28 @@ ZLinq
 Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree (FileSystem, Json, GameObject, etc.) for all .NET platforms and Unity.
 
 > [!IMPORTANT]
-> This library is currently in preview. Most methods are implemented, but some still throw NotImplementedException.
+> This library is currently in preview. Most methods are implemented, but some still throw NotImplementedException. Currently supports .NET Stanard 2.1, .NET 8, .NET 9 and Unity. However .NET Standard 2.0 will also be supported when it is officially released.
 
-* 99% compatibility with .NET 10's LINQ to Objects (including Shuffle, RightJoin, LeftJoin)
-* Zero allocation for method chains through struct-based Enumerable via `IValueEnumerable`
+![](images/title_bench.jpg)
+
+```csharp
+using ZLinq;
+
+var seq = source
+    .AsValueEnumerable() // only add this line
+    .Select(x => x * 3)
+    .Where(x => x % 2 == 0);
+
+foreach (var item in seq) { }
+```
+
+* **99% compatibility** with .NET 10's LINQ (including new `Shuffle`, `RightJoin`, `LeftJoin` operators)
+* **Zero allocation** for method chains through struct-based Enumerable via `IValueEnumerable`
 * Hybrid design with Source Generator to complement type inference
-* Full support for LINQ operations on Span using .NET 9/C# 13's `allows ref struct`
-* LINQ to Tree to extend tree-structured objects (built-in support for FileSystem, JSON (for System.Text.Json), GameObject (for Unity))
-* Automatic application of SIMD where possible and customizable LINQ to SIMD for arbitrary operations
-* Fusion of my past LINQ implementations ([linq.js](https://github.com/neuecc/linq.js/), [LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object), [SimdLinq](https://github.com/Cysharp/SimdLinq/), [UniRx](https://github.com/neuecc/UniRx), [R3](https://github.com/Cysharp/R3)) and zero allocation series ([ZString](https://github.com/Cysharp/ZString), [ZLogger](https://github.com/Cysharp/ZLogger))
+* Full support for LINQ operations on **Span** using .NET 9/C# 13's `allows ref struct`
+* **LINQ to Tree** to extend tree-structured objects (built-in support for FileSystem, JSON, GameObject)
+* Automatic application of SIMD where possible and customizable **LINQ to SIMD** for arbitrary operations
+* Fusion of my past LINQ ([linq.js](https://github.com/neuecc/linq.js/), [LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object), [SimdLinq](https://github.com/Cysharp/SimdLinq/), [UniRx](https://github.com/neuecc/UniRx), [R3](https://github.com/Cysharp/R3)) and zero alloc  ([ZString](https://github.com/Cysharp/ZString), [ZLogger](https://github.com/Cysharp/ZLogger)) impls
 
 I aimed to create not just an experimental library but a practical one. It's also designed to handle high-load requirements, such as those found in games.
 
@@ -224,11 +237,14 @@ The minimum supported Unity version will be `2022.3.12f1`, as it is necessary to
 
 There are two installation steps required to use it in Unity.
 
-1. Install `ZLinq` from NuGet using [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity)
+1. Install `ZLinq` from NuGet using [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity)  
 Open Window from NuGet -> Manage NuGet Packages, Search "ZLinq" and Press Install. 
 
 2. Install the `ZLinq.Unity` package by referencing the git URL  
-> https://github.com/Cysharp/ZLinq.git?path=src/ZLinq.Unity/Assets/ZLinq.Unity
+
+```bash
+https://github.com/Cysharp/ZLinq.git?path=src/ZLinq.Unity/Assets/ZLinq.Unity
+```
 
 With the help of the Unity package, in addition to the standard ZLinq, LINQ to GameObject functionality becomes available for exploring GameObject/Transform.
 

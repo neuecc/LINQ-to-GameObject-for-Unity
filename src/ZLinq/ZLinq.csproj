@@ -11,7 +11,7 @@
 
 		<!-- NuGet Packaging -->
 		<PackageTags>linq</PackageTags>
-		<Description>Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree (FileSystem, GameObject, etc.) for all .NET platforms and Unity.</Description>
+		<Description>Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree (FileSystem, Json, GameObject, etc.) for all .NET platforms and Unity.</Description>
 
 		<!-- SourceGenerator Packaging configs... -->
 		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
