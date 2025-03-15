@@ -12,8 +12,8 @@ using ZLinq;
 
 var seq = source
     .AsValueEnumerable() // only add this line
-    .Select(x => x * 3)
-    .Where(x => x % 2 == 0);
+    .Where(x => x % 2 == 0)
+    .Select(x => x * 3);
 
 foreach (var item in seq) { }
 ```
