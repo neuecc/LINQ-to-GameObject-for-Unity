@@ -17,6 +17,10 @@
 		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="$(TargetFramework.StartsWith(`netstandard`))">
+		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<None Include="../../Icon.png" Pack="true" PackagePath="/" />
 		<EmbeddedResource Include="..\..\LICENSE" />
