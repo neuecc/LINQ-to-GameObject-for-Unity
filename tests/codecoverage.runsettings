@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+  <!-- Available Options: https://github.com/microsoft/codecoverage/blob/main/docs/configuration.md -->
+  <CoverageFileName>TestResults/coverage.cobertura.xml</CoverageFileName>
+  <Format>cobertura</Format>
+  <IncludeTestAssembly>false</IncludeTestAssembly>
+  <DeterministicReport>true</DeterministicReport>
+  <CollectFromChildProcesses>true</CollectFromChildProcesses>
+  <CodeCoverage>
+    <ModulePaths>
+      <Include>
+        <ModulePath>.*ZLinq.*\.dll$</ModulePath>
+      </Include>
+      <Exclude>
+        <!-- Exclude tests DLLS -->
+        <ModulePath>.*Tests\.dll$</ModulePath>
+
+        <!-- Exclude third party DLLs -->
+        <ModulePath>.*Shouldly\.dll$</ModulePath>
+        <ModulePath>.*DiffEngine\.dll$</ModulePath>
+      </Exclude>
+    </ModulePaths>
+    <Attributes>
+      <Exclude>
+        <Attribute>^System\.CodeDom\.Compiler\.GeneratedCodeAttribute$</Attribute>
+      </Exclude>
+    </Attributes>
+    <Sources>
+      <Exclude>
+        <Source>.*\\[^\\]*\.g\.cs</Source>
+      </Exclude>
+    </Sources>
+    <!-- Disable following settings. Because C++ code is not contained (See: https://github.com/microsoft/codecoverage/blob/main/README.md#get-started)-->
+    <EnableStaticNativeInstrumentation>False</EnableStaticNativeInstrumentation>
+    <EnableDynamicNativeInstrumentation>False</EnableDynamicNativeInstrumentation>
+  </CodeCoverage>
+</Configuration>
