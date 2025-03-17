@@ -1,6 +1,7 @@
 ﻿namespace ZLinq;
 
 // This struct is wrapper for enumerator(enumerable) to improve type inference in C# compiler.
+// C# constraint inference issue: https://github.com/dotnet/csharplang/discussions/6930
 [StructLayout(LayoutKind.Auto)]
 #if NET9_0_OR_GREATER
 public readonly ref

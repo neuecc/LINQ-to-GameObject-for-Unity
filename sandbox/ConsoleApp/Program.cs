@@ -48,6 +48,10 @@ var nazo = ValueEnumerable.Range(1, 1000).Where(x => x % 2 == 0).Select(x => x *
     .ThenBy(x => x)
     .Take(1000);
 
+var foobarbaz = ValueEnumerable.Range(1, 100000).Select(x => new { OK = x });
+
+
+
 
 // ve1.OrderBy(x => x).Enumerator.ThenBy
 // ve1.OrderBy(x=>x)
@@ -209,6 +213,6 @@ namespace ZLinq
 
     public static class Test
     {
-        
+
     }
 }

@@ -20,7 +20,6 @@ foreach (var item in seq) { }
 
 * **99% compatibility** with .NET 10's LINQ (including new `Shuffle`, `RightJoin`, `LeftJoin` operators)
 * **Zero allocation** for method chains through struct-based Enumerable via `IValueEnumerable`
-* Hybrid design with Source Generator to complement type inference
 * Full support for LINQ operations on **Span** using .NET 9/C# 13's `allows ref struct`
 * **LINQ to Tree** to extend tree-structured objects (built-in support for FileSystem, JSON, GameObject)
 * Automatic application of SIMD where possible and customizable **LINQ to SIMD** for arbitrary operations
@@ -37,50 +36,31 @@ dotnet add package ZLinq
 ZLinq chains internally use the following interface:
 
 ```csharp
-// struct version of IEnumerable<T> and IEnumerator<T>
-public interface IValueEnumerable<T> : IDisposable
+public readonly ref struct ValueEnumerable<TEnumerator, T>(TEnumerator enumerator)
+    where TEnumerator : struct, IValueEnumerator<T>, allows ref struct
+{
+    public readonly TEnumerator Enumerator = enumerator;
+}
+
+public interface IValueEnumerator<T> : IDisposable
 {
     bool TryGetNext(out T current); // as MoveNext + Current
 
-    // Optimize options
+    // Optimization helper
     bool TryGetNonEnumeratedCount(out int count);
     bool TryGetSpan(out ReadOnlySpan<T> span);
     bool TryCopyTo(Span<T> destination);
 }
 ```
 
-Besides changing to a struct-based approach, we've integrated MoveNext and Current to reduce the number of iterator calls. Also, since structs automatically copy internal state, we've simplified the type complexity by unifying Enumerable and Enumerator.
+Besides changing to a struct-based approach, we've integrated MoveNext and Current to reduce the number of iterator calls. Also, since structs automatically copy internal state, we've simplified the type complexity by unifying Enumerable and Enumerator(almostly types only implements custom enumerator).
 
 ```csharp
-public static Where<TEnumerable, TSource> Where<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
-    where TEnumerable : struct, IValueEnumerable<TSource>, allows ref struct
+public static ValueEnumerable<Where<TEnumerator, TSource>, TSource> Where<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+    where TEnumerator : struct, IValueEnumerator<TSource>, allows ref struct
 ````
 
-Operators have this method signature, but C# cannot infer types from generic constraints (in this case, determining TSource type from TEnumerable) ([dotnet/csharplang#6930](https://github.com/dotnet/csharplang/discussions/6930)). Therefore, the traditional Struct LINQ approach required implementing all operator combinations as instance methods, resulting in nearly 100,000 methods and massive assembly sizes.
-
-ZLinq adopts a hybrid approach using Source Generator to partially convert TEnumerable to concrete types for extension methods based on usage, successfully keeping the assembly size to the minimum necessary.
-
-<details><summary>Generated Inference Helper Code</summary>
-
-![](Images/typeinference.jpg)
-
-</details>
-
-Struct-based LINQ leads to very unreadable type names due to chained generics. For example, with [LinqAf](https://github.com/kevin-montrose/LinqAF), types look like this:
-
-<details><summary>LinqAf IntelliSense</summary>
-
-![](Images/linqaf_intellisense.jpg)
-
-</details>
-
-ZLinq has been designed with readable generated types in mind:
-
-<details><summary>ZLinq IntelliSense</summary>
-
-![](Images/ZLinqIntellisense.jpg)
-
-</details>
+Operators have this method signature. C# cannot infer types from generic constraints([dotnet/csharplang#6930](https://github.com/dotnet/csharplang/discussions/6930)). Therefore, the traditional Struct LINQ approach required implementing all operator combinations as instance methods, resulting in nearly 100,000 methods and massive assembly sizes. However, in ZLinq, we've successfully avoided all the boilerplate method implementations by devising an approach that properly conveys types to C# compiler.
 
 Additionally, `TryGetNonEnumeratedCount(out int count)`, `TryGetSpan(out ReadOnlySpan<T> span)`, and `TryCopyTo(Span<T> destination)` defined in the interface itself enable flexible optimizations. For example, Take+Skip can be expressed entirely as Span slices, so if the original source can be converted to a Span, Span slices are passed through TryGetSpan chains. For ToArray, if the sequence length can be calculated, a fixed-length array is prepared in advance, and operators that can write directly to the final array via TryCopyTo will do so. Some methods automatically use SIMD-based optimization if a Span can be obtained.
 
@@ -100,10 +80,6 @@ var seq1 = source.AsValueEnumerable().Where(x => x % 2 == 0);
 Span<int> span = stackalloc int[5] { 1, 2, 3, 4, 5 };
 var seq2 = span.AsValueEnumerable().Select(x => x * x);
 ```
-
-> Auto-completion may temporarily stop until the Source Generator completes generation. Recent versions of Visual Studio run Source Generators on save, so you may need to explicitly save or compile when operations stop. If you experience issues with the code editor, you can write in normal LINQ first, then add AsValueEnumerable(). Method signatures are almost completely compatible.
-
-> Due to Source Generator limitations and code analysis trigger constraints, you cannot place method chains in temporary variables and continue. Except for foreach, all operators must be written in the method chain.  Also, you cannot use private visibility or anonymous types. You need to use ValueTuple or change to public/internal visibility.
 
 LINQ to Tree
 ---
