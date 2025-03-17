@@ -1,17 +1,29 @@
 ZLinq
 ===
-Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree (FileSystem, GameObject, etc.) for all .NET platforms and Unity.
+Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree (FileSystem, Json, GameObject, etc.) for all .NET platforms and Unity.
 
 > [!IMPORTANT]
-> This library is currently in preview. Most methods are implemented, but some still throw NotImplementedException.
+> This library is currently in preview. Most methods are implemented, but some still throw NotImplementedException. Currently supports .NET Stanard 2.1, .NET 8, .NET 9 and Unity. However .NET Standard 2.0 will also be supported when it is officially released.
 
-* 99% compatibility with .NET 10's LINQ to Objects (including Shuffle, RightJoin, LeftJoin)
-* Zero allocation for method chains through struct-based Enumerable via `IValueEnumerable`
-* Hybrid design with Source Generator to complement type inference
-* Full support for LINQ operations on Span using .NET 9/C# 13's `allows ref struct`
-* LINQ to Tree to extend tree-structured objects (built-in support for FileSystem, JSON (for System.Text.Json), GameObject (for Unity))
-* Automatic application of SIMD where possible and customizable LINQ to SIMD for arbitrary operations
-* Fusion of my past LINQ implementations ([linq.js](https://github.com/neuecc/linq.js/), [LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object), [SimdLinq](https://github.com/Cysharp/SimdLinq/), [UniRx](https://github.com/neuecc/UniRx), [R3](https://github.com/Cysharp/R3)) and zero allocation series ([ZString](https://github.com/Cysharp/ZString), [ZLogger](https://github.com/Cysharp/ZLogger))
+![](Images/title_bench.jpg)
+
+```csharp
+using ZLinq;
+
+var seq = source
+    .AsValueEnumerable() // only add this line
+    .Where(x => x % 2 == 0)
+    .Select(x => x * 3);
+
+foreach (var item in seq) { }
+```
+
+* **99% compatibility** with .NET 10's LINQ (including new `Shuffle`, `RightJoin`, `LeftJoin` operators)
+* **Zero allocation** for method chains through struct-based Enumerable via `IValueEnumerable`
+* Full support for LINQ operations on **Span** using .NET 9/C# 13's `allows ref struct`
+* **LINQ to Tree** to extend tree-structured objects (built-in support for FileSystem, JSON, GameObject)
+* Automatic application of SIMD where possible and customizable **LINQ to SIMD** for arbitrary operations
+* Fusion of my past LINQ ([linq.js](https://github.com/neuecc/linq.js/), [LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object), [SimdLinq](https://github.com/Cysharp/SimdLinq/), [UniRx](https://github.com/neuecc/UniRx), [R3](https://github.com/Cysharp/R3)) and zero alloc  ([ZString](https://github.com/Cysharp/ZString), [ZLogger](https://github.com/Cysharp/ZLogger)) impls
 
 I aimed to create not just an experimental library but a practical one. It's also designed to handle high-load requirements, such as those found in games.
 
@@ -24,50 +36,31 @@ dotnet add package ZLinq
 ZLinq chains internally use the following interface:
 
 ```csharp
-// struct version of IEnumerable<T> and IEnumerator<T>
-public interface IValueEnumerable<T> : IDisposable
+public readonly ref struct ValueEnumerable<TEnumerator, T>(TEnumerator enumerator)
+    where TEnumerator : struct, IValueEnumerator<T>, allows ref struct
+{
+    public readonly TEnumerator Enumerator = enumerator;
+}
+
+public interface IValueEnumerator<T> : IDisposable
 {
     bool TryGetNext(out T current); // as MoveNext + Current
 
-    // Optimize options
+    // Optimization helper
     bool TryGetNonEnumeratedCount(out int count);
     bool TryGetSpan(out ReadOnlySpan<T> span);
     bool TryCopyTo(Span<T> destination);
 }
 ```
 
-Besides changing to a struct-based approach, we've integrated MoveNext and Current to reduce the number of iterator calls. Also, since structs automatically copy internal state, we've simplified the type complexity by unifying Enumerable and Enumerator.
+Besides changing to a struct-based approach, we've integrated MoveNext and Current to reduce the number of iterator calls. Also, since structs automatically copy internal state, we've simplified the type complexity by unifying Enumerable and Enumerator(almostly types only implements custom enumerator).
 
 ```csharp
-public static Where<TEnumerable, TSource> Where<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
-    where TEnumerable : struct, IValueEnumerable<TSource>, allows ref struct
+public static ValueEnumerable<Where<TEnumerator, TSource>, TSource> Where<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+    where TEnumerator : struct, IValueEnumerator<TSource>, allows ref struct
 ````
 
-Operators have this method signature, but C# cannot infer types from generic constraints (in this case, determining TSource type from TEnumerable) ([dotnet/csharplang#6930](https://github.com/dotnet/csharplang/discussions/6930)). Therefore, the traditional Struct LINQ approach required implementing all operator combinations as instance methods, resulting in nearly 100,000 methods and massive assembly sizes.
-
-ZLinq adopts a hybrid approach using Source Generator to partially convert TEnumerable to concrete types for extension methods based on usage, successfully keeping the assembly size to the minimum necessary.
-
-<details><summary>Generated Inference Helper Code</summary>
-
-![](Images/typeinference.jpg)
-
-</details>
-
-Struct-based LINQ leads to very unreadable type names due to chained generics. For example, with [LinqAf](https://github.com/kevin-montrose/LinqAF), types look like this:
-
-<details><summary>LinqAf IntelliSense</summary>
-
-![](Images/linqaf_intellisense.jpg)
-
-</details>
-
-ZLinq has been designed with readable generated types in mind:
-
-<details><summary>ZLinq IntelliSense</summary>
-
-![](Images/ZLinqIntellisense.jpg)
-
-</details>
+Operators have this method signature. C# cannot infer types from generic constraints([dotnet/csharplang#6930](https://github.com/dotnet/csharplang/discussions/6930)). Therefore, the traditional Struct LINQ approach required implementing all operator combinations as instance methods, resulting in nearly 100,000 methods and massive assembly sizes. However, in ZLinq, we've successfully avoided all the boilerplate method implementations by devising an approach that properly conveys types to C# compiler.
 
 Additionally, `TryGetNonEnumeratedCount(out int count)`, `TryGetSpan(out ReadOnlySpan<T> span)`, and `TryCopyTo(Span<T> destination)` defined in the interface itself enable flexible optimizations. For example, Take+Skip can be expressed entirely as Span slices, so if the original source can be converted to a Span, Span slices are passed through TryGetSpan chains. For ToArray, if the sequence length can be calculated, a fixed-length array is prepared in advance, and operators that can write directly to the final array via TryCopyTo will do so. Some methods automatically use SIMD-based optimization if a Span can be obtained.
 
@@ -87,10 +80,6 @@ var seq1 = source.AsValueEnumerable().Where(x => x % 2 == 0);
 Span<int> span = stackalloc int[5] { 1, 2, 3, 4, 5 };
 var seq2 = span.AsValueEnumerable().Select(x => x * x);
 ```
-
-> Auto-completion may temporarily stop until the Source Generator completes generation. Recent versions of Visual Studio run Source Generators on save, so you may need to explicitly save or compile when operations stop. If you experience issues with the code editor, you can write in normal LINQ first, then add AsValueEnumerable(). Method signatures are almost completely compatible.
-
-> Due to Source Generator limitations and code analysis trigger constraints, you cannot place method chains in temporary variables and continue. Except for foreach, all operators must be written in the method chain.
 
 LINQ to Tree
 ---
@@ -205,7 +194,7 @@ var origin = json!["nesting"]!["level1"]!["level2"]!;
 // JsonNode axis, Children, Descendants, Anestors, BeforeSelf, AfterSelf and ***Self.
 foreach (var item in origin.Descendants().Select(x => x.Node).OfType(default(JsonArray)))
 {
-    // [truem false, true], ["fast", "accurate", "balanced"], [1, 1, 2, 3, 5, 8, 13]
+    // [true, false, true], ["fast", "accurate", "balanced"], [1, 1, 2, 3, 5, 8, 13]
     Console.WriteLine(item!.ToJsonString(JsonSerializerOptions.Web));
 }
 ```
@@ -224,11 +213,14 @@ The minimum supported Unity version will be `2022.3.12f1`, as it is necessary to
 
 There are two installation steps required to use it in Unity.
 
-1. Install `ZLinq` from NuGet using [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity)
+1. Install `ZLinq` from NuGet using [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity)  
 Open Window from NuGet -> Manage NuGet Packages, Search "ZLinq" and Press Install. 
 
 2. Install the `ZLinq.Unity` package by referencing the git URL  
-> https://github.com/Cysharp/ZLinq.git?path=src/ZLinq.Unity/Assets/ZLinq.Unity
+
+```bash
+https://github.com/Cysharp/ZLinq.git?path=src/ZLinq.Unity/Assets/ZLinq.Unity
+```
 
 With the help of the Unity package, in addition to the standard ZLinq, LINQ to GameObject functionality becomes available for exploring GameObject/Transform.
 

@@ -2,74 +2,122 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static TSource First<TEnumerable, TSource>(this TEnumerable source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource First<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            return TryGetFirst<TEnumerable, TSource>(ref source, out var value)
-                ? value
-                : Throws.NoElements<TSource>();
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetFirst<TEnumerator, TSource>(ref enumerator, out var value)
+                    ? value
+                    : Throws.NoElements<TSource>();
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
-        public static TSource First<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource First<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            return TryGetFirst<TEnumerable, TSource>(ref source, predicate, out var value)
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetFirst<TEnumerator, TSource>(ref enumerator, predicate, out var value)
                 ? value
                 : Throws.NoMatch<TSource>();
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
-        public static TSource FirstOrDefault<TEnumerable, TSource>(this TEnumerable source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource? FirstOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            return TryGetFirst<TEnumerable, TSource>(ref source, out var value)
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetFirst<TEnumerator, TSource>(ref enumerator, out var value)
                 ? value
-                : default!;
+                : default;
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
-        public static TSource FirstOrDefault<TEnumerable, TSource>(this TEnumerable source, TSource defaultValue)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource FirstOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, TSource defaultValue)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            return TryGetFirst<TEnumerable, TSource>(ref source, out var value)
-                ? value
-                : defaultValue;
-        }
-
-        public static TSource FirstOrDefault<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-        {
-            return TryGetFirst<TEnumerable, TSource>(ref source, predicate, out var value)
-                ? value
-                : default!;
-        }
-
-        public static TSource FirstOrDefault<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate, TSource defaultValue)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-        {
-            return TryGetFirst<TEnumerable, TSource>(ref source, predicate, out var value)
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetFirst<TEnumerator, TSource>(ref enumerator, out var value)
                 ? value
                 : defaultValue;
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
-        static bool TryGetFirst<TEnumerable, TSource>(ref TEnumerable source, out TSource value)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource? FirstOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+            where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+        {
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetFirst<TEnumerator, TSource>(ref enumerator, predicate, out var value)
+                ? value
+                : default;
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
+        }
+
+        public static TSource FirstOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate, TSource defaultValue)
+            where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+        {
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetFirst<TEnumerator, TSource>(ref enumerator, predicate, out var value)
+                ? value
+                : defaultValue;
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
+        }
+
+        static bool TryGetFirst<TEnumerator, TSource>(ref TEnumerator source, out TSource value)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -86,20 +134,17 @@
                 return false;
             }
 
-            using (source)
+            if (source.TryGetNext(out value))
             {
-                if (source.TryGetNext(out value))
-                {
-                    return true;
-                }
-
-                value = default!;
-                return false;
+                return true;
             }
+
+            value = default!;
+            return false;
         }
 
-        static bool TryGetFirst<TEnumerable, TSource>(ref TEnumerable source, Func<TSource, Boolean> predicate, out TSource value)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        static bool TryGetFirst<TEnumerator, TSource>(ref TEnumerator source, Func<TSource, Boolean> predicate, out TSource value)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -119,20 +164,17 @@
                 return false;
             }
 
-            using (source)
+            while (source.TryGetNext(out var current))
             {
-                while (source.TryGetNext(out var current))
+                if (predicate(current))
                 {
-                    if (predicate(current))
-                    {
-                        value = current;
-                        return true;
-                    }
+                    value = current;
+                    return true;
                 }
-
-                value = default!;
-                return false;
             }
+
+            value = default!;
+            return false;
         }
     }
 }

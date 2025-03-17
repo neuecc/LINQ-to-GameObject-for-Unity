@@ -2,6 +2,9 @@
 
 namespace ZLinq;
 
+// TODO: ITraverser?
+
+
 // like IValueEnumerable, ITraversable as enumerable-enumerator so must implement as `struct` to copy state naturally.
 public interface ITraversable<TTraversable, T> : IDisposable
     where TTraversable : struct, ITraversable<TTraversable, T> // self
@@ -18,8 +21,6 @@ public interface ITraversable<TTraversable, T> : IDisposable
 
 public static class TraversableExtensions
 {
-    // TODO: Func<Transform, bool> descendIntoChildren
-
     public static ChildrenEnumerable<TTraversable, T> Children<TTraversable, T>(this TTraversable traversable)
         where TTraversable : struct, ITraversable<TTraversable, T>
     {

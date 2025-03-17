@@ -290,26 +290,6 @@ public class GroupByTest
         age25Group.Count().ShouldBe(2);
     }
 
-    [Fact]
-    public void GroupSequenceDisposal()
-    {
-        var disposable = new DisposableEnumerable<int>(new[] { 1, 2, 3 });
-
-        using (var enumerable = disposable.AsValueEnumerable())
-        {
-            foreach (var group in enumerable.GroupBy(x => x % 2))
-            {
-                // Just iterate to make sure we can get all groups
-                foreach (var item in group)
-                {
-                    // Do nothing with the item
-                }
-            }
-        }
-
-        disposable.IsDisposed.ShouldBeTrue();
-    }
-
     private class DisposableEnumerable<T> : IEnumerable<T>
     {
         private readonly IEnumerable<T> _inner;

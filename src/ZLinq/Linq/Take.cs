@@ -4,19 +4,19 @@ namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static Take<TEnumerable, TSource> Take<TEnumerable, TSource>(this TEnumerable source, Int32 count)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static ValueEnumerable<Take<TEnumerator, TSource>, TSource> Take<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Int32 count)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, count);
+            => new(new(source.Enumerator, count));
 
-        public static TakeRange<TEnumerable, TSource> Take<TEnumerable, TSource>(this TEnumerable source, Range range)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static ValueEnumerable<TakeRange<TEnumerator, TSource>, TSource> Take<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Range range)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, range);
+            => new(new(source.Enumerator, range));
     }
 }
 
@@ -29,18 +29,16 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Take<TEnumerable, TSource>(TEnumerable source, Int32 count)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct Take<TEnumerator, TSource>(in TEnumerator source, Int32 count)
+        : IValueEnumerator<TSource>
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
         readonly int takeCount = (count < 0) ? 0 : count; // allows negative count
         int index;
-
-        public ValueEnumerator<Take<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -100,14 +98,14 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct TakeRange<TEnumerable, TSource>
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct TakeRange<TEnumerator, TSource>
+        : IValueEnumerator<TSource>
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source;
+        TEnumerator source;
         readonly Range range;
 
         int index;
@@ -116,7 +114,7 @@ namespace ZLinq.Linq
         readonly int fromEndQueueCount; // 0 is not use q
         Queue<TSource>? q;
 
-        public TakeRange(TEnumerable source, Range range)
+        public TakeRange(in TEnumerator source, Range range)
         {
             // initialize before run.
             this.source = source;
@@ -185,8 +183,6 @@ namespace ZLinq.Linq
                 }
             }
         }
-
-        public ValueEnumerator<TakeRange<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

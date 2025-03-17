@@ -2,19 +2,27 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static UnionBy<TEnumerable, TSource, TKey> UnionBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static ValueEnumerable<UnionBy<TEnumerator, TEnumerator2, TSource, TKey>, TSource> UnionBy<TEnumerator, TEnumerator2, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, in ValueEnumerable<TEnumerator2, TSource> second, Func<TSource, TKey> keySelector)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, second, keySelector, null);
+            where TEnumerator2 : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, second.Enumerator, keySelector, null));
 
-        public static UnionBy<TEnumerable, TSource, TKey> UnionBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static ValueEnumerable<UnionBy<TEnumerator, TEnumerator2, TSource, TKey>, TSource> UnionBy<TEnumerator, TEnumerator2, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, in ValueEnumerable<TEnumerator2, TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, second, keySelector, comparer);
+            where TEnumerator2 : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, second.Enumerator, keySelector, comparer));
 
     }
 }
@@ -28,19 +36,21 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct UnionBy<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct UnionBy<TEnumerator, TEnumerator2, TSource, TKey>(in TEnumerator source, in TEnumerator2 second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
+        : IValueEnumerator<TSource>
+        where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
+        TEnumerator2 second = second;
         HashSet<TKey>? set;
-        IEnumerator<TSource>? secondEnumerator;
         byte state = 0;
-
-        public ValueEnumerator<UnionBy<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -76,19 +86,10 @@ namespace ZLinq.Linq
 
             if (state == 2)
             {
-                if (secondEnumerator is null)
+                while (second.TryGetNext(out var value) && set!.Add(keySelector(value)))
                 {
-                    secondEnumerator = second.GetEnumerator();
-                }
-
-                while (secondEnumerator.MoveNext())
-                {
-                    var v = secondEnumerator.Current;
-                    if (set!.Add(keySelector(v)))
-                    {
-                        current = v;
-                        return true;
-                    }
+                    current = value;
+                    return true;
                 }
 
                 state = 3;
@@ -101,8 +102,8 @@ namespace ZLinq.Linq
         public void Dispose()
         {
             state = 3;
-            secondEnumerator?.Dispose();
             source.Dispose();
+            second.Dispose();
         }
     }
 

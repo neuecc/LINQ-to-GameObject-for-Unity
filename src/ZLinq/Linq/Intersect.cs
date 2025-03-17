@@ -2,19 +2,27 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Intersect<TEnumerable, TSource> Intersect<TEnumerable, TSource>(this TEnumerable source, IEnumerable<TSource> second)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static ValueEnumerable<Intersect<TEnumerator, TEnumerator2, TSource>, TSource> Intersect<TEnumerator, TEnumerator2, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, in ValueEnumerable<TEnumerator2, TSource> second)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, second, null);
+            where TEnumerator2 : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, second, null));
 
-        public static Intersect<TEnumerable, TSource> Intersect<TEnumerable, TSource>(this TEnumerable source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static ValueEnumerable<Intersect<TEnumerator, TEnumerator2, TSource>, TSource> Intersect<TEnumerator, TEnumerator2, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, in ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource>? comparer)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, second, comparer);
+            where TEnumerator2 : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, second, comparer));
 
     }
 }
@@ -28,17 +36,20 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Intersect<TEnumerable, TSource>(TEnumerable source, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct Intersect<TEnumerator, TEnumerator2, TSource>(in TEnumerator source, in ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource>? comparer)
+        : IValueEnumerator<TSource>
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
+        where TEnumerator2 : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
+        ValueEnumerable<TEnumerator2, TSource> second = second;
         HashSet<TSource>? set;
-
-        public ValueEnumerator<Intersect<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -58,7 +69,7 @@ namespace ZLinq.Linq
         {
             if (set == null)
             {
-                set = new HashSet<TSource>(second, comparer ?? EqualityComparer<TSource>.Default);
+                set = second.ToHashSet(comparer);
             }
 
             if (source.TryGetNext(out var value) && set.Remove(value))

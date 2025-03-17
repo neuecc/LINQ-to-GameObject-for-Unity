@@ -22,21 +22,60 @@ var xs = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
 
 
 
-var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
+var ve1 = xs.AsSpan().AsValueEnumerable();
+var ve2 = xs.AsSpan().AsValueEnumerable();
 
-var allDlls = root
-    .AsTraversable()
-    .Descendants()
-    .OfType(default(FileInfo))
-    .Where(x => x.Extension == ".dll")
-    .GroupBy(x => x.Name)
-    .Select(x => (FileName: x.Key, Count: x.Count()))
-    .OrderByDescending(x => x.Count);
+//var foo = ve1.OrderBy(x => x).ThenBy(x => x != 1).ThenBy(x=>x.ToString());
 
-foreach (var item in allDlls)
-{
-    Console.WriteLine(item);
-}
+var foo = ve1.Select(x => x * x);
+foo.Where(x => x % 2 == 0);
+
+
+var dict = ValueEnumerable.Range(1, 100)
+    .Select(x => new KeyValuePair<string, int>(x.ToString(), x))
+    .ToDictionary();
+
+ve1.SelectMany(x => new[] { x }.AsValueEnumerable());
+
+
+var zzzzzz = ve2.Where(x => x % 2 == 0).Select(x => new { foo = x * x });
+
+
+ve1.Order().ThenBy(x => x != 1);
+
+var nazo = ValueEnumerable.Range(1, 1000).Where(x => x % 2 == 0).Select(x => x * x)
+    .Order()
+    .ThenBy(x => x)
+    .Take(1000);
+
+var foobarbaz = ValueEnumerable.Range(1, 100000).Select(x => new { OK = x });
+
+
+
+
+// ve1.OrderBy(x => x).Enumerator.ThenBy
+// ve1.OrderBy(x=>x)
+
+var ccc = ve1.Concat(xs.AsValueEnumerable());
+
+// .ToArray();
+
+
+//var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
+
+//var allDlls = root
+//    .AsTraversable()
+//    .Descendants()
+//    .OfType(default(FileInfo))
+//    .Where(x => x.Extension == ".dll")
+//    .GroupBy(x => x.Name)
+//    .Select(x => (FileName: x.Key, Count: x.Count()))
+//    .OrderByDescending(x => x.Count);
+
+//foreach (var item in allDlls)
+//{
+//    Console.WriteLine(item);
+//}
 
 //static IEnumerable<T> Iterate<T>(IEnumerable<T> source)
 //{
@@ -105,11 +144,11 @@ var json = JsonNode.Parse("""
 var origin = json!["nesting"]!["level1"]!["level2"]!;
 
 // JsonNode axis, Children, Descendants, Anestors, BeforeSelf, AfterSelf and ***Self.
-foreach (var item in origin.Descendants().Select(x => x.Node).OfType(default(JsonArray)))
-{
-    // [truem false, true], ["fast", "accurate", "balanced"], [1, 1, 2, 3, 5, 8, 13]
-    Console.WriteLine(item!.ToJsonString(JsonSerializerOptions.Web));
-}
+//foreach (var item in origin.Descendants().Select(x => x.Node).OfType(default(JsonArray)))
+//{
+//    // [truem false, true], ["fast", "accurate", "balanced"], [1, 1, 2, 3, 5, 8, 13]
+//    Console.WriteLine(item!.ToJsonString(JsonSerializerOptions.Web));
+//}
 
 
 class Person
@@ -174,17 +213,6 @@ namespace ZLinq
 
     public static class Test
     {
-        public static FromEnumerable<T> ToIterableValueEnumerable<T>(this IEnumerable<T> source)
-        {
-            static IEnumerable<T> Core(IEnumerable<T> source)
-            {
-                foreach (var item in source)
-                {
-                    yield return item;
-                }
-            }
 
-            return Core(source).AsValueEnumerable();
-        }
     }
 }

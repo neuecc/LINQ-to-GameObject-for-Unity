@@ -31,7 +31,7 @@ public partial class Commands
 
         foreach (var item in returnEnumerables)
         {
-            EmitEnumerableTemplate(item);
+            EmiTEnumeratorTemplate(item);
         }
 
         foreach (var item in others)
@@ -42,7 +42,7 @@ public partial class Commands
 
     // KeyValuePair type format is failed but ok(fix manually...)
 
-    static void EmitEnumerableTemplate(IGrouping<string, MethodInfo> methods)
+    static void EmiTEnumeratorTemplate(IGrouping<string, MethodInfo> methods)
     {
         Directory.CreateDirectory("linq1");
         Directory.CreateDirectory("linq1_test");
@@ -77,9 +77,9 @@ public partial class Commands
             var t = methodInfo.GetParameters()[0].ParameterType.GetGenericArguments()[0]; // this IEnumerable<T> source's T
             var enumerableType = $"{className}ValueEnumerable{suffix}";
             var baseGenericArguments = string.Join(", ", methodInfo.GetGenericArguments().Select(x => x.Name));
-            var genericArguments = "TEnumerable" + (baseGenericArguments == "" ? "" : $", {baseGenericArguments}");
+            var genericArguments = "TEnumerator" + (baseGenericArguments == "" ? "" : $", {baseGenericArguments}");
             var baseParameters = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{FormatType(x.ParameterType)} {x.Name}")); // skip TSource source
-            var parameters = "TEnumerable source" + (baseParameters == "" ? "" : $", {baseParameters}");
+            var parameters = "TEnumerator source" + (baseParameters == "" ? "" : $", {baseParameters}");
             var baseParameterNames = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{x.Name}"));
             var parameterNames = "source" + (baseParameterNames == "" ? "" : $", {baseParameterNames}");
             var enumerableElementType = methodInfo.ReturnType.GetGenericArguments()[0].Name;
@@ -87,7 +87,7 @@ public partial class Commands
             // sb1
             sb1.AppendLine($"""
         public static {enumerableType}<{genericArguments}> {className}<{genericArguments}>(this {parameters})
-            where TEnumerable : struct, IValueEnumerable<{t}>
+            where TEnumerator : struct, IValueEnumerable<{t}>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -106,12 +106,12 @@ public partial class Commands
 #endif
     struct {{enumerableType}}<{{genericArguments}}>({{parameters}})
         : IValueEnumerable<{{enumerableElementType}}>
-        where TEnumerable : struct, IValueEnumerable<{{t}}>
+        where TEnumerator : struct, IValueEnumerable<{{t}}>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
 
         public ValueEnumerator<{{enumerableType}}<{{genericArguments}}>, {{enumerableElementType}}> GetEnumerator() => new(this);
 
@@ -233,9 +233,9 @@ public partial class Commands
             var t = methodInfo.GetParameters()[0].ParameterType.GetGenericArguments()[0]; // this IEnumerable<T> source's T
                                                                                           // var enumerableType = $"{className}ValueEnumerable{suffix}";
             var baseGenericArguments = string.Join(", ", methodInfo.GetGenericArguments().Select(x => x.Name));
-            var genericArguments = "TEnumerable" + (baseGenericArguments == "" ? "" : $", {baseGenericArguments}");
+            var genericArguments = "TEnumerator" + (baseGenericArguments == "" ? "" : $", {baseGenericArguments}");
             var baseParameters = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{FormatType(x.ParameterType)} {x.Name}")); // skip TSource source
-            var parameters = "TEnumerable source" + (baseParameters == "" ? "" : $", {baseParameters}");
+            var parameters = "TEnumerator source" + (baseParameters == "" ? "" : $", {baseParameters}");
             //var baseParameterNames = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{x.Name}"));
             //var parameterNames = "source" + (baseParameterNames == "" ? "" : $", {baseParameterNames}");
             //var enumerableElementType = methodInfo.ReturnType.GetGenericArguments()[0].Name;
@@ -244,7 +244,7 @@ public partial class Commands
             // sb1
             sb1.AppendLine($$"""
         public static {{returnType}} {{className}}<{{genericArguments}}>(this {{parameters}})
-            where TEnumerable : struct, IValueEnumerable<{{t}}>
+            where TEnumerator : struct, IValueEnumerable<{{t}}>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif

@@ -2,13 +2,12 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Append<TEnumerable, TSource> Append<TEnumerable, TSource>(this TEnumerable source, TSource element)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static ValueEnumerable<Append<TEnumerator, TSource>, TSource> Append<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, TSource element)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, element);
-
+            => new(new(source.Enumerator, element));
     }
 }
 
@@ -21,17 +20,15 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Append<TEnumerable, TSource>(TEnumerable source, TSource element)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct Append<TEnumerator, TSource>(in TEnumerator source, TSource element)
+        : IValueEnumerator<TSource>
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
         byte state;
-
-        public ValueEnumerator<Append<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

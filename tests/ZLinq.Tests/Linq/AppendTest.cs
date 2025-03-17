@@ -81,8 +81,8 @@ public class AppendTest
         // Check iteration order
         int index = 0;
         var expected = xs.Append(element).ToArray();
-        
-        while (enumerable.TryGetNext(out var current))
+        var e = enumerable.Enumerator;
+        while (e.TryGetNext(out var current))
         {
             current.ShouldBe(expected[index++]);
         }
@@ -96,7 +96,7 @@ public class AppendTest
         var xs = Array.Empty<int>();
         var element = 42;
         
-        var enumerable = xs.AsValueEnumerable().Append(element);
+        var enumerable = xs.AsValueEnumerable().Append(element).Enumerator;
         
         enumerable.TryGetNext(out var current).ShouldBeTrue();
         current.ShouldBe(element);
@@ -110,7 +110,7 @@ public class AppendTest
         var xs = new[] { 1, 2, 3, 4, 5 };
         var element = 42;
         
-        var enumerable = xs.AsValueEnumerable().Append(element);
+        var enumerable = xs.AsValueEnumerable().Append(element).Enumerator;
         
         // After disposal, it should return false
         enumerable.TryGetNext(out _);  // Consume one element

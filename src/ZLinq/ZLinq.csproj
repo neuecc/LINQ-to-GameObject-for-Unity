@@ -11,10 +11,14 @@
 
 		<!-- NuGet Packaging -->
 		<PackageTags>linq</PackageTags>
-		<Description>Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree (FileSystem, GameObject, etc.) for all .NET platforms and Unity.</Description>
+		<Description>Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree (FileSystem, Json, GameObject, etc.) for all .NET platforms and Unity.</Description>
 
 		<!-- SourceGenerator Packaging configs... -->
 		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(TargetFramework.StartsWith(`netstandard`))">
+		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -46,9 +50,5 @@
 
 	<!-- We don't consume the analyzers in this library itself,
          but we reference the project to add a package dependency so users of this library will automatically get the analyzers. -->
-	<ItemGroup>
-		<ProjectReference Include="..\ZLinq.SourceGenerator\ZLinq.SourceGenerator.csproj"
-						  PrivateAssets="all" />
-	</ItemGroup>
 
 </Project>

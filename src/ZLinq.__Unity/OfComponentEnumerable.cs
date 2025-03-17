@@ -6,13 +6,13 @@ using UnityEngine;
 namespace ZLinq
 {
     [StructLayout(LayoutKind.Auto)]
-    public struct OfComponentTransformEnumerable<TEnumerable, TComponent> : IValueEnumerable<TComponent>
-        where TEnumerable : struct, IValueEnumerable<Transform>
+    public struct OfComponentTransformEnumerable<TEnumerator, TComponent> : IValueEnumerator<TComponent>
+        where TEnumerator : struct, IValueEnumerator<Transform>
         where TComponent : Component
     {
-        readonly TEnumerable source;
+        readonly TEnumerator source;
 
-        internal OfComponentTransformEnumerable(TEnumerable source)
+        internal OfComponentTransformEnumerable(TEnumerator source)
         {
             this.source = source;
         }

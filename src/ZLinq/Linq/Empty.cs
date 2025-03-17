@@ -2,9 +2,9 @@
 {
     public static partial class ValueEnumerable
     {
-        public static FromEmpty<T> Empty<T>()
+        public static ValueEnumerable<FromEmpty<T>, T> Empty<T>()
         {
-            return default;
+            return new(default);
         }
     }
 }
@@ -13,7 +13,7 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromEmpty<T> : IValueEnumerable<T>
+    public struct FromEmpty<T> : IValueEnumerator<T>
     {
         public ValueEnumerator<FromEmpty<T>, T> GetEnumerator()
         {

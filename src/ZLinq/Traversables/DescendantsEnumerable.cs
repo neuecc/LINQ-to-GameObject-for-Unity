@@ -2,7 +2,7 @@
 
 [StructLayout(LayoutKind.Auto)]
 public struct DescendantsEnumerable<TTraversable, T>(TTraversable traversable, bool withSelf)
-    : IValueEnumerable<T>
+    : IValueEnumerator<T>
     where TTraversable : struct, ITraversable<TTraversable, T>
 {
     RefStack<ChildrenEnumerable<TTraversable, T>>? recursiveStack = null;

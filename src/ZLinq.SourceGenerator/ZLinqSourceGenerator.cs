@@ -145,7 +145,7 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                 {
                     if (methodSymbol.TypeArguments.Length == 0) continue;
 
-                    var enumerableType = methodSymbol.TypeArguments[0]; // TEnumerable
+                    var enumerableType = methodSymbol.TypeArguments[0]; // TEnumerator
                     if (!TryGetValueEnumerableSourceType(enumerableType, out var sourceType)) continue; // TSource
 
                     if (sourceType.TypeKind == TypeKind.TypeParameter) continue; // can't resolve
@@ -153,10 +153,10 @@ public partial class ZLinqSourceGenerator : IIncrementalGenerator
                     var extensionMethod = methodSymbol.ReducedFrom; // reduced code to original extension method
                     if (extensionMethod == null) continue;
 
-                    // IValueEnumerable implementation rule, first is TEnumerable, second is TSource.
+                    // IValueEnumerable implementation rule, first is TEnumerator, second is TSource.
                     ITypeSymbol[] constructTypeArguments = [enumerableType, sourceType, .. methodSymbol.TypeArguments.AsSpan()[2..]];
 
-                    var constructedMethod = extensionMethod.Construct(constructTypeArguments);  // TEnumerable, TSource, others...
+                    var constructedMethod = extensionMethod.Construct(constructTypeArguments);  // TEnumerator, TSource, others...
 
                     // Since formatting it directly would include the constructed Type in the type arguments as well,
                     // we need to break it down and build it separately.

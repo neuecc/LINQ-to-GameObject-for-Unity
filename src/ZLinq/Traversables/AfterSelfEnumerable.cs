@@ -2,7 +2,7 @@
 
 [StructLayout(LayoutKind.Auto)]
 public struct AfterSelfEnumerable<TTraversable, T>(TTraversable traversable, bool withSelf)
-    : IValueEnumerable<T>
+    : IValueEnumerator<T>
     where TTraversable : struct, ITraversable<TTraversable, T>
 {
     public bool TryGetNonEnumeratedCount(out int count)

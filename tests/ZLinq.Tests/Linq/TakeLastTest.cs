@@ -139,7 +139,7 @@ public class TakeLastTest
     public void TakeLast_EnumerationImplementation()
     {
         var sequence = Enumerable.Range(1, 5).ToArray();
-        var takeLast = sequence.ToValueEnumerable().TakeLast(3);
+        var takeLast = sequence.ToValueEnumerable().TakeLast(3).Enumerator;
         
         // Test the implementation of TryGetNext which uses the Queue logic
         var result = new List<int>();
@@ -178,28 +178,9 @@ public class TakeLastTest
         first.ShouldBe(second);
         first.ShouldBe(new[] { 8, 9, 10 });
     }
-
-    [Fact]
-    public void TakeLast_Disposal()
-    {
-        var disposeCalled = false;
-        
-        // Create a custom enumerable that tracks disposal
-        var enumerable = new DisposableTestEnumerable<int>(
-            Enumerable.Range(1, 10),
-            () => disposeCalled = true);
-            
-        using (var takeLast = enumerable.AsValueEnumerable().TakeLast(5))
-        {
-            var array = takeLast.ToArray();
-            array.ShouldBe(new[] { 6, 7, 8, 9, 10 });
-        }
-        
-        disposeCalled.ShouldBeTrue();
-    }
     
     // Helper class to test disposal behavior
-    private class DisposableTestEnumerable<T>(IEnumerable<T> source, Action onDispose) : IEnumerable<T>
+    private class DisposableTesTEnumerator<T>(IEnumerable<T> source, Action onDispose) : IEnumerable<T>
     {
         public IEnumerator<T> GetEnumerator() => new DisposableEnumerator(source.GetEnumerator(), onDispose);
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();

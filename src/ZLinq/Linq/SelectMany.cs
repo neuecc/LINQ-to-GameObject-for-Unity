@@ -2,62 +2,49 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static SelectMany<TEnumerable, TSource, TResult> SelectMany<TEnumerable, TSource, TResult>(this TEnumerable source, Func<TSource, IEnumerable<TResult>> selector)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static ValueEnumerable<SelectMany<TEnumerator, TEnumerator2, TSource, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, ValueEnumerable<TEnumerator2, TResult>> selector)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, selector);
+        where TEnumerator2 : struct, IValueEnumerator<TResult>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+            => new(new(source.Enumerator, selector));
 
-        public static ValueEnumerator<SelectMany<TEnumerable, TSource, TResult>, TResult> GetEnumerator<TEnumerable, TSource, TResult>(this SelectMany<TEnumerable, TSource, TResult> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static ValueEnumerable<SelectMany2<TEnumerator, TEnumerator2, TSource, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, int, ValueEnumerable<TEnumerator2, TResult>> selector)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source);
+        where TEnumerator2 : struct, IValueEnumerator<TResult>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+            => new(new(source.Enumerator, selector));
 
-        public static SelectMany2<TEnumerable, TSource, TResult> SelectMany<TEnumerable, TSource, TResult>(this TEnumerable source, Func<TSource, Int32, IEnumerable<TResult>> selector)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static ValueEnumerable<SelectMany3<TEnumerator, TEnumerator2, TSource, TCollection, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, selector);
+        where TEnumerator2 : struct, IValueEnumerator<TCollection>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+            => new(new(source.Enumerator, collectionSelector, resultSelector));
 
-        public static ValueEnumerator<SelectMany2<TEnumerable, TSource, TResult>, TResult> GetEnumerator<TEnumerable, TSource, TResult>(this SelectMany2<TEnumerable, TSource, TResult> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static ValueEnumerable<SelectMany4<TEnumerator, TEnumerator2, TSource, TCollection, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, int, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source);
-
-        public static SelectMany3<TEnumerable, TSource, TCollection, TResult> SelectMany<TEnumerable, TSource, TCollection, TResult>(this TEnumerable source, Func<TSource, Int32, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        where TEnumerator2 : struct, IValueEnumerator<TCollection>
 #if NET9_0_OR_GREATER
-            , allows ref struct
+        , allows ref struct
 #endif
-            => new(source, collectionSelector, resultSelector);
-
-        public static ValueEnumerator<SelectMany3<TEnumerable, TSource, TCollection, TResult>, TResult> GetEnumerator<TEnumerable, TSource, TCollection, TResult>(this SelectMany3<TEnumerable, TSource, TCollection, TResult> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
-
-        public static SelectMany4<TEnumerable, TSource, TCollection, TResult> SelectMany<TEnumerable, TSource, TCollection, TResult>(this TEnumerable source, Func<TSource, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source, collectionSelector, resultSelector);
-
-        public static ValueEnumerator<SelectMany4<TEnumerable, TSource, TCollection, TResult>, TResult> GetEnumerator<TEnumerable, TSource, TCollection, TResult>(this SelectMany4<TEnumerable, TSource, TCollection, TResult> source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source);
-
+            => new(new(source.Enumerator, collectionSelector, resultSelector));
     }
 }
 
@@ -70,15 +57,20 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SelectMany<TEnumerable, TSource, TResult>(TEnumerable source, Func<TSource, IEnumerable<TResult>> selector)
-        : IValueEnumerable<TResult>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct SelectMany<TEnumerator, TEnumerator2, TSource, TResult>(in TEnumerator source, Func<TSource, ValueEnumerable<TEnumerator2, TResult>> selector)
+        : IValueEnumerator<TResult>
+        where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TEnumerator2 : struct, IValueEnumerator<TResult>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
-        IEnumerator<TResult>? innerEnumerator;
+        TEnumerator source = source;
+        TEnumerator2 innerEnumerator;
+        bool hasInner = false;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -97,21 +89,21 @@ namespace ZLinq.Linq
         public bool TryGetNext(out TResult current)
         {
         BEGIN:
-            if (innerEnumerator != null)
+            if (hasInner)
             {
-                if (innerEnumerator.MoveNext())
+                if (innerEnumerator.TryGetNext(out current))
                 {
-                    current = innerEnumerator.Current;
                     return true;
                 }
 
                 innerEnumerator.Dispose();
-                innerEnumerator = null;
+                hasInner = false;
             }
 
             if (source.TryGetNext(out var value))
             {
-                innerEnumerator = selector(value).GetEnumerator();
+                innerEnumerator = selector(value).Enumerator;
+                hasInner = true;
                 goto BEGIN;
             }
 
@@ -121,7 +113,7 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
-            if (innerEnumerator != null)
+            if (hasInner)
             {
                 innerEnumerator.Dispose();
             }
@@ -136,35 +128,67 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SelectMany2<TEnumerable, TSource, TResult>(TEnumerable source, Func<TSource, Int32, IEnumerable<TResult>> selector)
-        : IValueEnumerable<TResult>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct SelectMany2<TEnumerator, TEnumerator2, TSource, TResult>(in TEnumerator source, Func<TSource, int, ValueEnumerable<TEnumerator2, TResult>> selector)
+        : IValueEnumerator<TResult>
+        where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TEnumerator2 : struct, IValueEnumerator<TResult>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
+        TEnumerator2 innerEnumerator;
+        bool hasInner = false;
+        int index = 0;
 
-        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            count = 0;
+            return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<TResult> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            span = default;
+            return false;
         }
 
         public bool TryCopyTo(Span<TResult> destination) => false;
 
         public bool TryGetNext(out TResult current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+        BEGIN:
+            if (hasInner)
+            {
+                if (innerEnumerator.TryGetNext(out current))
+                {
+                    return true;
+                }
+
+                innerEnumerator.Dispose();
+                hasInner = false;
+            }
+
+            if (source.TryGetNext(out var value))
+            {
+                innerEnumerator = selector(value, index++).Enumerator;
+                hasInner = true;
+                goto BEGIN;
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
         }
 
         public void Dispose()
         {
+            if (hasInner)
+            {
+                innerEnumerator.Dispose();
+            }
             source.Dispose();
         }
     }
@@ -176,35 +200,69 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SelectMany3<TEnumerable, TSource, TCollection, TResult>(TEnumerable source, Func<TSource, Int32, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
-        : IValueEnumerable<TResult>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct SelectMany3<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(in TEnumerator source, Func<TSource, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
+        : IValueEnumerator<TResult>
+        where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TEnumerator2 : struct, IValueEnumerator<TCollection>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
+        TEnumerator2 innerEnumerator;
+        TSource currentSource = default!;
+        bool hasInner = false;
 
-        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            count = 0;
+            return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<TResult> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            span = default;
+            return false;
         }
 
         public bool TryCopyTo(Span<TResult> destination) => false;
 
         public bool TryGetNext(out TResult current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+        BEGIN:
+            if (hasInner)
+            {
+                if (innerEnumerator.TryGetNext(out var innerCurrent))
+                {
+                    current = resultSelector(currentSource, innerCurrent);
+                    return true;
+                }
+
+                innerEnumerator.Dispose();
+                hasInner = false;
+            }
+
+            if (source.TryGetNext(out var value))
+            {
+                currentSource = value;
+                innerEnumerator = collectionSelector(value).Enumerator;
+                hasInner = true;
+                goto BEGIN;
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
         }
 
         public void Dispose()
         {
+            if (hasInner)
+            {
+                innerEnumerator.Dispose();
+            }
             source.Dispose();
         }
     }
@@ -216,37 +274,71 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SelectMany4<TEnumerable, TSource, TCollection, TResult>(TEnumerable source, Func<TSource, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
-        : IValueEnumerable<TResult>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct SelectMany4<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(in TEnumerator source, Func<TSource, int, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
+        : IValueEnumerator<TResult>
+        where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TEnumerator2 : struct, IValueEnumerator<TCollection>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
+        TEnumerator2 innerEnumerator;
+        TSource currentSource = default!;
+        int index;
+        bool hasInner = false;
 
-        public bool TryGetNonEnumeratedCount(out int count) => throw new NotImplementedException();
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            count = 0;
+            return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<TResult> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            span = default;
+            return false;
         }
 
         public bool TryCopyTo(Span<TResult> destination) => false;
 
         public bool TryGetNext(out TResult current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+        BEGIN:
+            if (hasInner)
+            {
+                if (innerEnumerator.TryGetNext(out var innerCurrent))
+                {
+                    current = resultSelector(currentSource, innerCurrent);
+                    return true;
+                }
+
+                innerEnumerator.Dispose();
+                hasInner = false;
+            }
+
+            if (source.TryGetNext(out var value))
+            {
+                currentSource = value;
+                innerEnumerator = collectionSelector(value, index++).Enumerator;
+                hasInner = true;
+                goto BEGIN;
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
         }
 
         public void Dispose()
         {
+            if (hasInner)
+            {
+                innerEnumerator.Dispose();
+            }
             source.Dispose();
         }
     }
-
 }

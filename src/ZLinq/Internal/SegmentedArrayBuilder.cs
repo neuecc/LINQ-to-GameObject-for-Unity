@@ -3,7 +3,7 @@
 namespace ZLinq.Internal;
 
 [StructLayout(LayoutKind.Auto)]
-internal ref struct SegmentedArrayBuilder<T>
+internal ref struct SegmentedArrayBuilder<T> : IDisposable
 {
     // Array.MaxLength = 2147483591
     T[]? array0;  // 16              total:16

@@ -2,21 +2,21 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Int64 LongCount<TEnumerable, TSource>(this TEnumerable source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Int64 LongCount<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
-                if (source.TryGetNonEnumeratedCount(out var count))
+                if (enumerator.TryGetNonEnumeratedCount(out var count))
                 {
                     return count;
                 }
 
                 var longCount = 0L;
-                while (source.TryGetNext(out _))
+                while (enumerator.TryGetNext(out _))
                 {
                     checked { longCount++; }
                 }
@@ -24,21 +24,21 @@
             }
         }
 
-        public static Int64 LongCount<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Int64 LongCount<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
-                if (source.TryGetNonEnumeratedCount(out var count))
+                if (enumerator.TryGetNonEnumeratedCount(out var count))
                 {
                     return count;
                 }
 
                 var longCount = 0L;
-                while (source.TryGetNext(out var current))
+                while (enumerator.TryGetNext(out var current))
                 {
                     if (predicate(current))
                     {
