@@ -1,11 +1,11 @@
 ﻿namespace ZLinq.Traversables;
 
 [StructLayout(LayoutKind.Auto)]
-public struct DescendantsEnumerable<TTraversable, T>(TTraversable traversable, bool withSelf)
+public struct Descendants<TTraverser, T>(TTraverser traverser, bool withSelf)
     : IValueEnumerator<T>
-    where TTraversable : struct, ITraversable<TTraversable, T>
+    where TTraverser : struct, ITraverser<TTraverser, T>
 {
-    RefStack<ChildrenEnumerable<TTraversable, T>>? recursiveStack = null;
+    RefStack<Children<TTraverser, T>>? recursiveStack = null;
 
     public bool TryGetNonEnumeratedCount(out int count)
     {
@@ -24,7 +24,7 @@ public struct DescendantsEnumerable<TTraversable, T>(TTraversable traversable, b
     public bool TryGetNext(out T current)
     {
         // IsDisposed
-        if (recursiveStack == RefStack<ChildrenEnumerable<TTraversable, T>>.DisposeSentinel)
+        if (recursiveStack == RefStack<Children<TTraverser, T>>.DisposeSentinel)
         {
             Unsafe.SkipInit(out current);
             return false;
@@ -32,7 +32,7 @@ public struct DescendantsEnumerable<TTraversable, T>(TTraversable traversable, b
 
         if (withSelf)
         {
-            current = traversable.Origin;
+            current = traverser.Origin;
             withSelf = false;
             return true;
         }
@@ -41,9 +41,9 @@ public struct DescendantsEnumerable<TTraversable, T>(TTraversable traversable, b
         if (recursiveStack == null)
         {
             // mutable struct(enumerator) must use from stack ref
-            var children = traversable.Children<TTraversable, T>();
-            recursiveStack = RefStack<ChildrenEnumerable<TTraversable, T>>.Rent();
-            recursiveStack.Push(children);
+            var children = traverser.Children<TTraverser, T>();
+            recursiveStack = RefStack<Children<TTraverser, T>>.Rent();
+            recursiveStack.Push(children.Enumerator);
         }
 
         // traverse depth first search
@@ -55,13 +55,13 @@ public struct DescendantsEnumerable<TTraversable, T>(TTraversable traversable, b
                 {
                     current = value; // set result
 
-                    var subTraversable = traversable.ConvertToTraversable(value);
+                    var subTraversable = traverser.ConvertToTraverser(value);
                     try
                     {
                         if (!subTraversable.TryGetHasChild(out var hasChild) || hasChild)
                         {
-                            var children = subTraversable.Children<TTraversable, T>();
-                            recursiveStack.Push(children);
+                            var children = subTraversable.Children<TTraverser, T>();
+                            recursiveStack.Push(children.Enumerator);
                         }
                     }
                     finally
@@ -86,8 +86,8 @@ public struct DescendantsEnumerable<TTraversable, T>(TTraversable traversable, b
     {
         if (recursiveStack != null)
         {
-            RefStack<ChildrenEnumerable<TTraversable, T>>.Return(recursiveStack);
-            recursiveStack = RefStack<ChildrenEnumerable<TTraversable, T>>.DisposeSentinel;
+            RefStack<Children<TTraverser, T>>.Return(recursiveStack);
+            recursiveStack = RefStack<Children<TTraverser, T>>.DisposeSentinel;
         }
     }
 }

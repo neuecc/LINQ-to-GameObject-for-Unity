@@ -1,9 +1,9 @@
 ﻿namespace ZLinq.Traversables;
 
 [StructLayout(LayoutKind.Auto)]
-public struct AfterSelfEnumerable<TTraversable, T>(TTraversable traversable, bool withSelf)
+public struct AfterSelf<TTraverser, T>(TTraverser traverser, bool withSelf)
     : IValueEnumerator<T>
-    where TTraversable : struct, ITraversable<TTraversable, T>
+    where TTraverser : struct, ITraverser<TTraverser, T>
 {
     public bool TryGetNonEnumeratedCount(out int count)
     {
@@ -23,16 +23,16 @@ public struct AfterSelfEnumerable<TTraversable, T>(TTraversable traversable, boo
     {
         if (withSelf)
         {
-            current = traversable.Origin;
+            current = traverser.Origin;
             withSelf = false;
             return true;
         }
 
-        return traversable.TryGetNextSibling(out current);
+        return traverser.TryGetNextSibling(out current);
     }
 
     public void Dispose()
     {
-        traversable.Dispose();
+        traverser.Dispose();
     }
 }

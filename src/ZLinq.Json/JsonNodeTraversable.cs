@@ -7,40 +7,33 @@ namespace ZLinq;
 
 public static class JsonNodeExtensions
 {
-    public static JsonNodeTraversable AsTraversable(this JsonNode origin) => new(new JsonNodeProperty(origin.Parent != null ? origin.GetPropertyName() : "", origin));
+    public static JsonNodeTraverser AsTraverser(this JsonNode origin) => new(new JsonNodeProperty(origin.Parent != null ? origin.GetPropertyName() : "", origin));
 
     // type inference helper
 
-    public static ChildrenEnumerable<JsonNodeTraversable, JsonNodeProperty> Children(this JsonNodeTraversable traversable) => traversable.Children<JsonNodeTraversable, JsonNodeProperty>();
-    public static ChildrenEnumerable<JsonNodeTraversable, JsonNodeProperty> ChildrenAndSelf(this JsonNodeTraversable traversable) => traversable.ChildrenAndSelf<JsonNodeTraversable, JsonNodeProperty>();
-    public static DescendantsEnumerable<JsonNodeTraversable, JsonNodeProperty> Descendants(this JsonNodeTraversable traversable) => traversable.Descendants<JsonNodeTraversable, JsonNodeProperty>();
-    public static DescendantsEnumerable<JsonNodeTraversable, JsonNodeProperty> DescendantsAndSelf(this JsonNodeTraversable traversable) => traversable.DescendantsAndSelf<JsonNodeTraversable, JsonNodeProperty>();
-    public static AncestorsEnumerable<JsonNodeTraversable, JsonNodeProperty> Ancestors(this JsonNodeTraversable traversable) => traversable.Ancestors<JsonNodeTraversable, JsonNodeProperty>();
-    public static AncestorsEnumerable<JsonNodeTraversable, JsonNodeProperty> AncestorsAndSelf(this JsonNodeTraversable traversable) => traversable.AncestorsAndSelf<JsonNodeTraversable, JsonNodeProperty>();
-    public static BeforeSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> BeforeSelf(this JsonNodeTraversable traversable) => traversable.BeforeSelf<JsonNodeTraversable, JsonNodeProperty>();
-    public static BeforeSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> BeforeSelfAndSelf(this JsonNodeTraversable traversable) => traversable.BeforeSelfAndSelf<JsonNodeTraversable, JsonNodeProperty>();
-    public static AfterSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> AfterSelf(this JsonNodeTraversable traversable) => traversable.AfterSelf<JsonNodeTraversable, JsonNodeProperty>();
-    public static AfterSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> AfterSelfAndSelf(this JsonNodeTraversable traversable) => traversable.AfterSelfAndSelf<JsonNodeTraversable, JsonNodeProperty>();
-
-    public static ValueEnumerator<ChildrenEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this ChildrenEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
-    public static ValueEnumerator<DescendantsEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this DescendantsEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
-    public static ValueEnumerator<AncestorsEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this AncestorsEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
-    public static ValueEnumerator<BeforeSelfEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this BeforeSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
-    public static ValueEnumerator<AfterSelfEnumerable<JsonNodeTraversable, JsonNodeProperty>, JsonNodeProperty> GetEnumerator(this AfterSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> source) => new(source);
+    public static ValueEnumerable<Children<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> Children(this JsonNodeTraverser traverser) => traverser.Children<JsonNodeTraverser, JsonNodeProperty>();
+    public static ValueEnumerable<Children<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> ChildrenAndSelf(this JsonNodeTraverser traverser) => traverser.ChildrenAndSelf<JsonNodeTraverser, JsonNodeProperty>();
+    public static ValueEnumerable<Descendants<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> Descendants(this JsonNodeTraverser traverser) => traverser.Descendants<JsonNodeTraverser, JsonNodeProperty>();
+    public static ValueEnumerable<Descendants<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> DescendantsAndSelf(this JsonNodeTraverser traverser) => traverser.DescendantsAndSelf<JsonNodeTraverser, JsonNodeProperty>();
+    public static ValueEnumerable<Ancestors<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> Ancestors(this JsonNodeTraverser traverser) => traverser.Ancestors<JsonNodeTraverser, JsonNodeProperty>();
+    public static ValueEnumerable<Ancestors<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> AncestorsAndSelf(this JsonNodeTraverser traverser) => traverser.AncestorsAndSelf<JsonNodeTraverser, JsonNodeProperty>();
+    public static ValueEnumerable<BeforeSelf<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> BeforeSelf(this JsonNodeTraverser traverser) => traverser.BeforeSelf<JsonNodeTraverser, JsonNodeProperty>();
+    public static ValueEnumerable<BeforeSelf<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> BeforeSelfAndSelf(this JsonNodeTraverser traverser) => traverser.BeforeSelfAndSelf<JsonNodeTraverser, JsonNodeProperty>();
+    public static ValueEnumerable<AfterSelf<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> AfterSelf(this JsonNodeTraverser traverser) => traverser.AfterSelf<JsonNodeTraverser, JsonNodeProperty>();
+    public static ValueEnumerable<AfterSelf<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> AfterSelfAndSelf(this JsonNodeTraverser traverser) => traverser.AfterSelfAndSelf<JsonNodeTraverser, JsonNodeProperty>();
 
     // direct shortcut
 
-    public static ChildrenEnumerable<JsonNodeTraversable, JsonNodeProperty> Children(this JsonNode origin) => origin.AsTraversable().Children();
-    public static ChildrenEnumerable<JsonNodeTraversable, JsonNodeProperty> ChildrenAndSelf(this JsonNode origin) => origin.AsTraversable().ChildrenAndSelf();
-    public static DescendantsEnumerable<JsonNodeTraversable, JsonNodeProperty> Descendants(this JsonNode origin) => origin.AsTraversable().Descendants();
-    public static DescendantsEnumerable<JsonNodeTraversable, JsonNodeProperty> DescendantsAndSelf(this JsonNode origin) => origin.AsTraversable().DescendantsAndSelf();
-    public static AncestorsEnumerable<JsonNodeTraversable, JsonNodeProperty> Ancestors(this JsonNode origin) => origin.AsTraversable().Ancestors();
-    public static AncestorsEnumerable<JsonNodeTraversable, JsonNodeProperty> AncestorsAndSelf(this JsonNode origin) => origin.AsTraversable().AncestorsAndSelf();
-    public static BeforeSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> BeforeSelf(this JsonNode origin) => origin.AsTraversable().BeforeSelf();
-    public static BeforeSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> BeforeSelfAndSelf(this JsonNode origin) => origin.AsTraversable().BeforeSelfAndSelf();
-    public static AfterSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> AfterSelf(this JsonNode origin) => origin.AsTraversable().AfterSelf();
-    public static AfterSelfEnumerable<JsonNodeTraversable, JsonNodeProperty> AfterSelfAndSelf(this JsonNode origin) => origin.AsTraversable().AfterSelfAndSelf();
-
+    public static ValueEnumerable<Children<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> Children(this JsonNode origin) => origin.AsTraverser().Children();
+    public static ValueEnumerable<Children<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> ChildrenAndSelf(this JsonNode origin) => origin.AsTraverser().ChildrenAndSelf();
+    public static ValueEnumerable<Descendants<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> Descendants(this JsonNode origin) => origin.AsTraverser().Descendants();
+    public static ValueEnumerable<Descendants<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> DescendantsAndSelf(this JsonNode origin) => origin.AsTraverser().DescendantsAndSelf();
+    public static ValueEnumerable<Ancestors<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> Ancestors(this JsonNode origin) => origin.AsTraverser().Ancestors();
+    public static ValueEnumerable<Ancestors<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> AncestorsAndSelf(this JsonNode origin) => origin.AsTraverser().AncestorsAndSelf();
+    public static ValueEnumerable<BeforeSelf<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> BeforeSelf(this JsonNode origin) => origin.AsTraverser().BeforeSelf();
+    public static ValueEnumerable<BeforeSelf<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> BeforeSelfAndSelf(this JsonNode origin) => origin.AsTraverser().BeforeSelfAndSelf();
+    public static ValueEnumerable<AfterSelf<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> AfterSelf(this JsonNode origin) => origin.AsTraverser().AfterSelf();
+    public static ValueEnumerable<AfterSelf<JsonNodeTraverser, JsonNodeProperty>, JsonNodeProperty> AfterSelfAndSelf(this JsonNode origin) => origin.AsTraverser().AfterSelfAndSelf();
 }
 
 // Can't use ITraversable<JsonNode> because JsonNull is not exists and we must represents null on iterate.
@@ -49,13 +42,13 @@ public static class JsonNodeExtensions
 public record struct JsonNodeProperty(string Name, JsonNode? Node);
 
 [StructLayout(LayoutKind.Auto)]
-public struct JsonNodeTraversable(JsonNodeProperty origin) : ITraversable<JsonNodeTraversable, JsonNodeProperty>
+public struct JsonNodeTraverser(JsonNodeProperty origin) : ITraverser<JsonNodeTraverser, JsonNodeProperty>
 {
     IEnumerator<KeyValuePair<string, JsonNode?>>? jsonObjectEnumerator; // state for TryGet...
 
     public JsonNodeProperty Origin => origin;
 
-    public JsonNodeTraversable ConvertToTraversable(JsonNodeProperty next) => new(next);
+    public JsonNodeTraverser ConvertToTraverser(JsonNodeProperty next) => new(next);
 
     public bool TryGetChildCount(out int count)
     {

@@ -61,21 +61,22 @@ var ccc = ve1.Concat(xs.AsValueEnumerable());
 // .ToArray();
 
 
-//var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
+var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
 
-//var allDlls = root
-//    .AsTraversable()
-//    .Descendants()
-//    .OfType(default(FileInfo))
-//    .Where(x => x.Extension == ".dll")
-//    .GroupBy(x => x.Name)
-//    .Select(x => (FileName: x.Key, Count: x.Count()))
-//    .OrderByDescending(x => x.Count);
+var allDlls = root
+    .Descendants()
+    .OfType(default(FileInfo)!)
+    .Where(x => x.Extension == ".dll");
 
-//foreach (var item in allDlls)
-//{
-//    Console.WriteLine(item);
-//}
+var grouped = allDlls
+    .GroupBy(x => x.Name)
+    .Select(x => new { FileName = x.Key, Count = x.Count() })
+    .OrderByDescending(x => x.Count);
+
+foreach (var item in grouped)
+{
+    Console.WriteLine(item);
+}
 
 //static IEnumerable<T> Iterate<T>(IEnumerable<T> source)
 //{
@@ -144,11 +145,11 @@ var json = JsonNode.Parse("""
 var origin = json!["nesting"]!["level1"]!["level2"]!;
 
 // JsonNode axis, Children, Descendants, Anestors, BeforeSelf, AfterSelf and ***Self.
-//foreach (var item in origin.Descendants().Select(x => x.Node).OfType(default(JsonArray)))
-//{
-//    // [truem false, true], ["fast", "accurate", "balanced"], [1, 1, 2, 3, 5, 8, 13]
-//    Console.WriteLine(item!.ToJsonString(JsonSerializerOptions.Web));
-//}
+foreach (var item in origin.Descendants().Select(x => x.Node).OfType(default(JsonArray)!))
+{
+    // [true, false, true], ["fast", "accurate", "balanced"], [1, 1, 2, 3, 5, 8, 13]
+    Console.WriteLine(item.ToJsonString(JsonSerializerOptions.Web));
+}
 
 
 class Person

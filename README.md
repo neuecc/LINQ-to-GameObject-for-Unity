@@ -23,7 +23,7 @@ foreach (var item in seq) { }
 * Full support for LINQ operations on **Span** using .NET 9/C# 13's `allows ref struct`
 * **LINQ to Tree** to extend tree-structured objects (built-in support for FileSystem, JSON, GameObject)
 * Automatic application of SIMD where possible and customizable **LINQ to SIMD** for arbitrary operations
-* Fusion of my past LINQ ([linq.js](https://github.com/neuecc/linq.js/), [LINQ to GameObject](http://u3d.as/content/neuecc/linq-to-game-object), [SimdLinq](https://github.com/Cysharp/SimdLinq/), [UniRx](https://github.com/neuecc/UniRx), [R3](https://github.com/Cysharp/R3)) and zero alloc  ([ZString](https://github.com/Cysharp/ZString), [ZLogger](https://github.com/Cysharp/ZLogger)) impls
+* Fusion of my past LINQ ([linq.js](https://github.com/neuecc/linq.js/), [SimdLinq](https://github.com/Cysharp/SimdLinq/), [UniRx](https://github.com/neuecc/UniRx), [R3](https://github.com/Cysharp/R3)) and zero alloc  ([ZString](https://github.com/Cysharp/ZString), [ZLogger](https://github.com/Cysharp/ZLogger)) impls
 
 I aimed to create not just an experimental library but a practical one. It's also designed to handle high-load requirements, such as those found in games.
 
@@ -90,11 +90,11 @@ LINQ to XML introduced the concept of querying around axes to C#. Even if you do
 Specifically, by defining a struct that implements the following interface, it becomes iterable:
 
 ```csharp
-public interface ITraversable<TTraversable, T> : IDisposable
-    where TTraversable : struct, ITraversable<TTraversable, T> // self
+public interface ITraverser<TTraverser, T> : IDisposable
+    where TTraverser : struct, ITraverser<TTraverser, T> // self
 {
     T Origin { get; }
-    TTraversable ConvertToTraversable(T next); // for Descendants
+    TTraverser ConvertToTraverser(T next); // for Descendants
     bool TryGetHasChild(out bool hasChild); // optional: optimize use for Descendants
     bool TryGetChildCount(out int count);   // optional: optimize use for Children
     bool TryGetParent(out T parent); // for Ancestors
@@ -118,14 +118,17 @@ using ZLinq;
 var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
 
 // FileSystemInfo(FileInfo/DirectoryInfo) can call `Ancestors`, `Children`, `Descendants`, `BeforeSelf`, `AfterSelf`
-var groupByName = root.Descendants()
-    .OfType(default(FileInfo))
-    .Where(x => x.Extension == ".dll")
+var allDlls = root
+    .Descendants()
+    .OfType(default(FileInfo)!)
+    .Where(x => x.Extension == ".dll");
+
+var grouped = allDlls
     .GroupBy(x => x.Name)
-    .Select(x => (FileName: x.Key, Count: x.Count()))
+    .Select(x => new { FileName = x.Key, Count = x.Count() })
     .OrderByDescending(x => x.Count);
 
-foreach (var item in groupByName)
+foreach (var item in grouped)
 {
     Console.WriteLine(item);
 }
@@ -192,10 +195,10 @@ var json = JsonNode.Parse("""
 var origin = json!["nesting"]!["level1"]!["level2"]!;
 
 // JsonNode axis, Children, Descendants, Anestors, BeforeSelf, AfterSelf and ***Self.
-foreach (var item in origin.Descendants().Select(x => x.Node).OfType(default(JsonArray)))
+foreach (var item in origin.Descendants().Select(x => x.Node).OfType(default(JsonArray)!))
 {
     // [true, false, true], ["fast", "accurate", "balanced"], [1, 1, 2, 3, 5, 8, 13]
-    Console.WriteLine(item!.ToJsonString(JsonSerializerOptions.Web));
+    Console.WriteLine(item.ToJsonString(JsonSerializerOptions.Web));
 }
 ```
 

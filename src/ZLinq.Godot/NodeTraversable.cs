@@ -3,7 +3,7 @@
 namespace ZLinq;
 
 [StructLayout(LayoutKind.Auto)]
-public struct NodeTraversable : ITraversable<NodeTraversable, Node>
+public struct NodeTraversable : ITraverser<NodeTraversable, Node>
 {
     static readonly object CalledTryGetNextChild = new object();
     static readonly object ParentNotFound = new object();
@@ -22,7 +22,7 @@ public struct NodeTraversable : ITraversable<NodeTraversable, Node>
     }
 
     public Node Origin => node;
-    public NodeTraversable ConvertToTraversable(Node next) => new(next);
+    public NodeTraversable ConvertToTraverser(Node next) => new(next);
 
     public bool TryGetParent(out Node parent)
     {

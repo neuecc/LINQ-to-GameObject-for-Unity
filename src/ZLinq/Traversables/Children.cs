@@ -1,13 +1,13 @@
 ﻿namespace ZLinq.Traversables;
 
 [StructLayout(LayoutKind.Auto)]
-public struct ChildrenEnumerable<TTraversable, T>(TTraversable traversable, bool withSelf)
+public struct Children<TTraverser, T>(TTraverser traverser, bool withSelf)
     : IValueEnumerator<T>
-    where TTraversable : struct, ITraversable<TTraversable, T>
+    where TTraverser : struct, ITraverser<TTraverser, T>
 {
     public bool TryGetNonEnumeratedCount(out int count)
     {
-        if (traversable.TryGetChildCount(out var childCount))
+        if (traverser.TryGetChildCount(out var childCount))
         {
             count = childCount + (withSelf ? 1 : 0);
             return true;
@@ -29,16 +29,16 @@ public struct ChildrenEnumerable<TTraversable, T>(TTraversable traversable, bool
     {
         if (withSelf)
         {
-            current = traversable.Origin;
+            current = traverser.Origin;
             withSelf = false;
             return true;
         }
 
-        return traversable.TryGetNextChild(out current);
+        return traverser.TryGetNextChild(out current);
     }
 
     public void Dispose()
     {
-        traversable.Dispose();
+        traverser.Dispose();
     }
 }

@@ -4,53 +4,47 @@ namespace ZLinq;
 
 public static class FileSystemInfoExtensions
 {
-    public static FileSystemInfoTraversable AsTraversable(this FileSystemInfo origin) => new(origin);
+    public static FileSystemInfoTraverser AsTraverser(this FileSystemInfo origin) => new(origin);
 
     // type inference helper
 
-    public static ChildrenEnumerable<FileSystemInfoTraversable, FileSystemInfo> Children(this FileSystemInfoTraversable traversable) => traversable.Children<FileSystemInfoTraversable, FileSystemInfo>();
-    public static ChildrenEnumerable<FileSystemInfoTraversable, FileSystemInfo> ChildrenAndSelf(this FileSystemInfoTraversable traversable) => traversable.ChildrenAndSelf<FileSystemInfoTraversable, FileSystemInfo>();
-    public static DescendantsEnumerable<FileSystemInfoTraversable, FileSystemInfo> Descendants(this FileSystemInfoTraversable traversable) => traversable.Descendants<FileSystemInfoTraversable, FileSystemInfo>();
-    public static DescendantsEnumerable<FileSystemInfoTraversable, FileSystemInfo> DescendantsAndSelf(this FileSystemInfoTraversable traversable) => traversable.DescendantsAndSelf<FileSystemInfoTraversable, FileSystemInfo>();
-    public static AncestorsEnumerable<FileSystemInfoTraversable, FileSystemInfo> Ancestors(this FileSystemInfoTraversable traversable) => traversable.Ancestors<FileSystemInfoTraversable, FileSystemInfo>();
-    public static AncestorsEnumerable<FileSystemInfoTraversable, FileSystemInfo> AncestorsAndSelf(this FileSystemInfoTraversable traversable) => traversable.AncestorsAndSelf<FileSystemInfoTraversable, FileSystemInfo>();
-    public static BeforeSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> BeforeSelf(this FileSystemInfoTraversable traversable) => traversable.BeforeSelf<FileSystemInfoTraversable, FileSystemInfo>();
-    public static BeforeSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> BeforeSelfAndSelf(this FileSystemInfoTraversable traversable) => traversable.BeforeSelfAndSelf<FileSystemInfoTraversable, FileSystemInfo>();
-    public static AfterSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> AfterSelf(this FileSystemInfoTraversable traversable) => traversable.AfterSelf<FileSystemInfoTraversable, FileSystemInfo>();
-    public static AfterSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> AfterSelfAndSelf(this FileSystemInfoTraversable traversable) => traversable.AfterSelfAndSelf<FileSystemInfoTraversable, FileSystemInfo>();
-
-    public static ValueEnumerator<ChildrenEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this ChildrenEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
-    public static ValueEnumerator<DescendantsEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this DescendantsEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
-    public static ValueEnumerator<AncestorsEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this AncestorsEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
-    public static ValueEnumerator<BeforeSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this BeforeSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
-    public static ValueEnumerator<AfterSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo>, FileSystemInfo> GetEnumerator(this AfterSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> source) => new(source);
+    public static ValueEnumerable<Children<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> Children(this FileSystemInfoTraverser traverser) => traverser.Children<FileSystemInfoTraverser, FileSystemInfo>();
+    public static ValueEnumerable<Children<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> ChildrenAndSelf(this FileSystemInfoTraverser traverser) => traverser.ChildrenAndSelf<FileSystemInfoTraverser, FileSystemInfo>();
+    public static ValueEnumerable<Descendants<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> Descendants(this FileSystemInfoTraverser traverser) => traverser.Descendants<FileSystemInfoTraverser, FileSystemInfo>();
+    public static ValueEnumerable<Descendants<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> DescendantsAndSelf(this FileSystemInfoTraverser traverser) => traverser.DescendantsAndSelf<FileSystemInfoTraverser, FileSystemInfo>();
+    public static ValueEnumerable<Ancestors<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> Ancestors(this FileSystemInfoTraverser traverser) => traverser.Ancestors<FileSystemInfoTraverser, FileSystemInfo>();
+    public static ValueEnumerable<Ancestors<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> AncestorsAndSelf(this FileSystemInfoTraverser traverser) => traverser.AncestorsAndSelf<FileSystemInfoTraverser, FileSystemInfo>();
+    public static ValueEnumerable<BeforeSelf<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> BeforeSelf(this FileSystemInfoTraverser traverser) => traverser.BeforeSelf<FileSystemInfoTraverser, FileSystemInfo>();
+    public static ValueEnumerable<BeforeSelf<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> BeforeSelfAndSelf(this FileSystemInfoTraverser traverser) => traverser.BeforeSelfAndSelf<FileSystemInfoTraverser, FileSystemInfo>();
+    public static ValueEnumerable<AfterSelf<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> AfterSelf(this FileSystemInfoTraverser traverser) => traverser.AfterSelf<FileSystemInfoTraverser, FileSystemInfo>();
+    public static ValueEnumerable<AfterSelf<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> AfterSelfAndSelf(this FileSystemInfoTraverser traverser) => traverser.AfterSelfAndSelf<FileSystemInfoTraverser, FileSystemInfo>();
 
     // direct shortcut
 
-    public static ChildrenEnumerable<FileSystemInfoTraversable, FileSystemInfo> Children(this FileSystemInfo origin) => origin.AsTraversable().Children();
-    public static ChildrenEnumerable<FileSystemInfoTraversable, FileSystemInfo> ChildrenAndSelf(this FileSystemInfo origin) => origin.AsTraversable().ChildrenAndSelf();
-    public static DescendantsEnumerable<FileSystemInfoTraversable, FileSystemInfo> Descendants(this FileSystemInfo origin) => origin.AsTraversable().Descendants();
-    public static DescendantsEnumerable<FileSystemInfoTraversable, FileSystemInfo> DescendantsAndSelf(this FileSystemInfo origin) => origin.AsTraversable().DescendantsAndSelf();
-    public static AncestorsEnumerable<FileSystemInfoTraversable, FileSystemInfo> Ancestors(this FileSystemInfo origin) => origin.AsTraversable().Ancestors();
-    public static AncestorsEnumerable<FileSystemInfoTraversable, FileSystemInfo> AncestorsAndSelf(this FileSystemInfo origin) => origin.AsTraversable().AncestorsAndSelf();
-    public static BeforeSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> BeforeSelf(this FileSystemInfo origin) => origin.AsTraversable().BeforeSelf();
-    public static BeforeSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> BeforeSelfAndSelf(this FileSystemInfo origin) => origin.AsTraversable().BeforeSelfAndSelf();
-    public static AfterSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> AfterSelf(this FileSystemInfo origin) => origin.AsTraversable().AfterSelf();
-    public static AfterSelfEnumerable<FileSystemInfoTraversable, FileSystemInfo> AfterSelfAndSelf(this FileSystemInfo origin) => origin.AsTraversable().AfterSelfAndSelf();
+    public static ValueEnumerable<Children<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> Children(this FileSystemInfo origin) => origin.AsTraverser().Children();
+    public static ValueEnumerable<Children<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> ChildrenAndSelf(this FileSystemInfo origin) => origin.AsTraverser().ChildrenAndSelf();
+    public static ValueEnumerable<Descendants<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> Descendants(this FileSystemInfo origin) => origin.AsTraverser().Descendants();
+    public static ValueEnumerable<Descendants<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> DescendantsAndSelf(this FileSystemInfo origin) => origin.AsTraverser().DescendantsAndSelf();
+    public static ValueEnumerable<Ancestors<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> Ancestors(this FileSystemInfo origin) => origin.AsTraverser().Ancestors();
+    public static ValueEnumerable<Ancestors<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> AncestorsAndSelf(this FileSystemInfo origin) => origin.AsTraverser().AncestorsAndSelf();
+    public static ValueEnumerable<BeforeSelf<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> BeforeSelf(this FileSystemInfo origin) => origin.AsTraverser().BeforeSelf();
+    public static ValueEnumerable<BeforeSelf<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> BeforeSelfAndSelf(this FileSystemInfo origin) => origin.AsTraverser().BeforeSelfAndSelf();
+    public static ValueEnumerable<AfterSelf<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> AfterSelf(this FileSystemInfo origin) => origin.AsTraverser().AfterSelf();
+    public static ValueEnumerable<AfterSelf<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> AfterSelfAndSelf(this FileSystemInfo origin) => origin.AsTraverser().AfterSelfAndSelf();
 
     // helper for OfType
 
-    // TODO:...OfFileInfo(), OfDirectoryInfo
+    // TODO: implement OfFileInfo(), OfDirectoryInfo
 }
 
 [StructLayout(LayoutKind.Auto)]
-public struct FileSystemInfoTraversable(FileSystemInfo origin) : ITraversable<FileSystemInfoTraversable, FileSystemInfo>
+public struct FileSystemInfoTraverser(FileSystemInfo origin) : ITraverser<FileSystemInfoTraverser, FileSystemInfo>
 {
     IEnumerator<FileSystemInfo>? fileSystemInfoEnumerator; // state for TryGet...
 
     public FileSystemInfo Origin => origin;
 
-    public FileSystemInfoTraversable ConvertToTraversable(FileSystemInfo next) => new(next);
+    public FileSystemInfoTraverser ConvertToTraverser(FileSystemInfo next) => new(next);
 
     // TryGetChildCount and TryGetHasChild is optimize path and allows return false.
     // We should avoid to call EnumerateFileSystemInfos, so return false.

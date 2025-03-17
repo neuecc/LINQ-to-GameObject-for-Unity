@@ -3,7 +3,7 @@ using ZLinq;
 
 public class NewBehaviourScript : MonoBehaviour
 {
-    public Transform Origin;
+    public GameObject Origin;
 
     void Start()
     {
@@ -21,5 +21,7 @@ public class NewBehaviourScript : MonoBehaviour
 
         Debug.Log("AfterSelf--------------");  // C3, C4
         foreach (var item in Origin.AfterSelf()) Debug.Log(item.name);
+
+        // Origin.Ancestors().OfComponent<UnityEngine.TrailRenderer>();
     }
 }

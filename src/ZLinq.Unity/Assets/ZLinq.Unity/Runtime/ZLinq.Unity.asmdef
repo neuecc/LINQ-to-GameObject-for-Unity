@@ -7,8 +7,7 @@
     "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
-        "ZLinq.dll",
-        "System.Runtime.CompilerServices.Unsafe.dll"
+        "ZLinq.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

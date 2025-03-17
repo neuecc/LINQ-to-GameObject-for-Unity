@@ -15,6 +15,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="..\ZLinq.Unity\Assets\ZLinq.Unity\Runtime\**\*.cs"  />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
 	</ItemGroup>
 

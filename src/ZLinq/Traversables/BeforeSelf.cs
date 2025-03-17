@@ -1,9 +1,9 @@
 ﻿namespace ZLinq.Traversables;
 
 [StructLayout(LayoutKind.Auto)]
-public struct BeforeSelfEnumerable<TTraversable, T>(TTraversable traversable, bool withSelf)
+public struct BeforeSelf<TTraverser, T>(TTraverser traverser, bool withSelf)
     : IValueEnumerator<T>
-    where TTraversable : struct, ITraversable<TTraversable, T>
+    where TTraverser : struct, ITraverser<TTraverser, T>
 {
     bool iterateCompleted = false;
 
@@ -29,7 +29,7 @@ public struct BeforeSelfEnumerable<TTraversable, T>(TTraversable traversable, bo
             return false;
         }
 
-        if (traversable.TryGetPreviousSibling(out current))
+        if (traverser.TryGetPreviousSibling(out current))
         {
             return true;
         }
@@ -38,7 +38,7 @@ public struct BeforeSelfEnumerable<TTraversable, T>(TTraversable traversable, bo
             iterateCompleted = true;
             if (withSelf)
             {
-                current = traversable.Origin;
+                current = traverser.Origin;
                 return true;
             }
         }
@@ -49,6 +49,6 @@ public struct BeforeSelfEnumerable<TTraversable, T>(TTraversable traversable, bo
 
     public void Dispose()
     {
-        traversable.Dispose();
+        traverser.Dispose();
     }
 }

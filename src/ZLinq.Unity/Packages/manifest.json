@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "com.cysharp.zlinq.internal": "file:../../ZLinq/bin/Debug/netstandard2.1",
+    "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
+    "com.unity.ide.visualstudio": "2.0.22"
+  }
+}
