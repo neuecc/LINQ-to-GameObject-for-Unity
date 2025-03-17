@@ -22,11 +22,6 @@ namespace ZLinq.Linq
     {
         int index;
 
-        public ValueEnumerator<FromRepeat<T>, T> GetEnumerator()
-        {
-            return new(this);
-        }
-
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = _count;

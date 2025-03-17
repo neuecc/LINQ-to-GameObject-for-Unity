@@ -30,8 +30,6 @@ namespace ZLinq.Linq
     {
         TEnumerator source = source;
 
-        public ValueEnumerator<SkipLast<TEnumerator, TSource>, TSource> GetEnumerator() => new(this);
-
         public bool TryGetNonEnumeratedCount(out int count)
         {
             throw new NotImplementedException();

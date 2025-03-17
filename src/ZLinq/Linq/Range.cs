@@ -30,11 +30,6 @@ namespace ZLinq.Linq
         readonly int to = start + count;
         int value = start;
 
-        public ValueEnumerator<FromRange, int> GetEnumerator()
-        {
-            return new(this);
-        }
-
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = this.count;

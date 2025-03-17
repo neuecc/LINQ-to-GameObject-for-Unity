@@ -15,11 +15,6 @@ namespace ZLinq.Linq
     [EditorBrowsable(EditorBrowsableState.Never)]
     public struct FromEmpty<T> : IValueEnumerator<T>
     {
-        public ValueEnumerator<FromEmpty<T>, T> GetEnumerator()
-        {
-            return new(this);
-        }
-
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = 0;

@@ -116,11 +116,6 @@ namespace ZLinq.Linq
         TSource[]? sourceMap; // allocate
         int index;
 
-        public ValueEnumerator<OrderBy<TEnumerator, TSource, TKey>, TSource> GetEnumerator()
-        {
-            return new(this);
-        }
-
         public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
