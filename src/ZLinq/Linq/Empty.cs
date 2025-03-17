@@ -2,9 +2,9 @@
 {
     public static partial class ValueEnumerable
     {
-        public static FromEmpty<T> Empty<T>()
+        public static ValueEnumerable<FromEmpty<T>, T> Empty<T>()
         {
-            return default;
+            return new(default);
         }
     }
 }

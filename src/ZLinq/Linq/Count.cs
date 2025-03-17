@@ -8,15 +8,15 @@
             , allows ref struct
 #endif
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
-                if (source.TryGetNonEnumeratedCount(out var count))
+                if (enumerator.TryGetNonEnumeratedCount(out var count))
                 {
                     return count;
                 }
 
                 count = 0;
-                while (source.TryGetNext(out _))
+                while (enumerator.TryGetNext(out _))
                 {
                     checked { count++; }
                 }
@@ -30,15 +30,15 @@
             , allows ref struct
 #endif
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
-                if (source.TryGetNonEnumeratedCount(out var count))
+                if (enumerator.TryGetNonEnumeratedCount(out var count))
                 {
                     return count;
                 }
 
                 count = 0;
-                while (source.TryGetNext(out var current))
+                while (enumerator.TryGetNext(out var current))
                 {
                     if (predicate(current))
                     {

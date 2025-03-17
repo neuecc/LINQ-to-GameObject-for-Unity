@@ -12,19 +12,19 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            return ToLookup(source, keySelector, null!);
+            return ToLookup(source, keySelector, null);
         }
 
-        public static ILookup<TKey, TSource> ToLookup<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+        public static ILookup<TKey, TSource> ToLookup<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
             var lookupBuilder = new LookupBuilder<TKey, TSource>(comparer ?? EqualityComparer<TKey>.Default);
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
-                if (source.TryGetSpan(out var span))
+                if (enumerator.TryGetSpan(out var span))
                 {
                     foreach (var item in span)
                     {
@@ -33,7 +33,7 @@ namespace ZLinq
                 }
                 else
                 {
-                    while (source.TryGetNext(out var item))
+                    while (enumerator.TryGetNext(out var item))
                     {
                         lookupBuilder.Add(keySelector(item), item);
                     }
@@ -59,9 +59,9 @@ namespace ZLinq
 #endif
         {
             var lookupBuilder = new LookupBuilder<TKey, TElement>(comparer ?? EqualityComparer<TKey>.Default);
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
-                if (source.TryGetSpan(out var span))
+                if (enumerator.TryGetSpan(out var span))
                 {
                     foreach (var item in span)
                     {
@@ -70,7 +70,7 @@ namespace ZLinq
                 }
                 else
                 {
-                    while (source.TryGetNext(out var item))
+                    while (enumerator.TryGetNext(out var item))
                     {
                         lookupBuilder.Add(keySelector(item), elementSelector(item));
                     }
@@ -87,40 +87,37 @@ namespace ZLinq.Linq
     internal static class Lookup
     {
         // Enumerable.Join operation ignores null key
-        public static Lookup<TKey, TSource> CreateForJoin<TEnumerator, TSource, TKey>(TEnumerator source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
+        public static Lookup<TKey, TSource> CreateForJoin<TEnumerator, TSource, TKey>(ref TEnumerator source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
             var lookupBuilder = new LookupBuilder<TKey, TSource>(comparer ?? EqualityComparer<TKey>.Default);
-            using (source)
+            if (source.TryGetSpan(out var span))
             {
-                if (source.TryGetSpan(out var span))
+                foreach (var item in span)
                 {
-                    foreach (var item in span)
+                    var key = keySelector(item);
+                    if (key is not null)
                     {
-                        var key = keySelector(item);
-                        if (key is not null)
-                        {
-                            lookupBuilder.Add(key, item);
-                        }
+                        lookupBuilder.Add(key, item);
                     }
                 }
-                else
-                {
-                    while (source.TryGetNext(out var item))
-                    {
-                        var key = keySelector(item);
-                        if (key is not null)
-                        {
-                            lookupBuilder.Add(key, item);
-                        }
-                    }
-                }
-
-                return lookupBuilder.BuildAndClear();
             }
+            else
+            {
+                while (source.TryGetNext(out var item))
+                {
+                    var key = keySelector(item);
+                    if (key is not null)
+                    {
+                        lookupBuilder.Add(key, item);
+                    }
+                }
+            }
+
+            return lookupBuilder.BuildAndClear();
         }
     }
 

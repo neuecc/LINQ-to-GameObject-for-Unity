@@ -5,21 +5,21 @@
         // same as AggregateBy, use Dictionary but we should remove null constraints.
         // https://github.com/dotnet/runtime/issues/98259
 
-        public static CountBy<TEnumerator, TSource, TKey> CountBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
+        public static ValueEnumerable<CountBy<TEnumerator, TSource, TKey>, KeyValuePair<TKey, int>> CountBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             where TKey : notnull
-            => new(source, keySelector, null);
+            => new(new(source.Enumerator, keySelector, null));
 
-        public static CountBy<TEnumerator, TSource, TKey> CountBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? keyComparer)
+        public static ValueEnumerable<CountBy<TEnumerator, TSource, TKey>, KeyValuePair<TKey, int>> CountBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? keyComparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             where TKey : notnull
-            => new(source, keySelector, keyComparer);
+            => new(new(source.Enumerator, keySelector, keyComparer));
     }
 }
 
@@ -32,7 +32,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct CountBy<TEnumerator, TSource, TKey>(TEnumerator source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? keyComparer)
+    struct CountBy<TEnumerator, TSource, TKey>(in TEnumerator source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? keyComparer)
         : IValueEnumerator<KeyValuePair<TKey, int>>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -44,8 +44,6 @@ namespace ZLinq.Linq
 
         Dictionary<TKey, int>? dictionary;
         Dictionary<TKey, int>.Enumerator enumerator;
-
-        public ValueEnumerator<CountBy<TEnumerator, TSource, TKey>, KeyValuePair<TKey, int>> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

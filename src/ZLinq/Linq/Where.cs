@@ -2,30 +2,26 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Where<TEnumerator, TSource> Where<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
-            where TEnumerator : struct, IValueEnumerator<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source, predicate);
-
-        public static Where2<TEnumerator, TSource> Where<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Int32, Boolean> predicate)
-            where TEnumerator : struct, IValueEnumerator<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(source, predicate);
-
-
-
-
-
-        public static ValueEnumerable<Where<TEnumerator, TSource>, TSource> Where2<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+        public static ValueEnumerable<Where<TEnumerator, TSource>, TSource> Where<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(new(source.Enumerator, predicate));
+
+        public static ValueEnumerable<Where2<TEnumerator, TSource>, TSource> Where<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Int32, Boolean> predicate)
+            where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, predicate));
+
+        public static ValueEnumerable<WhereSelect<TEnumerator, TSource, TResult>, TResult> Select<TEnumerator, TSource, TResult>(in this ValueEnumerable<Where<TEnumerator, TSource>, TSource> source, Func<TSource, TResult> selector)
+            where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(source.Enumerator.Select(selector));
     }
 }
 
@@ -38,7 +34,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Where<TEnumerator, TSource>(TEnumerator source, Func<TSource, Boolean> predicate)
+    struct Where<TEnumerator, TSource>(in TEnumerator source, Func<TSource, Boolean> predicate)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -46,11 +42,6 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerator source = source;
-
-        public ValueEnumerator<Where<TEnumerator, TSource>, TSource> GetEnumerator()
-        {
-            return new(this);
-        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -89,11 +80,6 @@ namespace ZLinq.Linq
         // Optimize for common pattern: Where().Select()
         public WhereSelect<TEnumerator, TSource, TResult> Select<TResult>(Func<TSource, TResult> selector)
             => new(source, predicate, selector);
-
-
-
-        public ValueEnumerable<WhereSelect<TEnumerator, TSource, TResult>, TResult> Select2<TResult>(Func<TSource, TResult> selector)
-            => new(new(source, predicate, selector));
     }
 
     [StructLayout(LayoutKind.Auto)]
@@ -103,7 +89,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Where2<TEnumerator, TSource>(TEnumerator source, Func<TSource, Int32, Boolean> predicate)
+    struct Where2<TEnumerator, TSource>(in TEnumerator source, Func<TSource, Int32, Boolean> predicate)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -112,11 +98,6 @@ namespace ZLinq.Linq
     {
         TEnumerator source = source;
         int index = 0;
-
-        public ValueEnumerator<Where2<TEnumerator, TSource>, TSource> GetEnumerator()
-        {
-            return new(this);
-        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -160,7 +141,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct WhereSelect<TEnumerator, TSource, TResult>(TEnumerator source, Func<TSource, Boolean> predicate, Func<TSource, TResult> selector)
+    struct WhereSelect<TEnumerator, TSource, TResult>(TEnumerator source, Func<TSource, Boolean> predicate, Func<TSource, TResult> selector) // no in TEnumerator
         : IValueEnumerator<TResult>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -168,11 +149,6 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerator source = source;
-
-        public ValueEnumerator<WhereSelect<TEnumerator, TSource, TResult>, TResult> GetEnumerator()
-        {
-            return new(this);
-        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

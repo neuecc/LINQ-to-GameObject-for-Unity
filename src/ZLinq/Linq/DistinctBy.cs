@@ -2,19 +2,19 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static DistinctBy<TEnumerator, TSource, TKey> DistinctBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
+        public static ValueEnumerable<DistinctBy<TEnumerator, TSource, TKey>, TSource> DistinctBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, keySelector, null);
+            => new(new(source.Enumerator, keySelector, null));
 
-        public static DistinctBy<TEnumerator, TSource, TKey> DistinctBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+        public static ValueEnumerable<DistinctBy<TEnumerator, TSource, TKey>, TSource> DistinctBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, keySelector, comparer);
+            => new(new(source.Enumerator, keySelector, comparer));
 
     }
 }
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct DistinctBy<TEnumerator, TSource, TKey>(TEnumerator source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
+    struct DistinctBy<TEnumerator, TSource, TKey>(in TEnumerator source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -37,8 +37,6 @@ namespace ZLinq.Linq
     {
         TEnumerator source = source;
         HashSet<TKey>? set;
-
-        public ValueEnumerator<DistinctBy<TEnumerator, TSource, TKey>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

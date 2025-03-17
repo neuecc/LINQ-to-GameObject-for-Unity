@@ -2,19 +2,27 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ExceptBy<TEnumerator, TSource, TKey> ExceptBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector)
+        public static ValueEnumerable<ExceptBy<TEnumerator, TEnumerator2, TSource, TKey>, TSource> ExceptBy<TEnumerator, TEnumerator2, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, in ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, second, keySelector, null);
+            where TEnumerator2 : struct, IValueEnumerator<TKey>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, second, keySelector, null));
 
-        public static ExceptBy<TEnumerator, TSource, TKey> ExceptBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+        public static ValueEnumerable<ExceptBy<TEnumerator, TEnumerator2, TSource, TKey>, TSource> ExceptBy<TEnumerator, TEnumerator2, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, in ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, second, keySelector, comparer);
+            where TEnumerator2 : struct, IValueEnumerator<TKey>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, second, keySelector, comparer));
 
     }
 }
@@ -28,17 +36,20 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct ExceptBy<TEnumerator, TSource, TKey>(TEnumerator source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
+    struct ExceptBy<TEnumerator, TEnumerator2, TSource, TKey>(in TEnumerator source, in ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
+        where TEnumerator2 : struct, IValueEnumerator<TKey>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         TEnumerator source = source;
+        ValueEnumerable<TEnumerator2, TKey> second = second;
         HashSet<TKey>? set;
-
-        public ValueEnumerator<ExceptBy<TEnumerator, TSource, TKey>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -58,7 +69,7 @@ namespace ZLinq.Linq
         {
             if (set == null)
             {
-                set = new HashSet<TKey>(second, comparer ?? EqualityComparer<TKey>.Default);
+                set = second.ToHashSet(comparer ?? EqualityComparer<TKey>.Default);
             }
 
             if (source.TryGetNext(out var value) && set.Remove(keySelector(value)))

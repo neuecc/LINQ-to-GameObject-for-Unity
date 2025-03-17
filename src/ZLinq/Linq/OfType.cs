@@ -2,12 +2,12 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static OfType<TEnumerator, TSource, TResult> OfType<TEnumerator, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, TResult typeHint)
+        public static ValueEnumerable<OfType<TEnumerator, TSource, TResult>, TResult> OfType<TEnumerator, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, TResult typeHint)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source);
+            => new(new(source.Enumerator));
     }
 }
 
@@ -20,7 +20,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct OfType<TEnumerator, TSource, TResult>(TEnumerator source)
+    struct OfType<TEnumerator, TSource, TResult>(in TEnumerator source)
         : IValueEnumerator<TResult>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -28,11 +28,6 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerator source = source;
-
-        public ValueEnumerator<OfType<TEnumerator, TSource, TResult>, TResult> GetEnumerator()
-        {
-            return new(this);
-        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

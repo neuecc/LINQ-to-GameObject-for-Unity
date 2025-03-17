@@ -2,12 +2,12 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Reverse<TEnumerator, TSource> Reverse<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        public static ValueEnumerable<Reverse<TEnumerator, TSource>, TSource> Reverse<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source);
+            => new(new(source.Enumerator));
 
     }
 }
@@ -21,7 +21,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Reverse<TEnumerator, TSource>(TEnumerator source)
+    struct Reverse<TEnumerator, TSource>(in TEnumerator source)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -31,8 +31,6 @@ namespace ZLinq.Linq
         TEnumerator source = source;
         TSource[]? array;
         int index;
-
-        public ValueEnumerator<Reverse<TEnumerator, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -63,7 +61,7 @@ namespace ZLinq.Linq
         {
             if (array == null)
             {
-                array = source.ToArray<TEnumerator, TSource>();
+                array = new ValueEnumerable<TEnumerator, TSource>(source).ToArray();
                 Array.Reverse(array);
             }
 

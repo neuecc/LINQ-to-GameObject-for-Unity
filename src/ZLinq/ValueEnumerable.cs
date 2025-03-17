@@ -14,9 +14,10 @@ struct ValueEnumerable<TEnumerator, T>(TEnumerator enumerator)
 #endif
 {
     // enumerator is struct so it always copied, no need to create new Enumerator.
+    // internal operator should use this
     public readonly TEnumerator Enumerator = enumerator;
 
-    // for foreach
+    // only for foreach
     public ValueEnumerator<TEnumerator, T> GetEnumerator() => new(Enumerator);
 }
 

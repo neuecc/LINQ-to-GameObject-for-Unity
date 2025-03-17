@@ -13,7 +13,7 @@ namespace ZLinq.Tests.Linq
         public void Index_WithEmptyCollection_ShouldReturnEmpty()
         {
             var source = new EmptyEnumerable<int>();
-            var result = source.AsValueEnumerable(default(int)).Index();
+            var result = source.AsValueEnumerable(default(int)).Index().Enumerator;
 
             result.TryGetNonEnumeratedCount(out var count).ShouldBeTrue();
             count.ShouldBe(0);
@@ -25,7 +25,7 @@ namespace ZLinq.Tests.Linq
         public void Index_WithNonEmptyCollection_ShouldReturnIndexedItems()
         {
             var source = new TesTEnumerator<int>(new[] { 10, 20, 30 });
-            var result = source.AsValueEnumerable(default(int)).Index();
+            var result = source.AsValueEnumerable(default(int)).Index().Enumerator;
 
             result.TryGetNonEnumeratedCount(out var count).ShouldBeTrue();
             count.ShouldBe(3);

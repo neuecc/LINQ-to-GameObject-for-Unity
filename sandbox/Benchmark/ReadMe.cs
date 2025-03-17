@@ -57,20 +57,6 @@ public class ReadMeBenchmark
         }
     }
 
-    [Benchmark]
-    public void ZLinq2()
-    {
-        var seq = source
-            .AsValueEnumerable2()
-            .Where2(x => x % 2 == 0)
-            .Select2(x => x * 3);
-
-        foreach (var item in seq)
-        {
-            Do(item);
-        }
-    }
-
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
     static void Do(int x) { }
 }

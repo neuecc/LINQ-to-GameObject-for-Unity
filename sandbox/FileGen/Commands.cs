@@ -41,10 +41,10 @@ public partial class Commands
             var code = $$"""
         else if (typeof(TSource) == typeof({{type}}))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 {{type}} sum = default;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += Unsafe.As<TSource, {{type}}>(ref item); }
                 }

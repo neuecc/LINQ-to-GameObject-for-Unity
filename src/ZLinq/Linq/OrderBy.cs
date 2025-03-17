@@ -4,61 +4,91 @@ namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static OrderBy<TEnumerator, TSource, TSource> Order<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        public static ValueEnumerable<OrderBy<TEnumerator, TSource, TSource>, TSource> Order<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(source, UnsafeFunctions<TSource, TSource>.Identity, null, null, descending: false);
+            => new(new(source.Enumerator, UnsafeFunctions<TSource, TSource>.Identity, null, null, descending: false));
 
-        public static OrderBy<TEnumerator, TSource, TSource> Order<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IComparer<TSource>? comparer)
+        public static ValueEnumerable<OrderBy<TEnumerator, TSource, TSource>, TSource> Order<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IComparer<TSource>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(source, UnsafeFunctions<TSource, TSource>.Identity, comparer, null, descending: false);
+            => new(new(source.Enumerator, UnsafeFunctions<TSource, TSource>.Identity, comparer, null, descending: false));
 
-        public static OrderBy<TEnumerator, TSource, TSource> OrderDescending<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        public static ValueEnumerable<OrderBy<TEnumerator, TSource, TSource>, TSource> OrderDescending<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(source, UnsafeFunctions<TSource, TSource>.Identity, null, null, descending: true);
+            => new(new(source.Enumerator, UnsafeFunctions<TSource, TSource>.Identity, null, null, descending: true));
 
-        public static OrderBy<TEnumerator, TSource, TSource> OrderDescending<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IComparer<TSource>? comparer)
+        public static ValueEnumerable<OrderBy<TEnumerator, TSource, TSource>, TSource> OrderDescending<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IComparer<TSource>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(source, UnsafeFunctions<TSource, TSource>.Identity, comparer, null, descending: true);
+            => new(new(source.Enumerator, UnsafeFunctions<TSource, TSource>.Identity, comparer, null, descending: true));
 
-        public static OrderBy<TEnumerator, TSource, TKey> OrderBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
+        public static ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> OrderBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(source, keySelector, null, null, descending: false);
+            => new(new(source.Enumerator, keySelector, null, null, descending: false));
 
-        public static OrderBy<TEnumerator, TSource, TKey> OrderBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer)
+        public static ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> OrderBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(source, keySelector, comparer, null, descending: false);
+            => new(new(source.Enumerator, keySelector, comparer, null, descending: false));
 
-        public static OrderBy<TEnumerator, TSource, TKey> OrderByDescending<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
+        public static ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> OrderByDescending<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(source, keySelector, null, null, descending: true);
+            => new(new(source.Enumerator, keySelector, null, null, descending: true));
 
-        public static OrderBy<TEnumerator, TSource, TKey> OrderByDescending<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer)
+        public static ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> OrderByDescending<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(source, keySelector, comparer, null, descending: true);
+            => new(new(source.Enumerator, keySelector, comparer, null, descending: true));
+
+        // ThenBy
+
+        public static ValueEnumerable<OrderBy<TEnumerator, TSource, TSecondKey>, TSource> ThenBy<TEnumerator, TSource, TKey, TSecondKey>(in this ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> source, Func<TSource, TSecondKey> keySelector)
+            where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+                , allows ref struct
+#endif
+            => new(source.Enumerator.ThenBy(keySelector));
+
+        public static ValueEnumerable<OrderBy<TEnumerator, TSource, TSecondKey>, TSource> ThenBy<TEnumerator, TSource, TKey, TSecondKey>(in this ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> source, Func<TSource, TSecondKey> keySelector, IComparer<TSecondKey>? comparer)
+            where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+                , allows ref struct
+#endif
+            => new(source.Enumerator.ThenBy(keySelector, comparer));
+
+        public static ValueEnumerable<OrderBy<TEnumerator, TSource, TSecondKey>, TSource> ThenByDescending<TEnumerator, TSource, TKey, TSecondKey>(in this ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> source, Func<TSource, TSecondKey> keySelector)
+            where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+                , allows ref struct
+#endif
+            => new(source.Enumerator.ThenByDescending(keySelector));
+
+        public static ValueEnumerable<OrderBy<TEnumerator, TSource, TSecondKey>, TSource> ThenByDescending<TEnumerator, TSource, TKey, TSecondKey>(in this ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> source, Func<TSource, TSecondKey> keySelector, IComparer<TSecondKey>? comparer)
+            where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+                , allows ref struct
+#endif
+            => new(source.Enumerator.ThenByDescending(keySelector, comparer));
     }
 }
 
@@ -69,7 +99,7 @@ namespace ZLinq.Linq
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
 #if NET9_0_OR_GREATER
-        public ref
+    public ref
 #else
     public
 #endif
@@ -137,7 +167,7 @@ namespace ZLinq.Linq
         {
             if (sourceMap == null)
             {
-                sourceMap = source.ToArray<TEnumerator, TSource>();
+                sourceMap = new ValueEnumerable<TEnumerator, TSource>(source).ToArray();
 
                 if (IsAllowDirectSort())
                 {

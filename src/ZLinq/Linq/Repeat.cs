@@ -2,14 +2,14 @@
 {
     public static partial class ValueEnumerable
     {
-        public static FromRepeat<T> Repeat<T>(T element, int count)
+        public static ValueEnumerable<FromRepeat<T>, T> Repeat<T>(T element, int count)
         {
             if (count < 0)
             {
                 Throws.ArgumentOutOfRange(nameof(count));
             }
 
-            return new(element, count);
+            return new(new(element, count));
         }
     }
 }

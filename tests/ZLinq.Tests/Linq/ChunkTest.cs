@@ -7,7 +7,7 @@ public class ChunkTest
     {
         var xs = new int[0];
 
-        var enumerable = xs.AsValueEnumerable().Chunk(3);
+        var enumerable = xs.AsValueEnumerable().Chunk(3).Enumerator;
 
         var e1 = enumerable;
         e1.TryGetNonEnumeratedCount(out var nonEnumeratedCount).ShouldBe(true);
@@ -20,7 +20,7 @@ public class ChunkTest
         var e3 = enumerable;
         e3.TryGetNext(out var _).ShouldBeFalse();
 
-        TestUtil.Empty().AsValueEnumerable().TryGetNext(out _).ShouldBeFalse();
+        TestUtil.Empty().AsValueEnumerable().Enumerator.TryGetNext(out _).ShouldBeFalse();
 
         enumerable.Dispose();
     }

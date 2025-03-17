@@ -19,9 +19,9 @@
         {
             comparer ??= Comparer<TKey>.Default;
 
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
-                if (!source.TryGetNext(out var value)) // TSource value;
+                if (!enumerator.TryGetNext(out var value)) // TSource value;
                 {
                     if (default(TSource) is null)
                     {
@@ -45,7 +45,7 @@
 
                         do
                         {
-                            if (!source.TryGetNext(out var current))
+                            if (!enumerator.TryGetNext(out var current))
                             {
                                 return firstValue; // return first-value when all keys are null.
                             }
@@ -55,7 +55,7 @@
                         while (key is null);
                     }
 
-                    while (source.TryGetNext(out var current))
+                    while (enumerator.TryGetNext(out var current))
                     {
                         var currentKey = keySelector(current);
                         if (currentKey is not null && comparer.Compare(currentKey, key) < 0)
@@ -70,7 +70,7 @@
                     // value type
                     if (comparer == Comparer<TKey>.Default)
                     {
-                        while (source.TryGetNext(out var current))
+                        while (enumerator.TryGetNext(out var current))
                         {
                             var currentKey = keySelector(current);
                             if (Comparer<TKey>.Default.Compare(currentKey, key) < 0)
@@ -84,7 +84,7 @@
                     }
                     else
                     {
-                        while (source.TryGetNext(out var current))
+                        while (enumerator.TryGetNext(out var current))
                         {
                             var currentKey = keySelector(current);
                             if (comparer.Compare(currentKey, key) < 0)

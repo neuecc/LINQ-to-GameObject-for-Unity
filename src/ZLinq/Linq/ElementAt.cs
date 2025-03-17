@@ -8,9 +8,17 @@
             , allows ref struct
 #endif
         {
-            return TryGetElementAt<TEnumerator, TSource>(ref source, index, out var value)
-                ? value
-                : Throws.ArgumentOutOfRange<TSource>(nameof(index));
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetElementAt<TEnumerator, TSource>(ref enumerator, index, out var value)
+                    ? value
+                    : Throws.ArgumentOutOfRange<TSource>(nameof(index));
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
 
@@ -20,9 +28,17 @@
             , allows ref struct
 #endif
         {
-            return TryGetElementAt<TEnumerator, TSource>(ref source, index, out var value)
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetElementAt<TEnumerator, TSource>(ref enumerator, index, out var value)
                 ? value
                 : Throws.ArgumentOutOfRange<TSource>(nameof(index));
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
         public static TSource ElementAtOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Int32 index)
@@ -31,9 +47,17 @@
             , allows ref struct
 #endif
         {
-            return TryGetElementAt<TEnumerator, TSource>(ref source, index, out var value)
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetElementAt<TEnumerator, TSource>(ref enumerator, index, out var value)
                 ? value
                 : default!;
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
         public static TSource ElementAtOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Index index)
@@ -42,9 +66,17 @@
             , allows ref struct
 #endif
         {
-            return TryGetElementAt<TEnumerator, TSource>(ref source, index, out var value)
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetElementAt<TEnumerator, TSource>(ref enumerator, index, out var value)
                 ? value
                 : default!;
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
         static bool TryGetElementAt<TEnumerator, TSource>(ref TEnumerator source, int index, out TSource value)
@@ -65,24 +97,21 @@
                 return true;
             }
 
-            using (source)
+            if (index >= 0)
             {
-                if (index >= 0)
+                while (source.TryGetNext(out var current))
                 {
-                    while (source.TryGetNext(out var current))
+                    if (index == 0)
                     {
-                        if (index == 0)
-                        {
-                            value = current;
-                            return true;
-                        }
-                        index--;
+                        value = current;
+                        return true;
                     }
+                    index--;
                 }
-
-                value = default!;
-                return false;
             }
+
+            value = default!;
+            return false;
         }
 
         static bool TryGetElementAt<TEnumerator, TSource>(ref TEnumerator source, Index index, out TSource value)
@@ -110,23 +139,20 @@
                 return true;
             }
 
-            using (source)
+            using var q = new ValueQueue<TSource>(4);
+            while (source.TryGetNext(out var current))
             {
-                using var q = new ValueQueue<TSource>(4);
-                while (source.TryGetNext(out var current))
-                {
-                    if (q.Count == indexFromEnd)
-                    {
-                        q.Dequeue();
-                    }
-                    q.Enqueue(current);
-                }
-
                 if (q.Count == indexFromEnd)
                 {
-                    value = q.Dequeue();
-                    return true;
+                    q.Dequeue();
                 }
+                q.Enqueue(current);
+            }
+
+            if (q.Count == indexFromEnd)
+            {
+                value = q.Dequeue();
+                return true;
             }
 
             value = default!;

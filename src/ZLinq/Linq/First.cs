@@ -8,9 +8,17 @@
             , allows ref struct
 #endif
         {
-            return TryGetFirst<TEnumerator, TSource>(ref source, out var value)
-                ? value
-                : Throws.NoElements<TSource>();
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetFirst<TEnumerator, TSource>(ref enumerator, out var value)
+                    ? value
+                    : Throws.NoElements<TSource>();
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
         public static TSource First<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
@@ -19,9 +27,17 @@
             , allows ref struct
 #endif
         {
-            return TryGetFirst<TEnumerator, TSource>(ref source, predicate, out var value)
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetFirst<TEnumerator, TSource>(ref enumerator, predicate, out var value)
                 ? value
                 : Throws.NoMatch<TSource>();
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
         public static TSource? FirstOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
@@ -30,9 +46,17 @@
             , allows ref struct
 #endif
         {
-            return TryGetFirst<TEnumerator, TSource>(ref source, out var value)
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetFirst<TEnumerator, TSource>(ref enumerator, out var value)
                 ? value
                 : default;
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
         public static TSource FirstOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, TSource defaultValue)
@@ -41,9 +65,17 @@
             , allows ref struct
 #endif
         {
-            return TryGetFirst<TEnumerator, TSource>(ref source, out var value)
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetFirst<TEnumerator, TSource>(ref enumerator, out var value)
                 ? value
                 : defaultValue;
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
         public static TSource? FirstOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
@@ -52,9 +84,17 @@
             , allows ref struct
 #endif
         {
-            return TryGetFirst<TEnumerator, TSource>(ref source, predicate, out var value)
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetFirst<TEnumerator, TSource>(ref enumerator, predicate, out var value)
                 ? value
                 : default;
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
         public static TSource FirstOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate, TSource defaultValue)
@@ -63,9 +103,17 @@
             , allows ref struct
 #endif
         {
-            return TryGetFirst<TEnumerator, TSource>(ref source, predicate, out var value)
+            var enumerator = source.Enumerator;
+            try
+            {
+                return TryGetFirst<TEnumerator, TSource>(ref enumerator, predicate, out var value)
                 ? value
                 : defaultValue;
+            }
+            finally
+            {
+                enumerator.Dispose();
+            }
         }
 
         static bool TryGetFirst<TEnumerator, TSource>(ref TEnumerator source, out TSource value)
@@ -74,28 +122,25 @@
             , allows ref struct
 #endif
         {
-            using (source)
+            if (source.TryGetSpan(out var span))
             {
-                if (source.TryGetSpan(out var span))
+                if (span.Length > 0)
                 {
-                    if (span.Length > 0)
-                    {
-                        value = span[0];
-                        return true;
-                    }
-
-                    value = default!;
-                    return false;
-                }
-
-                if (source.TryGetNext(out value))
-                {
+                    value = span[0];
                     return true;
                 }
 
                 value = default!;
                 return false;
             }
+
+            if (source.TryGetNext(out value))
+            {
+                return true;
+            }
+
+            value = default!;
+            return false;
         }
 
         static bool TryGetFirst<TEnumerator, TSource>(ref TEnumerator source, Func<TSource, Boolean> predicate, out TSource value)
@@ -104,28 +149,13 @@
             , allows ref struct
 #endif
         {
-            using (source)
+            if (source.TryGetSpan(out var span))
             {
-                if (source.TryGetSpan(out var span))
+                foreach (var item in span)
                 {
-                    foreach (var item in span)
+                    if (predicate(item))
                     {
-                        if (predicate(item))
-                        {
-                            value = item;
-                            return true;
-                        }
-                    }
-
-                    value = default!;
-                    return false;
-                }
-
-                while (source.TryGetNext(out var current))
-                {
-                    if (predicate(current))
-                    {
-                        value = current;
+                        value = item;
                         return true;
                     }
                 }
@@ -133,6 +163,18 @@
                 value = default!;
                 return false;
             }
+
+            while (source.TryGetNext(out var current))
+            {
+                if (predicate(current))
+                {
+                    value = current;
+                    return true;
+                }
+            }
+
+            value = default!;
+            return false;
         }
     }
 }

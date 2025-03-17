@@ -22,10 +22,10 @@ partial class ValueEnumerableExtensions
     {
         if (typeof(TSource) == typeof(float))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 double sum = default; // calculate as double
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     sum += (double)Unsafe.As<TSource, float>(ref item);
                 }
@@ -36,15 +36,15 @@ partial class ValueEnumerableExtensions
 #if NET8_0_OR_GREATER
         else
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
-                if (source.TryGetSpan(out var span))
+                if (enumerator.TryGetSpan(out var span))
                 {
                     return SumSpan(span);
                 }
 
                 var sum = TSource.Zero;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += TSource.CreateChecked(item); }
                 }
@@ -55,10 +55,10 @@ partial class ValueEnumerableExtensions
 #region generate from FileGen.Commands.Sum
         else if (typeof(TSource) == typeof(byte))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 byte sum = default;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += Unsafe.As<TSource, byte>(ref item); }
                 }
@@ -67,10 +67,10 @@ partial class ValueEnumerableExtensions
         }
         else if (typeof(TSource) == typeof(sbyte))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 sbyte sum = default;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += Unsafe.As<TSource, sbyte>(ref item); }
                 }
@@ -79,10 +79,10 @@ partial class ValueEnumerableExtensions
         }
         else if (typeof(TSource) == typeof(short))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 short sum = default;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += Unsafe.As<TSource, short>(ref item); }
                 }
@@ -91,10 +91,10 @@ partial class ValueEnumerableExtensions
         }
         else if (typeof(TSource) == typeof(ushort))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 ushort sum = default;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += Unsafe.As<TSource, ushort>(ref item); }
                 }
@@ -103,10 +103,10 @@ partial class ValueEnumerableExtensions
         }
         else if (typeof(TSource) == typeof(int))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 int sum = default;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += Unsafe.As<TSource, int>(ref item); }
                 }
@@ -115,10 +115,10 @@ partial class ValueEnumerableExtensions
         }
         else if (typeof(TSource) == typeof(uint))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 uint sum = default;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += Unsafe.As<TSource, uint>(ref item); }
                 }
@@ -127,10 +127,10 @@ partial class ValueEnumerableExtensions
         }
         else if (typeof(TSource) == typeof(long))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 long sum = default;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += Unsafe.As<TSource, long>(ref item); }
                 }
@@ -139,10 +139,10 @@ partial class ValueEnumerableExtensions
         }
         else if (typeof(TSource) == typeof(ulong))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 ulong sum = default;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += Unsafe.As<TSource, ulong>(ref item); }
                 }
@@ -151,10 +151,10 @@ partial class ValueEnumerableExtensions
         }
         else if (typeof(TSource) == typeof(double))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 double sum = default;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += Unsafe.As<TSource, double>(ref item); }
                 }
@@ -163,10 +163,10 @@ partial class ValueEnumerableExtensions
         }
         else if (typeof(TSource) == typeof(decimal))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 decimal sum = default;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += Unsafe.As<TSource, decimal>(ref item); }
                 }
@@ -175,10 +175,10 @@ partial class ValueEnumerableExtensions
         }
         else if (typeof(TSource) == typeof(nint))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 nint sum = default;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += Unsafe.As<TSource, nint>(ref item); }
                 }
@@ -187,10 +187,10 @@ partial class ValueEnumerableExtensions
         }
         else if (typeof(TSource) == typeof(nuint))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
                 nuint sum = default;
-                while (source.TryGetNext(out var item))
+                while (enumerator.TryGetNext(out var item))
                 {
                     checked { sum += Unsafe.As<TSource, nuint>(ref item); }
                 }
@@ -215,13 +215,14 @@ partial class ValueEnumerableExtensions
 #endif
         where TSource : struct, INumber<TSource>
     {
-        if (source.TryGetSpan(out var span))
+        using var enumerator = source.Enumerator;
+        if (enumerator.TryGetSpan(out var span))
         {
             return SimdSumNumberUnchecked(span);
         }
 
         var sum = TSource.Zero;
-        while (source.TryGetNext(out var item))
+        while (enumerator.TryGetNext(out var item))
         {
             unchecked { sum += item; }
         }

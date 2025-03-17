@@ -2,19 +2,27 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Union<TEnumerator, TSource> Union<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second)
+        public static ValueEnumerable<Union<TEnumerator, TEnumerator2, TSource>, TSource> Union<TEnumerator, TEnumerator2, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, in ValueEnumerable<TEnumerator2, TSource> second)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, second, null);
+            where TEnumerator2 : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, second.Enumerator, null));
 
-        public static Union<TEnumerator, TSource> Union<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer)
+        public static ValueEnumerable<Union<TEnumerator, TEnumerator2, TSource>, TSource> Union<TEnumerator, TEnumerator2, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, in ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, second, comparer);
+            where TEnumerator2 : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, second.Enumerator, comparer));
 
     }
 }
@@ -28,19 +36,21 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-   struct Union<TEnumerator, TSource>(TEnumerator source, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer)
+   struct Union<TEnumerator, TEnumerator2, TSource>(in TEnumerator source, in TEnumerator2 second, IEqualityComparer<TSource>? comparer)
        : IValueEnumerator<TSource>
        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
+        where TEnumerator2 : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
     {
         TEnumerator source = source;
+        TEnumerator2 second = second;
         HashSet<TSource>? set;
-        IEnumerator<TSource>? secondEnumerator;
         byte state = 0;
-
-        public ValueEnumerator<Union<TEnumerator, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -76,19 +86,10 @@ namespace ZLinq.Linq
 
             if (state == 2)
             {
-                if (secondEnumerator is null)
+                while (second.TryGetNext(out var value) && set!.Add(value))
                 {
-                    secondEnumerator = second.GetEnumerator();
-                }
-
-                while (secondEnumerator.MoveNext())
-                {
-                    var v = secondEnumerator.Current;
-                    if (set!.Add(v))
-                    {
-                        current = v;
-                        return true;
-                    }
+                    current = value;
+                    return true;
                 }
 
                 state = 3;
@@ -101,8 +102,8 @@ namespace ZLinq.Linq
         public void Dispose()
         {
             state = 3;
-            secondEnumerator?.Dispose();
             source.Dispose();
+            second.Dispose();
         }
     }
 }
