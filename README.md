@@ -27,7 +27,7 @@ foreach (var item in seq) { }
 
 I aimed to create not just an experimental library but a practical one. It's also designed to handle high-load requirements, such as those found in games.
 
-You can install it from [NuGet/ZLinq](https://www.nuget.org/packages/ZLinq). For Unity usage, refer to the [Unity section](#unity).
+You can install it from [NuGet/ZLinq](https://www.nuget.org/packages/ZLinq). For Unity usage, refer to the [Unity section](#unity). For Godot usage, refer to the [Godot section](#godot).
 
 ```bash
 dotnet add package ZLinq
@@ -261,6 +261,57 @@ var foobars = root.Descendants().Where(x => x.tag == "foobar");
 
 // get FooScript under self childer objects and self
 var fooScripts = root.ChildrenAndSelf().OfComponent<FooScript>(); 
+```
+
+Godot
+---
+The minimum supported Godot version will be `4.0.0`.
+You can install ZLinq.Godot package via NuGet.
+
+```bash
+dotnet add package ZLinq.Godot
+```
+
+In addition to the standard ZLinq, LINQ to Node functionality is available.
+
+![](Images/godot.jpg)
+
+```csharp
+using Godot;
+using ZLinq;
+
+public partial class SampleScript : Node2D
+{
+    public override void _Ready()
+    {
+        var origin = GetNode<Node2D>("Container/Origin");
+
+        GD.Print("Ancestors--------------"); // Container, Root, root (Root Window)
+        foreach (var item in origin.Ancestors()) GD.Print(item.Name);
+
+        GD.Print("Children--------------"); // Sphere_A, Sphere_B, Group, Sphere_A, Sphere_B
+        foreach (var item in origin.Children()) GD.Print(item.Name);
+
+        GD.Print("Descendants--------------"); // Sphere_A, Sphere_B, Group, P1, Group, Sphere_B, P2, Sphere_A, Sphere_B
+        foreach (var item in origin.Descendants()) GD.Print(item.Name);
+
+        GD.Print("BeforeSelf--------------"); // C1, C2
+        foreach (var item in origin.BeforeSelf()) GD.Print(item.Name);
+
+        GD.Print("AfterSelf--------------"); // C3, C4
+        foreach (var item in origin.AfterSelf()) GD.Print(item.Name);
+    }
+}
+
+```
+
+You can chain query(LINQ to Objects). Also, you can filter by node type using the `OfType()`.
+
+```csharp
+// get ancestors under a Window
+var ancestors = root.Ancestors().TakeWhile(x => x is not Window);
+// get FooScript under self childer objects and self
+var fooScripts = root.ChildrenAndSelf().OfType(default(FooScript));
 ```
 
 License
