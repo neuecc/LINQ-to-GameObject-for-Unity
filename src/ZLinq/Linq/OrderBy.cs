@@ -219,11 +219,13 @@ namespace ZLinq.Linq
 
     // my previously implementation in js: https://github.com/neuecc/linq.js/blob/v3/linq.js#L2672-L2760
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IOrderByComparable<TSource>
     {
         IOrderByComparer GetComparer(ReadOnlySpan<TSource> source, IOrderByComparer? childComparer);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IOrderByComparer : IComparer<int>, IDisposable
     {
     }

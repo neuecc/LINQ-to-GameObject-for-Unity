@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
+using System.Runtime.CompilerServices;
 using ZLinq;
 
 namespace Benchmark;
@@ -17,6 +18,18 @@ public class ReadMeBenchmark
     }
 
     [Benchmark]
+    public void For()
+    {
+        foreach (var item in source)
+        {
+            if (item % 2 == 0)
+            {
+                Do(item * 3);
+            }
+        }
+    }
+
+    [Benchmark]
     public void SystemLinq()
     {
         var seq = source
@@ -25,6 +38,7 @@ public class ReadMeBenchmark
 
         foreach (var item in seq)
         {
+            Do(item);
         }
     }
 
@@ -36,6 +50,12 @@ public class ReadMeBenchmark
             .Where(x => x % 2 == 0)
             .Select(x => x * 3);
 
-        foreach (var item in seq) { }
+        foreach (var item in seq)
+        {
+            Do(item);
+        }
     }
+
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
+    static void Do(int x) { }
 }

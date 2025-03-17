@@ -24,7 +24,7 @@
                 : Throws.NoMatch<TSource>();
         }
 
-        public static TSource FirstOrDefault<TEnumerable, TSource>(this TEnumerable source)
+        public static TSource? FirstOrDefault<TEnumerable, TSource>(this TEnumerable source)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -32,7 +32,7 @@
         {
             return TryGetFirst<TEnumerable, TSource>(ref source, out var value)
                 ? value
-                : default!;
+                : default;
         }
 
         public static TSource FirstOrDefault<TEnumerable, TSource>(this TEnumerable source, TSource defaultValue)
@@ -46,7 +46,7 @@
                 : defaultValue;
         }
 
-        public static TSource FirstOrDefault<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
+        public static TSource? FirstOrDefault<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
             where TEnumerable : struct, IValueEnumerable<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -54,7 +54,7 @@
         {
             return TryGetFirst<TEnumerable, TSource>(ref source, predicate, out var value)
                 ? value
-                : default!;
+                : default;
         }
 
         public static TSource FirstOrDefault<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate, TSource defaultValue)
@@ -74,20 +74,20 @@
             , allows ref struct
 #endif
         {
-            if (source.TryGetSpan(out var span))
-            {
-                if (span.Length > 0)
-                {
-                    value = span[0];
-                    return true;
-                }
-
-                value = default!;
-                return false;
-            }
-
             using (source)
             {
+                if (source.TryGetSpan(out var span))
+                {
+                    if (span.Length > 0)
+                    {
+                        value = span[0];
+                        return true;
+                    }
+
+                    value = default!;
+                    return false;
+                }
+
                 if (source.TryGetNext(out value))
                 {
                     return true;
@@ -104,23 +104,23 @@
             , allows ref struct
 #endif
         {
-            if (source.TryGetSpan(out var span))
-            {
-                foreach (var item in span)
-                {
-                    if (predicate(item))
-                    {
-                        value = item;
-                        return true;
-                    }
-                }
-
-                value = default!;
-                return false;
-            }
-
             using (source)
             {
+                if (source.TryGetSpan(out var span))
+                {
+                    foreach (var item in span)
+                    {
+                        if (predicate(item))
+                        {
+                            value = item;
+                            return true;
+                        }
+                    }
+
+                    value = default!;
+                    return false;
+                }
+
                 while (source.TryGetNext(out var current))
                 {
                     if (predicate(current))
