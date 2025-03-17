@@ -2,7 +2,7 @@
 
 [StructLayout(LayoutKind.Auto)]
 public struct BeforeSelfEnumerable<TTraversable, T>(TTraversable traversable, bool withSelf)
-    : IValueEnumerable<T>
+    : IValueEnumerator<T>
     where TTraversable : struct, ITraversable<TTraversable, T>
 {
     bool iterateCompleted = false;

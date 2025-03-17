@@ -2,15 +2,15 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Distinct<TEnumerable, TSource> Distinct<TEnumerable, TSource>(this TEnumerable source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Distinct<TEnumerator, TSource> Distinct<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, null!);
 
-        public static Distinct<TEnumerable, TSource> Distinct<TEnumerable, TSource>(this TEnumerable source, IEqualityComparer<TSource> comparer)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Distinct<TEnumerator, TSource> Distinct<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IEqualityComparer<TSource> comparer)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -28,17 +28,17 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Distinct<TEnumerable, TSource>(TEnumerable source, IEqualityComparer<TSource>? comparer)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct Distinct<TEnumerator, TSource>(TEnumerator source, IEqualityComparer<TSource>? comparer)
+        : IValueEnumerator<TSource>
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
         HashSet<TSource>? set;
 
-        public ValueEnumerator<Distinct<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<Distinct<TEnumerator, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

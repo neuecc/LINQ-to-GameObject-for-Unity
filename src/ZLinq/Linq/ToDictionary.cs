@@ -4,16 +4,16 @@
     {
         // .NET has IEnumerable<KeyValuePair<>> method but we can not infer it so not implemented.
 
-        //public static Dictionary<TKey, TValue> ToDictionary<TEnumerable, TKey, TValue>(this TEnumerable source)
+        //public static Dictionary<TKey, TValue> ToDictionary<TEnumerator, TKey, TValue>(in this ValueEnumerable<TEnumerator, TSource> source)
         //    where TKey : notnull
-        //    where TEnumerable : struct, IValueEnumerable<KeyValuePair<TKey, TValue>>
-        //public static Dictionary<TKey, TValue> ToDictionary<TEnumerable, TKey, TValue>(this TEnumerable source, IEqualityComparer<TKey> comparer)
+        //    where TEnumerator : struct, IValueEnumerable<KeyValuePair<TKey, TValue>>
+        //public static Dictionary<TKey, TValue> ToDictionary<TEnumerator, TKey, TValue>(in this ValueEnumerable<TEnumerator, TSource> source, IEqualityComparer<TKey> comparer)
         //    where TKey : notnull
-        //    where TEnumerable : struct, IValueEnumerable<KeyValuePair<TKey, TValue>>
+        //    where TEnumerator : struct, IValueEnumerable<KeyValuePair<TKey, TValue>>
 
-        public static Dictionary<TKey, TSource> ToDictionary<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector)
+        public static Dictionary<TKey, TSource> ToDictionary<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
             where TKey : notnull
-            where TEnumerable : struct, IValueEnumerable<TSource>
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -21,9 +21,9 @@
             return ToDictionary(source, keySelector, null!);
         }
 
-        public static Dictionary<TKey, TSource> ToDictionary<TEnumerable, TSource, TKey>(this TEnumerable source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+        public static Dictionary<TKey, TSource> ToDictionary<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
             where TKey : notnull
-            where TEnumerable : struct, IValueEnumerable<TSource>
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -50,9 +50,9 @@
             }
         }
 
-        public static Dictionary<TKey, TElement> ToDictionary<TEnumerable, TSource, TKey, TElement>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
+        public static Dictionary<TKey, TElement> ToDictionary<TEnumerator, TSource, TKey, TElement>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
             where TKey : notnull
-            where TEnumerable : struct, IValueEnumerable<TSource>
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -60,9 +60,9 @@
             return ToDictionary(source, keySelector, elementSelector, null!);
         }
 
-        public static Dictionary<TKey, TElement> ToDictionary<TEnumerable, TSource, TKey, TElement>(this TEnumerable source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
+        public static Dictionary<TKey, TElement> ToDictionary<TEnumerator, TSource, TKey, TElement>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
             where TKey : notnull
-            where TEnumerable : struct, IValueEnumerable<TSource>
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif

@@ -2,22 +2,22 @@
 //{
 //    partial class ValueEnumerableExtensions
 //    {
-//        public static Zip<TEnumerable, TFirst, TSecond, TResult> Zip<TEnumerable, TFirst, TSecond, TResult>(this TEnumerable source, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector)
-//            where TEnumerable : struct, IValueEnumerable<TFirst>
+//        public static Zip<TEnumerator, TFirst, TSecond, TResult> Zip<TEnumerator, TFirst, TSecond, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector)
+//            where TEnumerator : struct, IValueEnumerable<TFirst>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
 //#endif
 //            => new(source, second, resultSelector);
 
-//        public static Zip2<TEnumerable, TFirst, TSecond> Zip<TEnumerable, TFirst, TSecond>(this TEnumerable source, IEnumerable<TSecond> second)
-//            where TEnumerable : struct, IValueEnumerable<TFirst>
+//        public static Zip2<TEnumerator, TFirst, TSecond> Zip<TEnumerator, TFirst, TSecond>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSecond> second)
+//            where TEnumerator : struct, IValueEnumerable<TFirst>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
 //#endif
 //            => new(source, second);
 
-//        public static Zip3<TEnumerable, TFirst, TSecond, TThird> Zip<TEnumerable, TFirst, TSecond, TThird>(this TEnumerable source, IEnumerable<TSecond> second, IEnumerable<TThird> third)
-//            where TEnumerable : struct, IValueEnumerable<TFirst>
+//        public static Zip3<TEnumerator, TFirst, TSecond, TThird> Zip<TEnumerator, TFirst, TSecond, TThird>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSecond> second, IEnumerable<TThird> third)
+//            where TEnumerator : struct, IValueEnumerable<TFirst>
 //#if NET9_0_OR_GREATER
 //            , allows ref struct
 //#endif
@@ -35,16 +35,16 @@
 //#else
 //    public
 //#endif
-//    struct Zip<TEnumerable, TFirst, TSecond, TResult>(TEnumerable source, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector)
+//    struct Zip<TEnumerator, TFirst, TSecond, TResult>(TEnumerator source, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector)
 //        : IValueEnumerable<TResult>
-//        where TEnumerable : struct, IValueEnumerable<TFirst>
+//        where TEnumerator : struct, IValueEnumerable<TFirst>
 //#if NET9_0_OR_GREATER
 //        , allows ref struct
 //#endif
 //    {
-//        TEnumerable source = source;
+//        TEnumerator source = source;
 
-//        public ValueEnumerator<Zip<TEnumerable, TFirst, TSecond, TResult>, TResult> GetEnumerator() => new(this);
+//        public ValueEnumerator<Zip<TEnumerator, TFirst, TSecond, TResult>, TResult> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {
@@ -81,16 +81,16 @@
 //#else
 //    public
 //#endif
-//    struct Zip2<TEnumerable, TFirst, TSecond>(TEnumerable source, IEnumerable<TSecond> second)
+//    struct Zip2<TEnumerator, TFirst, TSecond>(TEnumerator source, IEnumerable<TSecond> second)
 //        : IValueEnumerable<ValueTuple`2>
-//        where TEnumerable : struct, IValueEnumerable<TFirst>
+//        where TEnumerator : struct, IValueEnumerable<TFirst>
 //#if NET9_0_OR_GREATER
 //        , allows ref struct
 //#endif
 //    {
-//        TEnumerable source = source;
+//        TEnumerator source = source;
 
-//        public ValueEnumerator<Zip2<TEnumerable, TFirst, TSecond>, ValueTuple`2> GetEnumerator() => new(this);
+//        public ValueEnumerator<Zip2<TEnumerator, TFirst, TSecond>, ValueTuple`2> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {
@@ -127,16 +127,16 @@
 //#else
 //    public
 //#endif
-//    struct Zip3<TEnumerable, TFirst, TSecond, TThird>(TEnumerable source, IEnumerable<TSecond> second, IEnumerable<TThird> third)
+//    struct Zip3<TEnumerator, TFirst, TSecond, TThird>(TEnumerator source, IEnumerable<TSecond> second, IEnumerable<TThird> third)
 //        : IValueEnumerable<ValueTuple`3>
-//        where TEnumerable : struct, IValueEnumerable<TFirst>
+//        where TEnumerator : struct, IValueEnumerable<TFirst>
 //#if NET9_0_OR_GREATER
 //        , allows ref struct
 //#endif
 //    {
-//        TEnumerable source = source;
+//        TEnumerator source = source;
 
-//        public ValueEnumerator<Zip3<TEnumerable, TFirst, TSecond, TThird>, ValueTuple`3> GetEnumerator() => new(this);
+//        public ValueEnumerator<Zip3<TEnumerator, TFirst, TSecond, TThird>, ValueTuple`3> GetEnumerator() => new(this);
 
 //        public bool TryGetNonEnumeratedCount(out int count)
 //        {

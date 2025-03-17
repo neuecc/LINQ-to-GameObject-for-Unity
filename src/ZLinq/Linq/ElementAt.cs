@@ -2,53 +2,53 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static TSource ElementAt<TEnumerable, TSource>(this TEnumerable source, Int32 index)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource ElementAt<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Int32 index)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            return TryGetElementAt<TEnumerable, TSource>(ref source, index, out var value)
+            return TryGetElementAt<TEnumerator, TSource>(ref source, index, out var value)
                 ? value
                 : Throws.ArgumentOutOfRange<TSource>(nameof(index));
         }
 
 
-        public static TSource ElementAt<TEnumerable, TSource>(this TEnumerable source, Index index)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource ElementAt<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Index index)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            return TryGetElementAt<TEnumerable, TSource>(ref source, index, out var value)
+            return TryGetElementAt<TEnumerator, TSource>(ref source, index, out var value)
                 ? value
                 : Throws.ArgumentOutOfRange<TSource>(nameof(index));
         }
 
-        public static TSource ElementAtOrDefault<TEnumerable, TSource>(this TEnumerable source, Int32 index)
-          where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource ElementAtOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Int32 index)
+          where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            return TryGetElementAt<TEnumerable, TSource>(ref source, index, out var value)
+            return TryGetElementAt<TEnumerator, TSource>(ref source, index, out var value)
                 ? value
                 : default!;
         }
 
-        public static TSource ElementAtOrDefault<TEnumerable, TSource>(this TEnumerable source, Index index)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource ElementAtOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Index index)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            return TryGetElementAt<TEnumerable, TSource>(ref source, index, out var value)
+            return TryGetElementAt<TEnumerator, TSource>(ref source, index, out var value)
                 ? value
                 : default!;
         }
 
-        static bool TryGetElementAt<TEnumerable, TSource>(ref TEnumerable source, int index, out TSource value)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        static bool TryGetElementAt<TEnumerator, TSource>(ref TEnumerator source, int index, out TSource value)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -85,15 +85,15 @@
             }
         }
 
-        static bool TryGetElementAt<TEnumerable, TSource>(ref TEnumerable source, Index index, out TSource value)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        static bool TryGetElementAt<TEnumerator, TSource>(ref TEnumerator source, Index index, out TSource value)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
             if (!index.IsFromEnd)
             {
-                return TryGetElementAt<TEnumerable, TSource>(ref source, index.Value, out value);
+                return TryGetElementAt<TEnumerator, TSource>(ref source, index.Value, out value);
             }
 
             var indexFromEnd = index.Value;

@@ -2,15 +2,15 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static IntersectBy<TEnumerable, TSource, TKey> IntersectBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static IntersectBy<TEnumerator, TSource, TKey> IntersectBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, second, keySelector, null);
 
-        public static IntersectBy<TEnumerable, TSource, TKey> IntersectBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static IntersectBy<TEnumerator, TSource, TKey> IntersectBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -28,17 +28,17 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct IntersectBy<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct IntersectBy<TEnumerator, TSource, TKey>(TEnumerator source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
+        : IValueEnumerator<TSource>
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
         HashSet<TKey>? set;
 
-        public ValueEnumerator<IntersectBy<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<IntersectBy<TEnumerator, TSource, TKey>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

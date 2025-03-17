@@ -18,7 +18,7 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromRepeat<T>(T _element, int _count) : IValueEnumerable<T>
+    public struct FromRepeat<T>(T _element, int _count) : IValueEnumerator<T>
     {
         int index;
 

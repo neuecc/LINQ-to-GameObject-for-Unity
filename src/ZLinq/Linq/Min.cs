@@ -7,17 +7,17 @@ partial class ValueEnumerableExtensions
 {
     // Due to type inference considerations, there are no overloads for selector.
 
-    public static TSource? Min<TEnumerable, TSource>(this TEnumerable source)
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    public static TSource? Min<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        return Min<TEnumerable, TSource>(source, null);
+        return Min<TEnumerator, TSource>(source, null);
     }
 
-    public static TSource? Min<TEnumerable, TSource>(this TEnumerable source, IComparer<TSource>? comparer)
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    public static TSource? Min<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IComparer<TSource>? comparer)
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif

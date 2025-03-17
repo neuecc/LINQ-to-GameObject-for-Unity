@@ -2,8 +2,8 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Int64 LongCount<TEnumerable, TSource>(this TEnumerable source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Int64 LongCount<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -24,8 +24,8 @@
             }
         }
 
-        public static Int64 LongCount<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Int64 LongCount<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif

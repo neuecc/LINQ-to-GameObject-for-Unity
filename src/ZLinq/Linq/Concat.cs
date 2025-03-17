@@ -2,10 +2,10 @@
 {
     partial class ValueEnumerableExtensions
     {
-        // currently source-generator only infer first argument type so can not define `TEnumerable source, TEnumerable2 second`.
+        // currently source-generator only infer first argument type so can not define `TEnumerator source, TEnumerator2 second`.
 
-        public static Concat<TEnumerable, TSource> Concat<TEnumerable, TSource>(this TEnumerable source, IEnumerable<TSource> second)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Concat<TEnumerator, TSource> Concat<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -22,18 +22,18 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Concat<TEnumerable, TSource>(TEnumerable source, IEnumerable<TSource> second)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct Concat<TEnumerator, TSource>(TEnumerator source, IEnumerable<TSource> second)
+        : IValueEnumerator<TSource>
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
         IEnumerator<TSource>? secondEnumerator;
         bool firstCompleted;
 
-        public ValueEnumerator<Concat<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<Concat<TEnumerator, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

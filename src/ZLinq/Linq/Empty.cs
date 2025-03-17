@@ -13,7 +13,7 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromEmpty<T> : IValueEnumerable<T>
+    public struct FromEmpty<T> : IValueEnumerator<T>
     {
         public ValueEnumerator<FromEmpty<T>, T> GetEnumerator()
         {

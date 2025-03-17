@@ -2,32 +2,32 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Boolean Any<TEnumerable, TSource>(this TEnumerable source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Boolean Any<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
-                if (source.TryGetNonEnumeratedCount(out var count))
+                if (enumerator.TryGetNonEnumeratedCount(out var count))
                 {
                     return count > 0;
                 }
 
-                return source.TryGetNext(out _);
+                return enumerator.TryGetNext(out _);
             }
         }
 
-        public static Boolean Any<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Boolean Any<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
-                if (source.TryGetSpan(out var span))
+                if (enumerator.TryGetSpan(out var span))
                 {
                     foreach (var item in span)
                     {
@@ -39,7 +39,7 @@
                 }
                 else
                 {
-                    while (source.TryGetNext(out var item))
+                    while (enumerator.TryGetNext(out var item))
                     {
                         if (predicate(item))
                         {

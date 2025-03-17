@@ -12,8 +12,8 @@ partial class ValueEnumerableExtensions
 {
     // System.Linq returns float -> float, decimal -> decimal, others(int, long, double) -> double
     // Due to limitations with overloads, generics, and where constraints, the return value is restricted to double only.
-    public static double Average<TEnumerable, TSource>(this TEnumerable source)
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    public static double Average<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif

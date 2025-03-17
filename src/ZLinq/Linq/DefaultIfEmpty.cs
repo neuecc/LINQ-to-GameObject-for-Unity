@@ -2,15 +2,15 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static DefaultIfEmpty<TEnumerable, TSource> DefaultIfEmpty<TEnumerable, TSource>(this TEnumerable source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static DefaultIfEmpty<TEnumerator, TSource> DefaultIfEmpty<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, default!);
 
-        public static DefaultIfEmpty<TEnumerable, TSource> DefaultIfEmpty<TEnumerable, TSource>(this TEnumerable source, TSource defaultValue)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static DefaultIfEmpty<TEnumerator, TSource> DefaultIfEmpty<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, TSource defaultValue)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -28,17 +28,17 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct DefaultIfEmpty<TEnumerable, TSource>(TEnumerable source, TSource defaultValue)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct DefaultIfEmpty<TEnumerator, TSource>(TEnumerator source, TSource defaultValue)
+        : IValueEnumerator<TSource>
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
         bool iterateDefault = true;
 
-        public ValueEnumerator<DefaultIfEmpty<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<DefaultIfEmpty<TEnumerator, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

@@ -10,8 +10,8 @@ namespace ZLinq
     public static partial class ValueEnumerable
     {
         // Source Generator trigger
-        public static TEnumerable AsValueEnumerable<TEnumerable, TSource>(this TEnumerable source, TSource typeHint)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TEnumerator AsValueEnumerable<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, TSource typeHint)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -27,6 +27,11 @@ namespace ZLinq
         public static FromArray<T> AsValueEnumerable<T>(this T[] source)
         {
             return new(source);
+        }
+
+        public static ValueEnumerable<FromArray<T>, T> AsValueEnumerable2<T>(this T[] source)
+        {
+            return new(new(source));
         }
 
         public static FromList<T> AsValueEnumerable<T>(this List<T> source)
@@ -112,7 +117,7 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromEnumerable<T>(IEnumerable<T> source) : IValueEnumerable<T>
+    public struct FromEnumerable<T>(IEnumerable<T> source) : IValueEnumerator<T>
     {
         IEnumerator<T>? enumerator = null;
 
@@ -207,7 +212,7 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromArray<T>(T[] source) : IValueEnumerable<T>
+    public struct FromArray<T>(T[] source) : IValueEnumerator<T>
     {
         int index;
 
@@ -258,7 +263,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct FromMemory<T>(ReadOnlyMemory<T> source) : IValueEnumerable<T>
+    struct FromMemory<T>(ReadOnlyMemory<T> source) : IValueEnumerator<T>
     {
 #if NET9_0_OR_GREATER
         ReadOnlySpan<T> source = source.Span;
@@ -322,7 +327,7 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromList<T>(List<T> source) : IValueEnumerable<T>
+    public struct FromList<T>(List<T> source) : IValueEnumerator<T>
     {
         bool isInit = false;
         List<T>.Enumerator enumerator;
@@ -380,7 +385,7 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromDictionary<TKey, TValue>(Dictionary<TKey, TValue> source) : IValueEnumerable<KeyValuePair<TKey, TValue>>
+    public struct FromDictionary<TKey, TValue>(Dictionary<TKey, TValue> source) : IValueEnumerator<KeyValuePair<TKey, TValue>>
         where TKey : notnull
     {
         bool isInit = false;
@@ -439,7 +444,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct FromReadOnlySequence<T>(ReadOnlySequence<T> source) : IValueEnumerable<T>
+    struct FromReadOnlySequence<T>(ReadOnlySequence<T> source) : IValueEnumerator<T>
     {
         bool isInit = false;
         ReadOnlySequence<T>.Enumerator sequenceEnumerator;
@@ -516,7 +521,7 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromQueue<T>(Queue<T> source) : IValueEnumerable<T>
+    public struct FromQueue<T>(Queue<T> source) : IValueEnumerator<T>
     {
         bool isInit;
         Queue<T>.Enumerator enumerator;
@@ -569,7 +574,7 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromStack<T>(Stack<T> source) : IValueEnumerable<T>
+    public struct FromStack<T>(Stack<T> source) : IValueEnumerator<T>
     {
         bool isInit;
         Stack<T>.Enumerator enumerator;
@@ -622,7 +627,7 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromLinkedList<T>(LinkedList<T> source) : IValueEnumerable<T>
+    public struct FromLinkedList<T>(LinkedList<T> source) : IValueEnumerator<T>
     {
         bool isInit;
         LinkedList<T>.Enumerator enumerator;
@@ -675,7 +680,7 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromHashSet<T>(HashSet<T> source) : IValueEnumerable<T>
+    public struct FromHashSet<T>(HashSet<T> source) : IValueEnumerator<T>
     {
         bool isInit;
         HashSet<T>.Enumerator enumerator;
@@ -730,7 +735,7 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromImmutableArray<T>(ImmutableArray<T> source) : IValueEnumerable<T>
+    public struct FromImmutableArray<T>(ImmutableArray<T> source) : IValueEnumerator<T>
     {
         bool isInit = false;
         ImmutableArray<T>.Enumerator enumerator;
@@ -788,7 +793,7 @@ namespace ZLinq.Linq
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public ref struct FromSpan<T>(ReadOnlySpan<T> source) : IValueEnumerable<T>
+    public ref struct FromSpan<T>(ReadOnlySpan<T> source) : IValueEnumerator<T>
     {
         ReadOnlySpan<T> source = source;
         int index;

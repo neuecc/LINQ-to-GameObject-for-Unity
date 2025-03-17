@@ -10,8 +10,8 @@ partial class ValueEnumerableExtensions
 
     // Instead, ZLinq supports INumber and has added the SumUnchecked method.
 
-    public static TSource Sum<TEnumerable, TSource>(this TEnumerable source)
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    public static TSource Sum<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
@@ -208,8 +208,8 @@ partial class ValueEnumerableExtensions
 
 #if NET8_0_OR_GREATER
 
-    public static TSource SumUnchecked<TEnumerable, TSource>(this TEnumerable source)
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    public static TSource SumUnchecked<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif

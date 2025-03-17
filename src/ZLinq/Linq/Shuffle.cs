@@ -5,8 +5,8 @@ namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static Shuffle<TEnumerable, TSource> Shuffle<TEnumerable, TSource>(this TEnumerable source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Shuffle<TEnumerator, TSource> Shuffle<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -23,18 +23,18 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Shuffle<TEnumerable, TSource>(TEnumerable source)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct Shuffle<TEnumerator, TSource>(TEnumerator source)
+        : IValueEnumerator<TSource>
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
         TSource[]? temp;
         int index = 0;
 
-        public ValueEnumerator<Shuffle<TEnumerable, TSource>, TSource> GetEnumerator()
+        public ValueEnumerator<Shuffle<TEnumerator, TSource>, TSource> GetEnumerator()
         {
             return new(this);
         }
@@ -65,7 +65,7 @@ namespace ZLinq.Linq
         {
             if (temp == null)
             {
-                temp = source.ToArray<TEnumerable, TSource>(); // do not use pool(struct field can't gurantees state of reference)
+                temp = source.ToArray<TEnumerator, TSource>(); // do not use pool(struct field can't gurantees state of reference)
                 RandomShared.Shuffle(temp);
             }
 

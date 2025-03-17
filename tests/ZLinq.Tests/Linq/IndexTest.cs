@@ -24,7 +24,7 @@ namespace ZLinq.Tests.Linq
         [Fact]
         public void Index_WithNonEmptyCollection_ShouldReturnIndexedItems()
         {
-            var source = new TestEnumerable<int>(new[] { 10, 20, 30 });
+            var source = new TesTEnumerator<int>(new[] { 10, 20, 30 });
             var result = source.AsValueEnumerable(default(int)).Index();
 
             result.TryGetNonEnumeratedCount(out var count).ShouldBeTrue();
@@ -45,7 +45,7 @@ namespace ZLinq.Tests.Linq
         [Fact]
         public void Index_TryGetSpan_ShouldReturnFalse()
         {
-            var source = new TestEnumerable<int>(new[] { 10, 20, 30 });
+            var source = new TesTEnumerator<int>(new[] { 10, 20, 30 });
             var result = source.AsValueEnumerable(default(int)).Index();
 
             result.TryGetSpan(out var span).ShouldBeFalse();
@@ -55,7 +55,7 @@ namespace ZLinq.Tests.Linq
         [Fact]
         public void Index_TryCopyTo_ShouldReturnFalse()
         {
-            var source = new TestEnumerable<int>(new[] { 10, 20, 30 });
+            var source = new TesTEnumerator<int>(new[] { 10, 20, 30 });
             var result = source.AsValueEnumerable(default(int)).Index();
 
             result.TryCopyTo(new Span<(int, int)>()).ShouldBeFalse();
@@ -63,7 +63,7 @@ namespace ZLinq.Tests.Linq
     }
 
     // Mock implementations for testing
-    public struct EmptyEnumerable<T> : IValueEnumerable<T>
+    public struct EmptyEnumerable<T> : IValueEnumerator<T>
     {
         public bool TryGetNext(out T current)
         {
@@ -92,12 +92,12 @@ namespace ZLinq.Tests.Linq
         public void Dispose() { }
     }
 
-    public struct TestEnumerable<T> : IValueEnumerable<T>
+    public struct TesTEnumerator<T> : IValueEnumerator<T>
     {
         private readonly T[] _items;
         private int _index;
 
-        public TestEnumerable(T[] items)
+        public TesTEnumerator(T[] items)
         {
             _items = items;
             _index = 0;

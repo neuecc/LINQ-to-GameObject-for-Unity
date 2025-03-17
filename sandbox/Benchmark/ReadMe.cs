@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Order;
 using System.Runtime.CompilerServices;
 using ZLinq;
+using ZLinq.Linq;
 
 namespace Benchmark;
 
@@ -49,6 +50,20 @@ public class ReadMeBenchmark
             .AsValueEnumerable() // only add this lien
             .Where(x => x % 2 == 0)
             .Select(x => x * 3);
+
+        foreach (var item in seq)
+        {
+            Do(item);
+        }
+    }
+
+    [Benchmark]
+    public void ZLinq2()
+    {
+        var seq = source
+            .AsValueEnumerable2()
+            .Where2(x => x % 2 == 0)
+            .Select2(x => x * 3);
 
         foreach (var item in seq)
         {

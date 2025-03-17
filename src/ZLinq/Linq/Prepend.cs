@@ -2,8 +2,8 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Prepend<TEnumerable, TSource> Prepend<TEnumerable, TSource>(this TEnumerable source, TSource element)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Prepend<TEnumerator, TSource> Prepend<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, TSource element)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -21,17 +21,17 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Prepend<TEnumerable, TSource>(TEnumerable source, TSource element)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct Prepend<TEnumerator, TSource>(TEnumerator source, TSource element)
+        : IValueEnumerator<TSource>
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
         byte state;
 
-        public ValueEnumerator<Prepend<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<Prepend<TEnumerator, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

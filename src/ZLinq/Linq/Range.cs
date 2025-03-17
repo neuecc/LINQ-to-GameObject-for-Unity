@@ -23,7 +23,7 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromRange(int start, int count) : IValueEnumerable<int>
+    public struct FromRange(int start, int count) : IValueEnumerator<int>
     {
         readonly int count = count;
         readonly int start = start;

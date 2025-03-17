@@ -2,74 +2,74 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static TSource Last<TEnumerable, TSource>(this TEnumerable source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource Last<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            return TryGetLast<TEnumerable, TSource>(ref source, out var value)
+            return TryGetLast<TEnumerator, TSource>(ref source, out var value)
                 ? value
                 : Throws.NoElements<TSource>();
         }
 
-        public static TSource Last<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource Last<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            return TryGetLast<TEnumerable, TSource>(ref source, predicate, out var value)
+            return TryGetLast<TEnumerator, TSource>(ref source, predicate, out var value)
                 ? value
                 : Throws.NoMatch<TSource>();
         }
 
-        public static TSource? LastOrDefault<TEnumerable, TSource>(this TEnumerable source)
-    where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource? LastOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+    where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
     , allows ref struct
 #endif
         {
-            return TryGetLast<TEnumerable, TSource>(ref source, out var value)
+            return TryGetLast<TEnumerator, TSource>(ref source, out var value)
                 ? value
                 : default;
         }
 
-        public static TSource LastOrDefault<TEnumerable, TSource>(this TEnumerable source, TSource defaultValue)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource LastOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, TSource defaultValue)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            return TryGetLast<TEnumerable, TSource>(ref source, out var value)
+            return TryGetLast<TEnumerator, TSource>(ref source, out var value)
                 ? value
                 : defaultValue;
         }
 
-        public static TSource? LastOrDefault<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource? LastOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            return TryGetLast<TEnumerable, TSource>(ref source, predicate, out var value)
+            return TryGetLast<TEnumerator, TSource>(ref source, predicate, out var value)
                 ? value
                 : default;
         }
 
-        public static TSource LastOrDefault<TEnumerable, TSource>(this TEnumerable source, Func<TSource, Boolean> predicate, TSource defaultValue)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static TSource LastOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate, TSource defaultValue)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            return TryGetLast<TEnumerable, TSource>(ref source, predicate, out var value)
+            return TryGetLast<TEnumerator, TSource>(ref source, predicate, out var value)
                 ? value
                 : defaultValue;
         }
 
-        public static bool TryGetLast<TEnumerable, TSource>(ref TEnumerable source, out TSource value)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static bool TryGetLast<TEnumerator, TSource>(ref TEnumerator source, out TSource value)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -101,8 +101,8 @@
             }
         }
 
-        public static bool TryGetLast<TEnumerable, TSource>(ref TEnumerable source, Func<TSource, Boolean> predicate, out TSource value)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static bool TryGetLast<TEnumerator, TSource>(ref TEnumerator source, Func<TSource, Boolean> predicate, out TSource value)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif

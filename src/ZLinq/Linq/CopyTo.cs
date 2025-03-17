@@ -2,8 +2,8 @@
 
 partial class ValueEnumerableExtensions
 {
-    public static void CopyTo<TEnumerable, T>(this TEnumerable source, List<T> list)
-        where TEnumerable : struct, IValueEnumerable<T>
+    public static void CopyTo<TEnumerator, T>(in this ValueEnumerable<TEnumerator, TSource> source, List<T> list)
+        where TEnumerator : struct, IValueEnumerator<T>
 #if NET9_0_OR_GREATER
     , allows ref struct
 #endif
@@ -105,8 +105,8 @@ partial class ValueEnumerableExtensions
         }
     }
 
-    public static int CopyTo<TEnumerable, T>(this TEnumerable source, Span<T> dest)
-        where TEnumerable : struct, IValueEnumerable<T>
+    public static int CopyTo<TEnumerator, T>(in this ValueEnumerable<TEnumerator, TSource> source, Span<T> dest)
+        where TEnumerator : struct, IValueEnumerator<T>
 #if NET9_0_OR_GREATER
     , allows ref struct
 #endif
@@ -130,8 +130,8 @@ partial class ValueEnumerableExtensions
     /// <summary>
     /// CopyTo but non optimized-path(use for TryGetSpan is not implemented)
     /// </summary>
-    static int SlowCopyTo<TEnumerable, T>(ref TEnumerable source, Span<T> dest)
-        where TEnumerable : struct, IValueEnumerable<T>
+    static int SlowCopyTo<TEnumerator, T>(ref TEnumerator source, Span<T> dest)
+        where TEnumerator : struct, IValueEnumerator<T>
 #if NET9_0_OR_GREATER
     , allows ref struct
 #endif
@@ -151,8 +151,8 @@ partial class ValueEnumerableExtensions
         }
     }
 
-    static int UnsafeSlowCopyTo<TEnumerable, T>(ref TEnumerable source, ref T dest)
-        where TEnumerable : struct, IValueEnumerable<T>
+    static int UnsafeSlowCopyTo<TEnumerator, T>(ref TEnumerator source, ref T dest)
+        where TEnumerator : struct, IValueEnumerator<T>
 #if NET9_0_OR_GREATER
     , allows ref struct
 #endif

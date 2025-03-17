@@ -4,8 +4,8 @@ namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static Cast<TEnumerable, TSource, TResult> Cast<TEnumerable, TSource, TResult>(this TEnumerable source, TResult typeHint)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Cast<TEnumerator, TSource, TResult> Cast<TEnumerator, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, TResult typeHint)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -22,16 +22,16 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Cast<TEnumerable, TSource, TResult>(TEnumerable source)
-        : IValueEnumerable<TResult>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct Cast<TEnumerator, TSource, TResult>(TEnumerator source)
+        : IValueEnumerator<TResult>
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
 
-        public ValueEnumerator<Cast<TEnumerable, TSource, TResult>, TResult> GetEnumerator()
+        public ValueEnumerator<Cast<TEnumerator, TSource, TResult>, TResult> GetEnumerator()
         {
             return new(this);
         }

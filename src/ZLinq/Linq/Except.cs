@@ -2,15 +2,15 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Except<TEnumerable, TSource> Except<TEnumerable, TSource>(this TEnumerable source, IEnumerable<TSource> second)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Except<TEnumerator, TSource> Except<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, second, null);
 
-        public static Except<TEnumerable, TSource> Except<TEnumerable, TSource>(this TEnumerable source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Except<TEnumerator, TSource> Except<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -28,17 +28,17 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Except<TEnumerable, TSource>(TEnumerable source, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct Except<TEnumerator, TSource>(TEnumerator source, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer)
+        : IValueEnumerator<TSource>
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
         HashSet<TSource>? set;
 
-        public ValueEnumerator<Except<TEnumerable, TSource>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<Except<TEnumerator, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

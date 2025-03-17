@@ -2,8 +2,8 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Boolean SequenceEqual<TEnumerable, TSource>(this TEnumerable source, IEnumerable<TSource> second)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Boolean SequenceEqual<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -11,8 +11,8 @@
             return SequenceEqual(source, second, null!);
         }
 
-        public static Boolean SequenceEqual<TEnumerable, TSource>(this TEnumerable source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) // comaprer is nullable
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static Boolean SequenceEqual<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) // comaprer is nullable
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -51,7 +51,7 @@
             }
 
             comparer ??= EqualityComparer<TSource>.Default;
-            using var e1 = source.GetEnumerator<TEnumerable, TSource>();
+            using var e1 = source.GetEnumerator<TEnumerator, TSource>();
             using var e2 = second.GetEnumerator();
             while (e1.MoveNext())
             {

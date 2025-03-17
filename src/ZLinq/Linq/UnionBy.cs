@@ -2,15 +2,15 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static UnionBy<TEnumerable, TSource, TKey> UnionBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static UnionBy<TEnumerator, TSource, TKey> UnionBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(source, second, keySelector, null);
 
-        public static UnionBy<TEnumerable, TSource, TKey> UnionBy<TEnumerable, TSource, TKey>(this TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static UnionBy<TEnumerator, TSource, TKey> UnionBy<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
@@ -28,19 +28,19 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct UnionBy<TEnumerable, TSource, TKey>(TEnumerable source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
-        : IValueEnumerable<TSource>
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    struct UnionBy<TEnumerator, TSource, TKey>(TEnumerator source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
+        : IValueEnumerator<TSource>
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
         HashSet<TKey>? set;
         IEnumerator<TSource>? secondEnumerator;
         byte state = 0;
 
-        public ValueEnumerator<UnionBy<TEnumerable, TSource, TKey>, TSource> GetEnumerator() => new(this);
+        public ValueEnumerator<UnionBy<TEnumerator, TSource, TKey>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
