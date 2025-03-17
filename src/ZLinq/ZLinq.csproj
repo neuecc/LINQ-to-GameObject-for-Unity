@@ -50,9 +50,5 @@
 
 	<!-- We don't consume the analyzers in this library itself,
          but we reference the project to add a package dependency so users of this library will automatically get the analyzers. -->
-	<ItemGroup>
-		<ProjectReference Include="..\ZLinq.SourceGenerator\ZLinq.SourceGenerator.csproj"
-						  PrivateAssets="all" />
-	</ItemGroup>
 
 </Project>
