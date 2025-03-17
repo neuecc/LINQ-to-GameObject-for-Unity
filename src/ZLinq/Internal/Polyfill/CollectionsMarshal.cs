@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 #if NETSTANDARD2_1
+#pragma warning disable
 
 namespace System.Runtime.InteropServices
 {
@@ -47,15 +48,12 @@ namespace System.Runtime.InteropServices
         }
     }
 
-#pragma warning disable CS8618
     internal class ListView<T>
     {
         public T[] _items;
         public int _size;
         public int _version;
     }
-#pragma warning restore CS8618
-
 }
 
 #endif
