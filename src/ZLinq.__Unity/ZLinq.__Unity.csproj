@@ -1,29 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<!-- Config for Unity, share by Source-code -->
-		<RootNamespace>ZLinq</RootNamespace>
-		<ImplicitUsings>disable</ImplicitUsings>
-		<TargetFramework>netstandard2.1</TargetFramework>
-		<Nullable>enable</Nullable>
-		<LangVersion>9</LangVersion>
-		<IsPackable>false</IsPackable>
-	</PropertyGroup>
+  <PropertyGroup>
+    <!-- Config for Unity, share by Source-code -->
+    <RootNamespace>ZLinq</RootNamespace>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>9</LangVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="$(TargetFramework.StartsWith(`netstandard`))">
-		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
-	</PropertyGroup>
+  <PropertyGroup Condition="$(TargetFramework.StartsWith(`netstandard`))">
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<Compile Include="..\ZLinq.Unity\Assets\ZLinq.Unity\Runtime\**\*.cs"  />
-	</ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\ZLinq.Unity\Assets\ZLinq.Unity\Runtime\**\*.cs"  />
+  </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\ZLinq\ZLinq.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZLinq\ZLinq.csproj" />
+  </ItemGroup>
 
 </Project>

@@ -1,40 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1;net8.0;net9.0</TargetFrameworks>
-		<RootNamespace>ZLinq</RootNamespace>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<NoWarn>1701;1702;9124</NoWarn>
-		<LangVersion>13</LangVersion>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;net8.0;net9.0</TargetFrameworks>
+    <RootNamespace>ZLinq</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NoWarn>1701;1702;9124</NoWarn>
+    <LangVersion>13</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-		<!-- NuGet Packaging -->
-		<PackageTags>linq</PackageTags>
-		<Description>Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree (FileSystem, Json, GameObject, etc.) for all .NET platforms and Unity.</Description>
-	</PropertyGroup>
+    <!-- NuGet Packaging -->
+    <PackageTags>linq</PackageTags>
+    <Description>Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree (FileSystem, Json, GameObject, etc.) for all .NET platforms and Unity.</Description>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="$(TargetFramework.StartsWith(`netstandard`))">
-		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
-	</PropertyGroup>
+  <PropertyGroup Condition="$(TargetFramework.StartsWith(`netstandard`))">
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<None Include="../../Icon.png" Pack="true" PackagePath="/" />
-		<EmbeddedResource Include="..\..\LICENSE" />
-	</ItemGroup>
+  <ItemGroup>
+    <None Include="../../Icon.png" Pack="true" PackagePath="/" />
+    <EmbeddedResource Include="..\..\LICENSE" />
+  </ItemGroup>
 
-	<ItemGroup Condition="$(TargetFramework) == 'netstandard2.1'">
-		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
-	</ItemGroup>
+  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.1'">
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<Using Include="ZLinq" />
-		<Using Include="ZLinq.Internal" />
-		<Using Include="ZLinq.Traversables" />
-		<Using Include="ZLinq.Linq" />
-		<Using Include="System.Runtime.CompilerServices" />
-		<Using Include="System.Runtime.InteropServices" />
-		<Using Include="System.ComponentModel" />
-	</ItemGroup>
+  <ItemGroup>
+    <Using Include="ZLinq" />
+    <Using Include="ZLinq.Internal" />
+    <Using Include="ZLinq.Traversables" />
+    <Using Include="ZLinq.Linq" />
+    <Using Include="System.Runtime.CompilerServices" />
+    <Using Include="System.Runtime.InteropServices" />
+    <Using Include="System.ComponentModel" />
+  </ItemGroup>
 
 </Project>

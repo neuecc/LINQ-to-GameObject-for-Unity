@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-		<TargetFramework>net9.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<IsPackable>false</IsPackable>
-	</PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\..\src\ZLinq.FileSystem\ZLinq.FileSystem.csproj" />
-		<ProjectReference Include="..\..\src\ZLinq.Json\ZLinq.Json.csproj" />
-		<ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ZLinq.FileSystem\ZLinq.FileSystem.csproj" />
+    <ProjectReference Include="..\..\src\ZLinq.Json\ZLinq.Json.csproj" />
+    <ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
+  </ItemGroup>
 
 </Project>
