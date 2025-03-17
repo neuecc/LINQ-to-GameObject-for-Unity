@@ -1,4 +1,4 @@
-namespace ZLinq.Tests.Linq;
+﻿namespace ZLinq.Tests.Linq;
 
 public class ThenByTest
 {

@@ -50,27 +50,27 @@ partial class ValueEnumerableExtensions
                 }
                 return;
 #else
-            var listSpan = CollectionsMarshal.AsSpan(list);
-            if (length < listSpan.Length)
-            {
-                if (list.Count < length)
+                var listSpan = CollectionsMarshal.AsSpan(list);
+                if (length < listSpan.Length)
                 {
-                    CollectionsMarshal.UnsafeSetCount(list, length);
-                    listSpan.Slice(length).Clear(); // clear rest
-                }
+                    if (list.Count < length)
+                    {
+                        CollectionsMarshal.UnsafeSetCount(list, length);
+                        listSpan.Slice(length).Clear(); // clear rest
+                    }
 
-                if (enumerator.TryCopyTo(listSpan))
-                {
+                    if (enumerator.TryCopyTo(listSpan))
+                    {
+                        return;
+                    }
+
+                    var i = 0;
+                    while (enumerator.TryGetNext(out var current))
+                    {
+                        listSpan[i++] = current;
+                    }
                     return;
                 }
-
-                var i = 0;
-                while (enumerator.TryGetNext(out var current))
-                {
-                    listSpan[i++] = current;
-                }
-                return;
-            }
 #endif
             }
 

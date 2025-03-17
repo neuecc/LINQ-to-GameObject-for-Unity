@@ -119,10 +119,10 @@ public class AnyTest
 
         // Using standard array which should use Span optimization
         var result = xs.AsValueEnumerable().Any(Predicate);
-        
+
         // Predicate should have been called (proving the test works)
         called.ShouldBeTrue();
-        
+
         // Result should match expected value
         result.ShouldBeFalse();
     }

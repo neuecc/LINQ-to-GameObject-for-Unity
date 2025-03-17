@@ -11,7 +11,7 @@ public class ToHashSetTest
     public void Empty()
     {
         var xs = new int[0];
-        
+
         var actual1 = xs.AsValueEnumerable().ToHashSet();
         var actual2 = xs.AsValueEnumerable().Select(x => x).ToHashSet();
         var actual3 = xs.ToValueEnumerable().ToHashSet();
@@ -25,15 +25,15 @@ public class ToHashSetTest
     public void NonEmpty()
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
-        
+
         var actual1 = xs.AsValueEnumerable().ToHashSet();
         var actual2 = xs.AsValueEnumerable().Select(x => x).ToHashSet();
         var actual3 = xs.ToValueEnumerable().ToHashSet();
-        
+
         Assert.Equal(xs.Length, actual1.Count);
         Assert.Equal(xs.Length, actual2.Count);
         Assert.Equal(xs.Length, actual3.Count);
-        
+
         foreach (var x in xs)
         {
             Assert.Contains(x, actual1);
@@ -59,9 +59,9 @@ public class ToHashSetTest
     public void DuplicateElements()
     {
         var xs = new int[] { 1, 2, 2, 3, 3, 3 };
-        
+
         var actual = xs.AsValueEnumerable().ToHashSet();
-        
+
         actual.Count.ShouldBe(3);
         actual.Contains(1).ShouldBeTrue();
         actual.Contains(2).ShouldBeTrue();
