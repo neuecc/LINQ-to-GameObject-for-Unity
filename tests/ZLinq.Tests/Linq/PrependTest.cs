@@ -76,7 +76,7 @@ public class PrependTest
         var xs = new[] { 1, 2, 3, 4, 5 };
         var element = 42;
         
-        var enumerable = xs.AsValueEnumerable().Prepend(element);
+        var enumerable = xs.AsValueEnumerable().Prepend(element).Enumerator;
         
         // Check iteration order
         int index = 0;
@@ -96,7 +96,7 @@ public class PrependTest
         var xs = Array.Empty<int>();
         var element = 42;
         
-        var enumerable = xs.AsValueEnumerable().Prepend(element);
+        var enumerable = xs.AsValueEnumerable().Prepend(element).Enumerator;
         
         enumerable.TryGetNext(out var current).ShouldBeTrue();
         current.ShouldBe(element);
@@ -110,7 +110,7 @@ public class PrependTest
         var xs = new[] { 1, 2, 3, 4, 5 };
         var element = 42;
         
-        var enumerable = xs.AsValueEnumerable().Prepend(element);
+        var enumerable = xs.AsValueEnumerable().Prepend(element).Enumerator;
         
         // After disposal, it should return false
         enumerable.TryGetNext(out _);  // Consume one element

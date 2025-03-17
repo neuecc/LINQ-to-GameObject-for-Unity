@@ -5,29 +5,29 @@ namespace ZLinq;
 
 partial class ValueEnumerableExtensions
 {
-    // Due to type inference considerations, there are no overloads for selector.
+    // TODO: overload selector
 
-    public static TSource? Min<TEnumerable, TSource>(this TEnumerable source)
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    public static TSource? Min<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        return Min<TEnumerable, TSource>(source, null);
+        return Min<TEnumerator, TSource>(source, null);
     }
 
-    public static TSource? Min<TEnumerable, TSource>(this TEnumerable source, IComparer<TSource>? comparer)
-        where TEnumerable : struct, IValueEnumerable<TSource>
+    public static TSource? Min<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IComparer<TSource>? comparer)
+        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
         comparer ??= Comparer<TSource>.Default;
 
-        using (source)
+        using (var enumerator = source.Enumerator)
         {
 #if NET8_0_OR_GREATER
-            if (source.TryGetSpan(out var span))
+            if (enumerator.TryGetSpan(out var span))
             {
                 return MinSpan(span, comparer);
             }
@@ -40,7 +40,7 @@ partial class ValueEnumerableExtensions
                 // Therefore, We will first loop until right(value) becomes non-null.
                 do
                 {
-                    if (!source.TryGetNext(out var current))
+                    if (!enumerator.TryGetNext(out var current))
                     {
                         return value;
                     }
@@ -48,7 +48,7 @@ partial class ValueEnumerableExtensions
                 }
                 while (value is null);
 
-                while (source.TryGetNext(out var current))
+                while (enumerator.TryGetNext(out var current))
                 {
                     // compare both(left, right) non-null
                     if (current is not null && comparer.Compare(current, value) < 0)
@@ -61,7 +61,7 @@ partial class ValueEnumerableExtensions
             else
             {
                 // value type
-                if (!source.TryGetNext(out value))
+                if (!enumerator.TryGetNext(out value))
                 {
                     Throws.NoElements();
                 }
@@ -69,7 +69,7 @@ partial class ValueEnumerableExtensions
                 // optimize for default comparer
                 if (comparer == Comparer<TSource>.Default)
                 {
-                    while (source.TryGetNext(out var current))
+                    while (enumerator.TryGetNext(out var current))
                     {
                         if (Comparer<TSource>.Default.Compare(current, value) < 0)
                         {
@@ -81,7 +81,7 @@ partial class ValueEnumerableExtensions
                 }
                 else
                 {
-                    while (source.TryGetNext(out var current))
+                    while (enumerator.TryGetNext(out var current))
                     {
                         if (comparer.Compare(current, value) < 0)
                         {

@@ -13,7 +13,7 @@ using Benchmark;
 
 #if !DEBUG
 
-//BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
+BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
 //BenchmarkRunner.Run<SimdRange>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
 //BenchmarkRunner.Run<SimdSelect>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
 //BenchmarkRunner.Run<LookupBattle>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
@@ -25,7 +25,7 @@ using Benchmark;
 //BenchmarkRunner.Run<SimdAny>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default), args);
 
 
-BenchmarkRunner.Run<ReadMeBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default), args);
+//BenchmarkRunner.Run<ReadMeBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default), args);
 
 #else
 
@@ -74,34 +74,6 @@ public class IterateBenchmark
             .Where(x => x % 2 == 0);
 
         foreach (var item in seq) { }
-    }
-
-    [Benchmark]
-    public void ZLinqBest()
-    {
-        var seq = array.AsValueEnumerable()
-            .Select(x => x * 3)
-            .Where(x => x % 2 == 0);
-
-        while (seq.TryGetNext(out var _))
-        {
-
-        }
-    }
-
-    [Benchmark]
-    public void ZLinqBest2()
-    {
-        var seq = array.AsValueEnumerable()
-            .Select(x => x * 3)
-            .Where(x => x % 2 == 0);
-
-        while (seq.TryGetNext(out var _))
-        {
-
-        }
-
-        seq.Dispose();
     }
 
     //[Benchmark]

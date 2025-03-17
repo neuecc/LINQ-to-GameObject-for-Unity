@@ -2,22 +2,23 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static List<TSource> ToList<TEnumerable, TSource>(this TEnumerable source)
-            where TEnumerable : struct, IValueEnumerable<TSource>
+        public static List<TSource> ToList<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+            where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
+            var enumerator = source.Enumerator;
             try
             {
-                if (source.TryGetSpan(out var span))
+                if (enumerator.TryGetSpan(out var span))
                 {
                     var array = GC.AllocateUninitializedArray<TSource>(span.Length);
                     span.CopyTo(array);
                     return ListMarshal.AsList(array);
                 }
 
-                if (source.TryGetNonEnumeratedCount(out var count))
+                if (enumerator.TryGetNonEnumeratedCount(out var count))
                 {
                     var list = new List<TSource>(count);
 #if NET8_0_OR_GREATER
@@ -27,21 +28,20 @@
 #endif
                     var dest = CollectionsMarshal.AsSpan(list);
 
-                    if (source.TryCopyTo(dest))
+                    if (enumerator.TryCopyTo(dest))
                     {
                         return list;
                     }
                     else
                     {
-                        UnsafeSlowCopyTo(ref source, ref MemoryMarshal.GetReference(dest));
+                        UnsafeSlowCopyTo(ref enumerator, ref MemoryMarshal.GetReference(dest));
                         return list;
                     }
                 }
 
-                var arrayBuilder = new SegmentedArrayBuilder<TSource>();
-                try
                 {
-                    while (source.TryGetNext(out var item))
+                    using var arrayBuilder = new SegmentedArrayBuilder<TSource>();
+                    while (enumerator.TryGetNext(out var item))
                     {
                         arrayBuilder.Add(item);
                     }
@@ -50,14 +50,10 @@
                     arrayBuilder.CopyTo(array);
                     return ListMarshal.AsList(array);
                 }
-                finally
-                {
-                    arrayBuilder.Dispose();
-                }
             }
             finally
             {
-                source.Dispose();
+                enumerator.Dispose();
             }
         }
     }

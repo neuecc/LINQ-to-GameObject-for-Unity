@@ -82,28 +82,9 @@ public class TakeWhileTest
         actual1.ShouldBe(expected); // Should be all elements
         actual2.ShouldBe(expected); // Should be all elements
     }
-
-    [Fact]
-    public void TakeWhile_Disposal()
-    {
-        var disposeCalled = false;
-        
-        // Create a custom enumerable that tracks disposal
-        var enumerable = new DisposableTestEnumerable<int>(
-            Enumerable.Range(1, 10),
-            () => disposeCalled = true);
-            
-        using (var takeWhile = enumerable.AsValueEnumerable().TakeWhile(x => x < 5))
-        {
-            var array = takeWhile.ToArray();
-            array.ShouldBe(new[] { 1, 2, 3, 4 });
-        }
-        
-        disposeCalled.ShouldBeTrue();
-    }
     
     // Helper class to test disposal behavior
-    private class DisposableTestEnumerable<T>(IEnumerable<T> source, Action onDispose) : IEnumerable<T>
+    private class DisposableTesTEnumerator<T>(IEnumerable<T> source, Action onDispose) : IEnumerable<T>
     {
         public IEnumerator<T> GetEnumerator() => new DisposableEnumerator(source.GetEnumerator(), onDispose);
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();

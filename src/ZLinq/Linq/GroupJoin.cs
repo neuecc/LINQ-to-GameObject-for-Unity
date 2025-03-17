@@ -2,19 +2,27 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static GroupJoin<TEnumerable, TOuter, TInner, TKey, TResult> GroupJoin<TEnumerable, TOuter, TInner, TKey, TResult>(this TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector)
-            where TEnumerable : struct, IValueEnumerable<TOuter>
+        public static ValueEnumerable<GroupJoin<TEnumerator, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TEnumerator, TEnumerator2, TOuter, TInner, TKey, TResult>(in this ValueEnumerable<TEnumerator, TOuter> source, in ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector)
+            where TEnumerator : struct, IValueEnumerator<TOuter>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, inner, outerKeySelector, innerKeySelector, resultSelector, null);
+            where TEnumerator2 : struct, IValueEnumerator<TInner>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, inner.Enumerator, outerKeySelector, innerKeySelector, resultSelector, null));
 
-        public static GroupJoin<TEnumerable, TOuter, TInner, TKey, TResult> GroupJoin<TEnumerable, TOuter, TInner, TKey, TResult>(this TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
-            where TEnumerable : struct, IValueEnumerable<TOuter>
+        public static ValueEnumerable<GroupJoin<TEnumerator, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TEnumerator, TEnumerator2, TOuter, TInner, TKey, TResult>(in this ValueEnumerable<TEnumerator, TOuter> source, in ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
+            where TEnumerator : struct, IValueEnumerator<TOuter>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+            where TEnumerator2 : struct, IValueEnumerator<TInner>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, inner.Enumerator, outerKeySelector, innerKeySelector, resultSelector, comparer));
 
     }
 }
@@ -28,18 +36,21 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct GroupJoin<TEnumerable, TOuter, TInner, TKey, TResult>(TEnumerable source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey>? comparer)
-        : IValueEnumerable<TResult>
-        where TEnumerable : struct, IValueEnumerable<TOuter>
+    struct GroupJoin<TEnumerator, TEnumerator2, TOuter, TInner, TKey, TResult>(in TEnumerator source, in TEnumerator2 inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey>? comparer)
+        : IValueEnumerator<TResult>
+        where TEnumerator : struct, IValueEnumerator<TOuter>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
+        where TEnumerator2 : struct, IValueEnumerator<TInner>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
     {
-        TEnumerable source = source;
+        TEnumerator source = source;
+        TEnumerator2 inner = inner;
 
         Lookup<TKey, TInner>? innerLookup;
-
-        public ValueEnumerator<GroupJoin<TEnumerable, TOuter, TInner, TKey, TResult>, TResult> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -59,7 +70,14 @@ namespace ZLinq.Linq
         {
             if (innerLookup == null)
             {
-                innerLookup = Lookup.CreateForJoin(inner.AsValueEnumerable(), innerKeySelector, comparer);
+                try
+                {
+                    innerLookup = Lookup.CreateForJoin(ref inner, innerKeySelector, comparer);
+                }
+                finally
+                {
+                    inner.Dispose();
+                }
             }
 
             if (innerLookup.Count == 0)

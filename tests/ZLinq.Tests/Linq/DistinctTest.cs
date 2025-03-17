@@ -1,4 +1,4 @@
-namespace ZLinq.Tests.Linq;
+﻿namespace ZLinq.Tests.Linq;
 
 public class DistinctTest
 {
@@ -16,7 +16,7 @@ public class DistinctTest
         e2.TryGetSpan(out var span).ShouldBe(true); // TODO: true | false
 
         var e3 = enumerable;
-        e3.TryGetNext(out var next).ShouldBeFalse();
+        e3.Enumerator.TryGetNext(out var next).ShouldBeFalse();
 
         enumerable.Dispose();
     }
@@ -55,7 +55,7 @@ public class DistinctTest
         e2.TryGetSpan(out var span).ShouldBe(true); // TODO: true | false
 
         var e3 = enumerable;
-        e3.TryGetNext(out var next).ShouldBeFalse();
+        e3.Enumerator.TryGetNext(out var next).ShouldBeFalse();
 
         enumerable.Dispose();
     }

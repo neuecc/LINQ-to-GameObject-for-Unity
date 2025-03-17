@@ -6,7 +6,7 @@ namespace ZLinq
 {
     public static partial class ValueEnumerable
     {
-        public static FromRange Range(int start, int count)
+        public static ValueEnumerable<FromRange, int> Range(int start, int count)
         {
             long max = ((long)start) + count - 1;
             if (count < 0 || max > int.MaxValue)
@@ -14,7 +14,7 @@ namespace ZLinq
                 Throws.ArgumentOutOfRange(nameof(count));
             }
 
-            return new(start, count);
+            return new(new(start, count));
         }
     }
 }
@@ -23,7 +23,7 @@ namespace ZLinq.Linq
 {
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromRange(int start, int count) : IValueEnumerable<int>
+    public struct FromRange(int start, int count) : IValueEnumerator<int>
     {
         readonly int count = count;
         readonly int start = start;

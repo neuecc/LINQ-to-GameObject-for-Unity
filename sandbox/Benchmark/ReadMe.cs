@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Order;
 using System.Runtime.CompilerServices;
 using ZLinq;
+using ZLinq.Linq;
 
 namespace Benchmark;
 
