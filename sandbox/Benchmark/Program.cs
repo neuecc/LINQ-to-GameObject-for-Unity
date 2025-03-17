@@ -27,6 +27,13 @@ BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(Su
 
 //BenchmarkRunner.Run<ReadMeBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default), args);
 
+//BenchmarkRunner.Run<LinqPerfBenchmarks.AggregateBy00>(DefaultConfig.Instance, args);
+//BenchmarkRunner.Run<LinqPerfBenchmarks.Count00>(DefaultConfig.Instance, args);
+//BenchmarkRunner.Run<LinqPerfBenchmarks.CountBy00>(DefaultConfig.Instance, args);
+//BenchmarkRunner.Run<LinqPerfBenchmarks.GroupBy00>(DefaultConfig.Instance, args);
+//BenchmarkRunner.Run<LinqPerfBenchmarks.Order00>(DefaultConfig.Instance, args);
+//BenchmarkRunner.Run<LinqPerfBenchmarks.Where00>(DefaultConfig.Instance, args);
+//BenchmarkRunner.Run<LinqPerfBenchmarks.Where01>(DefaultConfig.Instance, args);
 #else
 
 BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
