@@ -16,6 +16,10 @@
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="$(TargetFramework.StartsWith(`netstandard`))">
+		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<!-- https://learn.microsoft.com/en-us/visualstudio/extensibility/roslyn-version-support?view=vs-2022 -->
 		<!-- require to support SyntaxValueProvider.ForAttributeWithMetadataName(Roslyn 4.3.0, VS2022 17.3) -->
