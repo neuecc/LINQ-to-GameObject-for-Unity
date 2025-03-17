@@ -22,21 +22,30 @@ var xs = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
 
 
 
-var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
+var ve1 = xs.AsSpan().AsValueEnumerable();
+var ve2 = xs.AsSpan().AsValueEnumerable();
 
-var allDlls = root
-    .AsTraversable()
-    .Descendants()
-    .OfType(default(FileInfo))
-    .Where(x => x.Extension == ".dll")
-    .GroupBy(x => x.Name)
-    .Select(x => (FileName: x.Key, Count: x.Count()))
-    .OrderByDescending(x => x.Count);
 
-foreach (var item in allDlls)
-{
-    Console.WriteLine(item);
-}
+var ccc = ve1.Concat(xs.AsValueEnumerable());
+
+// .ToArray();
+
+
+//var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
+
+//var allDlls = root
+//    .AsTraversable()
+//    .Descendants()
+//    .OfType(default(FileInfo))
+//    .Where(x => x.Extension == ".dll")
+//    .GroupBy(x => x.Name)
+//    .Select(x => (FileName: x.Key, Count: x.Count()))
+//    .OrderByDescending(x => x.Count);
+
+//foreach (var item in allDlls)
+//{
+//    Console.WriteLine(item);
+//}
 
 //static IEnumerable<T> Iterate<T>(IEnumerable<T> source)
 //{

@@ -9,103 +9,88 @@ namespace ZLinq
 {
     public static partial class ValueEnumerable
     {
-        // Source Generator trigger
-        public static TEnumerator AsValueEnumerable<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, TSource typeHint)
-            where TEnumerator : struct, IValueEnumerator<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-        {
-            return source;
-        }
-
-        public static FromEnumerable<T> AsValueEnumerable<T>(this IEnumerable<T> source)
-        {
-            return new(source);
-        }
-
-        public static FromArray<T> AsValueEnumerable<T>(this T[] source)
-        {
-            return new(source);
-        }
-
-        public static ValueEnumerable<FromArray<T>, T> AsValueEnumerable2<T>(this T[] source)
+        public static ValueEnumerable<FromEnumerable<T>, T> AsValueEnumerable<T>(this IEnumerable<T> source)
         {
             return new(new(source));
         }
 
-        public static FromList<T> AsValueEnumerable<T>(this List<T> source)
+        public static ValueEnumerable<FromArray<T>, T> AsValueEnumerable<T>(this T[] source)
         {
-            return new(source);
+            return new(new(source));
         }
 
-        public static FromMemory<T> AsValueEnumerable<T>(this ArraySegment<T> source)
+        public static ValueEnumerable<FromList<T>, T> AsValueEnumerable<T>(this List<T> source)
         {
-            return new(source);
+            return new(new(source));
         }
 
-        public static FromMemory<T> AsValueEnumerable<T>(this Memory<T> source)
+        public static ValueEnumerable<FromMemory<T>, T> AsValueEnumerable<T>(this ArraySegment<T> source)
         {
-            return new(source);
+            return new(new(source));
         }
 
-        public static FromMemory<T> AsValueEnumerable<T>(this ReadOnlyMemory<T> source)
+        public static ValueEnumerable<FromMemory<T>, T> AsValueEnumerable<T>(this Memory<T> source)
         {
-            return new(source);
+            return new(new(source));
         }
 
-        public static FromReadOnlySequence<T> AsValueEnumerable<T>(this ReadOnlySequence<T> source)
+        public static ValueEnumerable<FromMemory<T>, T> AsValueEnumerable<T>(this ReadOnlyMemory<T> source)
         {
-            return new(source);
+            return new(new(source));
+        }
+
+        public static ValueEnumerable<FromReadOnlySequence<T>, T> AsValueEnumerable<T>(this ReadOnlySequence<T> source)
+        {
+            return new(new(source));
         }
 
         // for System.Collections.Generic
 
-        public static FromDictionary<TKey, TValue> AsValueEnumerable<TKey, TValue>(this Dictionary<TKey, TValue> source)
+        public static ValueEnumerable<FromDictionary<TKey, TValue>, KeyValuePair<TKey, TValue>> AsValueEnumerable<TKey, TValue>(this Dictionary<TKey, TValue> source)
             where TKey : notnull
         {
-            return new(source);
+            return new(new(source));
         }
 
-        public static FromQueue<T> AsValueEnumerable<T>(this Queue<T> source)
+        public static ValueEnumerable<FromQueue<T>, T> AsValueEnumerable<T>(this Queue<T> source)
         {
-            return new(source);
+            return new(new(source));
         }
 
-        public static FromStack<T> AsValueEnumerable<T>(this Stack<T> source)
+        public static ValueEnumerable<FromStack<T>, T> AsValueEnumerable<T>(this Stack<T> source)
         {
-            return new(source);
+            return new(new(source));
         }
 
-        public static FromLinkedList<T> AsValueEnumerable<T>(this LinkedList<T> source)
+        public static ValueEnumerable<FromLinkedList<T>, T> AsValueEnumerable<T>(this LinkedList<T> source)
         {
-            return new(source);
+            return new(new(source));
         }
 
-        public static FromHashSet<T> AsValueEnumerable<T>(this HashSet<T> source)
+        public static ValueEnumerable<FromHashSet<T>, T> AsValueEnumerable<T>(this HashSet<T> source)
         {
-            return new(source);
+            return new(new(source));
         }
 
 #if NET8_0_OR_GREATER
 
-        public static FromImmutableArray<T> AsValueEnumerable<T>(this ImmutableArray<T> source)
+        public static ValueEnumerable<FromImmutableArray<T>, T> AsValueEnumerable<T>(this ImmutableArray<T> source)
         {
-            return new(source);
+            return new(new(source));
         }
 
 #endif
 
 #if NET9_0_OR_GREATER
 
-        public static FromSpan<T> AsValueEnumerable<T>(this Span<T> source)
+        public static ValueEnumerable<FromSpan<T>, T> AsValueEnumerable<T>(this Span<T> source)
         {
-            return new(source);
+            return new(new(source));
         }
 
-        public static FromSpan<T> AsValueEnumerable<T>(this ReadOnlySpan<T> source)
+        public static ValueEnumerable<FromSpan<T>, T> AsValueEnumerable<T>(this ReadOnlySpan<T> source)
         {
-            return new(source);
+            return new(new(source));
         }
 
 #endif
@@ -120,11 +105,6 @@ namespace ZLinq.Linq
     public struct FromEnumerable<T>(IEnumerable<T> source) : IValueEnumerator<T>
     {
         IEnumerator<T>? enumerator = null;
-
-        public ValueEnumerator<FromEnumerable<T>, T> GetEnumerator()
-        {
-            return new(this);
-        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -216,10 +196,6 @@ namespace ZLinq.Linq
     {
         int index;
 
-        public ValueEnumerator<FromArray<T>, T> GetEnumerator()
-        {
-            return new(this);
-        }
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Length;
@@ -270,11 +246,6 @@ namespace ZLinq.Linq
 #endif
 
         int index;
-
-        public ValueEnumerator<FromMemory<T>, T> GetEnumerator()
-        {
-            return new(this);
-        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -332,11 +303,6 @@ namespace ZLinq.Linq
         bool isInit = false;
         List<T>.Enumerator enumerator;
 
-        public ValueEnumerator<FromList<T>, T> GetEnumerator()
-        {
-            return new(this);
-        }
-
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Count;
@@ -391,11 +357,6 @@ namespace ZLinq.Linq
         bool isInit = false;
         Dictionary<TKey, TValue>.Enumerator enumerator;
 
-        public ValueEnumerator<FromDictionary<TKey, TValue>, KeyValuePair<TKey, TValue>> GetEnumerator()
-        {
-            return new(this);
-        }
-
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Count;
@@ -448,12 +409,7 @@ namespace ZLinq.Linq
     {
         bool isInit = false;
         ReadOnlySequence<T>.Enumerator sequenceEnumerator;
-        ValueEnumerator<FromMemory<T>, T> enumerator;
-
-        public ValueEnumerator<FromReadOnlySequence<T>, T> GetEnumerator()
-        {
-            return new(this);
-        }
+        FromMemory<T> enumerator;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -494,15 +450,14 @@ namespace ZLinq.Linq
             }
 
         MOVE_NEXT:
-            if (enumerator.MoveNext())
+            if (enumerator.TryGetNext(out current))
             {
-                current = enumerator.Current;
                 return true;
             }
 
             if (sequenceEnumerator.MoveNext())
             {
-                enumerator = sequenceEnumerator.Current.AsValueEnumerable().GetEnumerator<FromMemory<T>, T>();
+                enumerator = sequenceEnumerator.Current.AsValueEnumerable().Enumerator;
                 goto MOVE_NEXT;
             }
 
@@ -512,10 +467,7 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
-            if (isInit)
-            {
-                enumerator.Dispose();
-            }
+            // no needs FromMemory<T>.Dispose
         }
     }
 
@@ -525,11 +477,6 @@ namespace ZLinq.Linq
     {
         bool isInit;
         Queue<T>.Enumerator enumerator;
-
-        public ValueEnumerator<FromQueue<T>, T> GetEnumerator()
-        {
-            return new(this);
-        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -579,11 +526,6 @@ namespace ZLinq.Linq
         bool isInit;
         Stack<T>.Enumerator enumerator;
 
-        public ValueEnumerator<FromStack<T>, T> GetEnumerator()
-        {
-            return new(this);
-        }
-
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Count;
@@ -632,11 +574,6 @@ namespace ZLinq.Linq
         bool isInit;
         LinkedList<T>.Enumerator enumerator;
 
-        public ValueEnumerator<FromLinkedList<T>, T> GetEnumerator()
-        {
-            return new(this);
-        }
-
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Count;
@@ -684,11 +621,6 @@ namespace ZLinq.Linq
     {
         bool isInit;
         HashSet<T>.Enumerator enumerator;
-
-        public ValueEnumerator<FromHashSet<T>, T> GetEnumerator()
-        {
-            return new(this);
-        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -739,11 +671,6 @@ namespace ZLinq.Linq
     {
         bool isInit = false;
         ImmutableArray<T>.Enumerator enumerator;
-
-        public ValueEnumerator<FromImmutableArray<T>, T> GetEnumerator()
-        {
-            return new(this);
-        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -797,11 +724,6 @@ namespace ZLinq.Linq
     {
         ReadOnlySpan<T> source = source;
         int index;
-
-        public ValueEnumerator<FromSpan<T>, T> GetEnumerator()
-        {
-            return new(this);
-        }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

@@ -20,7 +20,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Append<TEnumerator, TSource>(TEnumerator source, TSource element)
+    struct Append<TEnumerator, TSource>(in TEnumerator source, TSource element)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

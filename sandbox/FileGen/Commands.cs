@@ -68,16 +68,16 @@ public partial class Commands
             var code = $$"""
         else if (typeof(TSource) == typeof({{type}}))
         {
-            using (source)
+            using (var enumerator = source.Enumerator)
             {
-                if (!source.TryGetNext(out var current))
+                if (!enumerator.TryGetNext(out var current))
                 {
                     Throws.NoElements();
                 }
 
                 {{type}} sum = Unsafe.As<TSource, {{type}}>(ref current);
                 long count = 1;
-                while (source.TryGetNext(out current))
+                while (enumerator.TryGetNext(out current))
                 {
                     checked { sum += Unsafe.As<TSource, {{type}}>(ref current); }
                     count++;

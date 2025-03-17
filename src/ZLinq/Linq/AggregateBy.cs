@@ -50,7 +50,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct AggregateBy<TEnumerator, TSource, TKey, TAccumulate>(TEnumerator source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey>? keyComparer)
+    struct AggregateBy<TEnumerator, TSource, TKey, TAccumulate>(in TEnumerator source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey>? keyComparer)
         : IValueEnumerator<KeyValuePair<TKey, TAccumulate>>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -176,7 +176,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct AggregateBy2<TEnumerator, TSource, TKey, TAccumulate>(TEnumerator source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey>? keyComparer)
+    struct AggregateBy2<TEnumerator, TSource, TKey, TAccumulate>(in TEnumerator source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey>? keyComparer)
         : IValueEnumerator<KeyValuePair<TKey, TAccumulate>>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

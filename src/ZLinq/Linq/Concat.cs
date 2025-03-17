@@ -2,14 +2,16 @@
 {
     partial class ValueEnumerableExtensions
     {
-        // currently source-generator only infer first argument type so can not define `TEnumerator source, TEnumerator2 second`.
-
-        public static Concat<TEnumerator, TSource> Concat<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second)
-            where TEnumerator : struct, IValueEnumerator<TSource>
+        public static ValueEnumerable<Concat<TEnumerator1, TEnumerator2, TSource>, TSource> Concat<TEnumerator1, TEnumerator2, TSource>(in this ValueEnumerable<TEnumerator1, TSource> source, in ValueEnumerable<TEnumerator2, TSource> second)
+            where TEnumerator1 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source, second);
+            where TEnumerator2 : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, second.Enumerator));
     }
 }
 
@@ -22,22 +24,24 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Concat<TEnumerator, TSource>(TEnumerator source, IEnumerable<TSource> second)
+    struct Concat<TEnumerator1, TEnumerator2, TSource>(in TEnumerator1 first, in TEnumerator2 second)
         : IValueEnumerator<TSource>
-        where TEnumerator : struct, IValueEnumerator<TSource>
+        where TEnumerator1 : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerator source = source;
-        IEnumerator<TSource>? secondEnumerator;
+        TEnumerator1 first = first;
+        TEnumerator2 second = second;
         bool firstCompleted;
-
-        public ValueEnumerator<Concat<TEnumerator, TSource>, TSource> GetEnumerator() => new(this);
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
-            if (source.TryGetNonEnumeratedCount(out var count1) && second.TryGetNonEnumeratedCount(out var count2))
+            if (first.TryGetNonEnumeratedCount(out var count1) && second.TryGetNonEnumeratedCount(out var count2))
             {
                 count = count1 + count2;
                 return true;
@@ -66,23 +70,17 @@ namespace ZLinq.Linq
             if (!firstCompleted)
             {
                 // iterate first
-                if (source.TryGetNext(out current))
+                if (first.TryGetNext(out current))
                 {
                     return true;
                 }
-                source.Dispose();
+                first.Dispose();
                 firstCompleted = true;
             }
 
             // iterate second
-            if (secondEnumerator == null)
+            if (second.TryGetNext(out current))
             {
-                secondEnumerator = second.GetEnumerator();
-            }
-
-            if (secondEnumerator.MoveNext())
-            {
-                current = secondEnumerator.Current;
                 return true;
             }
 
@@ -92,11 +90,8 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
-            if (secondEnumerator != null)
-            {
-                secondEnumerator.Dispose();
-            }
-            source.Dispose();
+            first.Dispose();
+            second.Dispose();
         }
     }
 }

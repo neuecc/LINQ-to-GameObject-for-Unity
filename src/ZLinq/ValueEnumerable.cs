@@ -16,9 +16,8 @@ struct ValueEnumerable<TEnumerator, T>(TEnumerator enumerator)
     // enumerator is struct so it always copied, no need to create new Enumerator.
     public readonly TEnumerator Enumerator = enumerator;
 
+    // for foreach
     public ValueEnumerator<TEnumerator, T> GetEnumerator() => new(Enumerator);
-
-    // TODO: implicit conversion from IEnumerable<T>?
 }
 
 // all implement types must be struct
@@ -61,24 +60,6 @@ struct ValueEnumerator<TEnumerator, T>(TEnumerator enumerator) : IDisposable
     public void Dispose() => enumerator.Dispose();
 }
 
-public static partial class ValueEnumerableExtensions
+public static partial class ValueEnumerableExtensions // keep `public static` partial class
 {
-    // TODO: remove this?
-
-    // not allows ref struct; in .NET 9, only use directly from ITraversable or simple sequence source like IEnumerable<T>.AsValueEnumerable.
-    public static IEnumerable<T> AsEnumerable<TEnumerator, T>(in this ValueEnumerable<TEnumerator, TSource> source)
-        where TEnumerator : struct, IValueEnumerator<T>
-    {
-        try
-        {
-            while (source.TryGetNext(out var current))
-            {
-                yield return current;
-            }
-        }
-        finally
-        {
-            source.Dispose();
-        }
-    }
 }

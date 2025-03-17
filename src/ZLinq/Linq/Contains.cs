@@ -16,39 +16,36 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            if (source.TryGetSpan(out var span))
+            using (var enumerator = source.Enumerator)
             {
-                // NOTE: .NET 10 can call span.Contains with comparer so no needs this hack.
+                if (enumerator.TryGetSpan(out var span))
+                {
+                    // NOTE: .NET 10 can call span.Contains with comparer so no needs this hack.
 #if NET8_0_OR_GREATER
-                return InvokeSpanContains(span, value);
+                    return InvokeSpanContains(span, value);
 #else
-                foreach (var item in span)
-                {
-                    if (EqualityComparer<TSource>.Default.Equals(item, value))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-#endif
-            }
-            else
-            {
-                try
-                {
-                    while (source.TryGetNext(out var item))
+                    foreach (var item in span)
                     {
                         if (EqualityComparer<TSource>.Default.Equals(item, value))
                         {
                             return true;
                         }
                     }
+                    return false;
+#endif
                 }
-                finally
+                else
                 {
-                    source.Dispose();
+                    while (enumerator.TryGetNext(out var item))
+                    {
+                        if (EqualityComparer<TSource>.Default.Equals(item, value))
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
                 }
-                return false;
             }
         }
 
@@ -58,21 +55,11 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
-            if (source.TryGetSpan(out var span))
+            using (var enumerator = source.Enumerator)
             {
-                foreach (var item in span)
+                if (enumerator.TryGetSpan(out var span))
                 {
-                    if (comparer.Equals(item, value))
-                    {
-                        return true;
-                    }
-                }
-            }
-            else
-            {
-                try
-                {
-                    while (source.TryGetNext(out var item))
+                    foreach (var item in span)
                     {
                         if (comparer.Equals(item, value))
                         {
@@ -80,13 +67,19 @@ namespace ZLinq
                         }
                     }
                 }
-                finally
+                else
                 {
-                    source.Dispose();
+                    while (enumerator.TryGetNext(out var item))
+                    {
+                        if (comparer.Equals(item, value))
+                        {
+                            return true;
+                        }
+                    }
                 }
-            }
 
-            return false;
+                return false;
+            }
         }
 
 #if NET8_0_OR_GREATER
