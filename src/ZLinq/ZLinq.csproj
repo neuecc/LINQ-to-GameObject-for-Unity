@@ -1,20 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<TargetFrameworks>netstandard2.1;net8.0;net9.0</TargetFrameworks>
 		<RootNamespace>ZLinq</RootNamespace>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<NoWarn>1701;1702;9124</NoWarn>
 		<LangVersion>13</LangVersion>
-		<TargetFrameworks>netstandard2.1;net8.0;net9.0</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
 		<!-- NuGet Packaging -->
 		<PackageTags>linq</PackageTags>
 		<Description>Zero allocation LINQ with Span and LINQ to SIMD, LINQ to Tree (FileSystem, Json, GameObject, etc.) for all .NET platforms and Unity.</Description>
-
-		<!-- SourceGenerator Packaging configs... -->
-		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.StartsWith(`netstandard`))">
@@ -39,16 +36,5 @@
 		<Using Include="System.Runtime.InteropServices" />
 		<Using Include="System.ComponentModel" />
 	</ItemGroup>
-
-	<!-- for nuget publish -->
-	<Target Name="PackBuildOutputs" DependsOnTargets="SatelliteDllsProjectOutputGroup;DebugSymbolsProjectOutputGroup">
-		<ItemGroup>
-			<TfmSpecificPackageFile Include="$(TargetDir)\ZLinq.SourceGenerator.dll" PackagePath="analyzers\dotnet\cs" />
-			<TfmSpecificPackageFile Include="@(SatelliteDllsProjectOutputGroupOutput->'%(FinalOutputPath)')" PackagePath="analyzers\dotnet\cs\%(SatelliteDllsProjectOutputGroupOutput.Culture)\" />
-		</ItemGroup>
-	</Target>
-
-	<!-- We don't consume the analyzers in this library itself,
-         but we reference the project to add a package dependency so users of this library will automatically get the analyzers. -->
 
 </Project>
