@@ -19,7 +19,7 @@ foreach (var item in seq) { }
 ```
 
 * **99% compatibility** with .NET 10's LINQ (including new `Shuffle`, `RightJoin`, `LeftJoin` operators)
-* **Zero allocation** for method chains through struct-based Enumerable via `IValueEnumerable`
+* **Zero allocation** for method chains through struct-based Enumerable via `ValueEnumerable`
 * Full support for LINQ operations on **Span** using .NET 9/C# 13's `allows ref struct`
 * **LINQ to Tree** to extend tree-structured objects (built-in support for FileSystem, JSON, GameObject)
 * Automatic application of SIMD where possible and customizable **LINQ to SIMD** for arbitrary operations
