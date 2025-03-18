@@ -2,13 +2,12 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Skip<TEnumerator, TSource> Skip<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Int32 count)
+        public static ValueEnumerable<Skip<TEnumerator, TSource>, TSource> Skip<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Int32 count)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => throw new NotImplementedException();
-
+            => new(new(source.Enumerator, count));
     }
 }
 
@@ -21,7 +20,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Skip<TEnumerator, TSource>(TEnumerator source, Int32 count)
+    struct Skip<TEnumerator, TSource>(in TEnumerator source, Int32 count)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -29,29 +28,61 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerator source = source;
+        readonly int skipCount = Math.Max(0, count); // ensure non-negative
+        int skipped;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
-            throw new NotImplementedException();
-            // return source.TryGetNonEnumeratedCount(count);
-            // count = 0;
-            // return false;
+            if (source.TryGetNonEnumeratedCount(out count))
+            {
+                count = Math.Max(0, count - skipCount); // subtract skip count, ensure non-negative
+                return true;
+            }
+
+            count = default;
+            return false;
         }
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
-            throw new NotImplementedException();
-            // span = default;
-            // return false;
+            if (source.TryGetSpan(out span))
+            {
+                if (span.Length <= skipCount)
+                {
+                    span = default;
+                    return true;
+                }
+                span = span.Slice(skipCount);
+                return true;
+            }
+
+            span = default;
+            return false;
         }
 
         public bool TryCopyTo(Span<TSource> destination) => false;
 
         public bool TryGetNext(out TSource current)
         {
-            throw new NotImplementedException();
-            // Unsafe.SkipInit(out current);
-            // return false;
+            // Skip elements if not already skipped
+            while (skipped < skipCount)
+            {
+                if (!source.TryGetNext(out var _))
+                {
+                    Unsafe.SkipInit(out current);
+                    return false;
+                }
+                skipped++;
+            }
+
+            // Return elements after skipping
+            if (source.TryGetNext(out current))
+            {
+                return true;
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
         }
 
         public void Dispose()
@@ -59,5 +90,4 @@ namespace ZLinq.Linq
             source.Dispose();
         }
     }
-
 }

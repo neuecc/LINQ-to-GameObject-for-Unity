@@ -50,7 +50,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Zip<TEnumerator, TEnumerator2, TFirst, TSecond>(TEnumerator source, TEnumerator2 second)
+    struct Zip<TEnumerator, TEnumerator2, TFirst, TSecond>(in TEnumerator source, in TEnumerator2 second)
         : IValueEnumerator<(TFirst First, TSecond Second)>
             where TEnumerator : struct, IValueEnumerator<TFirst>
 #if NET9_0_OR_GREATER
@@ -111,7 +111,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Zip<TEnumerator, TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>(TEnumerator source, TEnumerator2 second, TEnumerator3 third)
+    struct Zip<TEnumerator, TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>(in TEnumerator source, in TEnumerator2 second, in TEnumerator3 third)
         : IValueEnumerator<(TFirst First, TSecond Second, TThird Third)>
             where TEnumerator : struct, IValueEnumerator<TFirst>
 #if NET9_0_OR_GREATER
@@ -178,7 +178,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Zip<TEnumerator, TEnumerator2, TFirst, TSecond, TResult>(TEnumerator source, TEnumerator2 second, Func<TFirst, TSecond, TResult> resultSelector)
+    struct Zip<TEnumerator, TEnumerator2, TFirst, TSecond, TResult>(in TEnumerator source, in TEnumerator2 second, Func<TFirst, TSecond, TResult> resultSelector)
         : IValueEnumerator<TResult>
             where TEnumerator : struct, IValueEnumerator<TFirst>
 #if NET9_0_OR_GREATER
