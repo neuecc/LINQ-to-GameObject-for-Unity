@@ -2,9 +2,11 @@
 using System.Numerics;
 
 // System.Linq, int32 Average is specialized
-// other than same as Sum, supports  int/long/float/double/decimal and nullable + selector
+// other than same as Sum, supports  int/long/float/double/decimal and nullable
 // ZLinq doesn't support theres but supports INumber.
 // returns only double
+
+// TODO: selector overload
 
 namespace ZLinq;
 

@@ -21,44 +21,7 @@ var xs = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
 
 
 
-
-var ve1 = xs.AsSpan().AsValueEnumerable();
-var ve2 = xs.AsSpan().AsValueEnumerable();
-
-//var foo = ve1.OrderBy(x => x).ThenBy(x => x != 1).ThenBy(x=>x.ToString());
-
-var foo = ve1.Select(x => x * x);
-foo.Where(x => x % 2 == 0);
-
-
-var dict = ValueEnumerable.Range(1, 100)
-    .Select(x => new KeyValuePair<string, int>(x.ToString(), x))
-    .ToDictionary();
-
-ve1.SelectMany(x => new[] { x }.AsValueEnumerable());
-
-
-var zzzzzz = ve2.Where(x => x % 2 == 0).Select(x => new { foo = x * x });
-
-
-ve1.Order().ThenBy(x => x != 1);
-
-var nazo = ValueEnumerable.Range(1, 1000).Where(x => x % 2 == 0).Select(x => x * x)
-    .Order()
-    .ThenBy(x => x)
-    .Take(1000);
-
-var foobarbaz = ValueEnumerable.Range(1, 100000).Select(x => new { OK = x });
-
-
-
-
-// ve1.OrderBy(x => x).Enumerator.ThenBy
-// ve1.OrderBy(x=>x)
-
-var ccc = ve1.Concat(xs.AsValueEnumerable());
-
-// .ToArray();
+xs.AsValueEnumerable().Sum();
 
 
 var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");

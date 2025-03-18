@@ -5,8 +5,9 @@ namespace ZLinq;
 partial class ValueEnumerableExtensions
 {
     // Enumerable.Sum is for int/long/float/double/decimal and nullable
-    // however we can't support nullable.
-    // Also, due to type inference considerations, there are no overloads for selector.
+    // however we can't support nullable(using INumber<T> constraint)
+
+    // TODO:, overloads for selector.
 
     // Instead, ZLinq supports INumber and has added the SumUnchecked method.
 
