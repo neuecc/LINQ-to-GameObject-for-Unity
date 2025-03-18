@@ -17,9 +17,6 @@ struct ValueEnumerable<TEnumerator, T>(TEnumerator enumerator)
     // enumerator is struct so it always copied, no need to create new Enumerator.
     // internal operator should use this
     public readonly TEnumerator Enumerator = enumerator;
-
-    // only for foreach
-    public ValueEnumerator<TEnumerator, T> GetEnumerator() => new(Enumerator);
 }
 
 // all implement types must be struct
@@ -64,4 +61,11 @@ struct ValueEnumerator<TEnumerator, T>(TEnumerator enumerator) : IDisposable
 
 public static partial class ValueEnumerableExtensions // keep `public static` partial class
 {
+    // for foreach
+    public static ValueEnumerator<TEnumerator, T> GetEnumerator<TEnumerator, T>(in this ValueEnumerable<TEnumerator, T> valueEnumerable)
+        where TEnumerator : struct, IValueEnumerator<T>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        => new(valueEnumerable.Enumerator);
 }
