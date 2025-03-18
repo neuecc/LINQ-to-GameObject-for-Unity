@@ -27,7 +27,7 @@ public class AsEnumerableTest
         var xs = new int[] { 1, 2, 3, 4, 5 };
 
         var enumerable = xs.AsValueEnumerable(); // TODO: impl method like .Select(x => x);
-        
+
         var e1 = enumerable;
         e1.TryGetNonEnumeratedCount(out var nonEnumeratedCount).ShouldBe(true); // TODO: true | false
 

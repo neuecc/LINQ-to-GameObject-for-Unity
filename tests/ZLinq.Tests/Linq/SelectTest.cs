@@ -16,7 +16,7 @@ public class SelectTest
 
         foreach (var item in foo)
         {
-            
+
         }
 
     }

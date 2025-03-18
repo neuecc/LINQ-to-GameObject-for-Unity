@@ -44,7 +44,7 @@ namespace System.Runtime.InteropServices
                 var view = Unsafe.As<ListView<T>>(list);
                 return view._items.AsSpan();
             }
-            return default; 
+            return default;
         }
     }
 

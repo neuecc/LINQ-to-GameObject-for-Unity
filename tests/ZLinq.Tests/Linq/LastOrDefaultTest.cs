@@ -96,7 +96,7 @@ public class LastOrDefaultTest
         var xs = new int[] { 1, 2, 3, 3, 2, 1 };
         xs.AsValueEnumerable().LastOrDefault(x => x == 2).ShouldBe(2);
         xs.ToValueEnumerable().LastOrDefault(x => x == 2).ShouldBe(2);
-        
+
         xs.AsValueEnumerable().LastOrDefault(x => x == 3).ShouldBe(3);
         xs.ToValueEnumerable().LastOrDefault(x => x == 3).ShouldBe(3);
     }
@@ -107,7 +107,7 @@ public class LastOrDefaultTest
         var xs = new string?[] { "a", "b", null, "c" };
         xs.AsValueEnumerable().LastOrDefault().ShouldBe("c");
         xs.ToValueEnumerable().LastOrDefault().ShouldBe("c");
-        
+
         xs.AsValueEnumerable().LastOrDefault(x => x == null).ShouldBe(null);
         xs.ToValueEnumerable().LastOrDefault(x => x == null).ShouldBe(null);
     }

@@ -40,14 +40,14 @@ public static class TestUtil
 
     // direct shortcut of enumerable.enumerator
 
-//    public static bool TryGetNext<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable, out T current)
-//        where TEnumerator : struct, IValueEnumerator<T>
-//#if NET9_0_OR_GREATER
-//        , allows ref struct
-//#endif
-//    {
-//        return enumerable.Enumerator.TryGetNext(out current);
-//    }
+    //    public static bool TryGetNext<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable, out T current)
+    //        where TEnumerator : struct, IValueEnumerator<T>
+    //#if NET9_0_OR_GREATER
+    //        , allows ref struct
+    //#endif
+    //    {
+    //        return enumerable.Enumerator.TryGetNext(out current);
+    //    }
 
     public static bool TryGetNonEnumeratedCount<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable, out int count)
         where TEnumerator : struct, IValueEnumerator<T>

@@ -56,7 +56,7 @@ public class LastTest
         var xs = new int[] { 1, 2, 3, 3, 2, 1 };
         xs.AsValueEnumerable().Last(x => x == 3).ShouldBe(3);
         xs.ToValueEnumerable().Last(x => x == 3).ShouldBe(3);
-        
+
         xs.AsValueEnumerable().Last(x => x == 2).ShouldBe(2);
         xs.ToValueEnumerable().Last(x => x == 2).ShouldBe(2);
     }
