@@ -1,4 +1,4 @@
-﻿#pragma warning disable
+#pragma warning disable
 namespace ZLinq.Tests.Linq;
 
 public class MaxByTest

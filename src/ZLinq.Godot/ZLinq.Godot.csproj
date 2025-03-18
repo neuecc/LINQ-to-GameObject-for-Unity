@@ -1,31 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
 
-		<!-- NuGet Packaging -->
-		<PackageTags>linq</PackageTags>
-		<Description>LINQ to Godot's node tree; Node extensions of ZLinq's LINQ to Tree.</Description>
-	</PropertyGroup>
+    <!-- NuGet Packaging -->
+    <PackageTags>linq</PackageTags>
+    <Description>LINQ to Godot's node tree; Node extensions of ZLinq's LINQ to Tree.</Description>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\ZLinq\ZLinq.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-		<None Include="../../Icon.png" Pack="true" PackagePath="/" />
-		<EmbeddedResource Include="..\..\LICENSE" />
-	</ItemGroup>
-	<ItemGroup>
-	  <PackageReference Include="GodotSharp" Version="4.0.0" />
-	</ItemGroup>
-	<ItemGroup>
-		<Using Include="ZLinq" />
-		<Using Include="ZLinq.Internal" />
-		<Using Include="ZLinq.Linq" />
-		<Using Include="System.Runtime.CompilerServices" />
-		<Using Include="System.Runtime.InteropServices" />
-		<Using Include="System.ComponentModel" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZLinq\ZLinq.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../../Icon.png" Pack="true" PackagePath="/" />
+    <EmbeddedResource Include="..\..\LICENSE" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="GodotSharp" Version="4.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="ZLinq" />
+    <Using Include="ZLinq.Internal" />
+    <Using Include="ZLinq.Linq" />
+    <Using Include="System.Runtime.CompilerServices" />
+    <Using Include="System.Runtime.InteropServices" />
+    <Using Include="System.ComponentModel" />
+  </ItemGroup>
 </Project>

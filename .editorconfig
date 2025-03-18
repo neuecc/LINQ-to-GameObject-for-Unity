@@ -1,0 +1,43 @@
+# top-most EditorConfig file
+root = true
+
+[*]
+charset = utf-8-bom
+indent_style = space
+indent_size = 4
+insert_final_newline=true
+trim_trailing_whitespace=true
+
+# Solution files
+[*.{sln,slnx}]
+indent_size = 2
+
+# MSBuild project files
+[*.{csproj,props,targets}]
+indent_size = 2
+
+# Xml config files
+[*.{ruleset,config,nuspec,resx,runsettings,DotSettings}]
+indent_size = 2
+
+# JSON files
+[*.json]
+indent_size = 2
+
+# YAML files
+[*.{yml]
+indent_size = 2
+
+# PowerShell files
+[*.ps1]
+indent_size = 2
+
+# Markdown files
+[*.md]
+charset = utf-8-bom
+trim_trailing_whitespace = false
+
+# C# code style settings
+[*.{cs}]
+
+## TODO: Define custom settings

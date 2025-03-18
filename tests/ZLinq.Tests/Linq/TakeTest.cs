@@ -9,7 +9,7 @@ public class TakeTest
     public void Take_Empty()
     {
         var empty = Array.Empty<int>();
-        
+
         var expected = empty.Take(5).ToArray();
         var actual1 = empty.AsValueEnumerable().Take(5).ToArray();
         var actual2 = empty.ToValueEnumerable().Take(5).ToArray();
@@ -22,7 +22,7 @@ public class TakeTest
     public void Take_Zero()
     {
         var sequence = Enumerable.Range(1, 10).ToArray();
-        
+
         var expected = sequence.Take(0).ToArray();
         var actual1 = sequence.AsValueEnumerable().Take(0).ToArray();
         var actual2 = sequence.ToValueEnumerable().Take(0).ToArray();
@@ -35,7 +35,7 @@ public class TakeTest
     public void Take_Negative()
     {
         var sequence = Enumerable.Range(1, 10).ToArray();
-        
+
         var expected = sequence.Take(-5).ToArray();
         var actual1 = sequence.AsValueEnumerable().Take(-5).ToArray();
         var actual2 = sequence.ToValueEnumerable().Take(-5).ToArray();
@@ -48,7 +48,7 @@ public class TakeTest
     public void Take_PartialCollection()
     {
         var sequence = Enumerable.Range(1, 10).ToArray();
-        
+
         var expected = sequence.Take(5).ToArray();
         var actual1 = sequence.AsValueEnumerable().Take(5).ToArray();
         var actual2 = sequence.ToValueEnumerable().Take(5).ToArray();
@@ -61,7 +61,7 @@ public class TakeTest
     public void Take_ExceedingSize()
     {
         var sequence = Enumerable.Range(1, 10).ToArray();
-        
+
         var expected = sequence.Take(20).ToArray();
         var actual1 = sequence.AsValueEnumerable().Take(20).ToArray();
         var actual2 = sequence.ToValueEnumerable().Take(20).ToArray();
@@ -74,7 +74,7 @@ public class TakeTest
     public void Take_ExactSize()
     {
         var sequence = Enumerable.Range(1, 10).ToArray();
-        
+
         var expected = sequence.Take(10).ToArray();
         var actual1 = sequence.AsValueEnumerable().Take(10).ToArray();
         var actual2 = sequence.ToValueEnumerable().Take(10).ToArray();
@@ -88,9 +88,9 @@ public class TakeTest
     {
         var sequence = Enumerable.Range(1, 10).ToArray();
         var takeOperation = sequence.AsValueEnumerable().Take(5);
-        
+
         bool result = takeOperation.TryGetNonEnumeratedCount(out int count);
-        
+
         result.ShouldBeTrue();
         count.ShouldBe(5);
     }
@@ -100,9 +100,9 @@ public class TakeTest
     {
         var sequence = Enumerable.Range(1, 10).ToArray();
         var takeOperation = sequence.AsValueEnumerable().Take(20);
-        
+
         bool result = takeOperation.TryGetNonEnumeratedCount(out int count);
-        
+
         result.ShouldBeTrue();
         count.ShouldBe(10); // Should return the smaller of takCount and collection size
     }
@@ -112,9 +112,9 @@ public class TakeTest
     {
         var sequence = Enumerable.Range(1, 10).ToArray();
         var takeOperation = sequence.AsValueEnumerable().Take(5);
-        
+
         bool result = takeOperation.TryGetSpan(out var span);
-        
+
         result.ShouldBeTrue();
         span.Length.ShouldBe(5);
         span.ToArray().ShouldBe(new[] { 1, 2, 3, 4, 5 });
@@ -125,10 +125,10 @@ public class TakeTest
     {
         var sequence = Enumerable.Range(1, 10).ToArray();
         var takeOperation = sequence.AsValueEnumerable().Take(5);
-        
+
         Span<int> destination = new int[5];
         bool result = takeOperation.TryCopyTo(destination);
-        
+
         result.ShouldBeTrue();
         destination.ToArray().ShouldBe(new[] { 1, 2, 3, 4, 5 });
     }

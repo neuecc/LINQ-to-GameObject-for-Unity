@@ -72,7 +72,7 @@ public class TakeRangeTest(ITestOutputHelper testOutputHelper)
     public void TakeRange_EmptySource()
     {
         var empty = Array.Empty<int>();
-        
+
         TestRange(empty, 0..5, "Empty source with range");
         TestRange(empty, ^5..^0, "Empty source with from-end range");
     }
@@ -82,9 +82,9 @@ public class TakeRangeTest(ITestOutputHelper testOutputHelper)
     {
         var sequence = Enumerable.Range(1, 10).ToArray();
         var rangeOperation = sequence.AsValueEnumerable().Take(2..7);
-        
+
         bool result = rangeOperation.TryGetNonEnumeratedCount(out int count);
-        
+
         result.ShouldBeTrue();
         count.ShouldBe(5); // Should be end - start = 7 - 2 = 5
     }
@@ -94,9 +94,9 @@ public class TakeRangeTest(ITestOutputHelper testOutputHelper)
     {
         var sequence = Enumerable.Range(1, 10).ToArray();
         var rangeOperation = sequence.AsValueEnumerable().Take(2..7);
-        
+
         bool result = rangeOperation.TryGetSpan(out var span);
-        
+
         result.ShouldBeTrue();
         span.Length.ShouldBe(5);
         span.ToArray().ShouldBe(new[] { 3, 4, 5, 6, 7 });

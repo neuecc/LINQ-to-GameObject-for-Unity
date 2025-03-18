@@ -53,7 +53,7 @@ partial class ValueEnumerableExtensions
             }
         }
 #else
-#region generate from FileGen.Commands.Sum
+        #region generate from FileGen.Commands.Sum
         else if (typeof(TSource) == typeof(byte))
         {
             using (var enumerator = source.Enumerator)
@@ -198,7 +198,7 @@ partial class ValueEnumerableExtensions
                 return Unsafe.As<nuint, TSource>(ref sum);
             }
         }
-#endregion
+        #endregion
         else
         {
             Throws.NotSupportedType(typeof(TSource));

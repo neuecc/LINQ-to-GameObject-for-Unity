@@ -80,8 +80,10 @@ public class AggregateTest
         // Count occurrences of first character in each string
         var expected = xs.Aggregate(
             seed,
-            (dict, str) => {
-                if (str.Length > 0) {
+            (dict, str) =>
+            {
+                if (str.Length > 0)
+                {
                     var firstChar = str[0];
                     dict[firstChar] = dict.TryGetValue(firstChar, out var count) ? count + 1 : 1;
                 }
@@ -91,8 +93,10 @@ public class AggregateTest
 
         var actual = xs.AsValueEnumerable().Aggregate(
             new Dictionary<char, int>(),
-            (dict, str) => {
-                if (str.Length > 0) {
+            (dict, str) =>
+            {
+                if (str.Length > 0)
+                {
                     var firstChar = str[0];
                     dict[firstChar] = dict.TryGetValue(firstChar, out var count) ? count + 1 : 1;
                 }
@@ -119,7 +123,7 @@ public class AggregateTest
         // Should apply the result selector to the seed when source is empty
         xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
             .ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x, acc => acc * 2));
-            
+
         xs.ToValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
             .ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x, acc => acc * 2));
     }
@@ -133,14 +137,14 @@ public class AggregateTest
         // Both implementations should return the same result
         xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
             .ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x, acc => acc * 2));
-            
+
         xs.ToValueEnumerable().Aggregate(seed, (acc, x) => acc + x, acc => acc * 2)
             .ShouldBe(xs.Aggregate(seed, (acc, x) => acc + x, acc => acc * 2));
 
         // Test with different aggregation and result selector functions
         xs.AsValueEnumerable().Aggregate(seed, (acc, x) => acc * x, acc => $"Result: {acc}")
             .ShouldBe(xs.Aggregate(seed, (acc, x) => acc * x, acc => $"Result: {acc}"));
-            
+
         xs.ToValueEnumerable().Aggregate(seed, (acc, x) => acc * x, acc => $"Result: {acc}")
             .ShouldBe(xs.Aggregate(seed, (acc, x) => acc * x, acc => $"Result: {acc}"));
     }
@@ -149,7 +153,7 @@ public class AggregateTest
     public void WithComplexResult()
     {
         var xs = new int[] { 1, 2, 3, 4, 5 };
-        
+
         // Get sum and count, then calculate average as result
         var expected = xs.Aggregate(
             (Sum: 0, Count: 0),
@@ -164,7 +168,7 @@ public class AggregateTest
         );
 
         actual.ShouldBe(expected);
-        
+
         actual = xs.ToValueEnumerable().Aggregate(
             (Sum: 0, Count: 0),
             (acc, x) => (Sum: acc.Sum + x, Count: acc.Count + 1),

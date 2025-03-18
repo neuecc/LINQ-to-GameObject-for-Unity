@@ -39,7 +39,7 @@ partial class ValueEnumerableExtensions
         else
         {
             using var arrayBuilder = new SegmentedArrayBuilder<TSource>();
-            
+
             while (enumerator.TryGetNext(out var item))
             {
                 arrayBuilder.Add(item);
