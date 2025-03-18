@@ -22,7 +22,7 @@ public partial class LinqPerfBenchmarks
             Product medianPricedProduct = null!;
             for (int i = 0; i < IterationsOrder00; i++)
             {
-                var productsInPriceOrder = products.OrderByDescending(p => p.UnitPrice).ToArray();
+                var productsInPriceOrder = products.OrderByDescending(p => p.UnitPrice);
                 int count = productsInPriceOrder.Count();
                 medianPricedProduct = productsInPriceOrder.ElementAt(count / 2);
             }
@@ -38,7 +38,7 @@ public partial class LinqPerfBenchmarks
             Product medianPricedProduct = null!;
             for (int i = 0; i < IterationsOrder00; i++)
             {
-                var productsInPriceOrder = products.AsValueEnumerable().OrderByDescending(p => p.UnitPrice).ToArray();
+                var productsInPriceOrder = products.AsValueEnumerable().OrderByDescending(p => p.UnitPrice);
                 int count = productsInPriceOrder.Count();
                 medianPricedProduct = productsInPriceOrder.ElementAt(count / 2);
             }
