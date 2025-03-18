@@ -13,7 +13,7 @@ using Benchmark;
 
 #if !DEBUG
 
-BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
+//BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
 //BenchmarkRunner.Run<SimdRange>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
 //BenchmarkRunner.Run<SimdSelect>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
 //BenchmarkRunner.Run<LookupBattle>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
@@ -32,7 +32,7 @@ BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(Su
 //BenchmarkRunner.Run<LinqPerfBenchmarks.CountBy00>(DefaultConfig.Instance, args);
 //BenchmarkRunner.Run<LinqPerfBenchmarks.GroupBy00>(DefaultConfig.Instance, args);
 //BenchmarkRunner.Run<LinqPerfBenchmarks.Order00>(DefaultConfig.Instance, args);
-//BenchmarkRunner.Run<LinqPerfBenchmarks.Where00>(DefaultConfig.Instance, args);
+BenchmarkRunner.Run<LinqPerfBenchmarks.Where00>(DefaultConfig.Instance, args);
 //BenchmarkRunner.Run<LinqPerfBenchmarks.Where01>(DefaultConfig.Instance, args);
 #else
 

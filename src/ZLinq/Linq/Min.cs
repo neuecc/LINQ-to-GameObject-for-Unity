@@ -172,12 +172,6 @@ partial class ValueEnumerableExtensions
             var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, UInt128>(span));
             return Unsafe.As<UInt128, TSource>(ref result);
         }
-        else if (typeof(TSource) == typeof(char))
-        {
-            if (comparer != Comparer<TSource>.Default) return MinSpanComparer(span, comparer);
-            var result = SimdMinBinaryInteger(UnsafeSpanBitCast<TSource, char>(span));
-            return Unsafe.As<char, TSource>(ref result);
-        }
         #endregion
         else
         {

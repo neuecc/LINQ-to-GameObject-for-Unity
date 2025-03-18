@@ -12,7 +12,7 @@ public partial class Commands
     readonly static string[] PrimitiveTypesPlusString = [.. PrimitiveTypes, "string"];
     readonly static string[] PrimitiveNumbers = ["byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double", "decimal", "nint", "nuint"];
     readonly static string[] PrimitiveNumbersWithoutFloat = ["byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "double", "decimal", "nint", "nuint"];
-    readonly static string[] PrimitivesForMinMax = ["byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "nint", "nuint", "Int128", "UInt128", "char"];
+    readonly static string[] PrimitivesForMinMax = ["byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong", "nint", "nuint", "Int128", "UInt128"];
 
     public void TypeOfContains()
     {
