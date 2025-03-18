@@ -5,11 +5,63 @@ namespace ZLinq;
 partial class ValueEnumerableExtensions
 {
     // Enumerable.Sum is for int/long/float/double/decimal and nullable
-    // however we can't support nullable(using INumber<T> constraint)
+    // ZLinq supports more types(using INumber<T> constraint)
+    // And, added the SumUnchecked method.
 
-    // TODO:, overloads for selector.
+    public static TResult Sum<TEnumerator, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TResult> selector)
+        where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TResult : struct
+#if NET8_0_OR_GREATER
+        , INumber<TResult>
+#endif
+    {
+#if NET8_0_OR_GREATER
+        using (var enumerator = source.Enumerator)
+        {
+            var sum = TResult.Zero;
+            while (enumerator.TryGetNext(out var item))
+            {
+                var value = selector(item);
+                checked { sum += TResult.CreateChecked(value); }
+            }
+            return sum;
+        }
+#else
+        // While performance improvements can be expected by inlining, within ZLinq's zero-allocation iteration, the value of doing so cannot be justified.
+        return source.Select(selector).Sum();
+#endif
+    }
 
-    // Instead, ZLinq supports INumber and has added the SumUnchecked method.
+    public static TSource Sum<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, Nullable<TSource>> source)
+        where TEnumerator : struct, IValueEnumerator<Nullable<TSource>>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TSource : struct
+#if NET8_0_OR_GREATER
+        , INumber<TSource>
+#endif
+    {
+#if NET8_0_OR_GREATER
+        using (var enumerator = source.Enumerator)
+        {
+            var sum = TSource.Zero;
+            while (enumerator.TryGetNext(out var value))
+            {
+                if (value is not null)
+                {
+                    checked { sum += TSource.CreateChecked(value.GetValueOrDefault()); }
+                }
+            }
+            return sum;
+        }
+#else
+        return source.Where(static x => x.HasValue).Select(static x => x.GetValueOrDefault()).Sum();
+#endif
+    }
 
     public static TSource Sum<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
         where TEnumerator : struct, IValueEnumerator<TSource>

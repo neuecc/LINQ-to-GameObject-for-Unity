@@ -5,7 +5,18 @@ namespace ZLinq;
 
 partial class ValueEnumerableExtensions
 {
-    // TODO: overload selector
+    public static TResult? Max<TEnumerator, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TResult> selector)
+        where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+    {
+        // If inlined, we could expect a slight performance improvement,
+        // but since ZLinq's iteration is already sufficiently fast with no allocations, we'll use Select as is.
+        return source.Select(selector).Max();
+    }
+
+    // already nullable supported.
 
     public static TSource? Max<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
         where TEnumerator : struct, IValueEnumerator<TSource>

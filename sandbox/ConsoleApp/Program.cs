@@ -1,4 +1,6 @@
-﻿using System.Numerics;
+﻿#pragma warning disable
+
+using System.Numerics;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -17,12 +19,19 @@ using ZLinq.Traversables;
 // 2147483647
 
 
-var xs = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
 
 
+var xs = new int?[] { 1, 2, 3, null, 4, 5, 6, null, 7, 8 };
+var foo = xs.Max(x => x * x);
+Console.WriteLine(foo);
 
-xs.AsValueEnumerable().Sum();
+var tako = xs.Average();
+var hgua = xs.AsValueEnumerable().Average();
+Console.WriteLine(tako);
+Console.WriteLine(hgua);
 
+
+return;
 
 var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
 

@@ -94,6 +94,49 @@ public partial class Commands
         Console.WriteLine(sb.ToString());
     }
 
+    public void AverageNullable()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("#region generate from FileGen.Commands.AverageNullable");
+        foreach (var type in PrimitiveNumbersWithoutFloat)
+        {
+            var code = $$"""
+        else if (typeof(TSource) == typeof({{type}}))
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = Unsafe.As<TSource, {{type}}>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += Unsafe.As<TSource, {{type}}>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+""";
+            sb.AppendLine(code);
+        }
+        sb.AppendLine("#endregion");
+
+        Console.WriteLine(sb.ToString());
+    }
+
     public void Min()
     {
         var sb = new StringBuilder();

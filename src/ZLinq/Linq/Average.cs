@@ -1,19 +1,437 @@
 ﻿using System;
 using System.Numerics;
 
-// System.Linq, int32 Average is specialized
-// other than same as Sum, supports  int/long/float/double/decimal and nullable
-// ZLinq doesn't support theres but supports INumber.
-// returns only double
-
-// TODO: selector overload
+// System.Linq returns float -> float, decimal -> decimal, others(int, long, double) -> double
+// Due to limitations with overloads, generics, and where constraints, the return value is restricted to double only.
 
 namespace ZLinq;
 
 partial class ValueEnumerableExtensions
 {
-    // System.Linq returns float -> float, decimal -> decimal, others(int, long, double) -> double
-    // Due to limitations with overloads, generics, and where constraints, the return value is restricted to double only.
+    public static double Average<TEnumerator, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TResult> selector)
+        where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TResult : struct
+#if NET8_0_OR_GREATER
+        , INumber<TResult>
+#endif
+    {
+        return source.Select(selector).Average();
+    }
+
+    public static double? Average<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, Nullable<TSource>> source)
+        where TEnumerator : struct, IValueEnumerator<Nullable<TSource>>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TSource : struct
+#if NET8_0_OR_GREATER
+        , INumber<TSource>
+#endif
+    {
+#if NET8_0_OR_GREATER
+        using (var enumerator = source.Enumerator)
+        {
+            while (enumerator.TryGetNext(out var firstValue)) // store first value
+            {
+                if (firstValue.HasValue)
+                {
+                    var sum = TSource.CreateChecked(firstValue.GetValueOrDefault());
+                    long count = 1;
+
+                    while (enumerator.TryGetNext(out var current))
+                    {
+                        if (current.HasValue)
+                        {
+                            checked { sum += TSource.CreateChecked(current.GetValueOrDefault()); }
+                            count++;
+                        }
+                    }
+
+                    return double.CreateChecked(sum) / (double)count;
+                }
+            }
+
+            return null;
+        }
+#else
+        if (typeof(TSource) == typeof(float)) // float is hand-written
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = (double)Unsafe.As<TSource, float>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += (double)Unsafe.As<TSource, float>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+
+        #region generate from FileGen.Commands.AverageNullable
+        else if (typeof(TSource) == typeof(byte))
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = Unsafe.As<TSource, byte>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += Unsafe.As<TSource, byte>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+        else if (typeof(TSource) == typeof(sbyte))
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = Unsafe.As<TSource, sbyte>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += Unsafe.As<TSource, sbyte>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+        else if (typeof(TSource) == typeof(short))
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = Unsafe.As<TSource, short>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += Unsafe.As<TSource, short>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+        else if (typeof(TSource) == typeof(ushort))
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = Unsafe.As<TSource, ushort>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += Unsafe.As<TSource, ushort>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+        else if (typeof(TSource) == typeof(int))
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = Unsafe.As<TSource, int>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += Unsafe.As<TSource, int>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+        else if (typeof(TSource) == typeof(uint))
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = Unsafe.As<TSource, uint>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += Unsafe.As<TSource, uint>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+        else if (typeof(TSource) == typeof(long))
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = Unsafe.As<TSource, long>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += Unsafe.As<TSource, long>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+        else if (typeof(TSource) == typeof(ulong))
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = Unsafe.As<TSource, ulong>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += Unsafe.As<TSource, ulong>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+        else if (typeof(TSource) == typeof(double))
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = Unsafe.As<TSource, double>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += Unsafe.As<TSource, double>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+        else if (typeof(TSource) == typeof(decimal))
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = Unsafe.As<TSource, decimal>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += Unsafe.As<TSource, decimal>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+        else if (typeof(TSource) == typeof(nint))
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = Unsafe.As<TSource, nint>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += Unsafe.As<TSource, nint>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+        else if (typeof(TSource) == typeof(nuint))
+        {
+            using (var enumerator = source.Enumerator)
+            {
+                while (enumerator.TryGetNext(out var first))
+                {
+                    if (first.HasValue)
+                    {
+                        var firstValue = first.GetValueOrDefault();
+                        var sum = Unsafe.As<TSource, nuint>(ref firstValue);
+                        long count = 1;
+
+                        while (enumerator.TryGetNext(out var current))
+                        {
+                            if (current.HasValue)
+                            {
+                                var currentValue = current.GetValueOrDefault();
+                                checked { sum += Unsafe.As<TSource, nuint>(ref currentValue); }
+                                count++;
+                            }
+                        }
+
+                        return (double)sum / (double)count;
+                    }
+                }
+                return null;
+            }
+        }
+        #endregion
+        else
+        {
+            Throws.NotSupportedType(typeof(TSource));
+            return default!;
+        }
+#endif
+    }
+
     public static double Average<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
