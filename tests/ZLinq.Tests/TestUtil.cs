@@ -24,6 +24,11 @@ public static class TestUtil
         yield break;
     }
 
+    public static IEnumerable<T> Empty<T>()
+    {
+        yield break;
+    }
+
     // hide source type to avoid Span optimization
     public static ValueEnumerable<FromEnumerable<T>, T> ToValueEnumerable<T>(this IEnumerable<T> source)
     {
