@@ -129,3 +129,6 @@ src/ZLinq.Unity/Temp/*
 src/ZLinq.Unity/UserSettings/*
 src/ZLinq.Unity/*.sln
 src/ZLinq.Unity/*.csproj
+
+# BenchmarkDotNet
+BenchmarkDotNet.Artifacts/
