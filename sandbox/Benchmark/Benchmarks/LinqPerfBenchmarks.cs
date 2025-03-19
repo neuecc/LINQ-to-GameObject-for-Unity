@@ -12,23 +12,13 @@ public partial class LinqPerfBenchmarks
         public decimal UnitPrice { get; set; }
         public int UnitsInStock { get; set; }
 
-        private static List<Product> s_productList = default!;
-
         public static List<Product> GetProductList()
         {
-            if (s_productList == null)
-                CreateLists();
-
-            return s_productList!;
-        }
-
-        private static void CreateLists()
-        {
-            s_productList =
-                new List<Product> {
-                    new() { ProductID = 1, ProductName = "Chai", Category = "Beverages", UnitPrice = 18.0000M, UnitsInStock = 39 },
-                    new() { ProductID = 2, ProductName = "Chang", Category = "Beverages", UnitPrice = 19.0000M, UnitsInStock = 17 },
-                    new() { ProductID = 3, ProductName = "Aniseed Syrup", Category = "Condiments", UnitPrice = 10.0000M, UnitsInStock = 13 },
+            return new List<Product>
+            {
+                    new () { ProductID = 1, ProductName = "Chai", Category = "Beverages", UnitPrice = 18.0000M, UnitsInStock = 39 },
+                    new () { ProductID = 2, ProductName = "Chang", Category = "Beverages", UnitPrice = 19.0000M, UnitsInStock = 17 },
+                    new () { ProductID = 3, ProductName = "Aniseed Syrup", Category = "Condiments", UnitPrice = 10.0000M, UnitsInStock = 13 },
                     new() { ProductID = 4, ProductName = "Chef Anton's Cajun Seasoning", Category = "Condiments", UnitPrice = 22.0000M, UnitsInStock = 53 },
                     new() { ProductID = 5, ProductName = "Chef Anton's Gumbo Mix", Category = "Condiments", UnitPrice = 21.3500M, UnitsInStock = 0 },
                     new() { ProductID = 6, ProductName = "Grandma's Boysenberry Spread", Category = "Condiments", UnitPrice = 25.0000M, UnitsInStock = 120 },

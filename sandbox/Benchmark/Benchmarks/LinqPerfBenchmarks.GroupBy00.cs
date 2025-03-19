@@ -11,13 +11,17 @@ public partial class LinqPerfBenchmarks
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class GroupBy00
     {
-        public const int IterationsGroupBy00 = 1000000;
+        const int IterationsGroupBy00 = 1000000;
+        List<Product> TestData = default!;
+
+        [GlobalSetup]
+        public void Setup() => TestData = Product.GetProductList();
 
         [Benchmark]
         [BenchmarkCategory(Categories.LINQ)]
         public bool Linq_GroupBy_Count()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsGroupBy00; i++)
             {
@@ -34,7 +38,7 @@ public partial class LinqPerfBenchmarks
         ////        [BenchmarkCategory(Categories.LINQ)]
         ////        public bool Linq_AggregateBy_Count()
         ////        {
-        ////            List<Product> products = Product.GetProductList();
+        ////            List<Product> products = TestData;
         ////            int count = 0;
         ////            for (int i = 0; i < IterationsGroupBy00; i++)
         ////            {
@@ -51,7 +55,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.ZLinq)]
         public bool ZLinq_GroupBy_Count()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsGroupBy00; i++)
             {
@@ -69,7 +73,7 @@ public partial class LinqPerfBenchmarks
         ////        [BenchmarkCategory(Categories.ZLinq)]
         ////        public bool ZLinq_AggregateBy_Count()
         ////        {
-        ////            List<Product> products = Product.GetProductList();
+        ////            List<Product> products = TestData;
         ////            int count = 0;
         ////            for (int i = 0; i < IterationsGroupBy00; i++)
         ////            {

@@ -11,13 +11,18 @@ public partial class LinqPerfBenchmarks
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class Where01
     {
-        public const int IterationsWhere01 = 250000;
+        const int IterationsWhere01 = 250000;
+
+        List<Product> TestData = default!;
+
+        [GlobalSetup]
+        public void Setup() => TestData = Product.GetProductList();
 
         [Benchmark]
         [BenchmarkCategory(Categories.LINQ)]
         public bool Linq_Combined()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsWhere01; i++)
             {
@@ -36,7 +41,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.LINQ)]
         public bool Linq_Nested()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsWhere01; i++)
             {
@@ -56,7 +61,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.ZLinq)]
         public bool ZLinq_Combined()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsWhere01; i++)
             {
@@ -76,7 +81,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.ZLinq)]
         public bool ZLinq_Nested()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsWhere01; i++)
             {

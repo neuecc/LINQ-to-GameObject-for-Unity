@@ -11,13 +11,18 @@ public partial class LinqPerfBenchmarks
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class Where00
     {
-        public const int IterationsWhere00 = 1000000;
+        const int IterationsWhere00 = 1000000;
+        List<Product> TestData = default!;
+
+        [GlobalSetup]
+        public void Setup() => TestData = Product.GetProductList();
 
         [Benchmark]
         [BenchmarkCategory(Categories.LINQ)]
         public bool Linq()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
+
             int count = 0;
             for (int i = 0; i < IterationsWhere00; i++)
             {
@@ -36,7 +41,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.ZLinq)]
         public bool ZLinq()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsWhere00; i++)
             {

@@ -12,13 +12,17 @@ public partial class LinqPerfBenchmarks
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class Order00
     {
-        public const int IterationsOrder00 = 25000;
+        const int IterationsOrder00 = 25000;
+        List<Product> TestData = default!;
+
+        [GlobalSetup]
+        public void Setup() => TestData = Product.GetProductList();
 
         [Benchmark]
         [BenchmarkCategory(Categories.LINQ)]
         public bool Linq_OrderByDescending_Count_ElementAt()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             Product medianPricedProduct = null!;
             for (int i = 0; i < IterationsOrder00; i++)
             {
@@ -34,7 +38,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.ZLinq)]
         public bool ZLinq_OrderByDescending_Count_ElementAt()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             Product medianPricedProduct = null!;
             for (int i = 0; i < IterationsOrder00; i++)
             {

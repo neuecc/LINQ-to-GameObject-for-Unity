@@ -11,14 +11,18 @@ public partial class LinqPerfBenchmarks
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class CountBy00
     {
-        public const int IterationsCountBy00 = 1000000;
+        const int IterationsCountBy00 = 1000000;
+        List<Product> TestData = default!;
+
+        [GlobalSetup]
+        public void Setup() => TestData = Product.GetProductList();
 
 #if NET9_0_OR_GREATER
         [Benchmark]
         [BenchmarkCategory(Categories.LINQ)]
         public bool Linq_CountBy_Count()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsCountBy00; i++)
             {
@@ -34,7 +38,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.LINQ)]
         public bool Linq_AggregateBy_Count()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsCountBy00; i++)
             {
@@ -51,7 +55,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.LINQ)]
         public bool Linq_GroupBy_ToDictionary_Count()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsCountBy00; i++)
             {
@@ -68,7 +72,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.LINQ)]
         public bool Linq_ToLookup_ToDictionary_Count()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsCountBy00; i++)
             {
@@ -86,7 +90,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.ZLinq)]
         public bool ZLinq_CountBy_Count()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsCountBy00; i++)
             {
@@ -103,7 +107,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.ZLinq)]
         public bool ZLinq_AggregateBy_Count()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsCountBy00; i++)
             {
@@ -121,7 +125,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.ZLinq)]
         public bool ZLinq_GroupBy_ToDictionary_Count()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsCountBy00; i++)
             {
@@ -139,7 +143,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.ZLinq)]
         public bool ZLinq_ToLookup_ToDictionary_Count()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             int count = 0;
             for (int i = 0; i < IterationsCountBy00; i++)
             {
