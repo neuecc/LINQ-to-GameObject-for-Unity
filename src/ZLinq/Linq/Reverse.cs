@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<Reverse<TEnumerator, TSource>, TSource> Reverse<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        public static ValueEnumerable<Reverse<TEnumerator, TSource>, TSource> Reverse<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -21,7 +21,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Reverse<TEnumerator, TSource>(in TEnumerator source)
+    struct Reverse<TEnumerator, TSource>(TEnumerator source)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

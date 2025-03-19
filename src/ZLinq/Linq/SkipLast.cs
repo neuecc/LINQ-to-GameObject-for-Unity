@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<SkipLast<TEnumerator, TSource>, TSource> SkipLast<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Int32 count)
+        public static ValueEnumerable<SkipLast<TEnumerator, TSource>, TSource> SkipLast<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Int32 count)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -20,7 +20,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SkipLast<TEnumerator, TSource>(in TEnumerator source, Int32 count)
+    struct SkipLast<TEnumerator, TSource>(TEnumerator source, Int32 count)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

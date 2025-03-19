@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<Shuffle<TEnumerator, TSource>, TSource> Shuffle<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        public static ValueEnumerable<Shuffle<TEnumerator, TSource>, TSource> Shuffle<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -20,7 +20,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Shuffle<TEnumerator, TSource>(in TEnumerator source)
+    struct Shuffle<TEnumerator, TSource>(TEnumerator source)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

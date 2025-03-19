@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static TSource Single<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        public static TSource Single<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -21,7 +21,7 @@
             }
         }
 
-        public static TSource Single<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+        public static TSource Single<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -40,7 +40,7 @@
             }
         }
 
-        public static TSource? SingleOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        public static TSource? SingleOrDefault<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
     where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
     , allows ref struct
@@ -59,7 +59,7 @@
             }
         }
 
-        public static TSource SingleOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, TSource defaultValue)
+        public static TSource SingleOrDefault<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, TSource defaultValue)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -78,7 +78,7 @@
             }
         }
 
-        public static TSource? SingleOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+        public static TSource? SingleOrDefault<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -97,7 +97,7 @@
             }
         }
 
-        public static TSource SingleOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate, TSource defaultValue)
+        public static TSource SingleOrDefault<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate, TSource defaultValue)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -151,7 +151,7 @@
             return false;
         }
 
-        public static bool TryGetSingle<TEnumerator, TSource>(ref TEnumerator source, Func<TSource, Boolean> predicate, out TSource value)
+        static bool TryGetSingle<TEnumerator, TSource>(ref TEnumerator source, Func<TSource, Boolean> predicate, out TSource value)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct

@@ -57,7 +57,7 @@ public class Repeat
     public void ForEach()
     {
         var e = Enumerable.Repeat(1, 100).GetEnumerator();
-        foreach (var item in ValueEnumerable.Repeat(1, 100))
+        foreach (var item ValueEnumerable.Repeat(1, 100))
         {
             e.MoveNext();
             item.ShouldBe(e.Current);

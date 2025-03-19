@@ -8,7 +8,7 @@ partial class ValueEnumerableExtensions
     // ZLinq supports more types(using INumber<T> constraint)
     // And, added the SumUnchecked method.
 
-    public static TResult Sum<TEnumerator, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TResult> selector)
+    public static TResult Sum<TEnumerator, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TResult> selector)
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -35,7 +35,7 @@ partial class ValueEnumerableExtensions
 #endif
     }
 
-    public static TSource Sum<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, Nullable<TSource>> source)
+    public static TSource Sum<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, Nullable<TSource>> source)
         where TEnumerator : struct, IValueEnumerator<Nullable<TSource>>
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -63,7 +63,7 @@ partial class ValueEnumerableExtensions
 #endif
     }
 
-    public static TSource Sum<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+    public static TSource Sum<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -261,7 +261,7 @@ partial class ValueEnumerableExtensions
 
 #if NET8_0_OR_GREATER
 
-    public static TSource SumUnchecked<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+    public static TSource SumUnchecked<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct

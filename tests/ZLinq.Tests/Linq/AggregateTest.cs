@@ -2,7 +2,7 @@
 
 public class AggregateTest
 {
-    // Tests for Aggregate<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TSource, TSource> func)
+    // Tests for Aggregate<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TSource, TSource> func)
     [Fact]
     public void Empty()
     {
@@ -44,7 +44,7 @@ public class AggregateTest
         xs.ToValueEnumerable().Aggregate((x, y) => throw new Exception("Should not be called")).ShouldBe(42);
     }
 
-    // Tests for Aggregate<TEnumerator, TSource, TAccumulate>(in this ValueEnumerable<TEnumerator, TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func)
+    // Tests for Aggregate<TEnumerator, TSource, TAccumulate>(this ValueEnumerable<TEnumerator, TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func)
     [Fact]
     public void EmptyWithSeed()
     {
@@ -112,7 +112,7 @@ public class AggregateTest
         }
     }
 
-    // Tests for Aggregate<TEnumerator, TSource, TAccumulate, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, TAccumulate seed, 
+    // Tests for Aggregate<TEnumerator, TSource, TAccumulate, TResult>(this ValueEnumerable<TEnumerator, TSource> source, TAccumulate seed, 
     // Func<TAccumulate, TSource, TAccumulate> func, Func<TAccumulate, TResult> resultSelector)
     [Fact]
     public void EmptyWithSeedAndResultSelector()

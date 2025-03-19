@@ -10,7 +10,7 @@ namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static Boolean Contains<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, TSource value)
+        public static Boolean Contains<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, TSource value)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -49,7 +49,7 @@ namespace ZLinq
             }
         }
 
-        public static Boolean Contains<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, TSource value, IEqualityComparer<TSource> comparer)
+        public static Boolean Contains<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, TSource value, IEqualityComparer<TSource> comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct

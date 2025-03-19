@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<Append<TEnumerator, TSource>, TSource> Append<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, TSource element)
+        public static ValueEnumerable<Append<TEnumerator, TSource>, TSource> Append<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, TSource element)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -20,7 +20,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Append<TEnumerator, TSource>(in TEnumerator source, TSource element)
+    struct Append<TEnumerator, TSource>(TEnumerator source, TSource element)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

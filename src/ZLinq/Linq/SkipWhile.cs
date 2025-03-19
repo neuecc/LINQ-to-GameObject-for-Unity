@@ -2,14 +2,14 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<SkipWhile<TEnumerator, TSource>, TSource> SkipWhile<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+        public static ValueEnumerable<SkipWhile<TEnumerator, TSource>, TSource> SkipWhile<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(new(source.Enumerator, predicate));
 
-        public static ValueEnumerable<SkipWhile2<TEnumerator, TSource>, TSource> SkipWhile<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Int32, Boolean> predicate)
+        public static ValueEnumerable<SkipWhile2<TEnumerator, TSource>, TSource> SkipWhile<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Int32, Boolean> predicate)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SkipWhile<TEnumerator, TSource>(in TEnumerator source, Func<TSource, Boolean> predicate)
+    struct SkipWhile<TEnumerator, TSource>(TEnumerator source, Func<TSource, Boolean> predicate)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -88,7 +88,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SkipWhile2<TEnumerator, TSource>(in TEnumerator source, Func<TSource, Int32, Boolean> predicate)
+    struct SkipWhile2<TEnumerator, TSource>(TEnumerator source, Func<TSource, Int32, Boolean> predicate)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

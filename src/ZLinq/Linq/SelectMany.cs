@@ -2,47 +2,47 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<SelectMany<TEnumerator, TEnumerator2, TSource, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, ValueEnumerable<TEnumerator2, TResult>> selector)
+        public static ValueEnumerable<SelectMany<TEnumerator, TEnumerator2, TSource, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, ValueEnumerable<TEnumerator2, TResult>> selector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-        where TEnumerator2 : struct, IValueEnumerator<TResult>
+            where TEnumerator2 : struct, IValueEnumerator<TResult>
 #if NET9_0_OR_GREATER
-        , allows ref struct
+           , allows ref struct
 #endif
             => new(new(source.Enumerator, selector));
 
-        public static ValueEnumerable<SelectMany2<TEnumerator, TEnumerator2, TSource, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, int, ValueEnumerable<TEnumerator2, TResult>> selector)
+        public static ValueEnumerable<SelectMany2<TEnumerator, TEnumerator2, TSource, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, int, ValueEnumerable<TEnumerator2, TResult>> selector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-        where TEnumerator2 : struct, IValueEnumerator<TResult>
+            where TEnumerator2 : struct, IValueEnumerator<TResult>
 #if NET9_0_OR_GREATER
-        , allows ref struct
+            , allows ref struct
 #endif
             => new(new(source.Enumerator, selector));
 
-        public static ValueEnumerable<SelectMany3<TEnumerator, TEnumerator2, TSource, TCollection, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
+        public static ValueEnumerable<SelectMany3<TEnumerator, TEnumerator2, TSource, TCollection, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-        where TEnumerator2 : struct, IValueEnumerator<TCollection>
+            where TEnumerator2 : struct, IValueEnumerator<TCollection>
 #if NET9_0_OR_GREATER
-        , allows ref struct
+            , allows ref struct
 #endif
             => new(new(source.Enumerator, collectionSelector, resultSelector));
 
-        public static ValueEnumerable<SelectMany4<TEnumerator, TEnumerator2, TSource, TCollection, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, int, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
+        public static ValueEnumerable<SelectMany4<TEnumerator, TEnumerator2, TSource, TCollection, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, int, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-        where TEnumerator2 : struct, IValueEnumerator<TCollection>
+            where TEnumerator2 : struct, IValueEnumerator<TCollection>
 #if NET9_0_OR_GREATER
-        , allows ref struct
+            , allows ref struct
 #endif
             => new(new(source.Enumerator, collectionSelector, resultSelector));
     }
@@ -57,7 +57,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SelectMany<TEnumerator, TEnumerator2, TSource, TResult>(in TEnumerator source, Func<TSource, ValueEnumerable<TEnumerator2, TResult>> selector)
+    struct SelectMany<TEnumerator, TEnumerator2, TSource, TResult>(TEnumerator source, Func<TSource, ValueEnumerable<TEnumerator2, TResult>> selector)
         : IValueEnumerator<TResult>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -128,7 +128,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SelectMany2<TEnumerator, TEnumerator2, TSource, TResult>(in TEnumerator source, Func<TSource, int, ValueEnumerable<TEnumerator2, TResult>> selector)
+    struct SelectMany2<TEnumerator, TEnumerator2, TSource, TResult>(TEnumerator source, Func<TSource, int, ValueEnumerable<TEnumerator2, TResult>> selector)
         : IValueEnumerator<TResult>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -200,7 +200,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SelectMany3<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(in TEnumerator source, Func<TSource, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
+    struct SelectMany3<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(TEnumerator source, Func<TSource, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
         : IValueEnumerator<TResult>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -274,7 +274,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct SelectMany4<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(in TEnumerator source, Func<TSource, int, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
+    struct SelectMany4<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(TEnumerator source, Func<TSource, int, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
         : IValueEnumerator<TResult>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

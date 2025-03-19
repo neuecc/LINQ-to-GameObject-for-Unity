@@ -8,7 +8,7 @@ namespace ZLinq;
 
 partial class ValueEnumerableExtensions
 {
-    public static double Average<TEnumerator, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TResult> selector)
+    public static double Average<TEnumerator, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TResult> selector)
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -21,7 +21,7 @@ partial class ValueEnumerableExtensions
         return source.Select(selector).Average();
     }
 
-    public static double? Average<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, Nullable<TSource>> source)
+    public static double? Average<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, Nullable<TSource>> source)
         where TEnumerator : struct, IValueEnumerator<Nullable<TSource>>
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -432,7 +432,7 @@ partial class ValueEnumerableExtensions
 #endif
     }
 
-    public static double Average<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+    public static double Average<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -752,7 +752,7 @@ partial class ValueEnumerableExtensions
 
 #if NET8_0_OR_GREATER
 
-    public static double AverageIntSimd(ReadOnlySpan<int> span)
+    static double AverageIntSimd(ReadOnlySpan<int> span)
     {
         // based on SimdSumNumberUnchecked<T>
         // int[int.MaxValue] { int.MaxValue... }.Sum() is lower than long.MaxValue

@@ -2,7 +2,7 @@
 
 partial class ValueEnumerableExtensions
 {
-    public static void CopyTo<TEnumerator, T>(in this ValueEnumerable<TEnumerator, T> source, List<T> list)
+    public static void CopyTo<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> source, List<T> list)
         where TEnumerator : struct, IValueEnumerator<T>
 #if NET9_0_OR_GREATER
     , allows ref struct
@@ -100,7 +100,7 @@ partial class ValueEnumerableExtensions
         }
     }
 
-    public static int CopyTo<TEnumerator, T>(in this ValueEnumerable<TEnumerator, T> source, Span<T> dest)
+    public static int CopyTo<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> source, Span<T> dest)
         where TEnumerator : struct, IValueEnumerator<T>
 #if NET9_0_OR_GREATER
     , allows ref struct

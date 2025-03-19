@@ -62,7 +62,7 @@ public class RangeTest
     public void ForEach()
     {
         var e = Enumerable.Range(1, 100).GetEnumerator();
-        foreach (var item in ValueEnumerable.Range(1, 100))
+        foreach (var item ValueEnumerable.Range(1, 100))
         {
             e.MoveNext();
             item.ShouldBe(e.Current);

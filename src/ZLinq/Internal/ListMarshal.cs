@@ -15,12 +15,11 @@ internal static class ListMarshal
         return list;
     }
 
-#pragma warning disable CS8618
+#pragma warning disable
     internal class ListView<T>
     {
         public T[] _items;
         public int _size;
         public int _version;
     }
-#pragma warning restore CS8618
 }

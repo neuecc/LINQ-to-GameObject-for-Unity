@@ -12,7 +12,7 @@ public class Empty
     public void ForEach()
     {
         var e = Enumerable.Empty<int>().GetEnumerator();
-        foreach (var item in ValueEnumerable.Empty<int>())
+        foreach (var item ValueEnumerable.Empty<int>())
         {
             e.MoveNext();
             item.ShouldBe(e.Current);

@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileGen", "sandbox\FileGen\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZLinq.Godot", "src\ZLinq.Godot\ZLinq.Godot.csproj", "{672A654D-F698-489F-BC10-7FF0A831D65D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZLinq.DropInGenerator", "src\ZLinq.DropInGenerator\ZLinq.DropInGenerator.csproj", "{D7E3A89C-7FF5-475A-86E0-5C3C70CAFD3F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,6 +70,10 @@ Global
 		{672A654D-F698-489F-BC10-7FF0A831D65D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{672A654D-F698-489F-BC10-7FF0A831D65D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{672A654D-F698-489F-BC10-7FF0A831D65D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7E3A89C-7FF5-475A-86E0-5C3C70CAFD3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7E3A89C-7FF5-475A-86E0-5C3C70CAFD3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7E3A89C-7FF5-475A-86E0-5C3C70CAFD3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7E3A89C-7FF5-475A-86E0-5C3C70CAFD3F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +88,7 @@ Global
 		{1B36B6F5-A573-406D-981A-7CCBA652E617} = {F462254E-52F2-4CA2-8518-583E60F81452}
 		{873D634E-DA03-411C-AFED-F2651E7B749B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{672A654D-F698-489F-BC10-7FF0A831D65D} = {F462254E-52F2-4CA2-8518-583E60F81452}
+		{D7E3A89C-7FF5-475A-86E0-5C3C70CAFD3F} = {F462254E-52F2-4CA2-8518-583E60F81452}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2FFC585D-0FDF-489B-87D0-AB1122FD8C51}

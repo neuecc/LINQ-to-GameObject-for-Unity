@@ -1,4 +1,5 @@
 ﻿using System;
+using ZLinq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -76,11 +77,11 @@ public partial class Commands
 
             var t = methodInfo.GetParameters()[0].ParameterType.GetGenericArguments()[0]; // this IEnumerable<T> source's T
             var enumerableType = $"{className}ValueEnumerable{suffix}";
-            var baseGenericArguments = string.Join(", ", methodInfo.GetGenericArguments().Select(x => x.Name));
+            var baseGenericArguments = string.Join(", ", methodInfo.GetGenericArguments().Select(x => x.Name).ToArray());
             var genericArguments = "TEnumerator" + (baseGenericArguments == "" ? "" : $", {baseGenericArguments}");
-            var baseParameters = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{FormatType(x.ParameterType)} {x.Name}")); // skip TSource source
+            var baseParameters = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{FormatType(x.ParameterType)} {x.Name}").ToArray()); // skip TSource source
             var parameters = "TEnumerator source" + (baseParameters == "" ? "" : $", {baseParameters}");
-            var baseParameterNames = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{x.Name}"));
+            var baseParameterNames = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{x.Name}").ToArray());
             var parameterNames = "source" + (baseParameterNames == "" ? "" : $", {baseParameterNames}");
             var enumerableElementType = methodInfo.ReturnType.GetGenericArguments()[0].Name;
 
@@ -232,9 +233,9 @@ public partial class Commands
 
             var t = methodInfo.GetParameters()[0].ParameterType.GetGenericArguments()[0]; // this IEnumerable<T> source's T
                                                                                           // var enumerableType = $"{className}ValueEnumerable{suffix}";
-            var baseGenericArguments = string.Join(", ", methodInfo.GetGenericArguments().Select(x => x.Name));
+            var baseGenericArguments = string.Join(", ", methodInfo.GetGenericArguments().Select(x => x.Name).ToArray());
             var genericArguments = "TEnumerator" + (baseGenericArguments == "" ? "" : $", {baseGenericArguments}");
-            var baseParameters = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{FormatType(x.ParameterType)} {x.Name}")); // skip TSource source
+            var baseParameters = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{FormatType(x.ParameterType)} {x.Name}").ToArray()); // skip TSource source
             var parameters = "TEnumerator source" + (baseParameters == "" ? "" : $", {baseParameters}");
             //var baseParameterNames = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{x.Name}"));
             //var parameterNames = "source" + (baseParameterNames == "" ? "" : $", {baseParameterNames}");
@@ -299,7 +300,7 @@ public partial class Commands
 
         var genericName = type.GetGenericTypeDefinition().Name.Split('`')[0];
         var typeArguments = type.GetGenericArguments();
-        var arguments = string.Join(", ", typeArguments.Select(t => FormatType(t)));
+        var arguments = string.Join(", ", typeArguments.Select(t => FormatType(t)).ToArray());
 
         return $"{genericName}<{arguments}>";
     }
