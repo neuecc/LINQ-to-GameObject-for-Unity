@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static TSource ElementAt<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Int32 index)
+        public static TSource ElementAt<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Int32 index)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -22,7 +22,7 @@
         }
 
 
-        public static TSource ElementAt<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Index index)
+        public static TSource ElementAt<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Index index)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -41,7 +41,7 @@
             }
         }
 
-        public static TSource ElementAtOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Int32 index)
+        public static TSource ElementAtOrDefault<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Int32 index)
           where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -60,7 +60,7 @@
             }
         }
 
-        public static TSource ElementAtOrDefault<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Index index)
+        public static TSource ElementAtOrDefault<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Index index)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct

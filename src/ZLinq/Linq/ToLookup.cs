@@ -6,7 +6,7 @@ namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static ILookup<TKey, TSource> ToLookup<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
+        public static ILookup<TKey, TSource> ToLookup<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -15,7 +15,7 @@ namespace ZLinq
             return ToLookup(source, keySelector, null);
         }
 
-        public static ILookup<TKey, TSource> ToLookup<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
+        public static ILookup<TKey, TSource> ToLookup<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -43,7 +43,7 @@ namespace ZLinq
             }
         }
 
-        public static ILookup<TKey, TElement> ToLookup<TEnumerator, TSource, TKey, TElement>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
+        public static ILookup<TKey, TElement> ToLookup<TEnumerator, TSource, TKey, TElement>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -52,7 +52,7 @@ namespace ZLinq
             return ToLookup(source, keySelector, elementSelector, null!);
         }
 
-        public static ILookup<TKey, TElement> ToLookup<TEnumerator, TSource, TKey, TElement>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
+        public static ILookup<TKey, TElement> ToLookup<TEnumerator, TSource, TKey, TElement>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct

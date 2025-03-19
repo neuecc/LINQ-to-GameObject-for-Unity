@@ -1,24 +1,29 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 
 namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<Select<TEnumerator, TSource, TResult>, TResult> Select<TEnumerator, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TResult> selector)
+        public static ValueEnumerable<Select<TEnumerator, TSource, TResult>, TResult> Select<TEnumerator, TSource, TResult>(
+
+#if NET9_0_OR_GREATER
+#endif
+         this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TResult> selector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(new(source.Enumerator, selector));
 
-        public static ValueEnumerable<Select2<TEnumerator, TSource, TResult>, TResult> Select<TEnumerator, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Int32, TResult> selector)
+        public static ValueEnumerable<Select2<TEnumerator, TSource, TResult>, TResult> Select<TEnumerator, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Int32, TResult> selector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(new(source.Enumerator, selector));
 
-        public static ValueEnumerable<SelectWhere<TEnumerator, TSource, TResult>, TResult> Where<TEnumerator, TSource, TResult>(in this ValueEnumerable<Select<TEnumerator, TSource, TResult>, TResult> source, Func<TResult, bool> predicate)
+        public static ValueEnumerable<SelectWhere<TEnumerator, TSource, TResult>, TResult> Where<TEnumerator, TSource, TResult>(this ValueEnumerable<Select<TEnumerator, TSource, TResult>, TResult> source, Func<TResult, bool> predicate)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -36,7 +41,11 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Select<TEnumerator, TSource, TResult>(in TEnumerator source, Func<TSource, TResult> selector)
+    struct Select<TEnumerator, TSource, TResult>(
+#if NET9_0_OR_GREATER
+         // [UnscopedRef]
+#endif
+         TEnumerator source, Func<TSource, TResult> selector)
         : IValueEnumerator<TResult>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -87,7 +96,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Select2<TEnumerator, TSource, TResult>(in TEnumerator source, Func<TSource, Int32, TResult> selector)
+    struct Select2<TEnumerator, TSource, TResult>(TEnumerator source, Func<TSource, Int32, TResult> selector)
         : IValueEnumerator<TResult>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

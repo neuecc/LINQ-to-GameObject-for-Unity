@@ -2,7 +2,7 @@
 
 partial class ValueEnumerableExtensions
 {
-    public static TSource Aggregate<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TSource, TSource> func)
+    public static TSource Aggregate<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TSource, TSource> func)
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -42,7 +42,7 @@ partial class ValueEnumerableExtensions
         }
     }
 
-    public static TAccumulate Aggregate<TEnumerator, TSource, TAccumulate>(in this ValueEnumerable<TEnumerator, TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func)
+    public static TAccumulate Aggregate<TEnumerator, TSource, TAccumulate>(this ValueEnumerable<TEnumerator, TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func)
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -74,7 +74,7 @@ partial class ValueEnumerableExtensions
         }
     }
 
-    public static TResult Aggregate<TEnumerator, TSource, TAccumulate, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, Func<TAccumulate, TResult> resultSelector)
+    public static TResult Aggregate<TEnumerator, TSource, TAccumulate, TResult>(this ValueEnumerable<TEnumerator, TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, Func<TAccumulate, TResult> resultSelector)
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct

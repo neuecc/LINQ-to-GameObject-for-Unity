@@ -5,7 +5,7 @@ namespace ZLinq;
 
 partial class ValueEnumerableExtensions
 {
-    public static TResult? Min<TEnumerator, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TResult> selector)
+    public static TResult? Min<TEnumerator, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TResult> selector)
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -16,7 +16,7 @@ partial class ValueEnumerableExtensions
         return source.Select(selector).Min();
     }
 
-    public static TSource? Min<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+    public static TSource? Min<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -25,7 +25,7 @@ partial class ValueEnumerableExtensions
         return Min<TEnumerator, TSource>(source, null);
     }
 
-    public static TSource? Min<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IComparer<TSource>? comparer)
+    public static TSource? Min<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, IComparer<TSource>? comparer)
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct

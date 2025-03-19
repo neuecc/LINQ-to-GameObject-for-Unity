@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static List<TSource> ToList<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        public static List<TSource> ToList<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct

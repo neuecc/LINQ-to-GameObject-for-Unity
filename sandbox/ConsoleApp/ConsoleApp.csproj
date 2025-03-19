@@ -6,9 +6,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+
+    
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\ZLinq.DropInGenerator\ZLinq.DropInGenerator.csproj">
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\ZLinq.FileSystem\ZLinq.FileSystem.csproj" />
     <ProjectReference Include="..\..\src\ZLinq.Json\ZLinq.Json.csproj" />
     <ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />

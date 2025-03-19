@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Dictionary<TKey, TValue> ToDictionary<TEnumerator, TKey, TValue>(in this ValueEnumerable<TEnumerator, KeyValuePair<TKey, TValue>> source)
+        public static Dictionary<TKey, TValue> ToDictionary<TEnumerator, TKey, TValue>(this ValueEnumerable<TEnumerator, KeyValuePair<TKey, TValue>> source)
             where TKey : notnull
             where TEnumerator : struct, IValueEnumerator<KeyValuePair<TKey, TValue>>
 #if NET9_0_OR_GREATER
@@ -12,7 +12,7 @@
             return ToDictionary(source, null);
         }
 
-        public static Dictionary<TKey, TValue> ToDictionary<TEnumerator, TKey, TValue>(in this ValueEnumerable<TEnumerator, KeyValuePair<TKey, TValue>> source, IEqualityComparer<TKey>? comparer)
+        public static Dictionary<TKey, TValue> ToDictionary<TEnumerator, TKey, TValue>(this ValueEnumerable<TEnumerator, KeyValuePair<TKey, TValue>> source, IEqualityComparer<TKey>? comparer)
             where TKey : notnull
             where TEnumerator : struct, IValueEnumerator<KeyValuePair<TKey, TValue>>
 #if NET9_0_OR_GREATER
@@ -42,7 +42,7 @@
             }
         }
 
-        public static Dictionary<TKey, TSource> ToDictionary<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
+        public static Dictionary<TKey, TSource> ToDictionary<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
             where TKey : notnull
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -52,7 +52,7 @@
             return ToDictionary(source, keySelector, null);
         }
 
-        public static Dictionary<TKey, TSource> ToDictionary<TEnumerator, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
+        public static Dictionary<TKey, TSource> ToDictionary<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
             where TKey : notnull
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -82,7 +82,7 @@
             }
         }
 
-        public static Dictionary<TKey, TElement> ToDictionary<TEnumerator, TSource, TKey, TElement>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
+        public static Dictionary<TKey, TElement> ToDictionary<TEnumerator, TSource, TKey, TElement>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
             where TKey : notnull
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -92,7 +92,7 @@
             return ToDictionary(source, keySelector, elementSelector, null!);
         }
 
-        public static Dictionary<TKey, TElement> ToDictionary<TEnumerator, TSource, TKey, TElement>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
+        public static Dictionary<TKey, TElement> ToDictionary<TEnumerator, TSource, TKey, TElement>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer)
             where TKey : notnull
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

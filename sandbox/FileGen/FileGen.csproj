@@ -15,4 +15,12 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DropIn\" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>13</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AnalyzerLanguage>cs</AnalyzerLanguage>
+    <Nullable>enable</Nullable>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <IncludeSymbols>false</IncludeSymbols>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <IsRoslynComponent>true</IsRoslynComponent>
+
+    <DefineConstants>SOURCE_GENERATOR</DefineConstants>
+
+    <!-- NuGet Packaging -->
+    <PackageTags>linq</PackageTags>
+    <Description>DropIn replacement Source Generator for ZLinq.</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(TargetFramework.StartsWith(`netstandard`))">
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../Icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\sandbox\FileGen\DropIn\**\*.cs" LinkBase="ResourceCodes" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\ZLinq\ZLinqDropInAttribute.cs" Link="ZLinqDropInAttribute.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- https://learn.microsoft.com/en-us/visualstudio/extensibility/roslyn-version-support?view=vs-2022 -->
+    <!-- require to support SyntaxValueProvider.ForAttributeWithMetadataName(Roslyn 4.3.0, VS2022 17.3) -->
+    <!-- Unity 2022.3.12f1 or newer supports 4.3.0 -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="PolySharp" Version="1.15.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

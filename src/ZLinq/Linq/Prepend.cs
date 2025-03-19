@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<Prepend<TEnumerator, TSource>, TSource> Prepend<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, TSource element)
+        public static ValueEnumerable<Prepend<TEnumerator, TSource>, TSource> Prepend<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, TSource element)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -21,7 +21,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Prepend<TEnumerator, TSource>(in TEnumerator source, TSource element)
+    struct Prepend<TEnumerator, TSource>(TEnumerator source, TSource element)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<Concat<TEnumerator1, TEnumerator2, TSource>, TSource> Concat<TEnumerator1, TEnumerator2, TSource>(in this ValueEnumerable<TEnumerator1, TSource> source, in ValueEnumerable<TEnumerator2, TSource> second)
+        public static ValueEnumerable<Concat<TEnumerator1, TEnumerator2, TSource>, TSource> Concat<TEnumerator1, TEnumerator2, TSource>(this ValueEnumerable<TEnumerator1, TSource> source, ValueEnumerable<TEnumerator2, TSource> second)
             where TEnumerator1 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -24,7 +24,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Concat<TEnumerator1, TEnumerator2, TSource>(in TEnumerator1 first, in TEnumerator2 second)
+    struct Concat<TEnumerator1, TEnumerator2, TSource>(TEnumerator1 first, TEnumerator2 second)
         : IValueEnumerator<TSource>
         where TEnumerator1 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

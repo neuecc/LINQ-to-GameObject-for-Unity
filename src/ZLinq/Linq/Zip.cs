@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<Zip<TEnumerator, TEnumerator2, TFirst, TSecond>, (TFirst First, TSecond Second)> Zip<TEnumerator, TEnumerator2, TFirst, TSecond>(in this ValueEnumerable<TEnumerator, TFirst> source, in ValueEnumerable<TEnumerator2, TSecond> second)
+        public static ValueEnumerable<Zip<TEnumerator, TEnumerator2, TFirst, TSecond>, (TFirst First, TSecond Second)> Zip<TEnumerator, TEnumerator2, TFirst, TSecond>(this ValueEnumerable<TEnumerator, TFirst> source, ValueEnumerable<TEnumerator2, TSecond> second)
             where TEnumerator : struct, IValueEnumerator<TFirst>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -13,7 +13,7 @@
 #endif
             => new(new(source.Enumerator, second.Enumerator));
 
-        public static ValueEnumerable<Zip<TEnumerator, TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>, (TFirst First, TSecond Second, TThird Third)> Zip<TEnumerator, TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>(in this ValueEnumerable<TEnumerator, TFirst> source, in ValueEnumerable<TEnumerator2, TSecond> second, in ValueEnumerable<TEnumerator3, TThird> third)
+        public static ValueEnumerable<Zip<TEnumerator, TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>, (TFirst First, TSecond Second, TThird Third)> Zip<TEnumerator, TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>(this ValueEnumerable<TEnumerator, TFirst> source, ValueEnumerable<TEnumerator2, TSecond> second, ValueEnumerable<TEnumerator3, TThird> third)
             where TEnumerator : struct, IValueEnumerator<TFirst>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@
 #endif
             => new(new(source.Enumerator, second.Enumerator, third.Enumerator));
 
-        public static ValueEnumerable<Zip<TEnumerator, TEnumerator2, TFirst, TSecond, TResult>, TResult> Zip<TEnumerator, TEnumerator2, TFirst, TSecond, TResult>(in this ValueEnumerable<TEnumerator, TFirst> source, in ValueEnumerable<TEnumerator2, TSecond> second, Func<TFirst, TSecond, TResult> resultSelector)
+        public static ValueEnumerable<Zip<TEnumerator, TEnumerator2, TFirst, TSecond, TResult>, TResult> Zip<TEnumerator, TEnumerator2, TFirst, TSecond, TResult>(this ValueEnumerable<TEnumerator, TFirst> source, ValueEnumerable<TEnumerator2, TSecond> second, Func<TFirst, TSecond, TResult> resultSelector)
             where TEnumerator : struct, IValueEnumerator<TFirst>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -50,7 +50,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Zip<TEnumerator, TEnumerator2, TFirst, TSecond>(in TEnumerator source, in TEnumerator2 second)
+    struct Zip<TEnumerator, TEnumerator2, TFirst, TSecond>(TEnumerator source, TEnumerator2 second)
         : IValueEnumerator<(TFirst First, TSecond Second)>
             where TEnumerator : struct, IValueEnumerator<TFirst>
 #if NET9_0_OR_GREATER
@@ -111,7 +111,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Zip<TEnumerator, TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>(in TEnumerator source, in TEnumerator2 second, in TEnumerator3 third)
+    struct Zip<TEnumerator, TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>(TEnumerator source, TEnumerator2 second, TEnumerator3 third)
         : IValueEnumerator<(TFirst First, TSecond Second, TThird Third)>
             where TEnumerator : struct, IValueEnumerator<TFirst>
 #if NET9_0_OR_GREATER
@@ -178,7 +178,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Zip<TEnumerator, TEnumerator2, TFirst, TSecond, TResult>(in TEnumerator source, in TEnumerator2 second, Func<TFirst, TSecond, TResult> resultSelector)
+    struct Zip<TEnumerator, TEnumerator2, TFirst, TSecond, TResult>(TEnumerator source, TEnumerator2 second, Func<TFirst, TSecond, TResult> resultSelector)
         : IValueEnumerator<TResult>
             where TEnumerator : struct, IValueEnumerator<TFirst>
 #if NET9_0_OR_GREATER

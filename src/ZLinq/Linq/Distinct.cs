@@ -2,14 +2,14 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<Distinct<TEnumerator, TSource>, TSource> Distinct<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        public static ValueEnumerable<Distinct<TEnumerator, TSource>, TSource> Distinct<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(new(source.Enumerator, null!));
 
-        public static ValueEnumerable<Distinct<TEnumerator, TSource>, TSource> Distinct<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, IEqualityComparer<TSource>? comparer)
+        public static ValueEnumerable<Distinct<TEnumerator, TSource>, TSource> Distinct<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, IEqualityComparer<TSource>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -28,7 +28,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Distinct<TEnumerator, TSource>(in TEnumerator source, IEqualityComparer<TSource>? comparer)
+    struct Distinct<TEnumerator, TSource>(TEnumerator source, IEqualityComparer<TSource>? comparer)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<IntersectBy<TEnumerator, TEnumerator2, TSource, TKey>, TSource> IntersectBy<TEnumerator, TEnumerator2, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, in ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector)
+        public static ValueEnumerable<IntersectBy<TEnumerator, TEnumerator2, TSource, TKey>, TSource> IntersectBy<TEnumerator, TEnumerator2, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -13,7 +13,7 @@
 #endif
             => new(new(source.Enumerator, second, keySelector, null));
 
-        public static ValueEnumerable<IntersectBy<TEnumerator, TEnumerator2, TSource, TKey>, TSource> IntersectBy<TEnumerator, TEnumerator2, TSource, TKey>(in this ValueEnumerable<TEnumerator, TSource> source, in ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
+        public static ValueEnumerable<IntersectBy<TEnumerator, TEnumerator2, TSource, TKey>, TSource> IntersectBy<TEnumerator, TEnumerator2, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -36,7 +36,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct IntersectBy<TEnumerator, TEnumerator2, TSource, TKey>(in TEnumerator source, in ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
+    struct IntersectBy<TEnumerator, TEnumerator2, TSource, TKey>(TEnumerator source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

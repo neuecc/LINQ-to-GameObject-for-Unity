@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<OfType<TEnumerator, TSource, TResult>, TResult> OfType<TEnumerator, TSource, TResult>(in this ValueEnumerable<TEnumerator, TSource> source, TResult typeHint)
+        public static ValueEnumerable<OfType<TEnumerator, TSource, TResult>, TResult> OfType<TEnumerator, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, TResult typeHint)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -20,7 +20,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct OfType<TEnumerator, TSource, TResult>(in TEnumerator source)
+    struct OfType<TEnumerator, TSource, TResult>(TEnumerator source)
         : IValueEnumerator<TResult>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

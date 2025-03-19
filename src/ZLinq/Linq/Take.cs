@@ -4,14 +4,14 @@ namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<Take<TEnumerator, TSource>, TSource> Take<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Int32 count)
+        public static ValueEnumerable<Take<TEnumerator, TSource>, TSource> Take<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Int32 count)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(new(source.Enumerator, count));
 
-        public static ValueEnumerable<TakeRange<TEnumerator, TSource>, TSource> Take<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Range range)
+        public static ValueEnumerable<TakeRange<TEnumerator, TSource>, TSource> Take<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Range range)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -29,7 +29,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct Take<TEnumerator, TSource>(in TEnumerator source, Int32 count)
+    struct Take<TEnumerator, TSource>(TEnumerator source, Int32 count)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -114,7 +114,7 @@ namespace ZLinq.Linq
         readonly int fromEndQueueCount; // 0 is not use q
         Queue<TSource>? q;
 
-        public TakeRange(in TEnumerator source, Range range)
+        public TakeRange(TEnumerator source, Range range)
         {
             // initialize before run.
             this.source = source;

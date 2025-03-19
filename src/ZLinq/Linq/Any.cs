@@ -2,7 +2,7 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static Boolean Any<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source)
+        public static Boolean Any<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -19,7 +19,7 @@
             }
         }
 
-        public static Boolean Any<TEnumerator, TSource>(in this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
+        public static Boolean Any<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Boolean> predicate)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
