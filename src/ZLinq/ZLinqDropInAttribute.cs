@@ -1,12 +1,11 @@
 ﻿namespace ZLinq;
 
-[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false, Inherited = false)]
 #if SOURCE_GENERATOR
-internal
+internal record ZLinqDropInAttribute
 #else
-public
+[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false, Inherited = false)]
+public sealed class ZLinqDropInAttribute : Attribute
 #endif
-sealed class ZLinqDropInAttribute : Attribute
 {
     /// <summary>
     /// Gets the namespace where the generated LINQ implementations will be placed.
