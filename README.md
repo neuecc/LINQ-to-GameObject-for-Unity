@@ -124,6 +124,8 @@ For instance, be aware that you cannot store it in fields or pass it as method a
 For example, you cannot pass LINQ operations to `string.Join`. 
 In such cases, you need to use `ToArray` (if you want to minimize allocations, you can use `ToArrayPool` and return it to the Pool after the Join operation).
 
+> I recommend considering `Everything` to have too strong of side effects, so it would be better to try using namespaces and `DropInGenerateTypes.Collection`.
+
 Other options for `ZLinqDropInAttribute` include `GenerateAsPublic`, `ConditionalCompilationSymbols`, and `DisableEmitSource`.
 
 LINQ to Tree
