@@ -141,7 +141,11 @@ namespace ZLinq.Linq
     {
         TEnumerator source = source;
 
-        public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            count = default;
+            return false;
+        }
 
         public bool TryGetSpan(out ReadOnlySpan<TResult> span)
         {
