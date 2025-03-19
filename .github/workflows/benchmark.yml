@@ -1,0 +1,37 @@
+name: Benchmark
+
+on:
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60 # Default: 360 minutes
+    strategy:
+      fail-fast: true
+    steps:
+      - uses: Cysharp/Actions/.github/actions/checkout@main
+      - uses: Cysharp/Actions/.github/actions/setup-dotnet@main
+      - run: dotnet build -c Release
+
+      - name: Run Benchmarks
+        working-directory: sandbox/Benchmark
+        run: |
+          dotnet run -c Release --no-build --no-launch-profile -- --filter "*" --logBuildOutput BenchmarkDotNet.Artifacts --exporters GitHub
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 #v4.6.1
+        with:
+          name: BenchmarkDotNet.Artifacts
+          path: sandbox/Benchmark/BenchmarkDotNet.Artifacts/
+          if-no-files-found: error
+
+      - name: Output results to JobSummary
+        working-directory: sandbox/Benchmark
+        shell: pwsh
+        run: |
+          $items = Get-ChildItem "BenchmarkDotNet.Artifacts/results/*.md"
+          foreach($item in $items) {
+            Write-Output ('## {0}' -f $item.Name)          >> $env:GITHUB_STEP_SUMMARY
+            Write-Output (Get-Content $item.FullName -Raw) >> $env:GITHUB_STEP_SUMMARY
+          }
