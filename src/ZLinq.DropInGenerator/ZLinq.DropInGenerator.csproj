@@ -25,13 +25,12 @@
 
   <ItemGroup>
     <None Include="../../Icon.png" Pack="true" PackagePath="/" />
+    <!-- Create nuget package as analyzer -->
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="..\..\sandbox\FileGen\DropIn\**\*.cs" LinkBase="ResourceCodes" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Include="..\ZLinq\ZLinqDropInAttribute.cs" Link="ZLinqDropInAttribute.cs" />
   </ItemGroup>
 
