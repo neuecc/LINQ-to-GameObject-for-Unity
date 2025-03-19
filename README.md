@@ -90,6 +90,8 @@ When introducing `ZLinq.DropInGenerator`, you can automatically use ZLinq for al
 dotnet add package ZLinq.DropInGenerator
 ```
 
+![](Images/dropin.jpg)
+
 It works by using a Source Generator to add extension methods for each type that take priority, making `ZLinq` methods be selected instead of System.Linq when the same name and arguments are used. 
 After installing the package, you need to configure it with an assembly attribute.
 
