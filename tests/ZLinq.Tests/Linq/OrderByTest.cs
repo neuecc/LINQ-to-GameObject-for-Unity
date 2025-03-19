@@ -328,6 +328,45 @@ public class OrderByTest
 
         destination.ToArray().ShouldBe(new[] { 1, 2, 5, 8, 9 });
     }
+
+    // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Linq/tests/ThenByDescendingTests.cs#L92-L106
+    [Fact]
+    public void OrderIsStable()
+    {
+        var source = @"Because I could not stop for Death -
+He kindly stopped for me -
+The Carriage held but just Ourselves -
+And Immortality.".Split([' ', '\n', '\r', '-'], StringSplitOptions.RemoveEmptyEntries);
+
+        {
+            // LINQ
+            var results1 = source.OrderBy(word => char.IsUpper(word[0]))
+                                 .ThenByDescending(word => word.Length)
+                                 .ToArray();
+
+            // ZLinq
+            var results2 = source.AsValueEnumerable()
+                                 .OrderBy(word => char.IsUpper(word[0]))
+                                 .ThenByDescending(word => word.Length)
+                                 .ToArray();
+
+            Assert.Equal(results1, results2);
+        }
+        {
+            // LINQ
+            var results1 = source.OrderBy(word => char.IsUpper(word[0]))
+                                 .ThenBy(word => word.Length)
+                                 .ToArray();
+
+            // ZLinq
+            var results2 = source.AsValueEnumerable()
+                                 .OrderBy(word => char.IsUpper(word[0]))
+                                 .ThenBy(word => word.Length)
+                                 .ToArray();
+
+            Assert.Equal(results1, results2);
+        }
+    }
 }
 
 public class Person

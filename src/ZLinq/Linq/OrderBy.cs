@@ -303,14 +303,7 @@ namespace ZLinq.Linq
 
             // finally compare index to ensure stable sort
             if (index1 == index2) return 0;
-            if (descending)
-            {
-                return (index1 > index2) ? -1 : 1;
-            }
-            else
-            {
-                return (index1 > index2) ? 1 : -1;
-            }
+            return (index1 < index2) ? -1 : 1;
         }
 
         public void Dispose()
