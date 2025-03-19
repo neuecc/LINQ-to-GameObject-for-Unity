@@ -56,13 +56,19 @@ public class RangeTest
         TestUtil.Throws<ArgumentOutOfRangeException>(
             () => Enumerable.Range(100, int.MaxValue - 50),
             () => ValueEnumerable.Range(100, int.MaxValue - 50));
+
+        var xs = new int[] { 1, 2, 3, 4, 5 };
+        foreach (var item in xs.AsValueEnumerable())
+        {
+            Console.WriteLine(item);
+        }
     }
 
     [Fact]
     public void ForEach()
     {
         var e = Enumerable.Range(1, 100).GetEnumerator();
-        foreach (var item ValueEnumerable.Range(1, 100))
+        foreach (var item in ValueEnumerable.Range(1, 100))
         {
             e.MoveNext();
             item.ShouldBe(e.Current);
