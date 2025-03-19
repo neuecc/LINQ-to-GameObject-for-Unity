@@ -86,7 +86,9 @@ Drop-in replacement
 ---
 When introducing `ZLinq.DropInGenerator`, you can automatically use ZLinq for all LINQ methods without calling `AsValueEnumerable()`.
 
-> dotnet add ZLinq.DropInGenerator
+```bash
+dotnet add package ZLinq.DropInGenerator
+```
 
 It works by using a Source Generator to add extension methods for each type that take priority, making `ZLinq` methods be selected instead of System.Linq when the same name and arguments are used. 
 After installing the package, you need to configure it with an assembly attribute.
