@@ -23,6 +23,7 @@ foreach (var item in seq) { }
 * Full support for LINQ operations on **Span** using .NET 9/C# 13's `allows ref struct`
 * **LINQ to Tree** to extend tree-structured objects (built-in support for FileSystem, JSON, GameObject)
 * Automatic application of SIMD where possible and customizable **LINQ to SIMD** for arbitrary operations
+* Optional **Drop-in replacement** Source Generator to automatically accelerate all LINQ methods
 * Fusion of my past LINQ ([linq.js](https://github.com/neuecc/linq.js/), [SimdLinq](https://github.com/Cysharp/SimdLinq/), [UniRx](https://github.com/neuecc/UniRx), [R3](https://github.com/Cysharp/R3)) and zero alloc  ([ZString](https://github.com/Cysharp/ZString), [ZLogger](https://github.com/Cysharp/ZLogger)) impls
 
 I aimed to create not just an experimental library but a practical one. It's also designed to handle high-load requirements, such as those found in games.
@@ -80,6 +81,46 @@ var seq1 = source.AsValueEnumerable().Where(x => x % 2 == 0);
 Span<int> span = stackalloc int[5] { 1, 2, 3, 4, 5 };
 var seq2 = span.AsValueEnumerable().Select(x => x * x);
 ```
+
+Drop-in replacement
+---
+When introducing `ZLinq.DropInGenerator`, you can automatically use ZLinq for all LINQ methods without calling `AsValueEnumerable()`.
+
+> dotnet add ZLinq.DropInGenerator
+
+It works by using a Source Generator to add extension methods for each type that take priority, making `ZLinq` methods be selected instead of System.Linq when the same name and arguments are used. 
+After installing the package, you need to configure it with an assembly attribute.
+
+```csharp
+[assembly: ZLinq.ZLinqDropInAttribute("ZLinq.DropIn", ZLinq.DropInGenerateTypes.Array)]
+```
+
+`generateNamespace` is the namespace for the generated code, and `DropInGenerateTypes` selects the target types. 
+`DropInGenerateTypes` allows you to choose from `Array`, `Span` (Span/ReadOnlySpan), `Memory` (Memory/ReadOnlyMemory), `List`, and `Enumerable` (IEnumerable). 
+These are Flags, so you can combine them, such as `DropInGenerateTypes.Array | DropInGenerateTypes.Span`. 
+There are also predefined combinations: `Collection = Array | Span | Memory | List` and `Everything = Array | Span | Memory | List | Enumerable`.
+
+You can enable it for all files by global using the generated namespace:
+
+```csharp
+global using ZLinq.Dropin;
+```
+
+When using `DropInGenerateTypes.Enumerable`, which generates extension methods for `IEnumerable<T>`, you need to make `generateNamespace` global as a namespace priority. 
+For example:
+
+```csharp
+[assembly: ZLinq.ZLinqDropInAttribute("", ZLinq.DropInGenerateTypes.Everything)]
+```
+
+This is the most aggressive configuration, causing all LINQ methods to be processed by ZLinq, and making it impossible to use normal LINQ methods (if Enumerable is not included, you can call AsEnumerable() to execute with System.Linq).
+
+While ZLinq offers superior performance, there are some differences from System.Linq. 
+For instance, be aware that you cannot store it in fields or pass it as method arguments. 
+For example, you cannot pass LINQ operations to `string.Join`. 
+In such cases, you need to use `ToArray` (if you want to minimize allocations, you can use `ToArrayPool` and return it to the Pool after the Join operation).
+
+Other options for `ZLinqDropInAttribute` include `GenerateAsPublic`, `ConditionalCompilationSymbols`, and `DisableEmitSource`.
 
 LINQ to Tree
 ---
