@@ -21,17 +21,26 @@ using ZLinq.Traversables;
 //byte.MaxValue
 // 2147483647
 
-[assembly: ZLinq.ZLinqDropInAttribute("", ZLinq.DropInGenerateTypes.Everything)]
+[assembly: ZLinq.ZLinqDropInAttribute("", ZLinq.DropInGenerateTypes.Everything, DisableEmitSource = true)]
 
-Enumerable.Range(1, 1000).Where(x => x % 2 == 0).Sum();
+var list = new List<Foo>
+{
+    new Foo() { Value = 1 },
+    new Foo() { Value = 2 },
+    new Foo() { Value = 3 },
+    new Foo() { Value = 4 },
+};
 
+var expectedCount = list.Count(x => x.Value == 1);
+var actualCount = list.AsValueEnumerable().Count(x => x.Value == 1);
 
-var xs = new[] { 1, 10, 100 };
+Console.WriteLine(expectedCount);
+Console.WriteLine(actualCount);
 
-// var foo = xs.;
-
-
-var joe = xs.Where(x => x % 2 == 0).Select(x => x * x);
+public class Foo
+{
+    public int Value;
+}
 
 
 

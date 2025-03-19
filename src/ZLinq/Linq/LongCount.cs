@@ -32,11 +32,6 @@
         {
             using (var enumerator = source.Enumerator)
             {
-                if (enumerator.TryGetNonEnumeratedCount(out var count))
-                {
-                    return count;
-                }
-
                 var longCount = 0L;
                 while (enumerator.TryGetNext(out var current))
                 {
@@ -45,7 +40,7 @@
                         checked { longCount++; }
                     }
                 }
-                return count;
+                return longCount;
             }
         }
 

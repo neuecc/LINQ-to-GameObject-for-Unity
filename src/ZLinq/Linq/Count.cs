@@ -32,12 +32,7 @@
         {
             using (var enumerator = source.Enumerator)
             {
-                if (enumerator.TryGetNonEnumeratedCount(out var count))
-                {
-                    return count;
-                }
-
-                count = 0;
+                var count = 0;
                 while (enumerator.TryGetNext(out var current))
                 {
                     if (predicate(current))
