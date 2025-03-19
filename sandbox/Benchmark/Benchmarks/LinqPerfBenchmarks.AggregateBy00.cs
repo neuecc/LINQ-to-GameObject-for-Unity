@@ -1,10 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ZLinq;
 
 namespace Benchmark;
@@ -16,14 +11,18 @@ public partial class LinqPerfBenchmarks
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class AggregateBy00
     {
-        public const int IterationsAggregateBy00 = 1000000;
+        int IterationsAggregateBy00 = 1000000;
+        List<Product> TestData = default!;
+
+        [GlobalSetup]
+        public void Setup() => TestData = Product.GetProductList();
 
 #if NET9_0_OR_GREATER
         [Benchmark]
         [BenchmarkCategory(Categories.LINQ)]
         public bool Linq_AggregateBy_Sum()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             decimal sum = 0;
             for (int i = 0; i < IterationsAggregateBy00; i++)
             {
@@ -40,7 +39,7 @@ public partial class LinqPerfBenchmarks
         [BenchmarkCategory(Categories.LINQ)]
         public bool Linq_GroupBy_ToDictionary_Sum()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             decimal count = 0;
             for (int i = 0; i < IterationsAggregateBy00; i++)
             {
@@ -53,31 +52,30 @@ public partial class LinqPerfBenchmarks
             return (count == 5 * IterationsAggregateBy00);
         }
 
-        // Note: AsValueEnumerable().AggregatedBy(...).Sum selector is not supported by ZLinq.
-        ////#if NET9_0_OR_GREATER
-        ////        [Benchmark]
-        ////        [BenchmarkCategory(Categories.ZLinq)]
-        ////        public bool ZLinq_AggregateBy_Sum()
-        ////        {
-        ////            List<Product> products = Product.GetProductList();
-        ////            decimal sum = 0;
-        ////            for (int i = 0; i < IterationsAggregateBy00; i++)
-        ////            {
-        ////                sum += products
-        ////                    .AsValueEnumerable()
-        ////                    .AggregateBy(p => p.Category, decimal.Zero, (total, p) => total + p.UnitsInStock * p.UnitPrice)
-        ////                    .Sum(kvp => kvp.Value);
-        ////            }
-        ////
-        ////            return (sum == 5 * IterationsAggregateBy00);
-        ////        }
-        ////#endif
+#if NET9_0_OR_GREATER
+        [Benchmark]
+        [BenchmarkCategory(Categories.ZLinq)]
+        public bool ZLinq_AggregateBy_Sum()
+        {
+            List<Product> products = TestData;
+            decimal sum = 0;
+            for (int i = 0; i < IterationsAggregateBy00; i++)
+            {
+                sum += products
+                    .AsValueEnumerable()
+                    .AggregateBy(p => p.Category, decimal.Zero, (total, p) => total + p.UnitsInStock * p.UnitPrice)
+                    .Sum(kvp => kvp.Value);
+            }
+
+            return (sum == 5 * IterationsAggregateBy00);
+        }
+#endif
 
         [Benchmark]
         [BenchmarkCategory(Categories.ZLinq)]
         public bool ZLinq_GroupBy_ToDictionary_Sum()
         {
-            List<Product> products = Product.GetProductList();
+            List<Product> products = TestData;
             decimal count = 0;
             for (int i = 0; i < IterationsAggregateBy00; i++)
             {
