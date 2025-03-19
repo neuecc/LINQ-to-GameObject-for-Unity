@@ -12,6 +12,8 @@
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <IsRoslynComponent>true</IsRoslynComponent>
 
+    <DefineConstants>SOURCE_GENERATOR</DefineConstants>
+
     <!-- NuGet Packaging -->
     <PackageTags>linq</PackageTags>
     <Description>DropIn replacement Source Generator for ZLinq.</Description>
@@ -27,6 +29,10 @@
 
   <ItemGroup>
     <EmbeddedResource Include="..\..\sandbox\FileGen\DropIn\**\*.cs" LinkBase="ResourceCodes" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\ZLinq\ZLinqDropInAttribute.cs" Link="ZLinqDropInAttribute.cs" />
   </ItemGroup>
 
   <ItemGroup>

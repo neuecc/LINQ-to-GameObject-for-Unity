@@ -1,7 +1,12 @@
 ﻿namespace ZLinq;
 
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false, Inherited = false)]
-public sealed class ZLinqDropInAttribute : Attribute
+#if SOURCE_GENERATOR
+internal
+#else
+public
+#endif
+sealed class ZLinqDropInAttribute : Attribute
 {
     /// <summary>
     /// Gets the namespace where the generated LINQ implementations will be placed.
@@ -47,7 +52,12 @@ public sealed class ZLinqDropInAttribute : Attribute
 }
 
 [Flags]
-public enum DropInGenerateTypes
+#if SOURCE_GENERATOR
+internal
+#else
+public
+#endif
+enum DropInGenerateTypes
 {
     None = 0,
     Array = 1,

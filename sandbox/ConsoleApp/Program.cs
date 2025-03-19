@@ -12,7 +12,6 @@ using ZLinq.Linq;
 using ZLinq.Simd;
 using ZLinq.Traversables;
 
-
 //Span<int> xs = stackalloc int[255];
 
 // caseof bool, char, decimal, nint...
@@ -22,10 +21,9 @@ using ZLinq.Traversables;
 //byte.MaxValue
 // 2147483647
 
-using ZLinq;
-using ZLinq.DroIn;
+[assembly: ZLinq.ZLinqDropInAttribute("", ZLinq.DropInGenerateTypes.Everything)]
 
-[assembly: ZLinq.ZLinqDropIn("ZLinq.DropIn", ZLinq.DropInGenerateTypes.Array)]
+Enumerable.Range(1, 1000).Where(x => x % 2 == 0).Sum();
 
 
 var xs = new[] { 1, 10, 100 };
