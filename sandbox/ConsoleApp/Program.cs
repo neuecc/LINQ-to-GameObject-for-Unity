@@ -22,7 +22,7 @@ using ZLinq.Traversables;
 //byte.MaxValue
 // 2147483647
 
-[assembly: ZLinq.ZLinqDropInAttribute("", ZLinq.DropInGenerateTypes.Everything, DisableEmitSource = true)]
+[assembly: ZLinq.ZLinqDropInAttribute("", ZLinq.DropInGenerateTypes.Everything, DisableEmitSource = false)]
 
 var l = new int[] { 84 }.AsValueEnumerable().Prepend(42).Last();
 Console.WriteLine(l);
