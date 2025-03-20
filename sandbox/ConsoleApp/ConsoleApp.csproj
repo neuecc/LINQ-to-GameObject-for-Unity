@@ -7,8 +7,17 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
 
-    
+
+    <DefineConstants>DIAGHUB_ENABLE_TRACE_SYSTEM</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Benchmark\Benchmarks\LinqPerfBenchmarks.cs" Link="LinqPerfBenchmarks.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.UserMarks" Version="17.13.35606.1" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ZLinq.DropInGenerator\ZLinq.DropInGenerator.csproj">

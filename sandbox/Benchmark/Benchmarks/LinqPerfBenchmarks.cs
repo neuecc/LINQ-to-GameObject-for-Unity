@@ -4,7 +4,7 @@
 // https://github.com/dotnet/performance/blob/main/src/benchmarks/micro/runtime/Linq/Linq.cs
 public partial class LinqPerfBenchmarks
 {
-    private class Product
+    public class Product
     {
         public int ProductID { get; set; }
         public required string ProductName { get; set; }

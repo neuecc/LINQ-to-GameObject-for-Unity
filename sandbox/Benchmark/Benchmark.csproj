@@ -15,6 +15,7 @@
     <PackageReference Include="LinqAF" Version="3.0.0" />
     <PackageReference Include="LinqGen" Version="0.3.1" />
     <PackageReference Include="LinqGen.Generator" Version="0.3.1" />
+    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="17.13.35606.1" />
     <PackageReference Include="StructLinq" Version="0.28.2" />
   </ItemGroup>
 
