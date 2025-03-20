@@ -17,6 +17,10 @@ struct ValueEnumerable<TEnumerator, T>(TEnumerator enumerator)
     // enumerator is struct so it always copied, no need to create new Enumerator.
     // internal operator should use this
     public readonly TEnumerator Enumerator = enumerator;
+
+    // Cast and OfType are implemented as instance methods rather than extension methods to simplify type specification.
+    public ValueEnumerable<Cast<TEnumerator, T, TResult>, TResult> Cast<TResult>() => new(new(Enumerator));
+    public ValueEnumerable<OfType<TEnumerator, T, TResult>, TResult> OfType<TResult>() => new(new(Enumerator));
 }
 
 // all implement types must be struct

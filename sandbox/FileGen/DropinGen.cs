@@ -70,6 +70,7 @@ internal static partial class ZLinqDropInExtensions
                     sb.AppendLine(signature);
                 }
             }
+            sb.AppendLine(BuildCastAndOfTypeSignature(dropinType));
 
             sb.AppendLine("}");
             if (dropinType.Replacement == "FromSpan")
@@ -118,7 +119,7 @@ internal static partial class ZLinqDropInExtensions
         var sourceType = BuildSourceType(methodInfo, dropInType.Name, dropInType.IsArray);
         var constraints = BuildConstraints(methodInfo);
 
-        var signature = $"public static {returnType} {name}<{genericsTypes}>(this {sourceType} source{parameters}){constraints} => source.AsValueEnumerable().{name}({parameterNames});";
+        var signature = $"    public static {returnType} {name}<{genericsTypes}>(this {sourceType} source{parameters}){constraints} => source.AsValueEnumerable().{name}({parameterNames});";
 
         // quick fix
         if (signature.Contains("RightJoin"))
@@ -131,6 +132,19 @@ internal static partial class ZLinqDropInExtensions
         }
 
         return signature;
+    }
+
+    string BuildCastAndOfTypeSignature(DropInType dropInType)
+    {
+        // for nongeneric IEnumerable only
+        if (dropInType.Name != "IEnumerable") return "";
+      
+        var enumeratorType = $"{dropInType.Replacement}<object>";
+
+        return $$"""
+    public static ValueEnumerable<Cast<{{enumeratorType}}, object, TResult>, TResult> Cast<TResult>(this System.Collections.IEnumerable source) => System.Linq.Enumerable.Cast<object>(source).AsValueEnumerable().Cast<TResult>();
+    public static ValueEnumerable<OfType<{{enumeratorType}}, object, TResult>, TResult> OfType<TResult>(this System.Collections.IEnumerable source) => System.Linq.Enumerable.Cast<object>(source).AsValueEnumerable().OfType<TResult>();
+""";
     }
 
     string IsNullableReturnParameter(MethodInfo methodInfo)

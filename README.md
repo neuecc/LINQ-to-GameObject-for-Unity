@@ -167,7 +167,7 @@ var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
 // FileSystemInfo(FileInfo/DirectoryInfo) can call `Ancestors`, `Children`, `Descendants`, `BeforeSelf`, `AfterSelf`
 var allDlls = root
     .Descendants()
-    .OfType(default(FileInfo)!)
+    .OfType<FileInfo>()
     .Where(x => x.Extension == ".dll");
 
 var grouped = allDlls
@@ -242,7 +242,7 @@ var json = JsonNode.Parse("""
 var origin = json!["nesting"]!["level1"]!["level2"]!;
 
 // JsonNode axis, Children, Descendants, Anestors, BeforeSelf, AfterSelf and ***Self.
-foreach (var item in origin.Descendants().Select(x => x.Node).OfType(default(JsonArray)!))
+foreach (var item in origin.Descendants().Select(x => x.Node).OfType<JsoArray>())
 {
     // [true, false, true], ["fast", "accurate", "balanced"], [1, 1, 2, 3, 5, 8, 13]
     Console.WriteLine(item.ToJsonString(JsonSerializerOptions.Web));

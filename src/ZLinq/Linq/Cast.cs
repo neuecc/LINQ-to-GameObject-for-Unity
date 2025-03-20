@@ -2,15 +2,17 @@
 
 namespace ZLinq
 {
-    partial class ValueEnumerableExtensions
-    {
-        public static ValueEnumerable<Cast<TEnumerator, TSource, TResult>, TResult> Cast<TEnumerator, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, TResult typeHint)
-            where TEnumerator : struct, IValueEnumerator<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(new(source.Enumerator));
-    }
+    // Cast has been moved to instance method
+
+    //    partial class ValueEnumerableExtensions
+    //    {
+    //        public static ValueEnumerable<Cast<TEnumerator, TSource, TResult>, TResult> Cast<TEnumerator, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, TResult typeHint)
+    //            where TEnumerator : struct, IValueEnumerator<TSource>
+    //#if NET9_0_OR_GREATER
+    //            , allows ref struct
+    //#endif
+    //            => new(new(source.Enumerator));
+    //    }
 }
 
 namespace ZLinq.Linq

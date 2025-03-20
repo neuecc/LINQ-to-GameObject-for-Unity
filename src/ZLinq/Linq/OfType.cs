@@ -2,12 +2,14 @@
 {
     partial class ValueEnumerableExtensions
     {
-        public static ValueEnumerable<OfType<TEnumerator, TSource, TResult>, TResult> OfType<TEnumerator, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, TResult typeHint)
-            where TEnumerator : struct, IValueEnumerator<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-            => new(new(source.Enumerator));
+        // Cast has been moved to instance method
+
+        //        public static ValueEnumerable<OfType<TEnumerator, TSource, TResult>, TResult> OfType<TEnumerator, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, TResult typeHint)
+        //            where TEnumerator : struct, IValueEnumerator<TSource>
+        //#if NET9_0_OR_GREATER
+        //            , allows ref struct
+        //#endif
+        //            => new(new(source.Enumerator));
     }
 }
 

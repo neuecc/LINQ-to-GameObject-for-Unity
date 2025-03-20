@@ -31,10 +31,6 @@ public static class FileSystemInfoExtensions
     public static ValueEnumerable<BeforeSelf<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> BeforeSelfAndSelf(this FileSystemInfo origin) => origin.AsTraverser().BeforeSelfAndSelf();
     public static ValueEnumerable<AfterSelf<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> AfterSelf(this FileSystemInfo origin) => origin.AsTraverser().AfterSelf();
     public static ValueEnumerable<AfterSelf<FileSystemInfoTraverser, FileSystemInfo>, FileSystemInfo> AfterSelfAndSelf(this FileSystemInfo origin) => origin.AsTraverser().AfterSelfAndSelf();
-
-    // helper for OfType
-
-    // TODO: implement OfFileInfo(), OfDirectoryInfo
 }
 
 [StructLayout(LayoutKind.Auto)]

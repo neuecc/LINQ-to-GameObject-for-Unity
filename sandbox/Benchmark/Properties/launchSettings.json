@@ -2,7 +2,7 @@
   "profiles": {
     "Default": {
       "commandName": "Project",
-      "commandLineArgs": "--filter Benchmark.IterateBenchmark.*",
+      // "commandLineArgs": "--filter Benchmark.IterateBenchmark.*",
 
       // Available benchmarks:
       // "commandLineArgs": "--filter Benchmark.IterateBenchmark.*",
@@ -13,6 +13,7 @@
       // "commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.Order00.*",
       // "commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.Where00.*",
       // "commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.Where01.*",
+      "commandLineArgs": "--filter Benchmark.Select4.*",
       // "commandLineArgs": "--filter Benchmark.SimdRange.*",
       // "commandLineArgs": "--filter Benchmark.SimdSelect.*",
       // "commandLineArgs": "--filter Benchmark.LookupBattle.*",
