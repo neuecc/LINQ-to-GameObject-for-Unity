@@ -17,4 +17,8 @@
         <AssemblyOriginatorKeyFile Condition="EXISTS('./../../../../../../opensource.snk')">../../../../../../opensource.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
+    <PropertyGroup>
+      <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    </PropertyGroup>
+
 </Project>

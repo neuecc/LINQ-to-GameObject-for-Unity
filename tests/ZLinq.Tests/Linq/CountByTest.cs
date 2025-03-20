@@ -12,7 +12,7 @@ public class CountByTest
             [true] = 3,   // Count of odd numbers: 1, 3, 5
             [false] = 3   // Count of even numbers: 2, 4, 6
         };
-        Enumerable.Range(1, 10).Index();
+
         // Act
         var actual = source.AsValueEnumerable()
                           .CountBy(x => x % 2 == 1)   // Key selector: odd/even
