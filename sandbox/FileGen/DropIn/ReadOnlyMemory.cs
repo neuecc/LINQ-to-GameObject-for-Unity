@@ -49,6 +49,8 @@ internal static partial class ZLinqDropInExtensions
 #endif
  => source.AsValueEnumerable().Concat(second);
     public static ValueEnumerable<Concat<FromMemory<TSource>, FromEnumerable<TSource>, TSource>, TSource> Concat<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().Concat(second);
+    public static Boolean Contains<>(this ReadOnlyMemory<TSource> source, TSource value) => source.AsValueEnumerable().Contains(value);
+    public static Boolean Contains<>(this ReadOnlyMemory<TSource> source, TSource value) => source.AsValueEnumerable().Contains(value);
     public static Boolean Contains<TSource>(this ReadOnlyMemory<TSource> source, TSource value) => source.AsValueEnumerable().Contains(value);
     public static Boolean Contains<TSource>(this ReadOnlyMemory<TSource> source, TSource value, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Contains(value, comparer);
     public static void CopyTo<T>(this ReadOnlyMemory<T> source, List<T> list) => source.AsValueEnumerable().CopyTo(list);
