@@ -24,6 +24,21 @@
 #endif
             => new(new(source.Enumerator, second, comparer));
 
+
+
+        public static ValueEnumerable<Intersect<TEnumerator, FromEnumerable<TSource>, TSource>, TSource> Intersect<TEnumerator,  TSource>(this ValueEnumerable<TEnumerator, TSource> source, IEnumerable< TSource> second)
+            where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, second.AsValueEnumerable(), null));
+
+        public static ValueEnumerable<Intersect<TEnumerator, FromEnumerable<TSource>, TSource>, TSource> Intersect<TEnumerator,  TSource>(this ValueEnumerable<TEnumerator, TSource> source, IEnumerable< TSource> second, IEqualityComparer<TSource>? comparer)
+            where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, second.AsValueEnumerable(), comparer));
     }
 }
 

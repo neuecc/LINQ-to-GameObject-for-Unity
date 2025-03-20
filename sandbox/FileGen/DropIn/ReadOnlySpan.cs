@@ -49,6 +49,7 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Concat(second);
+    public static ValueEnumerable<Concat<FromSpan<TSource>, FromEnumerable<TSource>, TSource>, TSource> Concat<TSource>(this ReadOnlySpan<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().Concat(second);
     public static Boolean Contains<TSource>(this ReadOnlySpan<TSource> source, TSource value) => source.AsValueEnumerable().Contains(value);
     public static Boolean Contains<TSource>(this ReadOnlySpan<TSource> source, TSource value, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Contains(value, comparer);
     public static void CopyTo<T>(this ReadOnlySpan<T> source, List<T> list) => source.AsValueEnumerable().CopyTo(list);
@@ -79,6 +80,8 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Except(second, comparer);
+    public static ValueEnumerable<Except<FromSpan<TSource>, FromEnumerable<TSource>, TSource>, TSource> Except<TSource>(this ReadOnlySpan<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().Except(second);
+    public static ValueEnumerable<Except<FromSpan<TSource>, FromEnumerable<TSource>, TSource>, TSource> Except<TSource>(this ReadOnlySpan<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Except(second, comparer);
     public static ValueEnumerable<ExceptBy<FromSpan<TSource>, TEnumerator2, TSource, TKey>, TSource> ExceptBy<TEnumerator2, TSource, TKey>(this ReadOnlySpan<TSource> source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector)
         where TEnumerator2 : struct, IValueEnumerator<TKey>
 #if NET9_0_OR_GREATER
@@ -91,6 +94,8 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().ExceptBy(second, keySelector, comparer);
+    public static ValueEnumerable<ExceptBy<FromSpan<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> ExceptBy<TSource, TKey>(this ReadOnlySpan<TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().ExceptBy(second, keySelector);
+    public static ValueEnumerable<ExceptBy<FromSpan<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> ExceptBy<TSource, TKey>(this ReadOnlySpan<TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().ExceptBy(second, keySelector, comparer);
     public static TSource First<TSource>(this ReadOnlySpan<TSource> source) => source.AsValueEnumerable().First();
     public static TSource First<TSource>(this ReadOnlySpan<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().First(predicate);
     public static TSource? FirstOrDefault<TSource>(this ReadOnlySpan<TSource> source) => source.AsValueEnumerable().FirstOrDefault();
@@ -117,6 +122,8 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<GroupJoin<FromSpan<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this ReadOnlySpan<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector) => source.AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
+    public static ValueEnumerable<GroupJoin<FromSpan<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this ReadOnlySpan<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
     public static ValueEnumerable<Index<FromSpan<TSource>, TSource>, ValueTuple<Int32, TSource>> Index<TSource>(this ReadOnlySpan<TSource> source) => source.AsValueEnumerable().Index();
     public static ValueEnumerable<Intersect<FromSpan<TSource>, TEnumerator2, TSource>, TSource> Intersect<TEnumerator2, TSource>(this ReadOnlySpan<TSource> source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
@@ -130,6 +137,8 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Intersect(second, comparer);
+    public static ValueEnumerable<Intersect<FromSpan<TSource>, FromEnumerable<TSource>, TSource>, TSource> Intersect<TSource>(this ReadOnlySpan<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().Intersect(second);
+    public static ValueEnumerable<Intersect<FromSpan<TSource>, FromEnumerable<TSource>, TSource>, TSource> Intersect<TSource>(this ReadOnlySpan<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Intersect(second, comparer);
     public static ValueEnumerable<IntersectBy<FromSpan<TSource>, TEnumerator2, TSource, TKey>, TSource> IntersectBy<TEnumerator2, TSource, TKey>(this ReadOnlySpan<TSource> source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector)
         where TEnumerator2 : struct, IValueEnumerator<TKey>
 #if NET9_0_OR_GREATER
@@ -142,6 +151,8 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().IntersectBy(second, keySelector, comparer);
+    public static ValueEnumerable<IntersectBy<FromSpan<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> IntersectBy<TSource, TKey>(this ReadOnlySpan<TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().IntersectBy(second, keySelector);
+    public static ValueEnumerable<IntersectBy<FromSpan<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> IntersectBy<TSource, TKey>(this ReadOnlySpan<TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().IntersectBy(second, keySelector, comparer);
     public static ValueEnumerable<Join<FromSpan<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> Join<TEnumerator2, TOuter, TInner, TKey, TResult>(this ReadOnlySpan<TOuter> source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
@@ -154,6 +165,8 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<Join<FromSpan<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> Join<TOuter, TInner, TKey, TResult>(this ReadOnlySpan<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector) => source.AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector);
+    public static ValueEnumerable<Join<FromSpan<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> Join<TOuter, TInner, TKey, TResult>(this ReadOnlySpan<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
     public static TSource Last<TSource>(this ReadOnlySpan<TSource> source) => source.AsValueEnumerable().Last();
     public static TSource Last<TSource>(this ReadOnlySpan<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Last(predicate);
     public static TSource? LastOrDefault<TSource>(this ReadOnlySpan<TSource> source) => source.AsValueEnumerable().LastOrDefault();
@@ -172,6 +185,8 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<LeftJoin<FromSpan<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this ReadOnlySpan<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner?, TResult> resultSelector) => source.AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
+    public static ValueEnumerable<LeftJoin<FromSpan<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this ReadOnlySpan<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner?, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
     public static Int64 LongCount<TSource>(this ReadOnlySpan<TSource> source) => source.AsValueEnumerable().LongCount();
     public static Int64 LongCount<TSource>(this ReadOnlySpan<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().LongCount(predicate);
     public static TResult? Max<TSource, TResult>(this ReadOnlySpan<TSource> source, Func<TSource, TResult> selector) => source.AsValueEnumerable().Max(selector);
@@ -206,6 +221,8 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<RightJoin<FromSpan<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TOuter, TInner, TKey, TResult>(this ReadOnlySpan<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector) => source.AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
+    public static ValueEnumerable<RightJoin<FromSpan<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TOuter, TInner, TKey, TResult>(this ReadOnlySpan<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
     public static ValueEnumerable<Select<FromSpan<TSource>, TSource, TResult>, TResult> Select<TSource, TResult>(this ReadOnlySpan<TSource> source, Func<TSource, TResult> selector) => source.AsValueEnumerable().Select(selector);
     public static ValueEnumerable<Select2<FromSpan<TSource>, TSource, TResult>, TResult> Select<TSource, TResult>(this ReadOnlySpan<TSource> source, Func<TSource, Int32, TResult> selector) => source.AsValueEnumerable().Select(selector);
     public static ValueEnumerable<SelectMany<FromSpan<TSource>, TEnumerator2, TSource, TResult>, TResult> SelectMany<TEnumerator2, TSource, TResult>(this ReadOnlySpan<TSource> source, Func<TSource, ValueEnumerable<TEnumerator2, TResult>> selector)
@@ -232,6 +249,8 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
+    public static Boolean SequenceEqual<TSource>(this ReadOnlySpan<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().SequenceEqual(second);
+    public static Boolean SequenceEqual<TSource>(this ReadOnlySpan<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().SequenceEqual(second, comparer);
     public static Boolean SequenceEqual<TEnumerator2, TSource>(this ReadOnlySpan<TSource> source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -311,6 +330,8 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Union(second, comparer);
+    public static ValueEnumerable<Union<FromSpan<TSource>, FromEnumerable<TSource>, TSource>, TSource> Union<TSource>(this ReadOnlySpan<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().Union(second);
+    public static ValueEnumerable<Union<FromSpan<TSource>, FromEnumerable<TSource>, TSource>, TSource> Union<TSource>(this ReadOnlySpan<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Union(second, comparer);
     public static ValueEnumerable<UnionBy<FromSpan<TSource>, TEnumerator2, TSource, TKey>, TSource> UnionBy<TEnumerator2, TSource, TKey>(this ReadOnlySpan<TSource> source, ValueEnumerable<TEnumerator2, TSource> second, Func<TSource, TKey> keySelector)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -323,6 +344,8 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().UnionBy(second, keySelector, comparer);
+    public static ValueEnumerable<UnionBy<FromSpan<TSource>, FromEnumerable<TSource>, TSource, TKey>, TSource> UnionBy<TSource, TKey>(this ReadOnlySpan<TSource> source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().UnionBy(second, keySelector);
+    public static ValueEnumerable<UnionBy<FromSpan<TSource>, FromEnumerable<TSource>, TSource, TKey>, TSource> UnionBy<TSource, TKey>(this ReadOnlySpan<TSource> source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().UnionBy(second, keySelector, comparer);
     public static ValueEnumerable<Where<FromSpan<TSource>, TSource>, TSource> Where<TSource>(this ReadOnlySpan<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Where(predicate);
     public static ValueEnumerable<Where2<FromSpan<TSource>, TSource>, TSource> Where<TSource>(this ReadOnlySpan<TSource> source, Func<TSource, Int32, Boolean> predicate) => source.AsValueEnumerable().Where(predicate);
     public static ValueEnumerable<Zip<FromSpan<TFirst>, TEnumerator2, TFirst, TSecond>, ValueTuple<TFirst, TSecond>> Zip<TEnumerator2, TFirst, TSecond>(this ReadOnlySpan<TFirst> source, ValueEnumerable<TEnumerator2, TSecond> second)
@@ -347,6 +370,9 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Zip(second, resultSelector);
+    public static ValueEnumerable<Zip<FromSpan<TFirst>, FromEnumerable<TSecond>, TFirst, TSecond>, ValueTuple<TFirst, TSecond>> Zip<TFirst, TSecond>(this ReadOnlySpan<TFirst> source, IEnumerable<TSecond> second) => source.AsValueEnumerable().Zip(second);
+    public static ValueEnumerable<Zip<FromSpan<TFirst>, FromEnumerable<TSecond>, FromEnumerable<TThird>, TFirst, TSecond, TThird>, ValueTuple<TFirst, TSecond, TThird>> Zip<TFirst, TSecond, TThird>(this ReadOnlySpan<TFirst> source, IEnumerable<TSecond> second, IEnumerable<TThird> third) => source.AsValueEnumerable().Zip(second, third);
+    public static ValueEnumerable<Zip<FromSpan<TFirst>, FromEnumerable<TSecond>, TFirst, TSecond, TResult>, TResult> Zip<TFirst, TSecond, TResult>(this ReadOnlySpan<TFirst> source, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector) => source.AsValueEnumerable().Zip(second, resultSelector);
 
 }
 #endif

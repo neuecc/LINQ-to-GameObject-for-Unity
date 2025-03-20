@@ -1,0 +1,13 @@
+﻿{
+  "profiles": {
+    "Default": {
+      "commandName": "Project",
+      "commandLineArgs": "dropin",
+      "workingDirectory": "."
+    },
+    "Help": {
+      "commandName": "Project",
+      "commandLineArgs": "--help"
+    }
+  }
+}

@@ -138,7 +138,7 @@ internal static partial class ZLinqDropInExtensions
     {
         // for nongeneric IEnumerable only
         if (dropInType.Name != "IEnumerable") return "";
-      
+
         var enumeratorType = $"{dropInType.Replacement}<object>";
 
         return $$"""
@@ -273,6 +273,11 @@ internal static partial class ZLinqDropInExtensions
 
         if (methodInfo.Name is "Concat" or "Except" or "Intersect" or "Union" or "UnionBy" or "SequenceEqual")
         {
+            if (!methodInfo.GetGenericArguments().Any(x => x.Name == "TEnumerator2"))
+            {
+                return "";
+            }
+
             return """
 
         where TEnumerator2 : struct, IValueEnumerator<TSource>
@@ -285,6 +290,11 @@ internal static partial class ZLinqDropInExtensions
 
         if (methodInfo.Name is "ExceptBy" or "IntersectBy")
         {
+            if (!methodInfo.GetGenericArguments().Any(x => x.Name == "TEnumerator2"))
+            {
+                return "";
+            }
+
             return """
 
         where TEnumerator2 : struct, IValueEnumerator<TKey>
@@ -297,6 +307,11 @@ internal static partial class ZLinqDropInExtensions
 
         if (methodInfo.Name is "GroupJoin" or "Join" or "LeftJoin" or "RightJoin")
         {
+            if (!methodInfo.GetGenericArguments().Any(x => x.Name == "TEnumerator2"))
+            {
+                return "";
+            }
+
             return """
 
         where TEnumerator2 : struct, IValueEnumerator<TInner>
@@ -309,6 +324,11 @@ internal static partial class ZLinqDropInExtensions
 
         if (methodInfo.Name is "SelectMany")
         {
+            if (!methodInfo.GetGenericArguments().Any(x => x.Name == "TEnumerator2"))
+            {
+                return "";
+            }
+
             if (methodInfo.GetGenericArguments().Any(x => x.Name == "TCollection"))
             {
                 return """
@@ -335,6 +355,11 @@ internal static partial class ZLinqDropInExtensions
 
         if (methodInfo.Name is "Zip")
         {
+            if (!methodInfo.GetGenericArguments().Any(x => x.Name == "TEnumerator2"))
+            {
+                return "";
+            }
+
             if (methodInfo.GetGenericArguments().Any(x => x.Name == "TThird"))
             {
                 return """

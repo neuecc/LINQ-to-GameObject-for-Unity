@@ -13,6 +13,15 @@ namespace Benchmark;
 public class Select4
 {
     int[] src = Enumerable.Range(1, 1000000).ToArray();
+    // IEnumerable<int> src = Iterate();
+
+    static IEnumerable<int> Iterate()
+    {
+        foreach (var item in Enumerable.Range(1, 1000000))
+        {
+            yield return item;
+        }
+    }
 
     [Benchmark]
     [BenchmarkCategory(Categories.LINQ)]

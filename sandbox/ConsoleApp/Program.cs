@@ -25,7 +25,11 @@ using ZLinq.Traversables;
 [assembly: ZLinq.ZLinqDropInAttribute("", ZLinq.DropInGenerateTypes.Everything, DisableEmitSource = true)]
 
 
-Enumerable.Range(1, 10).Cast<object>().AsValueEnumerable();
+ValueEnumerable.Range(1, 10).Concat(Enumerable.Range(1, 10)).ToArray();
+
+var xssss = new[] { 1, 2, 3 };
+
+// ValueEnumerable.Range(1, 10).Zip(xssss, xssss);
 
 var root = new DirectoryInfo("C:\\Program Files (x86)\\Steam");
 

@@ -24,6 +24,21 @@
 #endif
             => new(new(source.Enumerator, inner.Enumerator, outerKeySelector, innerKeySelector, resultSelector, comparer));
 
+
+
+        public static ValueEnumerable<GroupJoin<TEnumerator, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TEnumerator, TOuter, TInner, TKey, TResult>(this ValueEnumerable<TEnumerator, TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector)
+            where TEnumerator : struct, IValueEnumerator<TOuter>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, inner.AsValueEnumerable().Enumerator, outerKeySelector, innerKeySelector, resultSelector, null));
+
+        public static ValueEnumerable<GroupJoin<TEnumerator, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TEnumerator, TOuter, TInner, TKey, TResult>(this ValueEnumerable<TEnumerator, TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
+            where TEnumerator : struct, IValueEnumerator<TOuter>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+            => new(new(source.Enumerator, inner.AsValueEnumerable().Enumerator, outerKeySelector, innerKeySelector, resultSelector, comparer));
     }
 }
 

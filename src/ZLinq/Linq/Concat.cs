@@ -12,6 +12,16 @@
             , allows ref struct
 #endif
             => new(new(source.Enumerator, second.Enumerator));
+
+
+        public static ValueEnumerable<Concat<TEnumerator1, FromEnumerable<TSource>, TSource>, TSource> Concat<TEnumerator1, TSource>(this ValueEnumerable<TEnumerator1, TSource> source, IEnumerable<TSource> second)
+            where TEnumerator1 : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+        {
+            return Concat(source, second.AsValueEnumerable());
+        }
     }
 }
 
