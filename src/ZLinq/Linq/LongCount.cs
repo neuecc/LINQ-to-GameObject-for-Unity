@@ -32,15 +32,30 @@
         {
             using (var enumerator = source.Enumerator)
             {
-                var longCount = 0L;
-                while (enumerator.TryGetNext(out var current))
+                if (enumerator.TryGetSpan(out var span))
                 {
-                    if (predicate(current))
+                    var longCount = 0L;
+                    foreach (var current in span)
                     {
-                        checked { longCount++; }
+                        if (predicate(current))
+                        {
+                            checked { longCount++; }
+                        }
                     }
+                    return longCount;
                 }
-                return longCount;
+                else
+                {
+                    var longCount = 0L;
+                    while (enumerator.TryGetNext(out var current))
+                    {
+                        if (predicate(current))
+                        {
+                            checked { longCount++; }
+                        }
+                    }
+                    return longCount;
+                }
             }
         }
 

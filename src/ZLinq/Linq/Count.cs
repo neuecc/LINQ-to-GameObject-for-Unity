@@ -15,6 +15,8 @@
                     return count;
                 }
 
+                // if Span exists, already TryGetNonEnumeratedCount returns true so no need to get Span.
+
                 count = 0;
                 while (enumerator.TryGetNext(out _))
                 {
@@ -32,15 +34,32 @@
         {
             using (var enumerator = source.Enumerator)
             {
-                var count = 0;
-                while (enumerator.TryGetNext(out var current))
+                if (enumerator.TryGetSpan(out var span))
                 {
-                    if (predicate(current))
+                    var count = 0;
+                    foreach (var current in span)
                     {
-                        checked { count++; }
+                        if (predicate(current))
+                        {
+                            checked { count++; }
+                        }
                     }
+
+                    return count;
                 }
-                return count;
+                else
+                {
+                    var count = 0;
+
+                    while (enumerator.TryGetNext(out var current))
+                    {
+                        if (predicate(current))
+                        {
+                            checked { count++; }
+                        }
+                    }
+                    return count;
+                }
             }
         }
 

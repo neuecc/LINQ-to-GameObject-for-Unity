@@ -139,8 +139,9 @@
                 return false;
             }
 
-            while (source.TryGetNext(out value))
+            while (source.TryGetNext(out var current))
             {
+                value = current;
             }
 
             return true;
