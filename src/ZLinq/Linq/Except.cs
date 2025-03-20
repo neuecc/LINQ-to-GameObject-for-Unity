@@ -86,10 +86,13 @@ namespace ZLinq.Linq
                 set = second.ToHashSet(comparer ?? EqualityComparer<TSource>.Default);
             }
 
-            if (source.TryGetNext(out var value) && set.Remove(value))
+            while (source.TryGetNext(out var value))
             {
-                current = value;
-                return true;
+                if (set.Remove(value))
+                {
+                    current = value;
+                    return true;
+                }
             }
 
             Unsafe.SkipInit(out current);

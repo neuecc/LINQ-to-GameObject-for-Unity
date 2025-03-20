@@ -90,20 +90,26 @@ namespace ZLinq.Linq
 
             if (state == 1)
             {
-                while (source.TryGetNext(out var value) && set!.Add(value))
+                while (source.TryGetNext(out var value))
                 {
-                    current = value;
-                    return true;
+                    if (set!.Add(value))
+                    {
+                        current = value;
+                        return true;
+                    }
                 }
                 state = 2;
             }
 
             if (state == 2)
             {
-                while (second.TryGetNext(out var value) && set!.Add(value))
+                while (second.TryGetNext(out var value))
                 {
-                    current = value;
-                    return true;
+                    if (set!.Add(value))
+                    {
+                        current = value;
+                        return true;
+                    }
                 }
 
                 state = 3;
