@@ -68,4 +68,20 @@ public class LastTest
         xs.AsValueEnumerable().Last(x => x > 0).ShouldBe(5);
         xs.ToValueEnumerable().Last(x => x > 0).ShouldBe(5);
     }
+
+    [Fact]
+    public void AppendPrepend_First_Last_ElementAt()
+    {
+        // System.Linq
+        Assert.Equal(42, new int[] { 42 }.Append(84).First());
+        Assert.Equal(42, new int[] { 84 }.Prepend(42).First());
+        Assert.Equal(84, new int[] { 42 }.Append(84).Last());
+        Assert.Equal(84, new int[] { 84 }.Prepend(42).Last());
+
+        // ZLinq
+        Assert.Equal(42, new int[] { 42 }.AsValueEnumerable().Append(84).First());
+        Assert.Equal(42, new int[] { 84 }.AsValueEnumerable().Prepend(42).First());
+        Assert.Equal(84, new int[] { 42 }.AsValueEnumerable().Append(84).Last());
+        Assert.Equal(84, new int[] { 84 }.AsValueEnumerable().Prepend(42).Last());
+    }
 }
