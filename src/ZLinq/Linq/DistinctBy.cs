@@ -59,10 +59,13 @@ namespace ZLinq.Linq
                 set = new HashSet<TKey>(comparer ?? EqualityComparer<TKey>.Default);
             }
 
-            if (source.TryGetNext(out var value) && set.Add(keySelector(value)))
+            while (source.TryGetNext(out var value))
             {
-                current = value;
-                return true;
+                if (set.Add(keySelector(value)))
+                {
+                    current = value;
+                    return true;
+                }
             }
 
             Unsafe.SkipInit(out current);
