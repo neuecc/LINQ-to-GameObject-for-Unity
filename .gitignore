@@ -132,3 +132,4 @@ src/ZLinq.Unity/*.csproj
 
 # BenchmarkDotNet
 BenchmarkDotNet.Artifacts/
+[Bb]in2/

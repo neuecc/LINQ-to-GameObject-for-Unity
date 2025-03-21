@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.Collections;
 using UnityEngine;
 using ZLinq;
+using ZLinq.Linq;
 
 public class NewBehaviourScript : MonoBehaviour
 {
@@ -29,6 +30,7 @@ public class NewBehaviourScript : MonoBehaviour
         // Origin.Ancestors().OfComponent<UnityEngine.TrailRenderer>();
 
         Test();
+        Test2();
     }
 
     public static void Test()
@@ -40,7 +42,23 @@ public class NewBehaviourScript : MonoBehaviour
 
     public static void Test2()
     {
-     // NativeSlice   
+        var w = ValueEnumerable.Range(1, 10)
+            .Where(x => x % 2 == 0)
+            .Take(10)
+            .Index()
+            .Order()
+            .Skip(1)
+            .Shuffle()
+            .Select(x => x.Item)
+            .Prepend(9999)
+            .Append(10000)
+            .Chunk(99)
+            .Distinct();
+            
+        foreach (var item in w)
+        {
+            Debug.Log(item);
+        }
     }
 }
 
