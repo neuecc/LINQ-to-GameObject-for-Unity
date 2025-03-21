@@ -149,15 +149,12 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<T> destination, int offset)
         {
-            // TODO: length validation
-            if (source.GetType() == typeof(T[]))
+            if (TryGetSpan(out var span))
             {
-                Unsafe.As<T[]>(source).CopyTo(destination);
-                return true;
-            }
-            else if (source.GetType() == typeof(List<T>))
-            {
-                CollectionsMarshal.AsSpan(Unsafe.As<List<T>>(source)).CopyTo(destination);
+                if (offset < 0 || offset >= span.Length) return false;
+                if ((span.Length - offset) < destination.Length) return false;
+
+                span.Slice(offset, destination.Length).CopyTo(destination);
                 return true;
             }
             else
@@ -212,8 +209,10 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<T> destination, int offset)
         {
-            // TODO: length validation
-            source.CopyTo(destination);
+            if (offset < 0 || offset >= source.Length) return false;
+            if ((source.Length - offset) < destination.Length) return false;
+
+            source.AsSpan(offset, destination.Length).CopyTo(destination);
             return true;
         }
 
@@ -262,8 +261,10 @@ namespace ZLinq.Linq
 #else
             var span = source.Span;
 #endif
-            // TODO: length validation
-            span.CopyTo(destination);
+            if (offset < 0 || offset >= span.Length) return false;
+            if ((span.Length - offset) < destination.Length) return false;
+
+            span.Slice(offset, destination.Length).CopyTo(destination);
             return true;
         }
 
@@ -319,8 +320,12 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<T> destination, int offset)
         {
-            // TODO: length validation
-            CollectionsMarshal.AsSpan(source).CopyTo(destination);
+            var span = CollectionsMarshal.AsSpan(source);
+
+            if (offset < 0 || offset >= span.Length) return false;
+            if ((span.Length - offset) < destination.Length) return false;
+
+            span.Slice(offset, destination.Length).CopyTo(destination);
             return true;
         }
 
@@ -435,9 +440,12 @@ namespace ZLinq.Linq
         {
             if (source.IsSingleSegment)
             {
-                // TODO: length validation
                 var span = source.First.Span;
-                span.CopyTo(destination);
+
+                if (offset < 0 || offset >= span.Length) return false;
+                if ((span.Length - offset) < destination.Length) return false;
+
+                span.Slice(offset, destination.Length).CopyTo(destination);
                 return true;
             }
             return false;
@@ -690,8 +698,10 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<T> destination, int offset)
         {
-            // TODO:length validation
-            source.AsSpan().CopyTo(destination);
+            if (offset < 0 || offset >= source.Length) return false;
+            if ((source.Length - offset) < destination.Length) return false;
+
+            source.AsSpan(offset, destination.Length).CopyTo(destination);
             return true;
         }
 
@@ -743,8 +753,10 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<T> destination, int offset)
         {
-            // TODO:length validation
-            source.CopyTo(destination);
+            if (offset < 0 || offset >= source.Length) return false;
+            if ((source.Length - offset) < destination.Length) return false;
+
+            source.Slice(offset, destination.Length).CopyTo(destination);
             return true;
         }
 

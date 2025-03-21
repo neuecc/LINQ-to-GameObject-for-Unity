@@ -72,7 +72,7 @@ public static class TestUtil
         return enumerable.Enumerator.TryGetSpan(out span);
     }
 
-    public static bool TryCopyTo<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable, Span<T> destination)
+    public static bool TryCopyTo<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable, Span<T> destination, int count = 0)
         where TEnumerator : struct, IValueEnumerator<T>
 #if NET9_0_OR_GREATER
         , allows ref struct
