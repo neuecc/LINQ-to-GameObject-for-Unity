@@ -107,6 +107,11 @@ internal static partial class ZLinqDropInExtensions
             return null;
         }
 
+        if (methodInfo.Name is "Contains" && !methodInfo.GetGenericArguments().Any(x => x.Name == "TEnumerator"))
+        {
+            return null;
+        }
+
         // debugging stop condition
         // if (methodInfo.Name is not "Select") continue;
 

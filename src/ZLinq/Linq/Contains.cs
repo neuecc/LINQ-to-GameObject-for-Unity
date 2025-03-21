@@ -10,7 +10,35 @@ namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
+        public static Boolean Contains<TSource>(this ValueEnumerable<FromEnumerable<TSource>, TSource> source, TSource value)
+        {
+            // When a collection like HashSet internally holds an IEqualityComparer, it's necessary to call the collection's own Contains method.
+            // This measure is also important for compatibility with LINQ to Objects.
+            var innerCollection = source.Enumerator.GetSource();
+            if (innerCollection is ICollection<TSource> collection)
+            {
+                return collection.Contains(value);
+            }
+
+            return ContainsCore(ref source, value);
+        }
+
+        public static Boolean Contains<TSource>(this ValueEnumerable<FromHashSet<TSource>, TSource> source, TSource value)
+        {
+            var innerCollection = source.Enumerator.GetSource();
+            return innerCollection.Contains(value);
+        }
+
         public static Boolean Contains<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, TSource value)
+    where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+        {
+            return ContainsCore(ref source, value);
+        }
+
+        static Boolean ContainsCore<TEnumerator, TSource>(ref ValueEnumerable<TEnumerator, TSource> source, TSource value)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
@@ -49,12 +77,16 @@ namespace ZLinq
             }
         }
 
-        public static Boolean Contains<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, TSource value, IEqualityComparer<TSource> comparer)
+        public static Boolean Contains<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, TSource value, IEqualityComparer<TSource>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
+            // In FromEnumerable and FromHashSet, when null is passed, there's a possibility of different behavior from when a non-IEqualityComparer is passed (possibility of ICollection.Contains).
+            // However, this behavior is identical to System.Linq.
+            comparer ??= EqualityComparer<TSource>.Default;
+
             using (var enumerator = source.Enumerator)
             {
                 if (enumerator.TryGetSpan(out var span))

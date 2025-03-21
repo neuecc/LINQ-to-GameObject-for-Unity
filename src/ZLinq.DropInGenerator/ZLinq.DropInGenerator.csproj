@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\..\sandbox\FileGen\DropIn\**\*.cs" LinkBase="ResourceCodes" />
+    <EmbeddedResource Include="..\FileGen\DropIn\**\*.cs" LinkBase="ResourceCodes" />
     <Compile Include="..\ZLinq\ZLinqDropInAttribute.cs" Link="ZLinqDropInAttribute.cs" />
   </ItemGroup>
 

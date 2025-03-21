@@ -237,13 +237,13 @@ namespace ZLinq.Tests.Linq
         // Helper classes
         private class Person
         {
-            public string Name { get; set; }
+            public string Name { get; set; } = default!;
             public int Age { get; set; }
         }
         
         private class PersonEqualityComparer : IEqualityComparer<Person>
         {
-            public bool Equals(Person x, Person y)
+            public bool Equals(Person? x, Person? y)
             {
                 if (x == null && y == null)
                     return true;

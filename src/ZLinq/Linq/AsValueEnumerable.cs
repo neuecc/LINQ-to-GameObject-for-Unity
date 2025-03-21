@@ -106,6 +106,8 @@ namespace ZLinq.Linq
     {
         IEnumerator<T>? enumerator = null;
 
+        internal IEnumerable<T> GetSource() => source;
+
         public bool TryGetNonEnumeratedCount(out int count)
         {
 #if NET8_0_OR_GREATER
@@ -621,6 +623,8 @@ namespace ZLinq.Linq
     {
         bool isInit;
         HashSet<T>.Enumerator enumerator;
+
+        internal HashSet<T> GetSource() => source;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
