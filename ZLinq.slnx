@@ -1,9 +1,10 @@
 <Solution>
   <Folder Name="/sandbox/">
-    <Project Path="sandbox/ConsoleAppNet6/ConsoleAppNet6.csproj" Id="a347184a-8fb7-4ef7-875f-df54d7977925" />
     <Project Path="sandbox/Benchmark/Benchmark.csproj" />
     <Project Path="sandbox/ConsoleApp/ConsoleApp.csproj" />
-    <Project Path="sandbox/ConsoleAppNetFramework48/ConsoleAppNetFramework48.csproj" Id="3429f07c-2daf-4866-9ec7-0c978c7903b3" />
+    <Project Path="sandbox/ConsoleAppNet6/ConsoleAppNet6.csproj" />
+    <!-- ignore for CI -->
+    <!-- <Project Path="sandbox/ConsoleAppNetFramework48/ConsoleAppNetFramework48.csproj" /> -->
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/FileGen/FileGen.csproj" />
