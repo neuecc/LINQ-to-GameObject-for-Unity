@@ -11,13 +11,6 @@
             var enumerator = source.Enumerator;
             try
             {
-                if (enumerator.TryGetSpan(out var span))
-                {
-                    var array = GC.AllocateUninitializedArray<TSource>(span.Length);
-                    span.CopyTo(array);
-                    return ListMarshal.AsList(array);
-                }
-
                 if (enumerator.TryGetNonEnumeratedCount(out var count))
                 {
                     var list = new List<TSource>(count);

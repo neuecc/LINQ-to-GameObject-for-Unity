@@ -10,11 +10,7 @@ partial class ValueEnumerableExtensions
     {
         using var enumerator = source.Enumerator;
 
-        if (enumerator.TryGetSpan(out var span))
-        {
-            return span.ToArray(); // fastest copy
-        }
-        else if (enumerator.TryGetNonEnumeratedCount(out var count))
+        if (enumerator.TryGetNonEnumeratedCount(out var count))
         {
             if (count == 0)
             {
