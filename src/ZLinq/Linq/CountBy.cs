@@ -58,7 +58,7 @@ namespace ZLinq.Linq
         }
 
 
-        public bool TryCopyTo(Span<KeyValuePair<TKey, int>> destination)
+        public bool TryCopyTo(Span<KeyValuePair<TKey, int>> destination, int offset)
         {
             destination = default;
             return false;

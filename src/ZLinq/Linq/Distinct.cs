@@ -50,7 +50,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> dest)
+        public bool TryCopyTo(Span<TSource> dest, int offset)
         {
             return false;
         }

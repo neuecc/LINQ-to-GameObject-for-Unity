@@ -147,7 +147,7 @@ namespace ZLinq.Linq
             }
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, int offset)
         {
             // TODO: length validation
             if (source.GetType() == typeof(T[]))
@@ -210,7 +210,7 @@ namespace ZLinq.Linq
             return true;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, int offset)
         {
             // TODO: length validation
             source.CopyTo(destination);
@@ -255,7 +255,7 @@ namespace ZLinq.Linq
             return true;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, int offset)
         {
 #if NET9_0_OR_GREATER
             var span = source;
@@ -317,7 +317,7 @@ namespace ZLinq.Linq
             return true;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, int offset)
         {
             // TODO: length validation
             CollectionsMarshal.AsSpan(source).CopyTo(destination);
@@ -371,7 +371,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<KeyValuePair<TKey, TValue>> destination) => false;
+        public bool TryCopyTo(Span<KeyValuePair<TKey, TValue>> destination, int offset) => false;
 
         public bool TryGetNext(out KeyValuePair<TKey, TValue> current)
         {
@@ -431,7 +431,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, int offset)
         {
             if (source.IsSingleSegment)
             {
@@ -492,7 +492,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> destination) => false;
+        public bool TryCopyTo(Span<T> destination, int offset) => false;
 
         public bool TryGetNext(out T current)
         {
@@ -540,7 +540,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> destination) => false;
+        public bool TryCopyTo(Span<T> destination, int offset) => false;
 
         public bool TryGetNext(out T current)
         {
@@ -588,7 +588,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> destination) => false;
+        public bool TryCopyTo(Span<T> destination, int offset) => false;
 
         public bool TryGetNext(out T current)
         {
@@ -638,7 +638,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> destination) => false;
+        public bool TryCopyTo(Span<T> destination, int offset) => false;
 
         public bool TryGetNext(out T current)
         {
@@ -688,7 +688,7 @@ namespace ZLinq.Linq
             return true;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, int offset)
         {
             // TODO:length validation
             source.AsSpan().CopyTo(destination);
@@ -741,7 +741,7 @@ namespace ZLinq.Linq
             return true;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, int offset)
         {
             // TODO:length validation
             source.CopyTo(destination);

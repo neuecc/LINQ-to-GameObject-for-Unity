@@ -34,7 +34,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> dest)
+        public bool TryCopyTo(Span<T> dest, int offset)
         {
             // TODO: range validation?
             dest.Slice(0, _count).Fill(_element);

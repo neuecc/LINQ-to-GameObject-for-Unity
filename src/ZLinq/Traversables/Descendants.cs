@@ -19,7 +19,7 @@ public struct Descendants<TTraverser, T>(TTraverser traverser, bool withSelf)
         return false;
     }
 
-    public bool TryCopyTo(Span<T> dest) => false;
+    public bool TryCopyTo(Span<T> dest, int offset) => false;
 
     public bool TryGetNext(out T current)
     {

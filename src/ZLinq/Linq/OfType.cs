@@ -43,7 +43,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TResult> dest) => false;
+        public bool TryCopyTo(Span<TResult> dest, int offset) => false;
 
         public bool TryGetNext(out TResult current)
         {

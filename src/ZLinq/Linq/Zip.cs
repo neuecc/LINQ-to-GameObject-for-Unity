@@ -103,7 +103,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<(TFirst First, TSecond Second)> destination)
+        public bool TryCopyTo(Span<(TFirst First, TSecond Second)> destination, int offset)
         {
             return false;
         }
@@ -169,7 +169,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<(TFirst First, TSecond Second, TThird Third)> destination)
+        public bool TryCopyTo(Span<(TFirst First, TSecond Second, TThird Third)> destination, int offset)
         {
             return false;
         }
@@ -231,7 +231,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TResult> destination)
+        public bool TryCopyTo(Span<TResult> destination, int offset)
         {
             return false;
         }

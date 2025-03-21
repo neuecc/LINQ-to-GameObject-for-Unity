@@ -49,7 +49,7 @@ namespace ZLinq
             source.Dispose();
         }
 
-        public bool TryCopyTo(Span<TComponent> destination)
+        public bool TryCopyTo(Span<TComponent> destination, int offset)
         {
             return false;
         }
@@ -100,7 +100,7 @@ namespace ZLinq
             source.Dispose();
         }
 
-        public bool TryCopyTo(Span<TComponent> destination)
+        public bool TryCopyTo(Span<TComponent> destination, int offset)
         {
             return false;
         }

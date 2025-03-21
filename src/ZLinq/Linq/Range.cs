@@ -42,7 +42,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<int> dest)
+        public bool TryCopyTo(Span<int> dest, int offset)
         {
             if (count > dest.Length)
             {

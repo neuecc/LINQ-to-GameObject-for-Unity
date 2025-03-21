@@ -83,7 +83,7 @@ namespace ZLinq.Tests.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, int offset)
         {
             destination = default;
             return false;
@@ -128,7 +128,7 @@ namespace ZLinq.Tests.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, int offset)
         {
             destination = default;
             return false;

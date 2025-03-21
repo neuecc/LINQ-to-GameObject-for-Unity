@@ -75,7 +75,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<KeyValuePair<TKey, TAccumulate>> destination)
+        public bool TryCopyTo(Span<KeyValuePair<TKey, TAccumulate>> destination, int offset)
         {
             destination = default;
             return false;
@@ -201,7 +201,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<KeyValuePair<TKey, TAccumulate>> destination)
+        public bool TryCopyTo(Span<KeyValuePair<TKey, TAccumulate>> destination, int offset)
         {
             destination = default;
             return false;

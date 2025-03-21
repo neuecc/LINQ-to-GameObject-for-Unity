@@ -39,7 +39,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination)
+        public bool TryCopyTo(Span<TSource> destination, int offset)
         {
             if (source.TryGetNonEnumeratedCount(out var count) && count <= destination.Length)
             {
