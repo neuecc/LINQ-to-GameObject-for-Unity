@@ -1,4 +1,6 @@
-﻿namespace ZLinq
+﻿using System;
+
+namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -86,27 +88,23 @@
 
 #endif
 
+
         static bool TryGetElementAt<TEnumerator, TSource>(ref TEnumerator source, int index, out TSource value)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
         {
-            if (source.TryGetSpan(out var span))
-            {
-                if (index < 0 || index >= span.Length)
-                {
-                    value = default!;
-                    return false;
-                }
-
-                value = span[index];
-                return true;
-            }
-
             if (index >= 0)
             {
-                while (source.TryGetNext(out var current))
+                var current = default(TSource)!;
+                if (source.TryCopyTo(SingleSpan.Create(ref current), offset: index))
+                {
+                    value = current;
+                    return true;
+                }
+
+                while (source.TryGetNext(out current))
                 {
                     if (index == 0)
                     {
@@ -122,9 +120,9 @@
         }
 
         static bool TryGetElementAt<TEnumerator, TSource>(ref TEnumerator source, Index index, out TSource value)
-            where TEnumerator : struct, IValueEnumerator<TSource>
+           where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
-            , allows ref struct
+           , allows ref struct
 #endif
         {
             if (!index.IsFromEnd)
@@ -134,16 +132,20 @@
 
             var indexFromEnd = index.Value;
 
-            if (source.TryGetSpan(out var span))
+            if (source.TryGetNonEnumeratedCount(out var count))
             {
-                if (indexFromEnd < 0 || indexFromEnd >= span.Length)
+                if (indexFromEnd < 0 || indexFromEnd > count)
                 {
                     value = default!;
                     return false;
                 }
 
-                value = span[index];
-                return true;
+                var current = default(TSource)!;
+                if (source.TryCopyTo(SingleSpan.Create(ref current), offset: count - indexFromEnd))
+                {
+                    value = current;
+                    return true;
+                }
             }
 
             using var q = new ValueQueue<TSource>(4);
