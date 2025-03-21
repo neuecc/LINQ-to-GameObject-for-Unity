@@ -42,14 +42,12 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<int> dest, int offset)
+        public bool TryCopyTo(Span<int> destination, int offset)
         {
-            if (count > dest.Length)
-            {
-                return false;
-            }
+            if (offset < 0 || offset >= count) return false;
+            if ((count - offset) < destination.Length) return false;
 
-            FillIncremental(dest.Slice(0, count), start);
+            FillIncremental(destination, start);
             return true;
         }
 
@@ -87,7 +85,7 @@ namespace ZLinq.Linq
 #else
                 var indices = new Vector<int>((ReadOnlySpan<int>)new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
 #endif
-                // for example, start = 5, Vecotr<int>.Count = 8
+                // for example, start = 5, Vector<int>.Count = 8
                 var data = indices + new Vector<int>(start);         // <5, 6, 7, 8, 9, 10, 11, 12>...
                 var increment = new Vector<int>(Vector<int>.Count);  // <8, 8, 8, 8, 8, 8, 8, 8>...
 

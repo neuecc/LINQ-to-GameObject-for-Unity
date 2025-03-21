@@ -26,11 +26,31 @@ struct ValueEnumerable<TEnumerator, T>(TEnumerator enumerator)
 // all implement types must be struct
 public interface IValueEnumerator<T> : IDisposable
 {
-    bool TryGetNext(out T current); // as MoveNext + Current
+    /// <summary>
+    /// MoveNext + Current.
+    /// </summary>
+    bool TryGetNext(out T current);
 
-    // Optimization helper
+    // for optimization
+
+    /// <summary>
+    /// Returns the length when processing time is not necessary.
+    /// Always returns true if TryGetSpan or TryCopyTo returns true.
+    /// </summary>
     bool TryGetNonEnumeratedCount(out int count);
+
+    /// <summary>
+    /// Returns true if it can return a Span.
+    /// Used for SIMD and loop processing optimization.
+    /// If copying the entire value is acceptable, prioritize TryGetNonEnumeratedCount -> TryCopyTo instead.
+    /// </summary>
     bool TryGetSpan(out ReadOnlySpan<T> span);
+
+    /// <summary>
+    /// Unlike the semantics of normal CopyTo, this allows the destination to be smaller than the source.
+    /// This serves as a GetAt function as well.
+    /// Also, it does not allow the destination to exceed the length of the source.
+    /// </summary>
     bool TryCopyTo(scoped Span<T> destination, int offset = 0);
 }
 

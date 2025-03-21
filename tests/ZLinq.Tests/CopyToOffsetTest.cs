@@ -95,6 +95,36 @@ public class CopyToOffsetTest
     }
 
     [Fact]
+    public void TryCopyTo_DestinationBiggerThanSource_Fail()
+    {
+        // Arrange
+        int[] source = { 1, 2, 3, 4, 5 };
+        var wrapper = source.AsValueEnumerable().Enumerator;
+        int[] destination = new int[10];
+
+        // Act
+        bool result = wrapper.TryCopyTo(destination, 0);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void TryCopyTo_DestinationBiggerThanSource_Fail2()
+    {
+        // Arrange
+        int[] source = { 1, 2, 3, 4, 5 };
+        var wrapper = source.AsValueEnumerable().Enumerator;
+        int[] destination = new int[4];
+
+        // Act
+        bool result = wrapper.TryCopyTo(destination, 3);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
     public void TryCopyTo_ZeroLengthDestination_ReturnsTrue()
     {
         // Arrange
