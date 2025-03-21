@@ -77,7 +77,11 @@ public class OrderByTest
             (x % 3).CompareTo(y % 3));
 
         var ordered = xs.AsValueEnumerable().Order(customComparer);
+#if NET8_0_OR_GREATER
         var expected = xs.Order(customComparer);
+#else
+        var expected = xs.OrderBy(x=> x, customComparer);
+#endif
 
         ordered.ToArray().ShouldBe(expected.ToArray());
     }

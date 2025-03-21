@@ -57,8 +57,11 @@ public class ChunkTest
             var enumerable = xs.AsValueEnumerable().Chunk(3);
 
             var e1 = enumerable;
+
+#if NET8_0_OR_GREATER
             e1.TryGetNonEnumeratedCount(out var nonEnumeratedCount).ShouldBe(true);
             nonEnumeratedCount.ShouldBe(2);
+#endif
 
             var e2 = enumerable;
             e2.TryGetSpan(out var span).ShouldBe(false);
