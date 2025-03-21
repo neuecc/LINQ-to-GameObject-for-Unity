@@ -314,6 +314,25 @@ var foobars = root.Descendants().Where(x => x.tag == "foobar");
 var fooScripts = root.ChildrenAndSelf().OfComponent<FooScript>(); 
 ```
 
+In .NET 9, `ValueEnumerable` is a `ref struct`, so it cannot be converted to `IEnumerable<T>`. However, in Unity it's a regular `struct`, making it possible to convert to `IEnumerable<T>`. You can improve interoperability by preparing an extension method like this:
+
+```csharp
+public static class ZLinqExtensions
+{
+    public static IEnumerable<T> AsEnumerable<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> valueEnumerable)
+        where TEnumerator : struct, IValueEnumerator<T>
+    {
+        using (var e = valueEnumerable.Enumerator)
+        {
+            while (e.TryGetNext(out var current))
+            {
+                yield return current;
+            }
+        }
+    }
+}
+```
+
 Godot
 ---
 The minimum supported Godot version will be `4.0.0`.
