@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.Collections;
+using UnityEngine;
 using ZLinq;
 
 public class NewBehaviourScript : MonoBehaviour
@@ -23,5 +27,34 @@ public class NewBehaviourScript : MonoBehaviour
         foreach (var item in Origin.AfterSelf()) Debug.Log(item.name);
 
         // Origin.Ancestors().OfComponent<UnityEngine.TrailRenderer>();
+
+        Test();
+    }
+
+    public static void Test()
+    {
+        var tako = ValueEnumerable.Range(1, 10).Select(x => x.ToString());
+        var str = string.Join(',', tako.AsEnumerable());
+        Debug.Log(str);
+    }
+
+    public static void Test2()
+    {
+     // NativeSlice   
+    }
+}
+
+public static class ZLinqExtensions
+{
+    public static IEnumerable<T> AsEnumerable<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> valueEnumerable)
+        where TEnumerator : struct, IValueEnumerator<T>
+    {
+        using (var e = valueEnumerable.Enumerator)
+        {
+            while (e.TryGetNext(out var current))
+            {
+                yield return current;
+            }
+        }
     }
 }

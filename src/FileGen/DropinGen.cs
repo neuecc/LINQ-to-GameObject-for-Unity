@@ -135,6 +135,22 @@ internal static partial class ZLinqDropInExtensions
         {
             signature = signature.Replace("Func<TOuter, TInner, TResult> resultSelector", "Func<TOuter, TInner?, TResult> resultSelector");
         }
+        else if ((methodInfo.Name.Contains("ElementAt") && signature.Contains("Index")) || (methodInfo.Name == "Take" && signature.Contains("Range")))
+        {
+            signature = $$"""
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
+{{signature}}
+#endif
+""";
+        }
+        else if (methodInfo.Name == "SumUnchecked")
+        {
+            signature = $$"""
+#if NET8_0_OR_GREATER
+{{signature}}
+#endif
+""";
+        }
 
         return signature;
     }

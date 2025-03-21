@@ -2,6 +2,7 @@
 #pragma warning disable
 
 using Microsoft.DiagnosticsHub;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -23,6 +24,10 @@ using ZLinq.Traversables;
 // 2147483647
 
 [assembly: ZLinq.ZLinqDropInAttribute("", ZLinq.DropInGenerateTypes.Everything, DisableEmitSource = true)]
+
+
+//var tako = ValueEnumerable.Range(1, 10).Select(x => x.ToString());
+//var ok = string.Join(',', tako);
 
 
 ValueEnumerable.Range(1, 10).Concat(Enumerable.Range(1, 10)).ToArray();

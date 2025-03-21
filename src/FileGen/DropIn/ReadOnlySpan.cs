@@ -65,9 +65,13 @@ internal static partial class ZLinqDropInExtensions
     public static ValueEnumerable<DistinctBy<FromSpan<TSource>, TSource, TKey>, TSource> DistinctBy<TSource, TKey>(this ReadOnlySpan<TSource> source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().DistinctBy(keySelector);
     public static ValueEnumerable<DistinctBy<FromSpan<TSource>, TSource, TKey>, TSource> DistinctBy<TSource, TKey>(this ReadOnlySpan<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().DistinctBy(keySelector, comparer);
     public static TSource ElementAt<TSource>(this ReadOnlySpan<TSource> source, Int32 index) => source.AsValueEnumerable().ElementAt(index);
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     public static TSource ElementAt<TSource>(this ReadOnlySpan<TSource> source, Index index) => source.AsValueEnumerable().ElementAt(index);
+#endif
     public static TSource? ElementAtOrDefault<TSource>(this ReadOnlySpan<TSource> source, Int32 index) => source.AsValueEnumerable().ElementAtOrDefault(index);
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     public static TSource? ElementAtOrDefault<TSource>(this ReadOnlySpan<TSource> source, Index index) => source.AsValueEnumerable().ElementAtOrDefault(index);
+#endif
     public static ValueEnumerable<Except<FromSpan<TSource>, TEnumerator2, TSource>, TSource> Except<TEnumerator2, TSource>(this ReadOnlySpan<TSource> source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -292,14 +296,18 @@ internal static partial class ZLinqDropInExtensions
         , INumber<TSource>
 #endif
  => source.AsValueEnumerable().Sum();
+#if NET8_0_OR_GREATER
     public static TSource SumUnchecked<TSource>(this ReadOnlySpan<TSource> source)
         where TSource : struct
 #if NET8_0_OR_GREATER
         , INumber<TSource>
 #endif
  => source.AsValueEnumerable().SumUnchecked();
+#endif
     public static ValueEnumerable<Take<FromSpan<TSource>, TSource>, TSource> Take<TSource>(this ReadOnlySpan<TSource> source, Int32 count) => source.AsValueEnumerable().Take(count);
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     public static ValueEnumerable<TakeRange<FromSpan<TSource>, TSource>, TSource> Take<TSource>(this ReadOnlySpan<TSource> source, Range range) => source.AsValueEnumerable().Take(range);
+#endif
     public static ValueEnumerable<TakeLast<FromSpan<TSource>, TSource>, TSource> TakeLast<TSource>(this ReadOnlySpan<TSource> source, Int32 count) => source.AsValueEnumerable().TakeLast(count);
     public static ValueEnumerable<TakeWhile<FromSpan<TSource>, TSource>, TSource> TakeWhile<TSource>(this ReadOnlySpan<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().TakeWhile(predicate);
     public static ValueEnumerable<TakeWhile2<FromSpan<TSource>, TSource>, TSource> TakeWhile<TSource>(this ReadOnlySpan<TSource> source, Func<TSource, Int32, Boolean> predicate) => source.AsValueEnumerable().TakeWhile(predicate);

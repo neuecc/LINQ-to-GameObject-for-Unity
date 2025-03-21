@@ -64,9 +64,13 @@ internal static partial class ZLinqDropInExtensions
     public static ValueEnumerable<DistinctBy<FromMemory<TSource>, TSource, TKey>, TSource> DistinctBy<TSource, TKey>(this Memory<TSource> source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().DistinctBy(keySelector);
     public static ValueEnumerable<DistinctBy<FromMemory<TSource>, TSource, TKey>, TSource> DistinctBy<TSource, TKey>(this Memory<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().DistinctBy(keySelector, comparer);
     public static TSource ElementAt<TSource>(this Memory<TSource> source, Int32 index) => source.AsValueEnumerable().ElementAt(index);
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     public static TSource ElementAt<TSource>(this Memory<TSource> source, Index index) => source.AsValueEnumerable().ElementAt(index);
+#endif
     public static TSource? ElementAtOrDefault<TSource>(this Memory<TSource> source, Int32 index) => source.AsValueEnumerable().ElementAtOrDefault(index);
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     public static TSource? ElementAtOrDefault<TSource>(this Memory<TSource> source, Index index) => source.AsValueEnumerable().ElementAtOrDefault(index);
+#endif
     public static ValueEnumerable<Except<FromMemory<TSource>, TEnumerator2, TSource>, TSource> Except<TEnumerator2, TSource>(this Memory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -291,14 +295,18 @@ internal static partial class ZLinqDropInExtensions
         , INumber<TSource>
 #endif
  => source.AsValueEnumerable().Sum();
+#if NET8_0_OR_GREATER
     public static TSource SumUnchecked<TSource>(this Memory<TSource> source)
         where TSource : struct
 #if NET8_0_OR_GREATER
         , INumber<TSource>
 #endif
  => source.AsValueEnumerable().SumUnchecked();
+#endif
     public static ValueEnumerable<Take<FromMemory<TSource>, TSource>, TSource> Take<TSource>(this Memory<TSource> source, Int32 count) => source.AsValueEnumerable().Take(count);
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     public static ValueEnumerable<TakeRange<FromMemory<TSource>, TSource>, TSource> Take<TSource>(this Memory<TSource> source, Range range) => source.AsValueEnumerable().Take(range);
+#endif
     public static ValueEnumerable<TakeLast<FromMemory<TSource>, TSource>, TSource> TakeLast<TSource>(this Memory<TSource> source, Int32 count) => source.AsValueEnumerable().TakeLast(count);
     public static ValueEnumerable<TakeWhile<FromMemory<TSource>, TSource>, TSource> TakeWhile<TSource>(this Memory<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().TakeWhile(predicate);
     public static ValueEnumerable<TakeWhile2<FromMemory<TSource>, TSource>, TSource> TakeWhile<TSource>(this Memory<TSource> source, Func<TSource, Int32, Boolean> predicate) => source.AsValueEnumerable().TakeWhile(predicate);

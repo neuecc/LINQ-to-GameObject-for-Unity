@@ -1,16 +1,18 @@
 <Solution>
   <Folder Name="/sandbox/">
+    <Project Path="sandbox/ConsoleAppNet6/ConsoleAppNet6.csproj" Id="a347184a-8fb7-4ef7-875f-df54d7977925" />
     <Project Path="sandbox/Benchmark/Benchmark.csproj" />
     <Project Path="sandbox/ConsoleApp/ConsoleApp.csproj" />
+    <Project Path="sandbox/ConsoleAppNetFramework48/ConsoleAppNetFramework48.csproj" Id="3429f07c-2daf-4866-9ec7-0c978c7903b3" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/FileGen/FileGen.csproj" />
     <Project Path="src/ZLinq.DropInGenerator/ZLinq.DropInGenerator.csproj" />
     <Project Path="src/ZLinq.FileSystem/ZLinq.FileSystem.csproj" />
     <Project Path="src/ZLinq.Godot/ZLinq.Godot.csproj" />
     <Project Path="src/ZLinq.Json/ZLinq.Json.csproj" />
     <Project Path="src/ZLinq.__Unity/ZLinq.__Unity.csproj" />
     <Project Path="src/ZLinq/ZLinq.csproj" />
-    <Project Path="src/FileGen/FileGen.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ZLinq.Tests/ZLinq.Tests.csproj" />
