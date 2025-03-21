@@ -1,4 +1,6 @@
-﻿using System.Buffers;
+﻿#pragma warning disable
+
+using System.Buffers;
 using System.Collections;
 using System.Diagnostics;
 
@@ -456,7 +458,11 @@ namespace ZLinq.Linq
 
         public TElement this[int index]
         {
+#if NETSTANDARD2_0
+            get => elements.Array.GetAt(index);
+#else
             get => elements.Array[index];
+#endif
             set => throw new NotSupportedException();
         }
 

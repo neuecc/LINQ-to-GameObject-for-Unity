@@ -118,7 +118,7 @@ namespace ZLinq.Linq
                     foreach (var item in span)
                     {
                         var key = keySelector(item);
-#if NETSTANDARD2_1
+#if NETSTANDARD2_0 || NETSTANDARD2_1
                         if (dict.TryGetValue(key, out var accumulate))
                         {
                             dict[key] = func(accumulate, item);
@@ -138,7 +138,7 @@ namespace ZLinq.Linq
                     while (source.TryGetNext(out var item))
                     {
                         var key = keySelector(item);
-#if NETSTANDARD2_1
+#if NETSTANDARD2_0 || NETSTANDARD2_1
                         if (dict.TryGetValue(key, out var accumulate))
                         {
                             dict[key] = func(accumulate, item);
@@ -244,7 +244,7 @@ namespace ZLinq.Linq
                     foreach (var item in span)
                     {
                         var key = keySelector(item);
-#if NETSTANDARD2_1
+#if NETSTANDARD2_0 || NETSTANDARD2_1
                         if (dict.TryGetValue(key, out var accumulate))
                         {
                             dict[key] = func(accumulate, item);
@@ -264,7 +264,7 @@ namespace ZLinq.Linq
                     while (source.TryGetNext(out var item))
                     {
                         var key = keySelector(item);
-#if NETSTANDARD2_1
+#if NETSTANDARD2_0 || NETSTANDARD2_1
                         if (dict.TryGetValue(key, out var accumulate))
                         {
                             dict[key] = func(accumulate, item);

@@ -1,4 +1,6 @@
-﻿using BenchmarkDotNet.Configs;
+﻿#pragma warning disable
+
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Cathei.LinqGen;

@@ -1,4 +1,5 @@
-﻿#if NETSTANDARD2_1
+﻿#if NETSTANDARD2_0 || NETSTANDARD2_1
+#pragma warning disable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

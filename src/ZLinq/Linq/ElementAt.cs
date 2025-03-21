@@ -21,6 +21,7 @@
             }
         }
 
+#if !NETSTANDARD2_0
 
         public static TSource ElementAt<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Index index)
             where TEnumerator : struct, IValueEnumerator<TSource>
@@ -41,6 +42,8 @@
             }
         }
 
+#endif
+
         public static TSource ElementAtOrDefault<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Int32 index)
           where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -60,6 +63,8 @@
             }
         }
 
+#if !NETSTANDARD2_0
+
         public static TSource ElementAtOrDefault<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Index index)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -78,6 +83,8 @@
                 enumerator.Dispose();
             }
         }
+
+#endif
 
         static bool TryGetElementAt<TEnumerator, TSource>(ref TEnumerator source, int index, out TSource value)
             where TEnumerator : struct, IValueEnumerator<TSource>

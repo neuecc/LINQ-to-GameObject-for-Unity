@@ -11,12 +11,16 @@ namespace ZLinq
 #endif
             => new(new(source.Enumerator, count));
 
+#if !NETSTANDARD2_0
+
         public static ValueEnumerable<TakeRange<TEnumerator, TSource>, TSource> Take<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Range range)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(new(source.Enumerator, range));
+
+#endif
     }
 }
 
@@ -90,6 +94,8 @@ namespace ZLinq.Linq
             source.Dispose();
         }
     }
+
+#if !NETSTANDARD2_0
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -311,4 +317,6 @@ namespace ZLinq.Linq
             source.Dispose();
         }
     }
+
+#endif
 }
