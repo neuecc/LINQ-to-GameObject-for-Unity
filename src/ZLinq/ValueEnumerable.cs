@@ -31,7 +31,7 @@ public interface IValueEnumerator<T> : IDisposable
     // Optimization helper
     bool TryGetNonEnumeratedCount(out int count);
     bool TryGetSpan(out ReadOnlySpan<T> span);
-    bool TryCopyTo(Span<T> destination);
+    bool TryCopyTo(scoped Span<T> destination, int offset = 0);
 }
 
 // generic implementation of enumerator
