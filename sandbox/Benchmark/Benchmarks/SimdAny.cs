@@ -121,7 +121,11 @@ public class SimdAny
         if (Vector.IsHardwareAccelerated && span.Length >= Vector<T>.Count)
         {
             ref var to = ref Unsafe.Subtract(ref end, Vector<T>.Count);
+#if NET9_0_OR_GREATER
             var state = Vector.Create(9800);
+#else
+            var state = new Vector<int>(9800);
+#endif
             do
             {
                 var data = Vector.LoadUnsafe(ref current);
