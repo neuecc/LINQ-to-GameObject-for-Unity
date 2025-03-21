@@ -10,29 +10,6 @@ partial class ValueEnumerableExtensions
     {
         using (var enumerator = source.Enumerator)
         {
-            if (enumerator.TryGetSpan(out var span))
-            {
-#if NET8_0_OR_GREATER
-                CollectionsMarshal.SetCount(list, span.Length);
-                span.CopyTo(CollectionsMarshal.AsSpan(list));
-                return;
-#else
-                // NETSTANDARD2_1 has no SetCount(Count + Grow)
-                // only use no needs Grow
-                var listSpan = CollectionsMarshal.UnsafeAsRawSpan(list);
-                if (span.Length < listSpan.Length)
-                {
-                    if (list.Count < span.Length)
-                    {
-                        CollectionsMarshal.UnsafeSetCount(list, span.Length);
-                        listSpan.Slice(span.Length).Clear(); // clear rest
-                    }
-                    span.CopyTo(listSpan);
-                    return;
-                }
-#endif
-            }
-
             if (enumerator.TryGetNonEnumeratedCount(out var length))
             {
 #if NET8_0_OR_GREATER
