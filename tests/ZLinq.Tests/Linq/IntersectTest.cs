@@ -292,8 +292,8 @@ namespace ZLinq.Tests.Linq
                 span = default;
                 return false;
             }
-
-            public bool TryCopyTo(Span<T> destination)
+          
+            public bool TryCopyTo(Span<T> destination, Index offset)
             {
                 return false;
             }

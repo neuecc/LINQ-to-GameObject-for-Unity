@@ -39,5 +39,5 @@ trim_trailing_whitespace = false
 
 # C# code style settings
 [*.{cs}]
-
-## TODO: Define custom settings
+# https://stackoverflow.com/questions/79195382/how-to-disable-fading-unused-methods-in-visual-studio-2022-17-12-0
+dotnet_diagnostic.IDE0051.severity = none

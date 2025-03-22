@@ -48,16 +48,19 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> dest)
+        public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
             if (!source.TryGetNonEnumeratedCount(out var srcCount)) return false;
-            if (srcCount + 1 > dest.Length) return false;
 
-            if (!source.TryCopyTo(dest.Slice(1)))
+            var srcOffset = offset.GetOffset(srcCount);
+            if ((srcCount - srcOffset + 1) > destination.Length) return false;
+
+            if (!source.TryCopyTo(destination.Slice(1), offset))
             {
                 return false;
             }
-            dest[0] = element;
+
+            destination[0] = element;
             return true;
         }
 

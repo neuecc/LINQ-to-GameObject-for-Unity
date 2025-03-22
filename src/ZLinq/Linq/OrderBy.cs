@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ZLinq
 {
@@ -113,82 +114,52 @@ namespace ZLinq.Linq
         TEnumerator source = source;
         OrderByComparable<TSource, TKey> comparable = new(keySelector, comparer, parent, descending); // boxed
 
-        TSource[]? sourceMap; // allocate
+        TSource[]? buffer;
         int index;
 
         public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
-            span = default;
-            return false;
+            InitBuffer();
+            span = buffer;
+            return true;
         }
 
-        public bool TryCopyTo(Span<TSource> destination)
+        public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
-            if (source.TryGetNonEnumeratedCount(out var count) && source.TryCopyTo(destination.Slice(0, count)))
+            // in-place sort needs full src buffer(no offset)
+            if (source.TryGetNonEnumeratedCount(out var count) && offset.GetOffset(count) == 0)
             {
-                // QuickSort is not stable sort algorithm, OrderBy must be stable sort so always use schwartzian transform.
-                var dest = destination.Slice(0, count);
-
-                // same as dotnet/runtime condition: Order() and primitive, default comparer, no-ThenBy
-                if (IsAllowDirectSort())
+                // destination must be larger than source
+                if (destination.Length >= count)
                 {
-                    if (descending)
+                    // and ok to copy then sort.
+                    if (source.TryCopyTo(destination, 0))
                     {
-                        dest.Sort(DescendingDefaultComparer<TSource>.Default);
+                        Sort(destination.Slice(0, count));
+                        return true;
                     }
-                    else
-                    {
-                        dest.Sort();
-                    }
-
-                    return true;
                 }
+            }
 
-                // faster(using SIMD) index map creation
-                var (indexMap, size) = ValueEnumerable.Range(0, count).ToArrayPool<FromRange, int>();
-
-                using var comparer = comparable.GetComparer(dest, null!);
-                indexMap.AsSpan(0, size).Sort(dest, comparer);
-                ArrayPool<int>.Shared.Return(indexMap);
-
+            InitBuffer();
+            if (IterateHelper.TryGetSlice<TSource>(buffer, offset, destination.Length, out var slice))
+            {
+                slice.CopyTo(destination);
                 return true;
             }
+
             return false;
         }
 
         public bool TryGetNext(out TSource current)
         {
-            if (sourceMap == null)
+            InitBuffer();
+
+            if (index < buffer.Length)
             {
-                sourceMap = new ValueEnumerable<TEnumerator, TSource>(source).ToArray();
-
-                if (IsAllowDirectSort())
-                {
-                    var dest = sourceMap.AsSpan();
-                    if (descending)
-                    {
-                        dest.Sort(DescendingDefaultComparer<TSource>.Default);
-                    }
-                    else
-                    {
-                        dest.Sort();
-                    }
-                }
-                else
-                {
-                    var (indexMap, size) = ValueEnumerable.Range(0, sourceMap.Length).ToArrayPool<FromRange, int>();
-
-                    using var comparer = comparable.GetComparer(sourceMap, null!);
-                    indexMap.AsSpan(0, size).Sort(sourceMap.AsSpan(), comparer);
-                    ArrayPool<int>.Shared.Return(indexMap);
-                }
-            }
-
-            if (index < sourceMap.Length)
-            {
-                current = sourceMap[index++];
+                current = buffer[index++];
                 return true;
             }
 
@@ -199,6 +170,42 @@ namespace ZLinq.Linq
         public void Dispose()
         {
             source.Dispose();
+        }
+
+        [MemberNotNull(nameof(buffer))]
+        void InitBuffer()
+        {
+            if (buffer == null)
+            {
+                // do not use pool(struct field can't gurantees state of reference)
+                // TODO: in-future use SafeBox
+                buffer = new ValueEnumerable<TEnumerator, TSource>(source).ToArray();
+                Sort(buffer);
+            }
+        }
+
+        void Sort(Span<TSource> span)
+        {
+            if (IsAllowDirectSort())
+            {
+                if (descending)
+                {
+                    span.Sort(DescendingDefaultComparer<TSource>.Default);
+                }
+                else
+                {
+                    span.Sort();
+                }
+            }
+            else
+            {
+                // faster(using SIMD) index map creation
+                var (indexMap, size) = ValueEnumerable.Range(0, span.Length).ToArrayPool();
+
+                using var comparer = comparable.GetComparer(span, null!);
+                indexMap.AsSpan(0, size).Sort(span, comparer);
+                ArrayPool<int>.Shared.Return(indexMap);
+            }
         }
 
         public OrderBy<TEnumerator, TSource, TSecondKey> ThenBy<TSecondKey>(Func<TSource, TSecondKey> keySelector, IComparer<TSecondKey>? comparer = null)

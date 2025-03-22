@@ -1,4 +1,6 @@
-﻿namespace ZLinq
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -28,26 +30,40 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerator source = source;
-        TSource[]? temp;
+        TSource[]? buffer;
         int index = 0;
 
         public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
-            span = default;
-            return false;
+            InitBuffer();
+            span = buffer;
+            return true;
         }
 
-        public bool TryCopyTo(Span<TSource> destination)
+        public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
-            if (source.TryGetNonEnumeratedCount(out var count) && count <= destination.Length)
+            // in-place shuffle needs full src buffer(no offset)
+            if (source.TryGetNonEnumeratedCount(out var count) && offset.GetOffset(count) == 0)
             {
-                if (source.TryCopyTo(destination))
+                // destination must be larger than source
+                if (destination.Length >= count)
                 {
-                    RandomShared.Shuffle(destination.Slice(0, count));
-                    return true;
+                    // and ok to copy then shuffle.
+                    if (source.TryCopyTo(destination, 0))
+                    {
+                        RandomShared.Shuffle(destination.Slice(0, count));
+                        return true;
+                    }
                 }
+            }
+
+            InitBuffer();
+            if (IterateHelper.TryGetSlice<TSource>(buffer, offset, destination.Length, out var slice))
+            {
+                slice.CopyTo(destination);
+                return true;
             }
 
             return false;
@@ -55,15 +71,11 @@ namespace ZLinq.Linq
 
         public bool TryGetNext(out TSource current)
         {
-            if (temp == null)
-            {
-                temp = new ValueEnumerable<TEnumerator, TSource>(source).ToArray<TEnumerator, TSource>(); // do not use pool(struct field can't gurantees state of reference)
-                RandomShared.Shuffle(temp);
-            }
+            InitBuffer();
 
-            if (index < temp.Length)
+            if (index < buffer.Length)
             {
-                current = temp[index++];
+                current = buffer[index++];
                 return true;
             }
 
@@ -74,6 +86,18 @@ namespace ZLinq.Linq
         public void Dispose()
         {
             source.Dispose();
+        }
+
+        [MemberNotNull(nameof(buffer))]
+        void InitBuffer()
+        {
+            if (buffer == null)
+            {
+                // do not use pool(struct field can't gurantees state of reference)
+                // TODO: in-future use SafeBox
+                buffer = new ValueEnumerable<TEnumerator, TSource>(source).ToArray<TEnumerator, TSource>();
+                RandomShared.Shuffle(buffer);
+            }
         }
     }
 }

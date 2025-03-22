@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Order;
 using ZLinq;
 
 namespace Benchmark;
@@ -9,21 +8,11 @@ namespace Benchmark;
 [ShortRunJob]
 [MemoryDiagnoser]
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
-[Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class Select4
 {
     int[] src = Enumerable.Range(1, 1000000).ToArray();
-    // IEnumerable<int> src = Iterate();
 
-    static IEnumerable<int> Iterate()
-    {
-        foreach (var item in Enumerable.Range(1, 1000000))
-        {
-            yield return item;
-        }
-    }
-
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     [BenchmarkCategory(Categories.LINQ)]
     public void LinqSelect1()
     {
@@ -63,7 +52,7 @@ public class Select4
         }
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     [BenchmarkCategory(Categories.ZLinq)]
     public void ZLinqSelect1()
     {
