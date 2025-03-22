@@ -17,7 +17,12 @@ internal static class Program
     public static int Main(string[] args)
     {
 #if DEBUG
-        BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
+        // BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
+
+        var bench = new LinqPerfBenchmarks.Order00();
+        bench.Setup();
+        bench.Linq_OrderByDescending_Count_ElementAt();
+        bench.ZLinq_OrderByDescending_Count_ElementAt();
 
         var i = 0;
         foreach (var item in typeof(Enumerable).GetMethods().GroupBy(x => x.Name))
