@@ -34,11 +34,15 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> dest, int offset)
+        public bool TryCopyTo(Span<T> destination, Index offset)
         {
-            // TODO: range validation?
-            dest.Slice(0, _count).Fill(_element);
-            return true;
+            if (IterateHelper.TryGetSliceRange(_count, offset, destination.Length, out var _, out var fillCount))
+            {
+                destination.Slice(0, fillCount).Fill(_element); // Span.Fill using SIMD
+                return true;
+            }
+
+            return false;
         }
 
         public bool TryGetNext(out T current)

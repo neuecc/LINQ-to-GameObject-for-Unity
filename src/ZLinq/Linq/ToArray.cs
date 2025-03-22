@@ -17,7 +17,6 @@ partial class ValueEnumerableExtensions
                 return Array.Empty<TSource>();
             }
 
-            var i = 0;
             var array = GC.AllocateUninitializedArray<TSource>(count);
 
             if (enumerator.TryCopyTo(array.AsSpan()))
@@ -25,6 +24,7 @@ partial class ValueEnumerableExtensions
                 return array;
             }
 
+            var i = 0;
             while (enumerator.TryGetNext(out var item))
             {
                 array[i++] = item;

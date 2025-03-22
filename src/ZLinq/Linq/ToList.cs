@@ -8,45 +8,47 @@
             , allows ref struct
 #endif
         {
-            var enumerator = source.Enumerator;
-            try
+            using var enumerator = source.Enumerator;
+
+            if (enumerator.TryGetNonEnumeratedCount(out var count))
             {
-                if (enumerator.TryGetNonEnumeratedCount(out var count))
-                {
-                    var list = new List<TSource>(count);
+                var list = new List<TSource>(count); // list with capacity set internal buffer as source size
 #if NET8_0_OR_GREATER
-                    CollectionsMarshal.SetCount(list, count);
+                CollectionsMarshal.SetCount(list, count);
 #else
-                    CollectionsMarshal.UnsafeSetCount(list, count);
+                CollectionsMarshal.UnsafeSetCount(list, count);
 #endif
-                    var dest = CollectionsMarshal.AsSpan(list);
-
-                    if (enumerator.TryCopyTo(dest))
-                    {
-                        return list;
-                    }
-                    else
-                    {
-                        UnsafeSlowCopyTo(ref enumerator, ref MemoryMarshal.GetReference(dest));
-                        return list;
-                    }
-                }
-
+                var span = CollectionsMarshal.AsSpan(list);
+                if (!enumerator.TryCopyTo(span))
                 {
-                    using var arrayBuilder = new SegmentedArrayBuilder<TSource>();
-                    while (enumerator.TryGetNext(out var item))
+                    var i = 0;
+                    while (enumerator.TryGetNext(out var current))
                     {
-                        arrayBuilder.Add(item);
+                        span[i++] = current;
                     }
-
-                    var array = GC.AllocateUninitializedArray<TSource>(arrayBuilder.Count);
-                    arrayBuilder.CopyTo(array);
-                    return ListMarshal.AsList(array);
                 }
+                return list;
             }
-            finally
+            else
             {
-                enumerator.Dispose();
+                // list.Add is slow, avoid it.
+
+                using var arrayBuilder = new SegmentedArrayBuilder<TSource>();
+                while (enumerator.TryGetNext(out var item))
+                {
+                    arrayBuilder.Add(item);
+                }
+
+                var list = new List<TSource>(arrayBuilder.Count);
+#if NET8_0_OR_GREATER
+                CollectionsMarshal.SetCount(list, count);
+#else
+                CollectionsMarshal.UnsafeSetCount(list, count);
+#endif
+
+                var span = CollectionsMarshal.AsSpan(list);
+                arrayBuilder.CopyTo(span);
+                return list;
             }
         }
     }

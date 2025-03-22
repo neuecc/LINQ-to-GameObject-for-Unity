@@ -27,7 +27,7 @@ struct ValueEnumerable<TEnumerator, T>(TEnumerator enumerator)
 public interface IValueEnumerator<T> : IDisposable
 {
     /// <summary>
-    /// MoveNext + Current.
+    /// Equivalent of IEnumerator.MoveNext + Current.
     /// </summary>
     bool TryGetNext(out T current);
 
@@ -48,10 +48,9 @@ public interface IValueEnumerator<T> : IDisposable
 
     /// <summary>
     /// Unlike the semantics of normal CopyTo, this allows the destination to be smaller than the source.
-    /// This serves as a GetAt function as well.
-    /// Also, it does not allow the destination to exceed the length of the source.
+    /// This serves as a TryGet function as well, e.g. single-span and ^1 is TryGetLast.
     /// </summary>
-    bool TryCopyTo(scoped Span<T> destination, int offset = 0);
+    bool TryCopyTo(scoped Span<T> destination, Index offset = default);
 }
 
 // generic implementation of enumerator

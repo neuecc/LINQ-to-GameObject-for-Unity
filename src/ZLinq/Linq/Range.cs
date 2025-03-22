@@ -42,13 +42,15 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<int> destination, int offset)
+        public bool TryCopyTo(Span<int> destination, Index offset)
         {
-            if (offset < 0 || offset >= count) return false;
-            if ((count - offset) < destination.Length) return false;
+            if (IterateHelper.TryGetSliceRange(count, offset, destination.Length, out var fillStart, out var fillCount))
+            {
+                FillIncremental(destination.Slice(0, fillCount), fillStart);
+                return true;
+            }
 
-            FillIncremental(destination, start);
-            return true;
+            return false;
         }
 
         public bool TryGetNext(out int current)

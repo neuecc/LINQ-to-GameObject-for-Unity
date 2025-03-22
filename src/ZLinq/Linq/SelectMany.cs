@@ -84,7 +84,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TResult> destination, int offset) => false;
+        public bool TryCopyTo(Span<TResult> destination, Index offset) => false;
 
         public bool TryGetNext(out TResult current)
         {
@@ -156,7 +156,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TResult> destination, int offset) => false;
+        public bool TryCopyTo(Span<TResult> destination, Index offset) => false;
 
         public bool TryGetNext(out TResult current)
         {
@@ -228,7 +228,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TResult> destination, int offset) => false;
+        public bool TryCopyTo(Span<TResult> destination, Index offset) => false;
 
         public bool TryGetNext(out TResult current)
         {
@@ -303,7 +303,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TResult> destination, int offset) => false;
+        public bool TryCopyTo(Span<TResult> destination, Index offset) => false;
 
         public bool TryGetNext(out TResult current)
         {

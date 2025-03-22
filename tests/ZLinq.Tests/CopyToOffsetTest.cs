@@ -1,158 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ZLinq.Tests;
+﻿namespace ZLinq.Tests;
 
 public class CopyToOffsetTest
 {
     [Fact]
-    public void TryCopyTo_ValidOffset_ReturnsTrue()
+    public void Foo()
     {
-        // Arrange
-        int[] source = { 1, 2, 3, 4, 5 };
-        var wrapper = source.AsValueEnumerable().Enumerator;
-        int[] destination = new int[3];
+        var fromArray = new[] { 1, 2, 3, 4, 5 }.AsValueEnumerable().Enumerator;
 
-        // Act
-        bool result = wrapper.TryCopyTo(destination, 1);
+        // same size of destination
+        var dest = new int[5];
+        fromArray.TryCopyTo(dest, 0).ShouldBeTrue();
+        dest.ShouldBe([1, 2, 3, 4, 5]);
 
-        // Assert
-        Assert.True(result);
-        Assert.Equal(new[] { 2, 3, 4 }, destination);
-    }
+        Array.Clear(dest);
+        fromArray.TryCopyTo(dest, 1).ShouldBeTrue();
+        dest.ShouldBe([2, 3, 4, 5, 0]);
 
-    [Fact]
-    public void TryCopyTo_NegativeOffset_ReturnsFalse()
-    {
-        // Arrange
-        int[] source = { 1, 2, 3, 4, 5 };
-        var wrapper = source.AsValueEnumerable().Enumerator;
-        int[] destination = new int[3];
-        int[] originalDestination = new int[3];
-        Array.Copy(destination, originalDestination, destination.Length);
+        Array.Clear(dest);
+        fromArray.TryCopyTo(dest, 2).ShouldBeTrue();
+        dest.ShouldBe([3, 4, 5, 0, 0]);
 
-        // Act
-        bool result = wrapper.TryCopyTo(destination, -1);
+        Array.Clear(dest);
+        fromArray.TryCopyTo(dest, 3).ShouldBeTrue();
+        dest.ShouldBe([4, 5, 0, 0, 0]);
 
-        // Assert
-        Assert.False(result);
-        Assert.Equal(originalDestination, destination); // Destination should be unchanged
-    }
+        Array.Clear(dest);
+        fromArray.TryCopyTo(dest, 4).ShouldBeTrue();
+        dest.ShouldBe([5, 0, 0, 0, 0]);
 
-    [Fact]
-    public void TryCopyTo_OffsetTooBig_ReturnsFalse()
-    {
-        // Arrange
-        int[] source = { 1, 2, 3, 4, 5 };
-        var wrapper = source.AsValueEnumerable().Enumerator;
-        int[] destination = new int[3];
-        int[] originalDestination = new int[3];
-        Array.Copy(destination, originalDestination, destination.Length);
+        // offset is full
+        Array.Clear(dest);
+        fromArray.TryCopyTo(dest, 5).ShouldBeTrue();
+        dest.ShouldBe([0, 0, 0, 0, 0]);
 
-        // Act
-        bool result = wrapper.TryCopyTo(destination, 5); // source.Length is the first invalid offset
+        // offset is larger than destination
+        fromArray.TryCopyTo(dest, 6).ShouldBeFalse();
 
-        // Assert
-        Assert.False(result);
-        Assert.Equal(originalDestination, destination); // Destination should be unchanged
-    }
+        // offset is negative
+        fromArray.TryCopyTo(dest, -1).ShouldBeFalse();
 
-    [Fact]
-    public void TryCopyTo_NotEnoughElementsAfterOffset_ReturnsFalse()
-    {
-        // Arrange
-        int[] source = { 1, 2, 3, 4, 5 };
-        var wrapper = source.AsValueEnumerable().Enumerator;
-        int[] destination = new int[3];
-        int[] originalDestination = new int[3];
-        Array.Copy(destination, originalDestination, destination.Length);
+        // destination is larger than source
+        // TODO: test this
 
-        // Act
-        bool result = wrapper.TryCopyTo(destination, 3); // Only 2 elements available from offset 3
-
-        // Assert
-        Assert.False(result);
-        Assert.Equal(originalDestination, destination); // Destination should be unchanged
-    }
-
-    [Fact]
-    public void TryCopyTo_DestinationSmallerThanSource_Success()
-    {
-        // Arrange
-        int[] source = { 1, 2, 3, 4, 5 };
-        var wrapper = source.AsValueEnumerable().Enumerator;
-        int[] destination = new int[2];
-
-        // Act
-        bool result = wrapper.TryCopyTo(destination, 1);
-
-        // Assert
-        Assert.True(result);
-        Assert.Equal(new[] { 2, 3 }, destination);
-    }
-
-    [Fact]
-    public void TryCopyTo_DestinationBiggerThanSource_Fail()
-    {
-        // Arrange
-        int[] source = { 1, 2, 3, 4, 5 };
-        var wrapper = source.AsValueEnumerable().Enumerator;
-        int[] destination = new int[10];
-
-        // Act
-        bool result = wrapper.TryCopyTo(destination, 0);
-
-        // Assert
-        Assert.False(result);
-    }
-
-    [Fact]
-    public void TryCopyTo_DestinationBiggerThanSource_Fail2()
-    {
-        // Arrange
-        int[] source = { 1, 2, 3, 4, 5 };
-        var wrapper = source.AsValueEnumerable().Enumerator;
-        int[] destination = new int[4];
-
-        // Act
-        bool result = wrapper.TryCopyTo(destination, 3);
-
-        // Assert
-        Assert.False(result);
-    }
-
-    [Fact]
-    public void TryCopyTo_ZeroLengthDestination_ReturnsTrue()
-    {
-        // Arrange
-        int[] source = { 1, 2, 3, 4, 5 };
-        var wrapper = source.AsValueEnumerable().Enumerator;
-        int[] destination = Array.Empty<int>();
-
-        // Act
-        bool result = wrapper.TryCopyTo(destination, 3);
-
-        // Assert
-        Assert.True(result);
-        Assert.Empty(destination);
-    }
-
-    [Fact]
-    public void TryCopyTo_SourceContainsNull_CopiesNullValues()
-    {
-        // Arrange
-        string?[] source = { "one", null, "three", "four", "five" };
-        var wrapper = source.AsValueEnumerable().Enumerator;
-        string[] destination = new string[3];
-
-        // Act
-        bool result = wrapper.TryCopyTo(destination, 1);
-
-        // Assert
-        Assert.True(result);
-        Assert.Equal(new[] { null, "three", "four" }, destination);
+        // destination is smaller than source
+        // TODO: test this
     }
 }

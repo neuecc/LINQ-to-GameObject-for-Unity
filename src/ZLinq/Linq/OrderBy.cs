@@ -124,7 +124,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination, int offset)
+        public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
             if (source.TryGetNonEnumeratedCount(out var count) && source.TryCopyTo(destination.Slice(0, count)))
             {

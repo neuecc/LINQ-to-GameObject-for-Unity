@@ -1,6 +1,7 @@
 ﻿#pragma warning disable
 
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Cathei.LinqGen;

@@ -35,8 +35,8 @@ namespace ZLinq
             try
             {
                 return TryGetElementAt<TEnumerator, TSource>(ref enumerator, index, out var value)
-                ? value
-                : Throws.ArgumentOutOfRange<TSource>(nameof(index));
+                    ? value
+                    : Throws.ArgumentOutOfRange<TSource>(nameof(index));
             }
             finally
             {
@@ -85,39 +85,7 @@ namespace ZLinq
                 enumerator.Dispose();
             }
         }
-
 #endif
-
-
-        static bool TryGetElementAt<TEnumerator, TSource>(ref TEnumerator source, int index, out TSource value)
-            where TEnumerator : struct, IValueEnumerator<TSource>
-#if NET9_0_OR_GREATER
-            , allows ref struct
-#endif
-        {
-            if (index >= 0)
-            {
-                var current = default(TSource)!;
-                if (source.TryCopyTo(SingleSpan.Create(ref current), offset: index))
-                {
-                    value = current;
-                    return true;
-                }
-
-                while (source.TryGetNext(out current))
-                {
-                    if (index == 0)
-                    {
-                        value = current;
-                        return true;
-                    }
-                    index--;
-                }
-            }
-
-            value = default!;
-            return false;
-        }
 
         static bool TryGetElementAt<TEnumerator, TSource>(ref TEnumerator source, Index index, out TSource value)
            where TEnumerator : struct, IValueEnumerator<TSource>
@@ -125,42 +93,15 @@ namespace ZLinq
            , allows ref struct
 #endif
         {
-            if (!index.IsFromEnd)
+            var current = default(TSource)!;
+            if (source.TryCopyTo(SingleSpan.Create(ref current), index))
             {
-                return TryGetElementAt<TEnumerator, TSource>(ref source, index.Value, out value);
+                value = current;
+                return true;
             }
-
-            var indexFromEnd = index.Value;
-
-            if (source.TryGetNonEnumeratedCount(out var count))
+            else if (IterateHelper.TryConsumeGetAt<TEnumerator, TSource>(ref source, index, out current))
             {
-                if (indexFromEnd < 0 || indexFromEnd > count)
-                {
-                    value = default!;
-                    return false;
-                }
-
-                var current = default(TSource)!;
-                if (source.TryCopyTo(SingleSpan.Create(ref current), offset: count - indexFromEnd))
-                {
-                    value = current;
-                    return true;
-                }
-            }
-
-            using var q = new ValueQueue<TSource>(4);
-            while (source.TryGetNext(out var current))
-            {
-                if (q.Count == indexFromEnd)
-                {
-                    q.Dequeue();
-                }
-                q.Enqueue(current);
-            }
-
-            if (q.Count == indexFromEnd)
-            {
-                value = q.Dequeue();
+                value = current!;
                 return true;
             }
 

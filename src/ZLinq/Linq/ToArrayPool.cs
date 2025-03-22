@@ -11,6 +11,7 @@ partial class ValueEnumerableExtensions
 #endif
     {
         using var enumerator = source.Enumerator;
+
         if (enumerator.TryGetNonEnumeratedCount(out var count))
         {
             if (count == 0)
