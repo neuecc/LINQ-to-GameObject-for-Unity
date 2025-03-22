@@ -30,14 +30,11 @@ using ZLinq.Traversables;
 //var ok = string.Join(',', tako);
 
 
-var source = new int[0]; // {532, 1, 21414, 14, 315, 5, 2, 542, 62, 62, 62, 753, 1, 63, 63, 6 };
+var source = new int[] { 532, 1, 21414, 14, 315, 5, 2, 542, 62, 62, 62, 753, 1, 63, 63, 6 };
+var l = source.OrderBy(x => x).ThenByDescending(x => x).ElementAt(0);
 
-var foo = source.AsValueEnumerable().OrderByDescending(x => x).FirstOrDefault();
-var bar = source.OrderByDescending(x => x).FirstOrDefault();
-
-Console.WriteLine(foo);
-Console.WriteLine(bar);
-
+var a = source.AsEnumerable().TryGetNonEnumeratedCount(out var foo);
+Console.WriteLine(a);
 
 return;
 ValueEnumerable.Range(1, 10).Concat(Enumerable.Range(1, 10)).ToArray();

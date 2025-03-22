@@ -172,7 +172,7 @@ namespace ZLinq.Linq
 
                     var elementIndex = elementAt switch
                     {
-                        0 => OrderByHelper.Min(indexMap, comparer, size), // Max? you can control OrderBy/OrderByDescending
+                        0 => OrderByHelper.Min(indexMap, comparer, size), // TODO:Max(Last)
                         _ => OrderByHelper.QuickSelect(indexMap, comparer, size - 1, elementAt)
                     };
 
@@ -485,7 +485,7 @@ namespace ZLinq.Linq
             int index = 0;
             for (int i = 1; i < count; i++)
             {
-                if (comparer.Compare(map[i], map[index]) > 0)
+                if (comparer.Compare(map[i], map[index]) >= 0)
                 {
                     index = i;
                 }
