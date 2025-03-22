@@ -66,22 +66,25 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> dest)
+        public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
-            if (dest.Length == 0) return true;
+            if (destination.Length == 0) return true;
 
-            if (source.TryGetNonEnumeratedCount(out var sourceCount) && sourceCount == 0 && dest.Length >= 1)
+            // ignore offset when checking
+            if (source.TryGetNonEnumeratedCount(out var sourceCount) && sourceCount == 0 && destination.Length >= 1)
             {
-                dest[0] = defaultValue;
-                return true;
+                // check offset
+                if (offset.GetOffset(sourceCount) == 0)
+                {
+                    destination[0] = defaultValue;
+                    return true;
+                }
+                return false;
             }
-
-            if (source.TryCopyTo(dest))
+            else
             {
-                return true;
+                return source.TryCopyTo(destination, offset);
             }
-
-            return false;
         }
 
         public bool TryGetNext(out TSource current)

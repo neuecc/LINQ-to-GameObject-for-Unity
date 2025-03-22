@@ -122,20 +122,15 @@
             , allows ref struct
 #endif
         {
-            if (source.TryGetSpan(out var span))
+            var current = default(TSource)!;
+            if (source.TryCopyTo(SingleSpan.Create(ref current), 0))
             {
-                if (span.Length > 0)
-                {
-                    value = span[0];
-                    return true;
-                }
-
-                value = default!;
-                return false;
+                value = current;
+                return true;
             }
-
-            if (source.TryGetNext(out value))
+            else if (IterateHelper.TryConsumeGetAt<TEnumerator, TSource>(ref source, 0, out current))
             {
+                value = current!;
                 return true;
             }
 

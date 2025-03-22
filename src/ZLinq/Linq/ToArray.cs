@@ -10,25 +10,21 @@ partial class ValueEnumerableExtensions
     {
         using var enumerator = source.Enumerator;
 
-        if (enumerator.TryGetSpan(out var span))
-        {
-            return span.ToArray(); // fastest copy
-        }
-        else if (enumerator.TryGetNonEnumeratedCount(out var count))
+        if (enumerator.TryGetNonEnumeratedCount(out var count))
         {
             if (count == 0)
             {
                 return Array.Empty<TSource>();
             }
 
-            var i = 0;
             var array = GC.AllocateUninitializedArray<TSource>(count);
 
-            if (enumerator.TryCopyTo(array.AsSpan()))
+            if (enumerator.TryCopyTo(array.AsSpan(), 0))
             {
                 return array;
             }
 
+            var i = 0;
             while (enumerator.TryGetNext(out var item))
             {
                 array[i++] = item;

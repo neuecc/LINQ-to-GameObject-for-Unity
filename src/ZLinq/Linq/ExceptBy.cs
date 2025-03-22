@@ -78,7 +78,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> dest) => false;
+        public bool TryCopyTo(Span<TSource> destination, Index offset) => false;
 
         public bool TryGetNext(out TSource current)
         {
