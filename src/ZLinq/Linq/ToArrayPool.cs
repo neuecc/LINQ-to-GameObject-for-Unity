@@ -11,27 +11,22 @@ partial class ValueEnumerableExtensions
 #endif
     {
         using var enumerator = source.Enumerator;
-        if (enumerator.TryGetSpan(out var span))
-        {
-            var array = ArrayPool<TSource>.Shared.Rent(span.Length);
-            span.CopyTo(array);
-            return (array, span.Length);
-        }
-        else if (enumerator.TryGetNonEnumeratedCount(out var count))
+
+        if (enumerator.TryGetNonEnumeratedCount(out var count))
         {
             if (count == 0)
             {
                 return (Array.Empty<TSource>(), 0);
             }
 
-            var i = 0;
             var array = ArrayPool<TSource>.Shared.Rent(count);
 
-            if (enumerator.TryCopyTo(array.AsSpan(0, count)))
+            if (enumerator.TryCopyTo(array.AsSpan(0, count), 0))
             {
                 return (array, count);
             }
 
+            var i = 0;
             while (enumerator.TryGetNext(out var item))
             {
                 array[i++] = item;

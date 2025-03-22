@@ -46,17 +46,17 @@
             using var e1 = source.Enumerator;
             using var e2 = second.Enumerator;
 
+            if (e1.TryGetNonEnumeratedCount(out var count1) && e2.TryGetNonEnumeratedCount(out var count2) && count1 != count2)
+            {
+                return false;
+            }
+
 #if NET8_0_OR_GREATER
             if (e1.TryGetSpan(out var sourceSpan) && e2.TryGetSpan(out var secondSpan))
             {
                 return sourceSpan.SequenceEqual(secondSpan, comparer); // SIMD acceleration
             }
 #endif
-
-            if (e1.TryGetNonEnumeratedCount(out var count1) && e2.TryGetNonEnumeratedCount(out var count2) && count1 != count2)
-            {
-                return false;
-            }
 
             comparer ??= EqualityComparer<TSource>.Default;
             while (e1.TryGetNext(out var value1))

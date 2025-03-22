@@ -49,7 +49,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination) => false;
+        public bool TryCopyTo(Span<TSource> destination, Index offset) => false;
 
         public bool TryGetNext(out TSource current)
         {
@@ -97,7 +97,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination) => false;
+        public bool TryCopyTo(Span<TSource> destination, Index offset) => false;
 
         public bool TryGetNext(out TSource current)
         {

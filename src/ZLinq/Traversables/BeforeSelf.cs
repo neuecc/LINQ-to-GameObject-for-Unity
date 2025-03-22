@@ -19,7 +19,7 @@ public struct BeforeSelf<TTraverser, T>(TTraverser traverser, bool withSelf)
         return false;
     }
 
-    public bool TryCopyTo(Span<T> dest) => false;
+    public bool TryCopyTo(Span<T> destination, Index offset) => false;
 
     public bool TryGetNext(out T current)
     {

@@ -111,21 +111,24 @@ namespace ZLinq.Linq
         public bool TryGetNonEnumeratedCount(out int count)
         {
 #if NET8_0_OR_GREATER
-            return source.TryGetNonEnumeratedCount(out count);
+            if (source.TryGetNonEnumeratedCount(out count)) // call System.Linq.Enumerable.TryGetNonEnumeratedCount
+            {
+                return true;
+            }
 #else
             if (source is ICollection<T> c)
             {
                 count = c.Count;
                 return true;
             }
-            else if (source is IReadOnlyCollection<T> rc)
+#endif
+            else if (source is IReadOnlyCollection<T> rc) // Enumerable.TryGetNonEnumeratedCount does not check IReadOnlyCollection
             {
                 count = rc.Count;
                 return true;
             }
             count = 0;
             return false;
-#endif
         }
 
         public bool TryGetSpan(out ReadOnlySpan<T> span)
@@ -147,23 +150,18 @@ namespace ZLinq.Linq
             }
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, Index offset)
         {
-            // TODO: length validation
-            if (source.GetType() == typeof(T[]))
+            if (TryGetSpan(out var span))
             {
-                Unsafe.As<T[]>(source).CopyTo(destination);
-                return true;
+                if (IterateHelper.TryGetSlice<T>(span, offset, destination.Length, out var slice))
+                {
+                    slice.CopyTo(destination);
+                    return true;
+                }
             }
-            else if (source.GetType() == typeof(List<T>))
-            {
-                CollectionsMarshal.AsSpan(Unsafe.As<List<T>>(source)).CopyTo(destination);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public bool TryGetNext(out T current)
@@ -210,11 +208,14 @@ namespace ZLinq.Linq
             return true;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, Index offset)
         {
-            // TODO: length validation
-            source.CopyTo(destination);
-            return true;
+            if (IterateHelper.TryGetSlice<T>(source, offset, destination.Length, out var slice))
+            {
+                slice.CopyTo(destination);
+                return true;
+            }
+            return false;
         }
 
         public bool TryGetNext(out T current)
@@ -255,16 +256,19 @@ namespace ZLinq.Linq
             return true;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, Index offset)
         {
 #if NET9_0_OR_GREATER
             var span = source;
 #else
             var span = source.Span;
 #endif
-            // TODO: length validation
-            span.CopyTo(destination);
-            return true;
+            if (IterateHelper.TryGetSlice<T>(span, offset, destination.Length, out var slice))
+            {
+                slice.CopyTo(destination);
+                return true;
+            }
+            return false;
         }
 
         public bool TryGetSpan(out ReadOnlySpan<T> span)
@@ -317,10 +321,14 @@ namespace ZLinq.Linq
             return true;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, Index offset)
         {
-            // TODO: length validation
-            CollectionsMarshal.AsSpan(source).CopyTo(destination);
+            var span = CollectionsMarshal.AsSpan(source);
+            if (IterateHelper.TryGetSlice<T>(span, offset, destination.Length, out var slice))
+            {
+                slice.CopyTo(destination);
+                return true;
+            }
             return true;
         }
 
@@ -371,7 +379,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<KeyValuePair<TKey, TValue>> destination) => false;
+        public bool TryCopyTo(Span<KeyValuePair<TKey, TValue>> destination, Index offset) => false;
 
         public bool TryGetNext(out KeyValuePair<TKey, TValue> current)
         {
@@ -431,15 +439,26 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, Index offset)
         {
             if (source.IsSingleSegment)
             {
-                // TODO: length validation
                 var span = source.First.Span;
-                span.CopyTo(destination);
-                return true;
+                if (IterateHelper.TryGetSlice<T>(span, offset, destination.Length, out var slice))
+                {
+                    slice.CopyTo(destination);
+                    return true;
+                }
             }
+            else
+            {
+                if (IterateHelper.TryGetSliceRange(checked((int)source.Length), offset, destination.Length, out var start, out var count))
+                {
+                    source.Slice(start, count).CopyTo(destination);
+                    return true;
+                }
+            }
+
             return false;
         }
 
@@ -492,7 +511,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> destination) => false;
+        public bool TryCopyTo(Span<T> destination, Index offset) => false;
 
         public bool TryGetNext(out T current)
         {
@@ -540,7 +559,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> destination) => false;
+        public bool TryCopyTo(Span<T> destination, Index offset) => false;
 
         public bool TryGetNext(out T current)
         {
@@ -588,7 +607,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> destination) => false;
+        public bool TryCopyTo(Span<T> destination, Index offset) => false;
 
         public bool TryGetNext(out T current)
         {
@@ -638,7 +657,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<T> destination) => false;
+        public bool TryCopyTo(Span<T> destination, Index offset) => false;
 
         public bool TryGetNext(out T current)
         {
@@ -688,11 +707,14 @@ namespace ZLinq.Linq
             return true;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, Index offset)
         {
-            // TODO:length validation
-            source.AsSpan().CopyTo(destination);
-            return true;
+            if (IterateHelper.TryGetSlice<T>(source.AsSpan(), offset, destination.Length, out var slice))
+            {
+                slice.CopyTo(destination);
+                return true;
+            }
+            return false;
         }
 
         public bool TryGetNext(out T current)
@@ -741,11 +763,14 @@ namespace ZLinq.Linq
             return true;
         }
 
-        public bool TryCopyTo(Span<T> destination)
+        public bool TryCopyTo(Span<T> destination, Index offset)
         {
-            // TODO:length validation
-            source.CopyTo(destination);
-            return true;
+            if (IterateHelper.TryGetSlice<T>(source, offset, destination.Length, out var slice))
+            {
+                slice.CopyTo(destination);
+                return true;
+            }
+            return false;
         }
 
         public bool TryGetNext(out T current)
