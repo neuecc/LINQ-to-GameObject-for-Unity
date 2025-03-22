@@ -251,6 +251,7 @@ partial class ValueEnumerableExtensions
                     {
                         value = span[index];
                     }
+                    index++;
                 }
 
                 return value;

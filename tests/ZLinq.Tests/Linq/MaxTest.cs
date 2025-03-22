@@ -249,6 +249,19 @@ public class MaxTest
         maxByAge.Name.ShouldBe("David");
     }
 
+    [Fact]
+    public void CustomComaprer2()
+    {
+        var source = new int[] { 1, 2, 4, 3 }.AsValueEnumerable();
+        var expected = 4;
+
+        Assert.Equal(expected, source.Max());
+        Assert.Equal(expected, source.Max(comparer: null));
+        Assert.Equal(expected, source.Max(Comparer<int>.Default));
+
+        Assert.Equal(1, source.Max(Comparer<int>.Create((x, y) => 0)));
+    }
+
     // Non-comparable class for testing
     private class Person
     {
