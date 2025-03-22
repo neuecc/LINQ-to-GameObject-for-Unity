@@ -154,7 +154,7 @@ namespace ZLinq.Linq
         {
             if (TryGetSpan(out var span))
             {
-                if (IterateHelper.TryGetSlice<T>(span, offset, destination.Length, out var slice))
+                if (EnumeratorHelper.TryGetSlice<T>(span, offset, destination.Length, out var slice))
                 {
                     slice.CopyTo(destination);
                     return true;
@@ -210,7 +210,7 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<T> destination, Index offset)
         {
-            if (IterateHelper.TryGetSlice<T>(source, offset, destination.Length, out var slice))
+            if (EnumeratorHelper.TryGetSlice<T>(source, offset, destination.Length, out var slice))
             {
                 slice.CopyTo(destination);
                 return true;
@@ -263,7 +263,7 @@ namespace ZLinq.Linq
 #else
             var span = source.Span;
 #endif
-            if (IterateHelper.TryGetSlice<T>(span, offset, destination.Length, out var slice))
+            if (EnumeratorHelper.TryGetSlice<T>(span, offset, destination.Length, out var slice))
             {
                 slice.CopyTo(destination);
                 return true;
@@ -324,7 +324,7 @@ namespace ZLinq.Linq
         public bool TryCopyTo(Span<T> destination, Index offset)
         {
             var span = CollectionsMarshal.AsSpan(source);
-            if (IterateHelper.TryGetSlice<T>(span, offset, destination.Length, out var slice))
+            if (EnumeratorHelper.TryGetSlice<T>(span, offset, destination.Length, out var slice))
             {
                 slice.CopyTo(destination);
                 return true;
@@ -444,7 +444,7 @@ namespace ZLinq.Linq
             if (source.IsSingleSegment)
             {
                 var span = source.First.Span;
-                if (IterateHelper.TryGetSlice<T>(span, offset, destination.Length, out var slice))
+                if (EnumeratorHelper.TryGetSlice<T>(span, offset, destination.Length, out var slice))
                 {
                     slice.CopyTo(destination);
                     return true;
@@ -452,7 +452,7 @@ namespace ZLinq.Linq
             }
             else
             {
-                if (IterateHelper.TryGetSliceRange(checked((int)source.Length), offset, destination.Length, out var start, out var count))
+                if (EnumeratorHelper.TryGetSliceRange(checked((int)source.Length), offset, destination.Length, out var start, out var count))
                 {
                     source.Slice(start, count).CopyTo(destination);
                     return true;
@@ -709,7 +709,7 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<T> destination, Index offset)
         {
-            if (IterateHelper.TryGetSlice<T>(source.AsSpan(), offset, destination.Length, out var slice))
+            if (EnumeratorHelper.TryGetSlice<T>(source.AsSpan(), offset, destination.Length, out var slice))
             {
                 slice.CopyTo(destination);
                 return true;
@@ -765,7 +765,7 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<T> destination, Index offset)
         {
-            if (IterateHelper.TryGetSlice<T>(source, offset, destination.Length, out var slice))
+            if (EnumeratorHelper.TryGetSlice<T>(source, offset, destination.Length, out var slice))
             {
                 slice.CopyTo(destination);
                 return true;

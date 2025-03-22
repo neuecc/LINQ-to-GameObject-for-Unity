@@ -59,7 +59,7 @@ namespace ZLinq.Linq
             // Iterate inlining
             if (source.TryGetSpan(out var span))
             {
-                if (IterateHelper.TryGetSlice(span, offset, destination.Length, out var slice))
+                if (EnumeratorHelper.TryGetSlice(span, offset, destination.Length, out var slice))
                 {
                     for (var i = 0; i < slice.Length; i++)
                     {
@@ -74,7 +74,7 @@ namespace ZLinq.Linq
             //  First/ElementAt/Last
             if (destination.Length == 1)
             {
-                if (IterateHelper.TryConsumeGetAt(ref source, offset, out TSource value))
+                if (EnumeratorHelper.TryConsumeGetAt(ref source, offset, out TSource value))
                 {
                     destination[0] = selector(value);
                 }

@@ -60,7 +60,7 @@ namespace ZLinq.Linq
             }
 
             InitBuffer();
-            if (IterateHelper.TryGetSlice<TSource>(buffer, offset, destination.Length, out var slice))
+            if (EnumeratorHelper.TryGetSlice<TSource>(buffer, offset, destination.Length, out var slice))
             {
                 slice.CopyTo(destination);
                 return true;

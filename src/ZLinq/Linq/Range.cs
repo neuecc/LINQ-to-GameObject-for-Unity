@@ -44,7 +44,7 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<int> destination, Index offset)
         {
-            if (IterateHelper.TryGetSliceRange(count, offset, destination.Length, out var fillStart, out var fillCount))
+            if (EnumeratorHelper.TryGetSliceRange(count, offset, destination.Length, out var fillStart, out var fillCount))
             {
                 FillIncremental(destination.Slice(0, fillCount), start + fillStart);
                 return true;

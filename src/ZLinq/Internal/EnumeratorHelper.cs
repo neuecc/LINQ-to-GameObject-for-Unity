@@ -1,6 +1,6 @@
 ﻿namespace ZLinq.Internal;
 
-internal static class IterateHelper
+internal static class EnumeratorHelper
 {
     public static bool TryGetSliceRange(int sourceLength, Index offset, int destinationLength, out int start, out int count)
     {

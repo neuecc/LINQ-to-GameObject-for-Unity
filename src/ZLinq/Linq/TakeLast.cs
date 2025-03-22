@@ -58,7 +58,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination, Index offset)
+        public bool TryCopyTo(Span<TSource> destination, Index offset) // TODO: impl
         {
             if (TryGetSpan(out var span) && span.Length <= destination.Length)
             {

@@ -30,6 +30,16 @@ using ZLinq.Traversables;
 //var ok = string.Join(',', tako);
 
 
+var source = new int[0]; // {532, 1, 21414, 14, 315, 5, 2, 542, 62, 62, 62, 753, 1, 63, 63, 6 };
+
+var foo = source.AsValueEnumerable().OrderByDescending(x => x).FirstOrDefault();
+var bar = source.OrderByDescending(x => x).FirstOrDefault();
+
+Console.WriteLine(foo);
+Console.WriteLine(bar);
+
+
+return;
 ValueEnumerable.Range(1, 10).Concat(Enumerable.Range(1, 10)).ToArray();
 
 var xssss = new[] { 1, 2, 3 };

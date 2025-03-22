@@ -101,7 +101,7 @@ namespace ZLinq
                 value = current;
                 return true;
             }
-            else if (IterateHelper.TryConsumeGetAt<TEnumerator, TSource>(ref source, index, out current))
+            else if (EnumeratorHelper.TryConsumeGetAt<TEnumerator, TSource>(ref source, index, out current))
             {
                 value = current!;
                 return true;

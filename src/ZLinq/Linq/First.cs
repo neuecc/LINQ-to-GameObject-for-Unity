@@ -128,7 +128,7 @@
                 value = current;
                 return true;
             }
-            else if (IterateHelper.TryConsumeGetAt<TEnumerator, TSource>(ref source, 0, out current))
+            else if (EnumeratorHelper.TryConsumeGetAt<TEnumerator, TSource>(ref source, 0, out current))
             {
                 value = current!;
                 return true;

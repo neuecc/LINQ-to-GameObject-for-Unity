@@ -373,6 +373,51 @@ And Immortality.".Split([' ', '\n', '\r', '-'], StringSplitOptions.RemoveEmptyEn
             Assert.Equal(results1, results2);
         }
     }
+
+    [Fact]
+    public void ElementAtOptimize()
+    {
+        var rand = new Random(42);
+        var source = Enumerable.Range(1, 100).Select(_ => rand.Next()).ToArray();
+
+        for (int i = 0; i < 100; i++)
+        {
+            var expected = source.OrderBy(x => x).ElementAt(i);
+            var actual = source.AsValueEnumerable().OrderBy(x => x).ElementAt(i);
+            Assert.Equal(expected, actual);
+        }
+
+        for (int i = 0; i < 100; i++)
+        {
+            var source2 = Enumerable.Range(1, 100).Select(_ => rand.Next()).ToArray();
+
+            var expected = source2.OrderBy(x => x).First();
+            var actual = source2.AsValueEnumerable().OrderBy(x => x).First();
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void ElementAtOptimize2()
+    {
+        // empty
+        var source = Array.Empty<int>();
+        source.AsValueEnumerable().OrderBy(x => x).FirstOrDefault().ShouldBe(0);
+
+        source = new int[] { 1, 2, 3 };
+
+        // ok
+        source.AsValueEnumerable().OrderBy(x => x).ElementAt(0).ShouldBe(1);
+        source.AsValueEnumerable().OrderBy(x => x).ElementAt(1).ShouldBe(2);
+        source.AsValueEnumerable().OrderBy(x => x).ElementAt(2).ShouldBe(3);
+        source.AsValueEnumerable().OrderBy(x => x).ElementAtOrDefault(3).ShouldBe(0);
+
+        // invalid offset
+        source.AsValueEnumerable().OrderBy(x => x).ElementAtOrDefault(10).ShouldBe(0);
+
+        // invalid offset2
+        source.AsValueEnumerable().OrderBy(x => x).ElementAtOrDefault(^10).ShouldBe(0);
+    }
 }
 
 public class Person

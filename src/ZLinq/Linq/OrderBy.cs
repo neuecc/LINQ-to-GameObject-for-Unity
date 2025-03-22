@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ZLinq
@@ -143,8 +144,52 @@ namespace ZLinq.Linq
                 }
             }
 
+            if (destination.Length == 1)
+            {
+                // Try to use quickselect algorithm instead of full sort
+                var (elementArray, elementCount) = new ValueEnumerable<TEnumerator, TSource>(source).ToArrayPool();
+                try
+                {
+                    var span = elementArray.AsSpan(0, elementCount);
+
+                    var elementAt = offset.GetOffset(elementCount);
+                    if (elementCount == 0)
+                    {
+                        buffer = [];
+                        return false;
+                    }
+                    else if (unchecked((uint)elementAt) >= elementCount)
+                    {
+                        // same as InitBuffer()
+                        buffer = span.ToArray();
+                        Sort(buffer);
+                        return false;
+                    }
+
+                    var (indexMap, size) = ValueEnumerable.Range(0, span.Length).ToArrayPool();
+
+                    using var comparer = comparable.GetComparer(span, null!);
+
+                    var elementIndex = elementAt switch
+                    {
+                        0 => OrderByHelper.Min(indexMap, comparer, size), // Max? you can control OrderBy/OrderByDescending
+                        _ => OrderByHelper.QuickSelect(indexMap, comparer, size - 1, elementAt)
+                    };
+
+                    destination[0] = span[elementIndex];
+
+                    ArrayPool<int>.Shared.Return(indexMap, clearArray: false);
+                }
+                finally
+                {
+                    ArrayPool<TSource>.Shared.Return(elementArray, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<TSource>());
+                }
+
+                return true;
+            }
+
             InitBuffer();
-            if (IterateHelper.TryGetSlice<TSource>(buffer, offset, destination.Length, out var slice))
+            if (EnumeratorHelper.TryGetSlice<TSource>(buffer, offset, destination.Length, out var slice))
             {
                 slice.CopyTo(destination);
                 return true;
@@ -204,7 +249,7 @@ namespace ZLinq.Linq
 
                 using var comparer = comparable.GetComparer(span, null!);
                 indexMap.AsSpan(0, size).Sort(span, comparer);
-                ArrayPool<int>.Shared.Return(indexMap);
+                ArrayPool<int>.Shared.Return(indexMap, clearArray: false);
             }
         }
 
@@ -220,32 +265,11 @@ namespace ZLinq.Linq
 
         bool IsAllowDirectSort()
         {
-            if (parent == null && keySelector == UnsafeFunctions<TSource, TKey>.Identity && TypeIsImplicitlyStable<TSource>() && (comparer is null || comparer == Comparer<TSource>.Default))
+            if (parent == null && keySelector == UnsafeFunctions<TSource, TKey>.Identity && OrderByHelper.TypeIsImplicitlyStable<TSource>() && (comparer is null || comparer == Comparer<TSource>.Default))
             {
                 return true;
             }
             return false;
-        }
-
-        // dotnet/runtime optimized types
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool TypeIsImplicitlyStable<T>()
-        {
-            Type t = typeof(T);
-            if (typeof(T).IsEnum)
-            {
-                t = typeof(T).GetEnumUnderlyingType();
-            }
-
-            return
-                t == typeof(sbyte) || t == typeof(byte) || t == typeof(bool) ||
-                t == typeof(short) || t == typeof(ushort) || t == typeof(char) ||
-                t == typeof(int) || t == typeof(uint) ||
-                t == typeof(long) || t == typeof(ulong) ||
-#if NET8_0_OR_GREATER
-                t == typeof(Int128) || t == typeof(UInt128) ||
-#endif
-                t == typeof(nint) || t == typeof(nuint);
         }
     }
 
@@ -345,6 +369,128 @@ namespace ZLinq.Linq
         public int Compare(T? x, T? y)
         {
             return Comparer<T?>.Default.Compare(y, x);
+        }
+    }
+
+    file static class OrderByHelper
+    {
+        // dotnet/runtime optimized types
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool TypeIsImplicitlyStable<T>()
+        {
+            Type t = typeof(T);
+            if (typeof(T).IsEnum)
+            {
+                t = typeof(T).GetEnumUnderlyingType();
+            }
+
+            return
+                t == typeof(sbyte) || t == typeof(byte) || t == typeof(bool) ||
+                t == typeof(short) || t == typeof(ushort) || t == typeof(char) ||
+                t == typeof(int) || t == typeof(uint) ||
+                t == typeof(long) || t == typeof(ulong) ||
+#if NET8_0_OR_GREATER
+                t == typeof(Int128) || t == typeof(UInt128) ||
+#endif
+                t == typeof(nint) || t == typeof(nuint);
+        }
+
+        // based dotnet/runtime implementation
+
+        internal static int QuickSelect(int[] map, IComparer<int> comparer, int right, int idx)
+        {
+            int left = 0;
+            do
+            {
+                int i = left;
+                int j = right;
+                int x = map[i + ((j - i) >> 1)];
+                do
+                {
+                    while (i < map.Length && comparer.Compare(x, map[i]) > 0)
+                    {
+                        i++;
+                    }
+
+                    while (j >= 0 && comparer.Compare(x, map[j]) < 0)
+                    {
+                        j--;
+                    }
+
+                    if (i > j)
+                    {
+                        break;
+                    }
+
+                    if (i < j)
+                    {
+                        int temp = map[i];
+                        map[i] = map[j];
+                        map[j] = temp;
+                    }
+
+                    i++;
+                    j--;
+                }
+                while (i <= j);
+
+                if (i <= idx)
+                {
+                    left = i + 1;
+                }
+                else
+                {
+                    right = j - 1;
+                }
+
+                if (j - left <= right - i)
+                {
+                    if (left < j)
+                    {
+                        right = j;
+                    }
+
+                    left = i;
+                }
+                else
+                {
+                    if (i < right)
+                    {
+                        left = i;
+                    }
+
+                    right = j;
+                }
+            }
+            while (left < right);
+
+            return map[idx];
+        }
+
+        internal static int Min(int[] map, IComparer<int> comparer, int count)
+        {
+            int index = 0;
+            for (int i = 1; i < count; i++)
+            {
+                if (comparer.Compare(map[i], map[index]) < 0)
+                {
+                    index = i;
+                }
+            }
+            return map[index];
+        }
+
+        internal static int Max(int[] map, IComparer<int> comparer, int count)
+        {
+            int index = 0;
+            for (int i = 1; i < count; i++)
+            {
+                if (comparer.Compare(map[i], map[index]) > 0)
+                {
+                    index = i;
+                }
+            }
+            return map[index];
         }
     }
 }

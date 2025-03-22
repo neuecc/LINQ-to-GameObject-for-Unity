@@ -42,11 +42,7 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<(int Index, TSource Item)> destination, Index offset)
-        {
-            destination = default;
-            return false;
-        }
+        public bool TryCopyTo(Span<(int Index, TSource Item)> destination, Index offset) => false;
 
         public bool TryGetNext(out (int Index, TSource Item) current)
         {
