@@ -14,6 +14,7 @@
       // "commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.Where00.*",
       // "commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.Where01.*",
       "commandLineArgs": "--filter Benchmark.Select4.*",
+      //"commandLineArgs": "--filter Benchmark.Select4_Consume.*",
       // "commandLineArgs": "--filter Benchmark.SimdRange.*",
       // "commandLineArgs": "--filter Benchmark.SimdSelect.*",
       // "commandLineArgs": "--filter Benchmark.LookupBattle.*",
