@@ -80,7 +80,7 @@ public class OrderByTest
 #if NET8_0_OR_GREATER
         var expected = xs.Order(customComparer);
 #else
-        var expected = xs.OrderBy(x=> x, customComparer);
+        var expected = xs.OrderBy(x => x, customComparer);
 #endif
 
         ordered.ToArray().ShouldBe(expected.ToArray());

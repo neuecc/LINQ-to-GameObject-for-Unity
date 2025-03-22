@@ -137,34 +137,34 @@ public class SkipTest
     {
         var sequence = Enumerable.Range(1, 5).ToArray();
         var skipOperation = sequence.AsValueEnumerable().Skip(2);
-        
+
         // Manual enumeration to test TryGetNext
         using var enumerator = skipOperation.Enumerator;
-        
+
         // Should get first element after skipping (element at index 2)
         enumerator.TryGetNext(out var first).ShouldBeTrue();
         first.ShouldBe(3);
-        
+
         // Should get second element after skipping (element at index 3)
         enumerator.TryGetNext(out var second).ShouldBeTrue();
         second.ShouldBe(4);
-        
+
         // Should get third element after skipping (element at index 4)
         enumerator.TryGetNext(out var third).ShouldBeTrue();
         third.ShouldBe(5);
-        
+
         // Should return false once end is reached
         enumerator.TryGetNext(out _).ShouldBeFalse();
     }
-    
+
     [Fact]
     public void Skip_TryGetNext_SkipAll()
     {
         var sequence = Enumerable.Range(1, 5).ToArray();
         var skipOperation = sequence.AsValueEnumerable().Skip(5); // Skip all elements
-        
+
         using var enumerator = skipOperation.Enumerator;
-        
+
         // Should return false since all elements were skipped
         enumerator.TryGetNext(out _).ShouldBeFalse();
     }

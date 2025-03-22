@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Shouldly;
 using Xunit;
@@ -11,7 +11,7 @@ public class SelectWhereTest
     public void Select_Where_Should_Filter_Correctly()
     {
         // Arrange
-        var input = new[] 
+        var input = new[]
         {
             new TestStruct { Value = 1 },
             new TestStruct { Value = 2 },
@@ -41,7 +41,7 @@ public class SelectWhereTest
     public void Where_Select_Should_Filter_Correctly()
     {
         // Arrange
-        var input = new[] 
+        var input = new[]
         {
             new TestStruct { Value = 1 },
             new TestStruct { Value = 2 },
@@ -71,7 +71,7 @@ public class SelectWhereTest
     public void Select_Where_Should_Handle_Empty_Result()
     {
         // Arrange
-        var input = new[] 
+        var input = new[]
         {
             new TestStruct { Value = 1 },
             new TestStruct { Value = 2 },
@@ -101,7 +101,7 @@ public class SelectWhereTest
     public void Select_Where_Original_Order_Preserved()
     {
         // Arrange
-        var input = new[] 
+        var input = new[]
         {
             new TestStruct { Value = 5 },
             new TestStruct { Value = 3 },
