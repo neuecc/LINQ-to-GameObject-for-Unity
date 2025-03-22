@@ -72,13 +72,13 @@ public static class TestUtil
         return enumerable.Enumerator.TryGetSpan(out span);
     }
 
-    public static bool TryCopyTo<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable, Span<T> destination, int count = 0)
+    public static bool TryCopyTo<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable, Span<T> destination, Index offset = default)
         where TEnumerator : struct, IValueEnumerator<T>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        return enumerable.Enumerator.TryCopyTo(destination);
+        return enumerable.Enumerator.TryCopyTo(destination, offset);
     }
 
     public static void Dispose<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable)

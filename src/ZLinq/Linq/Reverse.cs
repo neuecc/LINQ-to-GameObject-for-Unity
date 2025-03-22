@@ -1,4 +1,6 @@
-﻿namespace ZLinq
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -29,30 +31,40 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerator source = source;
-        TSource[]? array;
+        TSource[]? buffer;
         int index;
 
-        public bool TryGetNonEnumeratedCount(out int count)
-        {
-            return source.TryGetNonEnumeratedCount(out count);
-        }
+        public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
-            span = default;
-            return false;
+            InitBuffer();
+            span = buffer;
+            return true;
         }
 
-        // TODO: with offset
         public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
-            if (source.TryGetNonEnumeratedCount(out var count) && count <= destination.Length)
+            // in-place reverse needs full src buffer(no offset)
+            if (source.TryGetNonEnumeratedCount(out var count) && offset.GetOffset(count) == 0)
             {
-                if (source.TryCopyTo(destination))
+                // destination must be larger than source
+                if (destination.Length >= count)
                 {
-                    destination.Slice(0, count).Reverse();
-                    return true;
+                    // and ok to copy then reverse.
+                    if (source.TryCopyTo(destination, 0))
+                    {
+                        destination.Slice(0, count).Reverse();
+                        return true;
+                    }
                 }
+            }
+
+            InitBuffer();
+            if (IterateHelper.TryGetSlice<TSource>(buffer, offset, destination.Length, out var slice))
+            {
+                slice.CopyTo(destination);
+                return true;
             }
 
             return false;
@@ -60,16 +72,11 @@ namespace ZLinq.Linq
 
         public bool TryGetNext(out TSource current)
         {
-            if (array == null)
-            {
-                array = new ValueEnumerable<TEnumerator, TSource>(source).ToArray();
-                Array.Reverse(array);
-            }
+            InitBuffer();
 
-            if (index < array.Length)
+            if (index < buffer.Length)
             {
-                current = array[index];
-                index++;
+                current = buffer[index++];
                 return true;
             }
 
@@ -80,6 +87,18 @@ namespace ZLinq.Linq
         public void Dispose()
         {
             source.Dispose();
+        }
+
+        [MemberNotNull(nameof(buffer))]
+        void InitBuffer()
+        {
+            if (buffer == null)
+            {
+                // do not use pool(struct field can't gurantees state of reference)
+                // TODO: in-future use SafeBox
+                buffer = new ValueEnumerable<TEnumerator, TSource>(source).ToArray<TEnumerator, TSource>();
+                Array.Reverse(buffer);
+            }
         }
     }
 

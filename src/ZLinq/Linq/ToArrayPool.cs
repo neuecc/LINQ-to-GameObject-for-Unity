@@ -21,7 +21,7 @@ partial class ValueEnumerableExtensions
 
             var array = ArrayPool<TSource>.Shared.Rent(count);
 
-            if (enumerator.TryCopyTo(array.AsSpan(0, count)))
+            if (enumerator.TryCopyTo(array.AsSpan(0, count), 0))
             {
                 return (array, count);
             }

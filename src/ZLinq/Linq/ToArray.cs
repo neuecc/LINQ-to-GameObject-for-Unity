@@ -19,7 +19,7 @@ partial class ValueEnumerableExtensions
 
             var array = GC.AllocateUninitializedArray<TSource>(count);
 
-            if (enumerator.TryCopyTo(array.AsSpan()))
+            if (enumerator.TryCopyTo(array.AsSpan(), 0))
             {
                 return array;
             }

@@ -19,7 +19,7 @@
                 CollectionsMarshal.UnsafeSetCount(list, count);
 #endif
                 var span = CollectionsMarshal.AsSpan(list);
-                if (!enumerator.TryCopyTo(span))
+                if (!enumerator.TryCopyTo(span, 0))
                 {
                     var i = 0;
                     while (enumerator.TryGetNext(out var current))

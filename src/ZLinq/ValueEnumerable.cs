@@ -50,7 +50,7 @@ public interface IValueEnumerator<T> : IDisposable
     /// Unlike the semantics of normal CopyTo, this allows the destination to be smaller than the source.
     /// This serves as a TryGet function as well, e.g. single-span and ^1 is TryGetLast.
     /// </summary>
-    bool TryCopyTo(scoped Span<T> destination, Index offset = default);
+    bool TryCopyTo(scoped Span<T> destination, Index offset);
 }
 
 // generic implementation of enumerator

@@ -16,7 +16,7 @@ partial class ValueEnumerableExtensions
 
         if (enumerator.TryGetNonEnumeratedCount(out var count))
         {
-            if (enumerator.TryCopyTo(dest))
+            if (enumerator.TryCopyTo(dest, 0))
             {
                 return Math.Min(count, dest.Length);
             }
@@ -61,7 +61,7 @@ partial class ValueEnumerableExtensions
 #endif
 
             var span = CollectionsMarshal.AsSpan(list);
-            if (enumerator.TryCopyTo(span))
+            if (enumerator.TryCopyTo(span, 0))
             {
                 return;
             }
