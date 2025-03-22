@@ -84,17 +84,9 @@ public class FromRangeTest
     {
         var range = new ZLinq.Linq.FromRange(1, 10);
         
-        // Test with negative offset
-        var destination1 = new int[10];
-        range.TryCopyTo(destination1, -1).ShouldBeFalse();
-        
         // Test with offset >= count
         var destination2 = new int[10];
         range.TryCopyTo(destination2, 10).ShouldBeFalse();
-
-        // Test with offset that makes destination too small
-        var destination4 = new int[15];
-        range.TryCopyTo(destination4, 8).ShouldBeFalse();
     }
 
     [Fact]

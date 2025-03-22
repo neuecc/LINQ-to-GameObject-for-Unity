@@ -38,8 +38,9 @@
                 {
                     arrayBuilder.Add(item);
                 }
+                count = arrayBuilder.Count;
 
-                var list = new List<TSource>(arrayBuilder.Count);
+                var list = new List<TSource>(count);
 #if NET8_0_OR_GREATER
                 CollectionsMarshal.SetCount(list, count);
 #else

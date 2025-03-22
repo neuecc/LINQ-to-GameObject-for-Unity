@@ -80,15 +80,22 @@ public class RangeTest
     {
         // Test with start at int.MinValue
         var minStart = ValueEnumerable.Range(int.MinValue, 10).ToArray();
-        minStart.ShouldBe(Enumerable.Range(int.MinValue, 10).ToArray());
-        
+        var minStartExpected = Enumerable.Range(int.MinValue, 10).ToArray();
+        minStart.ShouldBe(minStartExpected);
+
         // Test with start near int.MaxValue
         var maxStart = ValueEnumerable.Range(int.MaxValue - 5, 5).ToArray();
         maxStart.ShouldBe(Enumerable.Range(int.MaxValue - 5, 5).ToArray());
-        
+
         // Test with maximum valid count from 0
         ValueEnumerable.Range(0, int.MaxValue).Take(100).ToArray()
             .ShouldBe(Enumerable.Range(0, int.MaxValue).Take(100).ToArray());
+    }
+
+    [Fact]
+    public void WithElementAt()
+    {
+        ValueEnumerable.Range(100, 10).ElementAt(5).ShouldBe(105);
     }
 
     [Fact]
@@ -97,19 +104,19 @@ public class RangeTest
         // Test with negative start values
         var range1 = ValueEnumerable.Range(-10, 20).ToArray();
         range1.ShouldBe(Enumerable.Range(-10, 20).ToArray());
-        
+
         range1.Length.ShouldBe(20);
         range1[0].ShouldBe(-10);
         range1[19].ShouldBe(9);
     }
-    
+
     [Fact]
     public void EnumerationAfterDispose()
     {
         // Ensure proper behavior after disposal
         var range = ValueEnumerable.Range(1, 5);
         var enumerator = range.GetEnumerator();
-        
+
         // Use and dispose
         var results = new List<int>();
         while (enumerator.MoveNext())
@@ -117,9 +124,9 @@ public class RangeTest
             results.Add(enumerator.Current);
         }
         results.ShouldBe(new[] { 1, 2, 3, 4, 5 });
-        
+
         enumerator.Dispose();
-        
+
         // After disposal, MoveNext should return false
         enumerator.MoveNext().ShouldBeFalse();
     }

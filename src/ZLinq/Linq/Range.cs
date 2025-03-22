@@ -46,7 +46,7 @@ namespace ZLinq.Linq
         {
             if (IterateHelper.TryGetSliceRange(count, offset, destination.Length, out var fillStart, out var fillCount))
             {
-                FillIncremental(destination.Slice(0, fillCount), fillStart);
+                FillIncremental(destination.Slice(0, fillCount), start + fillStart);
                 return true;
             }
 

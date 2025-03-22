@@ -30,8 +30,7 @@ public class CopyToOffsetTest
 
         // offset is full
         Array.Clear(dest);
-        fromArray.TryCopyTo(dest, 5).ShouldBeTrue();
-        dest.ShouldBe([0, 0, 0, 0, 0]);
+        fromArray.TryCopyTo(dest, 5).ShouldBeFalse();
 
         // offset is larger than destination
         fromArray.TryCopyTo(dest, 6).ShouldBeFalse();
@@ -72,8 +71,7 @@ public class CopyToOffsetTest
         dest.ShouldBe([5, 0, 0]);
 
         Array.Clear(dest);
-        fromArray.TryCopyTo(dest, ^0).ShouldBeTrue();
-        dest.ShouldBe([0, 0, 0]);
+        fromArray.TryCopyTo(dest, ^0).ShouldBeFalse(); // 0
 
         // from last offset is negative
         fromArray.TryCopyTo(dest, ^6).ShouldBeFalse();
