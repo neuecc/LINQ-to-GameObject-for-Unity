@@ -25,8 +25,8 @@ namespace ZLinq.Tests.Linq
         public void EmptySecond()
         {
             // Arrange
-            var source = new[] 
-            { 
+            var source = new[]
+            {
                 new Person("Alice", 25),
                 new Person("Bob", 30)
             };
@@ -41,8 +41,8 @@ namespace ZLinq.Tests.Linq
         public void BasicIntersect()
         {
             // Arrange
-            var people = new[] 
-            { 
+            var people = new[]
+            {
                 new Person("Alice", 25),
                 new Person("Bob", 30),
                 new Person("Charlie", 35),
@@ -63,8 +63,8 @@ namespace ZLinq.Tests.Linq
         public void IntersectWithDuplicatesInSource()
         {
             // Arrange
-            var people = new[] 
-            { 
+            var people = new[]
+            {
                 new Person("Alice", 25),
                 new Person("Bob", 30),
                 new Person("Alice", 35), // Duplicate name
@@ -86,8 +86,8 @@ namespace ZLinq.Tests.Linq
         public void IntersectWithDuplicatesInSecond()
         {
             // Arrange
-            var people = new[] 
-            { 
+            var people = new[]
+            {
                 new Person("Alice", 25),
                 new Person("Bob", 30),
                 new Person("Charlie", 35)
@@ -107,10 +107,10 @@ namespace ZLinq.Tests.Linq
         public void PreservesOrderOfFirstSequence()
         {
             // Arrange
-            var people = new[] 
-            { 
+            var people = new[]
+            {
                 new Person("Charlie", 35),
-                new Person("Alice", 25), 
+                new Person("Alice", 25),
                 new Person("Bob", 30),
                 new Person("David", 40)
             };
@@ -129,8 +129,8 @@ namespace ZLinq.Tests.Linq
         public void WithCustomComparer()
         {
             // Arrange
-            var people = new[] 
-            { 
+            var people = new[]
+            {
                 new Person("Alice", 25),
                 new Person("bob", 30),
                 new Person("Charlie", 35)
@@ -152,8 +152,8 @@ namespace ZLinq.Tests.Linq
         public void WithNullKeys()
         {
             // Arrange
-            var people = new[] 
-            { 
+            var people = new[]
+            {
                 new Person("Alice", 25),
                 new Person(null, 30),
                 new Person("Charlie", 35)
@@ -172,8 +172,8 @@ namespace ZLinq.Tests.Linq
         public void WithComplexKeySelector()
         {
             // Arrange
-            var people = new[] 
-            { 
+            var people = new[]
+            {
                 new Person("Alice Smith", 25),
                 new Person("Bob Jones", 30),
                 new Person("Charlie Brown", 35),
@@ -196,8 +196,8 @@ namespace ZLinq.Tests.Linq
         public void WithIEnumerableSource()
         {
             // Arrange
-            IEnumerable<Person> people = new[] 
-            { 
+            IEnumerable<Person> people = new[]
+            {
                 new Person("Alice", 25),
                 new Person("Bob", 30),
                 new Person("Charlie", 35)
@@ -217,8 +217,8 @@ namespace ZLinq.Tests.Linq
         public void WithIEnumerableSecond()
         {
             // Arrange
-            var people = new[] 
-            { 
+            var people = new[]
+            {
                 new Person("Alice", 25),
                 new Person("Bob", 30),
                 new Person("Charlie", 35)
@@ -238,8 +238,8 @@ namespace ZLinq.Tests.Linq
         public void ConsistentWithSystemLinq()
         {
             // Arrange
-            var people = new[] 
-            { 
+            var people = new[]
+            {
                 new Person("Alice", 25),
                 new Person("Bob", 30),
                 new Person("Charlie", 35),
@@ -262,10 +262,10 @@ namespace ZLinq.Tests.Linq
             var people = new[] { new Person("Alice", 25) }.AsValueEnumerable();
             var names = new string?[] { "Alice" }.AsValueEnumerable();
             var result = people.IntersectBy(names, p => p.Name);
-            
+
             // Act
             bool success = result.TryGetNonEnumeratedCount(out int count);
-            
+
             // Assert
             success.ShouldBeFalse();
             count.ShouldBe(0);
@@ -278,10 +278,10 @@ namespace ZLinq.Tests.Linq
             var people = new[] { new Person("Alice", 25) }.AsValueEnumerable();
             var names = new string?[] { "Alice" }.AsValueEnumerable();
             var result = people.IntersectBy(names, p => p.Name);
-            
+
             // Act
             bool success = result.TryGetSpan(out ReadOnlySpan<Person> span);
-            
+
             // Assert
             success.ShouldBeFalse();
             span.IsEmpty.ShouldBeTrue();
@@ -295,7 +295,7 @@ namespace ZLinq.Tests.Linq
             var people = Enumerable.Range(0, 1000)
                 .Select(i => new Person($"Person{i % 100}", random.Next(20, 60)))
                 .ToArray();
-            
+
             var names = Enumerable.Range(0, 50)
                 .Select(i => $"Person{i}")
                 .ToArray();
@@ -312,8 +312,8 @@ namespace ZLinq.Tests.Linq
         public void ForEachIteration()
         {
             // Arrange
-            var people = new[] 
-            { 
+            var people = new[]
+            {
                 new Person("Alice", 25),
                 new Person("Bob", 30),
                 new Person("Charlie", 35)
@@ -337,8 +337,8 @@ namespace ZLinq.Tests.Linq
         public void IntersectByFollowedByOtherOperations()
         {
             // Arrange
-            var people = new[] 
-            { 
+            var people = new[]
+            {
                 new Person("Alice", 25),
                 new Person("Bob", 30),
                 new Person("Charlie", 35),

@@ -91,7 +91,7 @@ public class CountTest
     {
         // Using an array which should support TryGetNonEnumeratedCount
         var xs = new int[] { 1, 2, 3, 4, 5 };
-        
+
         // Create a custom counter to verify we're not enumerating when not needed
         var counter = 0;
         bool CountPredicate(int x)
@@ -99,11 +99,11 @@ public class CountTest
             counter++;
             return x > 0;
         }
-        
+
         // Count without predicate should use optimization
         var result = xs.AsValueEnumerable().Count();
         result.ShouldBe(5);
-        
+
         // Count with predicate should enumerate all items
         counter = 0;
         result = xs.AsValueEnumerable().Count(CountPredicate);
@@ -115,11 +115,11 @@ public class CountTest
     public void LargeCollectionCountTest()
     {
         var xs = Enumerable.Range(1, 1000).ToArray();
-        
+
         // System LINQ reference implementation
         var expected = xs.Count();
         expected.ShouldBe(1000);
-        
+
         // ZLinq implementations
         xs.AsValueEnumerable().Count().ShouldBe(expected);
         xs.ToValueEnumerable().Count().ShouldBe(expected);
@@ -129,13 +129,13 @@ public class CountTest
     public void PredicateThrowsException()
     {
         var xs = new int[] { 1, 2, 3, 0, 4 };
-        
+
         // Create a predicate that will throw an exception
         bool ExceptionPredicate(int x)
         {
             return 10 / x > 0; // Will throw DivideByZeroException when x = 0
         }
-        
+
         // System LINQ and ZLinq should both throw the same exception
         Should.Throw<DivideByZeroException>(() => xs.Count(ExceptionPredicate));
         Should.Throw<DivideByZeroException>(() => xs.AsValueEnumerable().Count(ExceptionPredicate));

@@ -38,15 +38,15 @@ namespace ZLinq.Tests
         {
             // Arrange
             var array = new[] { 10, 20, 30, 40, 50 };
-            
+
             // First element only
             var firstSegment = new ArraySegment<int>(array, 0, 1);
             Assert.Equal(10, firstSegment.GetAt(0));
-            
+
             // Last element only
             var lastSegment = new ArraySegment<int>(array, 4, 1);
             Assert.Equal(50, lastSegment.GetAt(0));
-            
+
             // Full array
             var fullSegment = new ArraySegment<int>(array);
             for (int i = 0; i < array.Length; i++)
@@ -72,29 +72,29 @@ namespace ZLinq.Tests
         {
             // Note: There's a bug in the original GetEnumerator implementation.
             // The correct implementation should iterate from offset to (offset+count)
-            
+
             // Arrange
             var array = new[] { 1, 2, 3, 4, 5 };
             var segment = new ArraySegment<int>(array, 1, 3); // Elements: 2, 3, 4
-            
+
             // Using the fixed implementation for testing
             var enumeratedValues = GetEnumeratorFixed(segment).ToList();
-            
+
             // Act & Assert
             Assert.Equal(3, enumeratedValues.Count);
             Assert.Equal(new[] { 2, 3, 4 }, enumeratedValues);
         }
-        
+
         [Fact]
         public void GetEnumerator_WithEmptySegment_ShouldReturnEmptyEnumeration()
         {
             // Arrange
             var array = new[] { 1, 2, 3 };
             var segment = new ArraySegment<int>(array, 0, 0); // Empty segment
-            
+
             // Act
             var enumeratedValues = GetEnumeratorFixed(segment).ToList();
-            
+
             // Assert
             Assert.Empty(enumeratedValues);
         }
@@ -104,10 +104,10 @@ namespace ZLinq.Tests
         {
             // Arrange - using default constructor creates a segment with null array
             var segment = default(ArraySegment<int>);
-            
+
             // Act
             var enumeratedValues = GetEnumeratorFixed(segment).ToList();
-            
+
             // Assert
             Assert.Empty(enumeratedValues);
         }
@@ -117,10 +117,10 @@ namespace ZLinq.Tests
         {
             var array = new[] { 1, 2, 3, 4, 5 };
             var segment = new ArraySegment<int>(array, 1, 3); // Elements should be: 2, 3, 4
-         
+
             // Act - using a corrected implementation for comparison
             var correctResult = GetEnumeratorFixed(segment).ToList();
-            
+
             // Assert
             Assert.Equal(3, correctResult.Count);
             Assert.Equal(new[] { 2, 3, 4 }, correctResult);

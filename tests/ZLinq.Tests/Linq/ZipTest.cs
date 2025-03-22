@@ -39,7 +39,7 @@ public class ZipTest
         {
             var expected = new[] { (1, "a"), (2, "b"), (3, "c") };
             var actual = xs.AsValueEnumerable().Zip(ys.AsValueEnumerable()).ToArray();
-            
+
             actual.Length.ShouldBe(3);
             for (int i = 0; i < expected.Length; i++)
             {
@@ -51,7 +51,7 @@ public class ZipTest
         {
             var expected = new[] { (1, "a", true), (2, "b", false), (3, "c", true) };
             var actual = xs.AsValueEnumerable().Zip(ys.AsValueEnumerable(), zs.AsValueEnumerable()).ToArray();
-            
+
             actual.Length.ShouldBe(3);
             for (int i = 0; i < expected.Length; i++)
             {
@@ -63,7 +63,7 @@ public class ZipTest
         {
             var expected = new[] { "1:a", "2:b", "3:c" };
             var actual = xs.AsValueEnumerable().Zip(ys.AsValueEnumerable(), (x, y) => $"{x}:{y}").ToArray();
-            
+
             actual.ShouldBe(expected);
         }
     }
@@ -190,7 +190,7 @@ public class ZipTest
             disposed1 = false;
             disposed2 = false;
             var zipEnumerable = enum1.AsValueEnumerable().Zip(enum2.AsValueEnumerable());
-            
+
             // Just getting the enumerator doesn't dispose anything
             var enumerator = zipEnumerable.Enumerator;
             disposed1.ShouldBeFalse();
@@ -211,7 +211,7 @@ public class ZipTest
             disposed2 = false;
             disposed3 = false;
             var zipEnumerable = enum1.AsValueEnumerable().Zip(enum2.AsValueEnumerable(), enum3.AsValueEnumerable());
-            
+
             // Just getting the enumerator doesn't dispose anything
             var enumerator = zipEnumerable.Enumerator;
             disposed1.ShouldBeFalse();
@@ -232,7 +232,7 @@ public class ZipTest
             disposed1 = false;
             disposed2 = false;
             var zipEnumerable = enum1.AsValueEnumerable().Zip(enum2.AsValueEnumerable(), (x, y) => $"{x}:{y}");
-            
+
             // Just getting the enumerator doesn't dispose anything
             var enumerator = zipEnumerable.Enumerator;
             disposed1.ShouldBeFalse();

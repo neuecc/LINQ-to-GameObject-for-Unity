@@ -21,7 +21,7 @@ public class SingleTest
     public void SingleElementSequence()
     {
         var single = new[] { 42 };
-        
+
         single.AsValueEnumerable().Single().ShouldBe(42);
         single.ToValueEnumerable().Single().ShouldBe(42);
     }
@@ -59,7 +59,7 @@ public class SingleTest
     public void PredicateOneMatch()
     {
         var numbers = new[] { 1, 2, 3, 4, 5 };
-        
+
         numbers.AsValueEnumerable().Single(x => x == 3).ShouldBe(3);
         numbers.ToValueEnumerable().Single(x => x == 3).ShouldBe(3);
     }
@@ -97,7 +97,7 @@ public class SingleTest
     public void SingleOrDefaultEmptySequence()
     {
         var empty = Array.Empty<int>();
-        
+
         empty.AsValueEnumerable().SingleOrDefault().ShouldBe(0); // default for int is 0
         empty.ToValueEnumerable().SingleOrDefault().ShouldBe(0);
     }
@@ -106,7 +106,7 @@ public class SingleTest
     public void SingleOrDefaultWithDefaultValueEmptySequence()
     {
         var empty = Array.Empty<int>();
-        
+
         empty.AsValueEnumerable().SingleOrDefault(-1).ShouldBe(-1);
         empty.ToValueEnumerable().SingleOrDefault(-1).ShouldBe(-1);
     }
@@ -115,7 +115,7 @@ public class SingleTest
     public void SingleOrDefaultSingleElementSequence()
     {
         var single = new[] { 42 };
-        
+
         single.AsValueEnumerable().SingleOrDefault().ShouldBe(42);
         single.ToValueEnumerable().SingleOrDefault().ShouldBe(42);
     }
@@ -139,7 +139,7 @@ public class SingleTest
     public void SingleOrDefaultPredicateNoMatch()
     {
         var numbers = new[] { 1, 2, 3, 4, 5 };
-        
+
         numbers.AsValueEnumerable().SingleOrDefault(x => x > 10).ShouldBe(0);
         numbers.ToValueEnumerable().SingleOrDefault(x => x > 10).ShouldBe(0);
     }
@@ -148,7 +148,7 @@ public class SingleTest
     public void SingleOrDefaultPredicateWithDefaultValueNoMatch()
     {
         var numbers = new[] { 1, 2, 3, 4, 5 };
-        
+
         numbers.AsValueEnumerable().SingleOrDefault(x => x > 10, -1).ShouldBe(-1);
         numbers.ToValueEnumerable().SingleOrDefault(x => x > 10, -1).ShouldBe(-1);
     }
@@ -157,7 +157,7 @@ public class SingleTest
     public void SingleOrDefaultPredicateOneMatch()
     {
         var numbers = new[] { 1, 2, 3, 4, 5 };
-        
+
         numbers.AsValueEnumerable().SingleOrDefault(x => x == 3).ShouldBe(3);
         numbers.ToValueEnumerable().SingleOrDefault(x => x == 3).ShouldBe(3);
     }
@@ -180,7 +180,7 @@ public class SingleTest
     public void SingleOrDefaultPredicateEmptySequence()
     {
         var empty = Array.Empty<int>();
-        
+
         empty.AsValueEnumerable().SingleOrDefault(x => x > 0).ShouldBe(0);
         empty.ToValueEnumerable().SingleOrDefault(x => x > 0).ShouldBe(0);
     }
@@ -203,7 +203,7 @@ public class SingleTest
     {
         var empty = Array.Empty<string>();
         var defaultValue = "default";
-        
+
         empty.AsValueEnumerable().SingleOrDefault(defaultValue).ShouldBe(defaultValue);
         empty.ToValueEnumerable().SingleOrDefault(defaultValue).ShouldBe(defaultValue);
     }
@@ -212,7 +212,7 @@ public class SingleTest
     public void NullableTypeEmptySequence()
     {
         var empty = Array.Empty<int?>();
-        
+
         TestUtil.Throws<InvalidOperationException>(
             () => empty.Single(),
             () => empty.AsValueEnumerable().Single());
@@ -226,7 +226,7 @@ public class SingleTest
     {
         // Create an array that should use the span optimization path
         var array = new[] { 42 };
-        
+
         // This should use TryGetSpan internally
         array.AsValueEnumerable().Single().ShouldBe(42);
     }
@@ -236,7 +236,7 @@ public class SingleTest
     {
         // Create a sequence that won't use span optimization
         var sequence = Enumerable.Range(1, 1);
-        
+
         // This should use the TryGetNext path
         sequence.AsValueEnumerable().Single().ShouldBe(1);
     }
@@ -247,7 +247,7 @@ public class SingleTest
     {
         var person = new Person("John", 30);
         var people = new[] { person };
-        
+
         people.AsValueEnumerable().Single().ShouldBe(person);
     }
 

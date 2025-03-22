@@ -140,31 +140,31 @@ public class MaxTest
         // Byte
         var bytes = new byte[] { 5, 3, 8, 2, 10 };
         bytes.AsValueEnumerable().Max().ShouldBe(bytes.Max());
-        
+
         // Short
         var shorts = new short[] { 5, 3, 8, 2, 10 };
         shorts.AsValueEnumerable().Max().ShouldBe(shorts.Max());
-        
+
         // UShort
         var ushorts = new ushort[] { 5, 3, 8, 2, 10 };
         ushorts.AsValueEnumerable().Max().ShouldBe(ushorts.Max());
-        
+
         // Int
         var ints = new int[] { 5, 3, 8, 2, 10 };
         ints.AsValueEnumerable().Max().ShouldBe(ints.Max());
-        
+
         // UInt
         var uints = new uint[] { 5, 3, 8, 2, 10 };
         uints.AsValueEnumerable().Max().ShouldBe(uints.Max());
-        
+
         // Long
         var longs = new long[] { 5, 3, 8, 2, 10 };
         longs.AsValueEnumerable().Max().ShouldBe(longs.Max());
-        
+
         // ULong
         var ulongs = new ulong[] { 5, 3, 8, 2, 10 };
         ulongs.AsValueEnumerable().Max().ShouldBe(ulongs.Max());
-        
+
         // Char(is not supported SIMD)
         var chars = new char[] { 'a', 'c', 'b', 'z', 'd' };
         chars.AsValueEnumerable().Max().ShouldBe(chars.Max());
@@ -187,7 +187,7 @@ public class MaxTest
 
         actual.ShouldBe(expected);
     }
-    
+
     // Test negative values
     [Fact]
     public void NegativeValues()
@@ -197,7 +197,7 @@ public class MaxTest
         negatives.AsValueEnumerable().Max().ShouldBe(negatives.Max());
         negatives.ToValueEnumerable().Max().ShouldBe(negatives.Max());
     }
-    
+
     // Test mixed positive and negative values
     [Fact]
     public void MixedValues()
@@ -207,7 +207,7 @@ public class MaxTest
         mixed.AsValueEnumerable().Max().ShouldBe(mixed.Max());
         mixed.ToValueEnumerable().Max().ShouldBe(mixed.Max());
     }
-    
+
     // Test custom type with default comparer
     [Fact]
     public void CustomTypeWithDefaultComparer()
@@ -218,7 +218,7 @@ public class MaxTest
             new Person("Charlie", 22),
             new Person("David", 35)
         };
-        
+
         // Using an IComparable implementation
         var comparablePeople = new[] {
             new ComparablePerson("Alice", 25),
@@ -230,7 +230,7 @@ public class MaxTest
         comparablePeople.AsValueEnumerable().Max().Name.ShouldBe("David");
         comparablePeople.ToValueEnumerable().Max().Name.ShouldBe("David");
     }
-    
+
     // Test custom type with custom comparer
     [Fact]
     public void CustomTypeWithCustomComparer()
@@ -241,14 +241,14 @@ public class MaxTest
             new Person("Charlie", 22),
             new Person("David", 35)
         };
-        
+
         var ageComparer = new PersonAgeComparer();
-        
+
         var maxByAge = people.AsValueEnumerable().Max(ageComparer);
         maxByAge.Age.ShouldBe(35);
         maxByAge.Name.ShouldBe("David");
     }
-    
+
     // Non-comparable class for testing
     private class Person
     {
@@ -261,7 +261,7 @@ public class MaxTest
             Age = age;
         }
     }
-    
+
     // IComparable implementation for testing
     private class ComparablePerson : IComparable<ComparablePerson>
     {
@@ -280,7 +280,7 @@ public class MaxTest
             return Age.CompareTo(other.Age);
         }
     }
-    
+
     // Custom comparer for Person class
     private class PersonAgeComparer : IComparer<Person>
     {
@@ -289,7 +289,7 @@ public class MaxTest
             if (x == null && y == null) return 0;
             if (x == null) return -1;
             if (y == null) return 1;
-            
+
             return x.Age.CompareTo(y.Age);
         }
     }
