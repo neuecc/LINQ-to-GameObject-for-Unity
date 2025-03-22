@@ -122,6 +122,12 @@ internal static class IterateHelper
        , allows ref struct
 #endif
     {
+        if (indexFromEnd == 0)
+        {
+            value = default!;
+            return false;
+        }
+
         using var q = new ValueQueue<T>(4);
         while (enumerator.TryGetNext(out var current))
         {

@@ -53,4 +53,14 @@ public class ElementAtTest
         // large q
         Enumerable.Range(0, 1000).AsValueEnumerable().ElementAt(^100).ShouldBe(900);
     }
+
+    [Fact]
+    public void ElementAt()
+    {
+        var source = new int[] { 1 }.AsValueEnumerable();
+
+        Assert.Equal(1, source.ElementAt(0));
+        Assert.Equal(1, source.ElementAt(new Index(0)));
+        Assert.Equal(1, source.ElementAt(^1)); 
+    }
 }

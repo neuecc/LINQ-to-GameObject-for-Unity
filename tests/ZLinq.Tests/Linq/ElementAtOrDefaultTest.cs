@@ -50,4 +50,19 @@ public class ElementAtOrDefaultTest
         // large q
         Enumerable.Range(0, 1000).AsValueEnumerable().ElementAtOrDefault(^100).ShouldBe(900);
     }
+
+    [Fact]
+    public void ElementAtOrDefault_Last0()
+    {
+        var source = new int[] { 1, 2, 3, 4 };
+
+        // System.Linq
+        var expected = source.ElementAtOrDefault(^0); // expected: 0
+
+        // ZLinq
+        var actual = source.AsValueEnumerable()
+                           .ElementAtOrDefault(^0);  // System.ArgumentOutOfRangeException : Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+
+        Assert.Equal(expected, actual);
+    }
 }
