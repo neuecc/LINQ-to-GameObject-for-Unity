@@ -234,6 +234,109 @@ namespace ZLinq.Tests.Linq
             Assert.Equal(Enumerable.Range(500, 500), result);
         }
 
+        [Fact]
+        public void TryCopyToReturnsFalse()
+        {
+            // Arrange
+            var first = new[] { 1, 2, 3 }.AsValueEnumerable();
+            var second = new[] { 2, 3, 4 }.AsValueEnumerable();
+            var intersect = first.Intersect(second);
+            var destination = new int[3];
+
+            // Act
+            bool result = intersect.TryCopyTo(destination, 0);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void ConsistentWithSystemLinq()
+        {
+            // Arrange
+            var first = new[] { 1, 2, 3, 4, 5, 1, 2 };
+            var second = new[] { 3, 4, 9, 10 };
+
+            // Act
+            var systemResult = first.Intersect(second).ToArray();
+            var zlinqResult = first.AsValueEnumerable().Intersect(second).ToArray();
+
+            // Assert
+            Assert.Equal(systemResult, zlinqResult);
+        }
+
+        [Fact]
+        public void IntersectWithNoMatchingElements()
+        {
+            // Arrange
+            var first = new[] { 1, 2, 3 }.AsValueEnumerable();
+            var second = new[] { 4, 5, 6 }.AsValueEnumerable();
+
+            // Act
+            var result = first.Intersect(second).ToArray();
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void HashSetSlimDisposedAfterIteration()
+        {
+            // This test indirectly verifies that the HashSetSlim is disposed, 
+            // though we can't directly check it since it's an implementation detail
+            
+            // Arrange
+            var first = new[] { 1, 2, 3 }.AsValueEnumerable();
+            var second = new[] { 2, 3, 4 }.AsValueEnumerable();
+            
+            // Act & Assert - no memory leak or exception
+            var intersect = first.Intersect(second);
+            var result = intersect.ToArray();
+            
+            Assert.Equal(new[] { 2, 3 }, result);
+            // If there's a memory leak, it won't be caught by this test directly
+            // But at least we know the operation completes without throwing
+        }
+
+        [Fact]
+        public void IntersectWithValueTypes()
+        {
+            // Arrange
+            var first = new[] { 
+                new DateTime(2023, 1, 1),
+                new DateTime(2023, 2, 1),
+                new DateTime(2023, 3, 1)
+            }.AsValueEnumerable();
+            
+            var second = new[] {
+                new DateTime(2023, 2, 1),
+                new DateTime(2023, 3, 1),
+                new DateTime(2023, 4, 1)
+            }.AsValueEnumerable();
+
+            // Act
+            var result = first.Intersect(second).ToArray();
+
+            // Assert
+            Assert.Equal(2, result.Length);
+            Assert.Contains(new DateTime(2023, 2, 1), result);
+            Assert.Contains(new DateTime(2023, 3, 1), result);
+        }
+
+        [Fact]
+        public void IntersectWithAllMatchingElements()
+        {
+            // Arrange
+            var first = new[] { 1, 2, 3 }.AsValueEnumerable();
+            var second = new[] { 1, 2, 3 }.AsValueEnumerable();
+
+            // Act
+            var result = first.Intersect(second).ToArray();
+
+            // Assert
+            Assert.Equal(new[] { 1, 2, 3 }, result);
+        }
+
         // Helper classes
         private class Person
         {

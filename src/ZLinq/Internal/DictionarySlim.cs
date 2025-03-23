@@ -8,7 +8,7 @@ namespace ZLinq.Internal;
 // with minimal API surface focused on the specific use case
 internal sealed class DictionarySlim<TKey, TValue> : IDisposable // allows TKey null
 {
-    const int MinimumSize = 16; // minimum arraypool size
+    const int MinimumSize = 16; // minimum arraypool size(power of 2)
     const double LoadFactor = 0.72;
 
     readonly IEqualityComparer<TKey> comparer;

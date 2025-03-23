@@ -64,7 +64,7 @@ namespace ZLinq.Linq
     {
         TEnumerator source = source;
         ValueEnumerable<TEnumerator2, TKey> second = second;
-        HashSet<TKey>? set;
+        HashSetSlim<TKey>? set;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -84,7 +84,7 @@ namespace ZLinq.Linq
         {
             if (set == null)
             {
-                set = second.ToHashSet(comparer);
+                set = second.ToHashSetSlim(comparer);
             }
 
             while (source.TryGetNext(out var value))
@@ -102,6 +102,7 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
+            set?.Dispose();
             source.Dispose();
         }
     }
