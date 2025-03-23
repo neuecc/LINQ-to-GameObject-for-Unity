@@ -394,6 +394,10 @@ And Immortality.".Split([' ', '\n', '\r', '-'], StringSplitOptions.RemoveEmptyEn
             var expected = source2.OrderBy(x => x).First();
             var actual = source2.AsValueEnumerable().OrderBy(x => x).First();
             Assert.Equal(expected, actual);
+
+            var expected2 = source2.OrderBy(x => x).Last();
+            var actual2 = source2.AsValueEnumerable().OrderBy(x => x).Last();
+            Assert.Equal(expected2, actual2);
         }
     }
 
@@ -417,6 +421,18 @@ And Immortality.".Split([' ', '\n', '\r', '-'], StringSplitOptions.RemoveEmptyEn
 
         // invalid offset2
         source.AsValueEnumerable().OrderBy(x => x).ElementAtOrDefault(^10).ShouldBe(0);
+    }
+
+    [Fact]
+    public void FirstLast()
+    {
+        var source1 = new[] { 1, 3, 4, 2, 5 }.OrderBy(x => x).AsValueEnumerable();
+        source1.First().ShouldBe(1);
+        source1.Last().ShouldBe(5);
+
+        var source2 = new[] { 1, 3, 4, 2, 5 }.OrderByDescending(x => x).AsValueEnumerable();
+        source2.First().ShouldBe(5);
+        source2.Last().ShouldBe(1);
     }
 }
 

@@ -170,11 +170,19 @@ namespace ZLinq.Linq
 
                     using var comparer = comparable.GetComparer(span, null!);
 
-                    var elementIndex = elementAt switch
+                    int elementIndex;
+                    if (elementAt == 0)
                     {
-                        0 => OrderByHelper.Min(indexMap, comparer, size), // TODO:Max(Last)
-                        _ => OrderByHelper.QuickSelect(indexMap, comparer, size - 1, elementAt)
-                    };
+                        elementIndex = OrderByHelper.Min(indexMap, comparer, count: size); // First
+                    }
+                    else if (elementAt == size - 1)
+                    {
+                        elementIndex = OrderByHelper.Max(indexMap, comparer, count: size); // Last
+                    }
+                    else
+                    {
+                        elementIndex = OrderByHelper.QuickSelect(indexMap, comparer, right: size - 1, idx: elementAt); // ElementAt
+                    }
 
                     destination[0] = span[elementIndex];
 
