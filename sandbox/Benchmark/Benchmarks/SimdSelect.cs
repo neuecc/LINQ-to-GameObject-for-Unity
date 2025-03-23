@@ -13,8 +13,6 @@ using ZLinq;
 
 namespace Benchmark;
 
-[ShortRunJob]
-[MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class SimdSelect
 {

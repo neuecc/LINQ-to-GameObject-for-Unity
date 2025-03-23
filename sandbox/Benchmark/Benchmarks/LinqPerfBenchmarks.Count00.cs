@@ -1,13 +1,12 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
 using ZLinq;
 
 namespace Benchmark;
 
 public partial class LinqPerfBenchmarks
 {
-    [ShortRunJob]
-    [MemoryDiagnoser]
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class Count00
     {

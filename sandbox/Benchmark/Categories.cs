@@ -1,4 +1,7 @@
-﻿namespace Benchmark;
+﻿using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.CsProj;
+
+namespace Benchmark;
 
 public static class Categories
 {

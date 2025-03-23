@@ -4,9 +4,6 @@ using ZLinq;
 
 namespace Benchmark;
 
-
-[ShortRunJob]
-[MemoryDiagnoser]
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
 public class Select4
 {

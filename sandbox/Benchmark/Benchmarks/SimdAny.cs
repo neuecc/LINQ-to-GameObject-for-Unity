@@ -9,8 +9,6 @@ using ZLinq.Simd;
 
 namespace Benchmark;
 
-[ShortRunJob]
-[MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 // [GroupBenchmarksBy(BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule.ByParams)]
 public class SimdAny
