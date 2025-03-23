@@ -2,15 +2,16 @@
 {
     partial class ValueEnumerableExtensions
     {
-        // same as AggregateBy, use Dictionary but we should remove null constraints.
+        // The original dotnet implementation uses a Dictionary so it has TKey : notnull constraints.
+        // However, I think it would be better without any null constraints.
         // https://github.com/dotnet/runtime/issues/98259
+        // I'm going to use DictionarySlim instead of Dictionary so removed TKey : notnull constraints.
 
         public static ValueEnumerable<CountBy<TEnumerator, TSource, TKey>, KeyValuePair<TKey, int>> CountBy<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            where TKey : notnull
             => new(new(source.Enumerator, keySelector, null));
 
         public static ValueEnumerable<CountBy<TEnumerator, TSource, TKey>, KeyValuePair<TKey, int>> CountBy<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? keyComparer)
@@ -18,7 +19,6 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            where TKey : notnull
             => new(new(source.Enumerator, keySelector, keyComparer));
     }
 }
@@ -38,12 +38,11 @@ namespace ZLinq.Linq
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
-        where TKey : notnull
     {
         TEnumerator source = source;
 
-        Dictionary<TKey, int>? dictionary;
-        Dictionary<TKey, int>.Enumerator enumerator;
+        DictionarySlim<TKey, int>? dictionary;
+        DictionarySlim<TKey, int>.Enumerator enumerator;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -74,9 +73,8 @@ namespace ZLinq.Linq
                 Initialize();
             }
 
-            if (enumerator.MoveNext())
+            if (enumerator.TryGetNext(out current))
             {
-                current = enumerator.Current;
                 return true;
             }
 
@@ -87,8 +85,8 @@ namespace ZLinq.Linq
         void Initialize()
         {
             var dict = keyComparer != null
-                ? new Dictionary<TKey, int>(keyComparer)
-                : new Dictionary<TKey, int>();
+                ? new DictionarySlim<TKey, int>(keyComparer)
+                : new DictionarySlim<TKey, int>();
 
             using (source)
             {
@@ -97,19 +95,8 @@ namespace ZLinq.Linq
                     foreach (var item in span)
                     {
                         var key = keySelector(item);
-#if NETSTANDARD2_0 || NETSTANDARD2_1
-                        if (dict.TryGetValue(key, out var count))
-                        {
-                            dict[key] = checked(count + 1);
-                        }
-                        else
-                        {
-                            dict[key] = 1;
-                        }
-#else
-                        ref var count = ref CollectionsMarshal.GetValueRefOrAddDefault(dict, key, out var exists);
+                        ref var count = ref dict.GetValueRefOrAddDefault(key, out var exists);
                         checked { count += 1; }
-#endif
                     }
                 }
                 else
@@ -117,19 +104,8 @@ namespace ZLinq.Linq
                     while (source.TryGetNext(out var item))
                     {
                         var key = keySelector(item);
-#if NETSTANDARD2_0 || NETSTANDARD2_1
-                        if (dict.TryGetValue(key, out var count))
-                        {
-                            dict[key] = checked(count + 1);
-                        }
-                        else
-                        {
-                            dict[key] = 1;
-                        }
-#else
-                        ref var count = ref CollectionsMarshal.GetValueRefOrAddDefault(dict, key, out var exists);
+                        ref var count = ref dict.GetValueRefOrAddDefault(key, out var exists);
                         checked { count += 1; }
-#endif
                     }
                 }
             }
@@ -140,12 +116,8 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
-            if (dictionary != null)
-            {
-                enumerator.Dispose();
-            }
+            dictionary?.Dispose();
             source.Dispose();
         }
     }
-
 }

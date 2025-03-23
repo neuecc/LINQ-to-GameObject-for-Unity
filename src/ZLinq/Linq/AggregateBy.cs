@@ -2,17 +2,16 @@
 {
     partial class ValueEnumerableExtensions
     {
-        // Because the original implementation uses a Dictionary, I used a Dictionary with TKey : notnull in the same way.
+        // The original dotnet implementation uses a Dictionary so it has TKey : notnull constraints.
         // However, I think it would be better without any null constraints.
         // https://github.com/dotnet/runtime/issues/98259
-        // The enumeration order of Dictionary is guaranteed to be in the order of addition unless items are removed (according to comments in the issue).
+        // I'm going to use DictionarySlim instead of Dictionary so removed TKey : notnull constraints.
 
         public static ValueEnumerable<AggregateBy<TEnumerator, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TEnumerator, TSource, TKey, TAccumulate>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            where TKey : notnull
             => new(new(source.Enumerator, keySelector, seed, func, null));
 
         public static ValueEnumerable<AggregateBy<TEnumerator, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TEnumerator, TSource, TKey, TAccumulate>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey>? keyComparer)
@@ -20,7 +19,6 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            where TKey : notnull
             => new(new(source.Enumerator, keySelector, seed, func, keyComparer));
 
         public static ValueEnumerable<AggregateBy2<TEnumerator, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TEnumerator, TSource, TKey, TAccumulate>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func)
@@ -28,7 +26,6 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            where TKey : notnull
             => new(new(source.Enumerator, keySelector, seedSelector, func, null));
 
         public static ValueEnumerable<AggregateBy2<TEnumerator, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TEnumerator, TSource, TKey, TAccumulate>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey>? keyComparer)
@@ -36,7 +33,6 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            where TKey : notnull
             => new(new(source.Enumerator, keySelector, seedSelector, func, keyComparer));
     }
 }
@@ -56,12 +52,11 @@ namespace ZLinq.Linq
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
-        where TKey : notnull
     {
         TEnumerator source = source;
 
-        Dictionary<TKey, TAccumulate>? dictionary;
-        Dictionary<TKey, TAccumulate>.Enumerator enumerator;
+        DictionarySlim<TKey, TAccumulate>? dictionary;
+        DictionarySlim<TKey, TAccumulate>.Enumerator enumerator;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -87,13 +82,11 @@ namespace ZLinq.Linq
                     Unsafe.SkipInit(out current);
                     return false;
                 }
-
                 Initialize();
             }
 
-            if (enumerator.MoveNext())
+            if (enumerator.TryGetNext(out current))
             {
-                current = enumerator.Current;
                 return true;
             }
 
@@ -104,8 +97,8 @@ namespace ZLinq.Linq
         void Initialize()
         {
             var dict = keyComparer != null
-                ? new Dictionary<TKey, TAccumulate>(keyComparer)
-                : new Dictionary<TKey, TAccumulate>();
+                ? new DictionarySlim<TKey, TAccumulate>(keyComparer)
+                : new DictionarySlim<TKey, TAccumulate>();
 
             using (source)
             {
@@ -114,19 +107,8 @@ namespace ZLinq.Linq
                     foreach (var item in span)
                     {
                         var key = keySelector(item);
-#if NETSTANDARD2_0 || NETSTANDARD2_1
-                        if (dict.TryGetValue(key, out var accumulate))
-                        {
-                            dict[key] = func(accumulate, item);
-                        }
-                        else
-                        {
-                            dict[key] = func(seed, item);
-                        }
-#else
-                        ref var accumulate = ref CollectionsMarshal.GetValueRefOrAddDefault(dict, key, out var exists);
+                        ref var accumulate = ref dict.GetValueRefOrAddDefault(key, out var exists);
                         accumulate = func(exists ? accumulate! : seed, item);
-#endif
                     }
                 }
                 else
@@ -134,19 +116,8 @@ namespace ZLinq.Linq
                     while (source.TryGetNext(out var item))
                     {
                         var key = keySelector(item);
-#if NETSTANDARD2_0 || NETSTANDARD2_1
-                        if (dict.TryGetValue(key, out var accumulate))
-                        {
-                            dict[key] = func(accumulate, item);
-                        }
-                        else
-                        {
-                            dict[key] = func(seed, item);
-                        }
-#else
-                        ref var accumulate = ref CollectionsMarshal.GetValueRefOrAddDefault(dict, key, out var exists);
+                        ref var accumulate = ref dict.GetValueRefOrAddDefault(key, out var exists);
                         accumulate = func(exists ? accumulate! : seed, item);
-#endif
                     }
                 }
             }
@@ -157,10 +128,7 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
-            if (dictionary != null)
-            {
-                enumerator.Dispose();
-            }
+            dictionary?.Dispose();
             source.Dispose();
         }
     }
@@ -178,12 +146,11 @@ namespace ZLinq.Linq
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
-        where TKey : notnull
     {
         TEnumerator source = source;
 
-        Dictionary<TKey, TAccumulate>? dictionary;
-        Dictionary<TKey, TAccumulate>.Enumerator enumerator;
+        DictionarySlim<TKey, TAccumulate>? dictionary;
+        DictionarySlim<TKey, TAccumulate>.Enumerator enumerator;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -213,9 +180,8 @@ namespace ZLinq.Linq
                 Initialize();
             }
 
-            if (enumerator.MoveNext())
+            if (enumerator.TryGetNext(out current))
             {
-                current = enumerator.Current;
                 return true;
             }
 
@@ -226,8 +192,8 @@ namespace ZLinq.Linq
         void Initialize()
         {
             var dict = keyComparer != null
-                ? new Dictionary<TKey, TAccumulate>(keyComparer)
-                : new Dictionary<TKey, TAccumulate>();
+                ? new DictionarySlim<TKey, TAccumulate>(keyComparer)
+                : new DictionarySlim<TKey, TAccumulate>();
 
             using (source)
             {
@@ -236,19 +202,8 @@ namespace ZLinq.Linq
                     foreach (var item in span)
                     {
                         var key = keySelector(item);
-#if NETSTANDARD2_0 || NETSTANDARD2_1
-                        if (dict.TryGetValue(key, out var accumulate))
-                        {
-                            dict[key] = func(accumulate, item);
-                        }
-                        else
-                        {
-                            dict[key] = func(seedSelector(key), item);
-                        }
-#else
-                        ref var accumulate = ref CollectionsMarshal.GetValueRefOrAddDefault(dict, key, out var exists);
+                        ref var accumulate = ref dict.GetValueRefOrAddDefault(key, out var exists);
                         accumulate = func(exists ? accumulate! : seedSelector(key), item);
-#endif
                     }
                 }
                 else
@@ -256,19 +211,8 @@ namespace ZLinq.Linq
                     while (source.TryGetNext(out var item))
                     {
                         var key = keySelector(item);
-#if NETSTANDARD2_0 || NETSTANDARD2_1
-                        if (dict.TryGetValue(key, out var accumulate))
-                        {
-                            dict[key] = func(accumulate, item);
-                        }
-                        else
-                        {
-                            dict[key] = func(seedSelector(key), item);
-                        }
-#else
-                        ref var accumulate = ref CollectionsMarshal.GetValueRefOrAddDefault(dict, key, out var exists);
+                        ref var accumulate = ref dict.GetValueRefOrAddDefault(key, out var exists);
                         accumulate = func(exists ? accumulate! : seedSelector(key), item);
-#endif
                     }
                 }
             }
@@ -279,10 +223,7 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
-            if (dictionary != null)
-            {
-                enumerator.Dispose();
-            }
+            dictionary?.Dispose();
             source.Dispose();
         }
     }

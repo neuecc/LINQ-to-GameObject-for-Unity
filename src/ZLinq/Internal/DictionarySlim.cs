@@ -6,7 +6,7 @@ namespace ZLinq.Internal;
 
 // Lightweight dictionary implementation optimized for performance
 // with minimal API surface focused on the specific use case
-internal sealed class DictionarySlim<TKey, TValue> : IDisposable
+internal sealed class DictionarySlim<TKey, TValue> : IDisposable // allows TKey null
 {
     const int MinimumSize = 16; // minimum arraypool size
     const double LoadFactor = 0.72;
@@ -112,6 +112,9 @@ internal sealed class DictionarySlim<TKey, TValue> : IDisposable
         return (int)(hashCode & (bucketsLength - 1));
     }
 
+    // Since there are no deletions, the order of Entries is completely guaranteed to be in the order of addition.
+    public Enumerator GetEnumerator() => new Enumerator(this);
+
     // return to pool
     public void Dispose()
     {
@@ -135,5 +138,24 @@ internal sealed class DictionarySlim<TKey, TValue> : IDisposable
         public TKey Key;
         public TValue? Value;
         public int Next; // next is index of entries, -1 is end of chain
+    }
+
+    // Since it's only used internally, I won't make it an IEnumerator style.
+    public struct Enumerator(DictionarySlim<TKey, TValue> dictionary)
+    {
+        int index;
+
+        public bool TryGetNext(out KeyValuePair<TKey, TValue> item)
+        {
+            if (index < dictionary.entryIndex)
+            {
+                ref var entry = ref dictionary.entries[index];
+                index++;
+                item = new KeyValuePair<TKey, TValue>(entry.Key, entry.Value!);
+                return true;
+            }
+            item = default!;
+            return false;
+        }
     }
 }
