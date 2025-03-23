@@ -14,7 +14,8 @@ internal static class ExtensionMethods
             , allows ref struct
 #endif
     {
-        foreach (T item in enumerable)
+        using var e = enumerable.Enumerator;
+        while (e.TryGetNext(out var item))
         {
             consumer.Consume(in item);
         }
