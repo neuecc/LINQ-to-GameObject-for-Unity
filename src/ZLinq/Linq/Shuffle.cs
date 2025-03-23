@@ -30,7 +30,7 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerator source = source;
-        TSource[]? buffer;
+        RentedArrayBox<TSource>? buffer;
         int index = 0;
 
         public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
@@ -38,7 +38,7 @@ namespace ZLinq.Linq
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
             InitBuffer();
-            span = buffer;
+            span = buffer.Span;
             return true;
         }
 
@@ -60,7 +60,7 @@ namespace ZLinq.Linq
             }
 
             InitBuffer();
-            if (EnumeratorHelper.TryGetSlice<TSource>(buffer, offset, destination.Length, out var slice))
+            if (EnumeratorHelper.TryGetSlice<TSource>(buffer.Span, offset, destination.Length, out var slice))
             {
                 slice.CopyTo(destination);
                 return true;
@@ -75,7 +75,7 @@ namespace ZLinq.Linq
 
             if (index < buffer.Length)
             {
-                current = buffer[index++];
+                current = buffer.UnsafeGetAt(index++);
                 return true;
             }
 
@@ -85,6 +85,7 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
+            buffer?.Dispose();
             source.Dispose();
         }
 
@@ -93,10 +94,9 @@ namespace ZLinq.Linq
         {
             if (buffer == null)
             {
-                // do not use pool(struct field can't gurantees state of reference)
-                // TODO: in-future use SafeBox
-                buffer = new ValueEnumerable<TEnumerator, TSource>(source).ToArray<TEnumerator, TSource>();
-                RandomShared.Shuffle(buffer);
+                var (array, count) = new ValueEnumerable<TEnumerator, TSource>(source).ToArrayPool();
+                buffer = new RentedArrayBox<TSource>(array, count);
+                RandomShared.Shuffle(buffer.Span);
             }
         }
     }
