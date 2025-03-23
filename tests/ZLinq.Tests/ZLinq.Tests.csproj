@@ -40,6 +40,7 @@
   <ItemGroup>
     <!-- Test internal type(without InternalVisibleTo) -->
     <Compile Include="..\..\src\ZLinq\Internal\HashSetSlim.cs" LinkBase="InternalInclude" />
+    <Compile Include="..\..\src\ZLinq\Internal\DictionarySlim.cs" LinkBase="InternalInclude" />
     <Compile Include="..\..\src\ZLinq\Internal\Polyfill\BitOperations.cs" LinkBase="InternalInclude" />
   </ItemGroup>
 

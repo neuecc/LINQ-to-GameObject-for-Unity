@@ -20,11 +20,18 @@ internal sealed class HashSetSlim<T> : IDisposable
     int resizeThreshold;
 
     public HashSetSlim(IEqualityComparer<T>? comparer)
+        : this(MinimumSize, comparer)
     {
+    }
+
+    public HashSetSlim(int capacity, IEqualityComparer<T>? comparer)
+    {
+        capacity = Math.Min((int)System.Numerics.BitOperations.RoundUpToPowerOf2((uint)capacity), MinimumSize);
+
         this.comparer = comparer ?? EqualityComparer<T>.Default;
-        this.buckets = ArrayPool<int>.Shared.Rent(MinimumSize);
-        this.entries = ArrayPool<Entry>.Shared.Rent(MinimumSize);
-        this.bucketsLength = MinimumSize;
+        this.buckets = ArrayPool<int>.Shared.Rent(capacity);
+        this.entries = ArrayPool<Entry>.Shared.Rent(capacity);
+        this.bucketsLength = capacity;
         this.resizeThreshold = (int)(bucketsLength * LoadFactor);
         buckets.AsSpan().Clear(); // 0-clear.
     }

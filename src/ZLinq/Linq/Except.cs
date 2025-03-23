@@ -88,7 +88,7 @@ namespace ZLinq.Linq
 
             while (source.TryGetNext(out var value))
             {
-                if (set.Remove(value))
+                if (set.Remove(value)) // NOTE: currently HashSetSlim does not support Remove so we can't use it here.
                 {
                     current = value;
                     return true;

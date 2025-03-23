@@ -36,7 +36,7 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerator source = source;
-        HashSet<TKey>? set;
+        HashSetSlim<TKey>? set;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -56,7 +56,7 @@ namespace ZLinq.Linq
         {
             if (set == null)
             {
-                set = new HashSet<TKey>(comparer ?? EqualityComparer<TKey>.Default);
+                set = new HashSetSlim<TKey>(comparer ?? EqualityComparer<TKey>.Default);
             }
 
             while (source.TryGetNext(out var value))
@@ -74,6 +74,7 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
+            set?.Dispose();
             source.Dispose();
         }
     }

@@ -63,7 +63,7 @@ namespace ZLinq.Linq
     {
         TEnumerator source = source;
         TEnumerator2 second = second;
-        HashSet<TSource>? set;
+        HashSetSlim<TSource>? set;
         byte state = 0;
 
         public bool TryGetNonEnumeratedCount(out int count)
@@ -84,7 +84,7 @@ namespace ZLinq.Linq
         {
             if (state == 0)
             {
-                set = new HashSet<TSource>(comparer ?? EqualityComparer<TSource>.Default);
+                set = new HashSetSlim<TSource>(comparer ?? EqualityComparer<TSource>.Default);
                 state = 1;
             }
 
@@ -122,6 +122,7 @@ namespace ZLinq.Linq
         public void Dispose()
         {
             state = 3;
+            set?.Dispose();
             source.Dispose();
             second.Dispose();
         }
