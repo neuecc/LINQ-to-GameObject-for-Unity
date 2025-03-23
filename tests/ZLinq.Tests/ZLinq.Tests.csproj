@@ -36,6 +36,13 @@
     <ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <!-- Test internal type(without InternalVisibleTo) -->
+    <Compile Include="..\..\src\ZLinq\Internal\HashSetSlim.cs" LinkBase="InternalInclude" />
+    <Compile Include="..\..\src\ZLinq\Internal\Polyfill\BitOperations.cs" LinkBase="InternalInclude" />
+  </ItemGroup>
+
   <!-- I don't know why but my environemnts(VS2022) still neds this for run test in Test Explorer -->
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
@@ -49,5 +56,11 @@
     <Using Include="Xunit" />
     <Using Include="Shouldly" />
     <Using Include="ZLinq" />
+    <Using Include="System.Runtime.CompilerServices" />
+    <Using Include="System.Runtime.InteropServices" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="InternalInclude\" />
   </ItemGroup>
 </Project>

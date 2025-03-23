@@ -163,7 +163,7 @@ namespace ZLinq.Linq
             if (buckets == null)
             {
                 buckets = ArrayPool<Grouping<TKey, TElement>>.Shared.Rent(MinimumSize);
-                bucketsLength = buckets.Length;
+                bucketsLength = MinimumSize;
             }
 
             var hash = InternalGetHashCode(key);
@@ -278,7 +278,7 @@ namespace ZLinq.Linq
 
             var newBuckets = ArrayPool<Grouping<TKey, TElement>>.Shared.Rent((int)newSize);
             buckets = newBuckets;
-            bucketsLength = newBuckets.Length;
+            bucketsLength = (int)newSize;
 
             var first = group;
             do

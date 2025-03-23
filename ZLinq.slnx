@@ -3,8 +3,6 @@
     <Project Path="sandbox/Benchmark/Benchmark.csproj" />
     <Project Path="sandbox/ConsoleApp/ConsoleApp.csproj" />
     <Project Path="sandbox/ConsoleAppNet6/ConsoleAppNet6.csproj" />
-    <!-- ignore for CI -->
-    <!-- <Project Path="sandbox/ConsoleAppNetFramework48/ConsoleAppNetFramework48.csproj" /> -->
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/FileGen/FileGen.csproj" />
