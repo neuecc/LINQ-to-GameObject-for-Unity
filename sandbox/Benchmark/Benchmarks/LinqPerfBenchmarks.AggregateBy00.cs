@@ -6,8 +6,6 @@ namespace Benchmark;
 
 public partial class LinqPerfBenchmarks
 {
-    [ShortRunJob]
-    [MemoryDiagnoser]
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     public class AggregateBy00
     {

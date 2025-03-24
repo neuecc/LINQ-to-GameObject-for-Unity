@@ -6,8 +6,6 @@ using ZLinq.Linq;
 
 namespace Benchmark;
 
-[ShortRunJob]
-[MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 public class ReadMeBenchmark
 {

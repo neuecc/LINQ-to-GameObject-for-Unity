@@ -1,14 +1,13 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Order;
 using System.Runtime.CompilerServices;
 using ZLinq;
 
 namespace Benchmark;
 
-[ShortRunJob]
-[MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.Method)]
-[GroupBenchmarksBy(BenchmarkDotNet.Configs.BenchmarkLogicalGroupRule.ByParams)]
+[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByParams)]
 public class SimdSum
 {
     [Params(32, 128, 1024, 8192, 16384)]

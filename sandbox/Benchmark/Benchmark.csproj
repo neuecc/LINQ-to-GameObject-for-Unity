@@ -10,6 +10,9 @@
 
     <!-- CS8002: Referenced assembly does not have a strong name.-->
     <NoWarn>$(NoWarn);CS8002</NoWarn>
+
+    <!-- Settings for Microsoft.VisualStudio.DiagnosticsHub.UserMarks -->
+    <DefineConstants>$(DefineConstants);DIAGHUB_ENABLE_TRACE_SYSTEM</DefineConstants>
   </PropertyGroup>
 
   <!-- Add .NET 10 support when running build inside Visual Studio Preview-->
@@ -17,18 +20,47 @@
     <TargetFrameworks>$(TargetFrameworks);net10.0</TargetFrameworks>
   </PropertyGroup>
 
+  <!-- Settings for NuGetVersionsBenchmarkConfig -->
+  <PropertyGroup>
+    <!-- Define benchmark target versions.First element is selected as baseline version. -->
+    <TargetZLinqVersions>0.4.5;0.5.2</TargetZLinqVersions>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>TargetZLinqVersions</_Parameter1>
+      <_Parameter2>$(TargetZLinqVersions)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="AndanteSoft.SpanLinq" Version="1.0.1" />
-    <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
     <PackageReference Include="LinqAF" Version="3.0.0" />
     <PackageReference Include="LinqGen" Version="0.3.1" />
     <PackageReference Include="LinqGen.Generator" Version="0.3.1" />
-    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="17.13.35606.1" />
     <PackageReference Include="StructLinq" Version="0.28.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="17.13.35606.1" />
+    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.UserMarks"                 Version="17.13.35606.1" />
+    <PackageReference Include="Kokuban" Version="0.2.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseZLinqNuGetPackage)' != 'true'">
     <ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
   </ItemGroup>
 
+  <!-- If `UseDocfxNuGetPackage` property is enabled. Use baseline NuGet package -->
+  <ItemGroup Condition="'$(UseZLinqNuGetPackage)' == 'true'">
+    <PackageReference Include="ZLinq" Version="$(TargetZLinqVersions.Split(';')[0])" />
+  </ItemGroup>
+
+  <!-- Custom target to cleanup `BenchmarkDotNet.Artifacts` directory-->
+  <Target Name="CleanBenchmarkDotNetArtifacts"
+          BeforeTargets="Clean"
+          Condition="Exists('BenchmarkDotNet.Artifacts')">
+    <RemoveDir Directories="BenchmarkDotNet.Artifacts" />
+  </Target>
 </Project>
