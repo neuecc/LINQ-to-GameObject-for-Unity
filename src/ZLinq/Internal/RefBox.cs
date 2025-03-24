@@ -1,11 +1,13 @@
 ﻿namespace ZLinq.Internal;
 
+// store struct to heap
 internal sealed class RefBox<T> : IDisposable
     where T : struct, IDisposable
 {
     T value;
+    bool isDisposed;
 
-    public RefBox(ref T value)
+    public RefBox(T value)
     {
         this.value = value;
     }
@@ -14,6 +16,10 @@ internal sealed class RefBox<T> : IDisposable
 
     public void Dispose()
     {
-        value.Dispose();
+        if (!isDisposed)
+        {
+            isDisposed = true;
+            value.Dispose();
+        }
     }
 }

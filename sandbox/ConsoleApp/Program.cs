@@ -31,6 +31,22 @@ using ZLinq.Traversables;
 
 
 
+
+
+IEnumerable<double?> source = [double.MaxValue, null, double.MaxValue];
+var expected = double.PositiveInfinity;
+
+
+
+
+var a = source.Sum();
+var b = source.Sum(x => x);
+
+
+
+
+
+
 var srcFiles = new DirectoryInfo("../../../../../src/ZLinq/Linq/").GetFiles();
 var tstFiles = new DirectoryInfo("../../../../../tests/ZLinq.Tests/Linq/").GetFiles();
 

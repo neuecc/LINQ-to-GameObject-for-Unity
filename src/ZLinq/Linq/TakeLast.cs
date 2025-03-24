@@ -30,7 +30,7 @@ namespace ZLinq.Linq
     {
         TEnumerator source = source;
         readonly int takeCount = Math.Max(0, count);
-        Queue<TSource>? q;
+        Queue<TSource>? q; // TODO:RefBox<ValueQUeue>>
 
         public bool TryGetNonEnumeratedCount(out int count)
         {

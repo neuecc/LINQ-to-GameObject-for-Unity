@@ -29,8 +29,7 @@ namespace ZLinq.Linq
     {
         TEnumerator source = source;
         readonly int skipCount = Math.Max(0, count);
-        ValueQueue<TSource> buffer;
-        bool isBufferInitialized;
+        RefBox<ValueQueue<TSource>>? buffer;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -83,19 +82,18 @@ namespace ZLinq.Linq
                 return source.TryGetNext(out current);
             }
 
-            if (!isBufferInitialized)
+            if (buffer == null)
             {
-                isBufferInitialized = true;
-                buffer = new ValueQueue<TSource>(4);
+                buffer = new RefBox<ValueQueue<TSource>>(new ValueQueue<TSource>(4));
 
                 // Fill the buffer with initial items
-                while (buffer.Count < skipCount && source.TryGetNext(out var item))
+                while (buffer.GetValueRef().Count < skipCount && source.TryGetNext(out var item))
                 {
-                    buffer.Enqueue(item);
+                    buffer.GetValueRef().Enqueue(item);
                 }
 
                 // If we couldn't fill the buffer, there aren't enough items
-                if (buffer.Count < skipCount)
+                if (buffer.GetValueRef().Count < skipCount)
                 {
                     Unsafe.SkipInit(out current);
                     return false;
@@ -106,8 +104,8 @@ namespace ZLinq.Linq
             if (source.TryGetNext(out var next))
             {
                 // Return the oldest item from buffer and add the new one
-                current = buffer.Dequeue();
-                buffer.Enqueue(next);
+                current = buffer.GetValueRef().Dequeue();
+                buffer.GetValueRef().Enqueue(next);
                 return true;
             }
 
@@ -117,10 +115,7 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
-            if (isBufferInitialized)
-            {
-                buffer.Dispose();
-            }
+            buffer?.Dispose();
             source.Dispose();
         }
     }

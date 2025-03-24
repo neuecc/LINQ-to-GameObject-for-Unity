@@ -2,6 +2,7 @@
 
 namespace ZLinq.Internal;
 
+// TODO: unittest
 [StructLayout(LayoutKind.Auto)]
 internal ref struct SegmentedArrayBuilder<T> : IDisposable
 {

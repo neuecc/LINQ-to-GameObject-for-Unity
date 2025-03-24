@@ -115,7 +115,7 @@ namespace ZLinq.Linq
         int remains;
         readonly int skipIndex;
         readonly int fromEndQueueCount; // 0 is not use q
-        Queue<TSource>? q;
+        Queue<TSource>? q; // TODO:RefBox<ValueQUeue>>
 
         public TakeRange(TEnumerator source, Range range)
         {
