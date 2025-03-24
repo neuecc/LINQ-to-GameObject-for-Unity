@@ -15,10 +15,10 @@ internal static partial class ZLinqDropInExtensions
     public static TSource Aggregate<TSource>(this List<TSource> source, Func<TSource, TSource, TSource> func) => source.AsValueEnumerable().Aggregate(func);
     public static TAccumulate Aggregate<TSource, TAccumulate>(this List<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func) => source.AsValueEnumerable().Aggregate(seed, func);
     public static TResult Aggregate<TSource, TAccumulate, TResult>(this List<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, Func<TAccumulate, TResult> resultSelector) => source.AsValueEnumerable().Aggregate(seed, func, resultSelector);
-    public static ValueEnumerable<AggregateBy<FromList<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this List<TSource> source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func) where TKey : notnull => source.AsValueEnumerable().AggregateBy(keySelector, seed, func);
-    public static ValueEnumerable<AggregateBy<FromList<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this List<TSource> source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer) where TKey : notnull => source.AsValueEnumerable().AggregateBy(keySelector, seed, func, keyComparer);
-    public static ValueEnumerable<AggregateBy2<FromList<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this List<TSource> source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func) where TKey : notnull => source.AsValueEnumerable().AggregateBy(keySelector, seedSelector, func);
-    public static ValueEnumerable<AggregateBy2<FromList<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this List<TSource> source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer) where TKey : notnull => source.AsValueEnumerable().AggregateBy(keySelector, seedSelector, func, keyComparer);
+    public static ValueEnumerable<AggregateBy<FromList<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this List<TSource> source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func) => source.AsValueEnumerable().AggregateBy(keySelector, seed, func);
+    public static ValueEnumerable<AggregateBy<FromList<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this List<TSource> source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer) => source.AsValueEnumerable().AggregateBy(keySelector, seed, func, keyComparer);
+    public static ValueEnumerable<AggregateBy2<FromList<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this List<TSource> source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func) => source.AsValueEnumerable().AggregateBy(keySelector, seedSelector, func);
+    public static ValueEnumerable<AggregateBy2<FromList<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this List<TSource> source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer) => source.AsValueEnumerable().AggregateBy(keySelector, seedSelector, func, keyComparer);
     public static Boolean All<TSource>(this List<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().All(predicate);
     public static Boolean Any<TSource>(this List<TSource> source) => source.AsValueEnumerable().Any();
     public static Boolean Any<TSource>(this List<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Any(predicate);
@@ -51,12 +51,12 @@ internal static partial class ZLinqDropInExtensions
     public static ValueEnumerable<Concat<FromList<TSource>, FromEnumerable<TSource>, TSource>, TSource> Concat<TSource>(this List<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().Concat(second);
     public static Boolean Contains<TSource>(this List<TSource> source, TSource value) => source.AsValueEnumerable().Contains(value);
     public static Boolean Contains<TSource>(this List<TSource> source, TSource value, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Contains(value, comparer);
-    public static void CopyTo<T>(this List<T> source, List<T> list) => source.AsValueEnumerable().CopyTo(list);
     public static Int32 CopyTo<T>(this List<T> source, Span<T> dest) => source.AsValueEnumerable().CopyTo(dest);
+    public static void CopyTo<T>(this List<T> source, List<T> list) => source.AsValueEnumerable().CopyTo(list);
     public static Int32 Count<TSource>(this List<TSource> source) => source.AsValueEnumerable().Count();
     public static Int32 Count<TSource>(this List<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Count(predicate);
-    public static ValueEnumerable<CountBy<FromList<TSource>, TSource, TKey>, KeyValuePair<TKey, Int32>> CountBy<TSource, TKey>(this List<TSource> source, Func<TSource, TKey> keySelector) where TKey : notnull => source.AsValueEnumerable().CountBy(keySelector);
-    public static ValueEnumerable<CountBy<FromList<TSource>, TSource, TKey>, KeyValuePair<TKey, Int32>> CountBy<TSource, TKey>(this List<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> keyComparer) where TKey : notnull => source.AsValueEnumerable().CountBy(keySelector, keyComparer);
+    public static ValueEnumerable<CountBy<FromList<TSource>, TSource, TKey>, KeyValuePair<TKey, Int32>> CountBy<TSource, TKey>(this List<TSource> source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().CountBy(keySelector);
+    public static ValueEnumerable<CountBy<FromList<TSource>, TSource, TKey>, KeyValuePair<TKey, Int32>> CountBy<TSource, TKey>(this List<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> keyComparer) => source.AsValueEnumerable().CountBy(keySelector, keyComparer);
     public static ValueEnumerable<DefaultIfEmpty<FromList<TSource>, TSource>, TSource> DefaultIfEmpty<TSource>(this List<TSource> source) => source.AsValueEnumerable().DefaultIfEmpty();
     public static ValueEnumerable<DefaultIfEmpty<FromList<TSource>, TSource>, TSource> DefaultIfEmpty<TSource>(this List<TSource> source, TSource defaultValue) => source.AsValueEnumerable().DefaultIfEmpty(defaultValue);
     public static ValueEnumerable<Distinct<FromList<TSource>, TSource>, TSource> Distinct<TSource>(this List<TSource> source) => source.AsValueEnumerable().Distinct();
@@ -64,13 +64,9 @@ internal static partial class ZLinqDropInExtensions
     public static ValueEnumerable<DistinctBy<FromList<TSource>, TSource, TKey>, TSource> DistinctBy<TSource, TKey>(this List<TSource> source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().DistinctBy(keySelector);
     public static ValueEnumerable<DistinctBy<FromList<TSource>, TSource, TKey>, TSource> DistinctBy<TSource, TKey>(this List<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().DistinctBy(keySelector, comparer);
     public static TSource ElementAt<TSource>(this List<TSource> source, Int32 index) => source.AsValueEnumerable().ElementAt(index);
-#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     public static TSource ElementAt<TSource>(this List<TSource> source, Index index) => source.AsValueEnumerable().ElementAt(index);
-#endif
     public static TSource? ElementAtOrDefault<TSource>(this List<TSource> source, Int32 index) => source.AsValueEnumerable().ElementAtOrDefault(index);
-#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     public static TSource? ElementAtOrDefault<TSource>(this List<TSource> source, Index index) => source.AsValueEnumerable().ElementAtOrDefault(index);
-#endif
     public static ValueEnumerable<Except<FromList<TSource>, TEnumerator2, TSource>, TSource> Except<TEnumerator2, TSource>(this List<TSource> source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -252,6 +248,10 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
+    public static ValueEnumerable<SelectMany<FromList<TSource>, TSource, TResult>, TResult> SelectMany<TSource, TResult>(this List<TSource> source, Func<TSource, IEnumerable<TResult>> selector) => source.AsValueEnumerable().SelectMany(selector);
+    public static ValueEnumerable<SelectMany2<FromList<TSource>, TSource, TResult>, TResult> SelectMany<TSource, TResult>(this List<TSource> source, Func<TSource, Int32, IEnumerable<TResult>> selector) => source.AsValueEnumerable().SelectMany(selector);
+    public static ValueEnumerable<SelectMany3<FromList<TSource>, TSource, TCollection, TResult>, TResult> SelectMany<TSource, TCollection, TResult>(this List<TSource> source, Func<TSource, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector) => source.AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
+    public static ValueEnumerable<SelectMany4<FromList<TSource>, TSource, TCollection, TResult>, TResult> SelectMany<TSource, TCollection, TResult>(this List<TSource> source, Func<TSource, Int32, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector) => source.AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
     public static Boolean SequenceEqual<TSource>(this List<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().SequenceEqual(second);
     public static Boolean SequenceEqual<TSource>(this List<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().SequenceEqual(second, comparer);
     public static Boolean SequenceEqual<TEnumerator2, TSource>(this List<TSource> source, ValueEnumerable<TEnumerator2, TSource> second)
@@ -304,9 +304,7 @@ internal static partial class ZLinqDropInExtensions
  => source.AsValueEnumerable().SumUnchecked();
 #endif
     public static ValueEnumerable<Take<FromList<TSource>, TSource>, TSource> Take<TSource>(this List<TSource> source, Int32 count) => source.AsValueEnumerable().Take(count);
-#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     public static ValueEnumerable<TakeRange<FromList<TSource>, TSource>, TSource> Take<TSource>(this List<TSource> source, Range range) => source.AsValueEnumerable().Take(range);
-#endif
     public static ValueEnumerable<TakeLast<FromList<TSource>, TSource>, TSource> TakeLast<TSource>(this List<TSource> source, Int32 count) => source.AsValueEnumerable().TakeLast(count);
     public static ValueEnumerable<TakeWhile<FromList<TSource>, TSource>, TSource> TakeWhile<TSource>(this List<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().TakeWhile(predicate);
     public static ValueEnumerable<TakeWhile2<FromList<TSource>, TSource>, TSource> TakeWhile<TSource>(this List<TSource> source, Func<TSource, Int32, Boolean> predicate) => source.AsValueEnumerable().TakeWhile(predicate);
@@ -325,6 +323,7 @@ internal static partial class ZLinqDropInExtensions
     public static ILookup<TKey, TSource> ToLookup<TSource, TKey>(this List<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().ToLookup(keySelector, comparer);
     public static ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(this List<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) => source.AsValueEnumerable().ToLookup(keySelector, elementSelector);
     public static ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(this List<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().ToLookup(keySelector, elementSelector, comparer);
+    public static Boolean TryGetNonEnumeratedCount<TSource>(this List<TSource> source, out Int32 count) => source.AsValueEnumerable().TryGetNonEnumeratedCount(out count);
     public static ValueEnumerable<Union<FromList<TSource>, TEnumerator2, TSource>, TSource> Union<TEnumerator2, TSource>(this List<TSource> source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

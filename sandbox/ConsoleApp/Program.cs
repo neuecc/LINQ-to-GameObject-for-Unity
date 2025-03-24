@@ -23,18 +23,18 @@ using ZLinq.Traversables;
 //byte.MaxValue
 // 2147483647
 
-[assembly: ZLinq.ZLinqDropInAttribute("", ZLinq.DropInGenerateTypes.Everything, DisableEmitSource = true)]
+[assembly: ZLinq.ZLinqDropInAttribute("", ZLinq.DropInGenerateTypes.Everything, DisableEmitSource = false)]
 
-
+// Enumerable.Range(1, 10).ToDictionary();
 //var tako = ValueEnumerable.Range(1, 10).Select(x => x.ToString());
 //var ok = string.Join(',', tako);
 
 
-var source = new int[] { 532, 1, 21414, 14, 315, 5, 2, 542, 62, 62, 62, 753, 1, 63, 63, 6 };
-var l = source.OrderBy(x => x).ThenByDescending(x => x).ElementAt(0);
-
-var a = source.AsEnumerable().TryGetNonEnumeratedCount(out var foo);
-Console.WriteLine(a);
+var seq = ValueEnumerable.Range(1, 10).SelectMany(x => new[] { x, x });
+foreach (var item in seq)
+{
+    Console.WriteLine(item);
+}
 
 return;
 ValueEnumerable.Range(1, 10).Concat(Enumerable.Range(1, 10)).ToArray();

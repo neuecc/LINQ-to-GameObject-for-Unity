@@ -42,7 +42,25 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<(int Index, TSource Item)> destination, Index offset) => false;
+        public bool TryCopyTo(Span<(int Index, TSource Item)> destination, Index offset)
+        {
+            // Iterate inlining
+            if (source.TryGetSpan(out var span))
+            {
+                if (EnumeratorHelper.TryGetSlice(span, offset, destination.Length, out var slice))
+                {
+                    var index = offset.GetOffset(span.Length);
+                    for (var i = 0; i < slice.Length; i++)
+                    {
+                        destination[i] = (index, slice[i]);
+                        checked { index++; }
+                    }
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         public bool TryGetNext(out (int Index, TSource Item) current)
         {

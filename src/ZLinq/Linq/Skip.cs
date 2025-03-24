@@ -43,6 +43,19 @@ namespace ZLinq.Linq
             return false;
         }
 
+        public bool TryCopyTo(Span<TSource> destination, Index offset)
+        {
+            if (source.TryGetNonEnumeratedCount(out var count))
+            {
+                var skipOffset = offset.GetOffset(count) + skipCount;
+                if (source.TryCopyTo(destination, skipOffset))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
             if (source.TryGetSpan(out span))
@@ -59,8 +72,6 @@ namespace ZLinq.Linq
             span = default;
             return false;
         }
-
-        public bool TryCopyTo(Span<TSource> destination, Index offset) => false;
 
         public bool TryGetNext(out TSource current)
         {

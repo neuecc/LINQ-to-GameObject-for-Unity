@@ -60,6 +60,65 @@ namespace ZLinq.Tests.Linq
 
             result.TryCopyTo(new Span<(int, int)>()).ShouldBeFalse();
         }
+
+        [Fact]
+        public void TryCopyTo()
+        {
+            var dest = new (int Index, int Item)[5];
+
+            var source = new[] { 10, 20, 30, 40, 50 }.AsValueEnumerable().Index();
+
+            source.TryCopyTo(dest, 0);
+            dest.ShouldBe([(0, 10), (1, 20), (2, 30), (3, 40), (4, 50)]);
+
+            Array.Clear(dest);
+            source.TryCopyTo(dest, 1).ShouldBeTrue();
+            dest.ShouldBe([(1, 20), (2, 30), (3, 40), (4, 50), (0, 0)]);
+
+            Array.Clear(dest);
+            source.TryCopyTo(dest, 2).ShouldBeTrue();
+            dest.ShouldBe([(2, 30), (3, 40), (4, 50), (0, 0), (0, 0)]);
+
+            Array.Clear(dest);
+            source.TryCopyTo(dest, 3).ShouldBeTrue();
+            dest.ShouldBe([(3, 40), (4, 50), (0, 0), (0, 0), (0, 0)]);
+
+            Array.Clear(dest);
+            source.TryCopyTo(dest, 4).ShouldBeTrue();
+            dest.ShouldBe([(4, 50), (0, 0), (0, 0), (0, 0), (0, 0)]);
+
+            Array.Clear(dest);
+            source.TryCopyTo(dest, 5).ShouldBeFalse();
+
+            // from last
+
+            source.TryCopyTo(dest, ^0).ShouldBeFalse();
+
+            Array.Clear(dest);
+            source.TryCopyTo(dest, ^1).ShouldBeTrue();
+            dest.ShouldBe([(4, 50), (0, 0), (0, 0), (0, 0), (0, 0)]);
+
+            Array.Clear(dest);
+            source.TryCopyTo(dest, ^2).ShouldBeTrue();
+            dest.ShouldBe([(3, 40), (4, 50), (0, 0), (0, 0), (0, 0)]);
+
+            Array.Clear(dest);
+            source.TryCopyTo(dest, ^3).ShouldBeTrue();
+            dest.ShouldBe([(2, 30), (3, 40), (4, 50), (0, 0), (0, 0)]);
+
+            Array.Clear(dest);
+            source.TryCopyTo(dest, ^4).ShouldBeTrue();
+            dest.ShouldBe([(1, 20), (2, 30), (3, 40), (4, 50), (0, 0)]);
+
+            Array.Clear(dest);
+            source.TryCopyTo(dest, ^5).ShouldBeTrue();
+            dest.ShouldBe([(0, 10), (1, 20), (2, 30), (3, 40), (4, 50)]);
+
+            source.TryCopyTo(dest, ^6).ShouldBeFalse();
+
+
+            source.ElementAt(3).ShouldBe((3, 40));
+        }
     }
 
     // Mock implementations for testing

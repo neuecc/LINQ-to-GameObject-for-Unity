@@ -50,17 +50,37 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
+            if (destination.Length == 0) return false;
             if (!source.TryGetNonEnumeratedCount(out var srcCount)) return false;
 
-            var srcOffset = offset.GetOffset(srcCount);
-            if ((srcCount - srcOffset + 1) > destination.Length) return false;
+            var totalLength = srcCount + 1; // +1 for the prepended element
+            var start = offset.GetOffset(totalLength);
 
-            if (!source.TryCopyTo(destination.Slice(1), offset))
+            if (start >= totalLength)
             {
                 return false;
             }
 
-            destination[0] = element;
+            var includePrependedElement = (start == 0);
+
+            var sourceStart = start > 0 ? start - 1 : 0;
+            var availableDestSpace = destination.Length - (includePrependedElement ? 1 : 0);
+            var elementsToCopy = Math.Min(srcCount - sourceStart, availableDestSpace);
+
+            if (elementsToCopy > 0)
+            {
+                var destinationOffset = includePrependedElement ? 1 : 0;
+                var destinationSlice = destination.Slice(destinationOffset, elementsToCopy);
+                if (!source.TryCopyTo(destinationSlice, sourceStart))
+                {
+                    return false;
+                }
+            }
+
+            if (includePrependedElement)
+            {
+                destination[0] = element;
+            }
             return true;
         }
 

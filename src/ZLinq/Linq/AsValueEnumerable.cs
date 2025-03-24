@@ -423,8 +423,14 @@ namespace ZLinq.Linq
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
-            count = checked((int)source.Length);
-            return true;
+            const int ArrayMaxLength = 0X7FFFFFC7;
+            if (source.Length < ArrayMaxLength)
+            {
+                count = checked((int)source.Length);
+                return true;
+            }
+            count = 0;
+            return false;
         }
 
         public bool TryGetSpan(out ReadOnlySpan<T> span)

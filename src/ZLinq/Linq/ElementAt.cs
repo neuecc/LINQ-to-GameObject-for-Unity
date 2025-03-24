@@ -23,8 +23,6 @@ namespace ZLinq
             }
         }
 
-#if !NETSTANDARD2_0
-
         public static TSource ElementAt<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Index index)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -43,8 +41,6 @@ namespace ZLinq
                 enumerator.Dispose();
             }
         }
-
-#endif
 
         public static TSource? ElementAtOrDefault<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Int32 index)
           where TEnumerator : struct, IValueEnumerator<TSource>
@@ -67,8 +63,6 @@ namespace ZLinq
             }
         }
 
-#if !NETSTANDARD2_0
-
         public static TSource? ElementAtOrDefault<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Index index)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -87,7 +81,6 @@ namespace ZLinq
                 enumerator.Dispose();
             }
         }
-#endif
 
         static bool TryGetElementAt<TEnumerator, TSource>(ref TEnumerator source, Index index, out TSource value)
            where TEnumerator : struct, IValueEnumerator<TSource>

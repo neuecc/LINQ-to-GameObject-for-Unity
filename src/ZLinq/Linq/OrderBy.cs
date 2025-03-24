@@ -115,7 +115,7 @@ namespace ZLinq.Linq
         TEnumerator source = source;
         OrderByComparable<TSource, TKey> comparable = new(keySelector, comparer, parent, descending); // boxed
 
-        TSource[]? buffer;
+        RentedArrayBox<TSource>? buffer;
         int index;
 
         public bool TryGetNonEnumeratedCount(out int count) => source.TryGetNonEnumeratedCount(out count);
@@ -123,7 +123,7 @@ namespace ZLinq.Linq
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
             InitBuffer();
-            span = buffer;
+            span = buffer.Span;
             return true;
         }
 
@@ -148,24 +148,24 @@ namespace ZLinq.Linq
             {
                 // Try to use quickselect algorithm instead of full sort
                 var (elementArray, elementCount) = new ValueEnumerable<TEnumerator, TSource>(source).ToArrayPool();
+
+                var elementAt = offset.GetOffset(elementCount);
+                if (elementCount == 0)
+                {
+                    buffer = RentedArrayBox<TSource>.Empty;
+                    return false;
+                }
+                else if (unchecked((uint)elementAt) >= elementCount)
+                {
+                    // same as InitBuffer()
+                    buffer = new RentedArrayBox<TSource>(elementArray, elementCount); // keep rental array(don't return in this method)
+                    Sort(buffer.Span);
+                    return false;
+                }
+
                 try
                 {
                     var span = elementArray.AsSpan(0, elementCount);
-
-                    var elementAt = offset.GetOffset(elementCount);
-                    if (elementCount == 0)
-                    {
-                        buffer = [];
-                        return false;
-                    }
-                    else if (unchecked((uint)elementAt) >= elementCount)
-                    {
-                        // same as InitBuffer()
-                        buffer = span.ToArray();
-                        Sort(buffer);
-                        return false;
-                    }
-
                     var (indexMap, size) = ValueEnumerable.Range(0, span.Length).ToArrayPool();
 
                     using var comparer = comparable.GetComparer(span, null!);
@@ -197,7 +197,7 @@ namespace ZLinq.Linq
             }
 
             InitBuffer();
-            if (EnumeratorHelper.TryGetSlice<TSource>(buffer, offset, destination.Length, out var slice))
+            if (EnumeratorHelper.TryGetSlice<TSource>(buffer.Span, offset, destination.Length, out var slice))
             {
                 slice.CopyTo(destination);
                 return true;
@@ -212,7 +212,7 @@ namespace ZLinq.Linq
 
             if (index < buffer.Length)
             {
-                current = buffer[index++];
+                current = buffer.UnsafeGetAt(index++);
                 return true;
             }
 
@@ -222,6 +222,7 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
+            buffer?.Dispose();
             source.Dispose();
         }
 
@@ -230,10 +231,9 @@ namespace ZLinq.Linq
         {
             if (buffer == null)
             {
-                // do not use pool(struct field can't gurantees state of reference)
-                // TODO: in-future use SafeBox
-                buffer = new ValueEnumerable<TEnumerator, TSource>(source).ToArray();
-                Sort(buffer);
+                var (array, count) = new ValueEnumerable<TEnumerator, TSource>(source).ToArrayPool();
+                buffer = new RentedArrayBox<TSource>(array, count);
+                Sort(buffer.Span);
             }
         }
 

@@ -46,14 +46,14 @@ public static class TestUtil
     // direct shortcut of enumerable.enumerator
 
     // Enumerator is struct so this shortcut is dangerous.
-//    public static bool TryGetNext<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable, out T current)
-//        where TEnumerator : struct, IValueEnumerator<T>
-//#if NET9_0_OR_GREATER
-//        , allows ref struct
-//#endif
-//    {
-//        return enumerable.Enumerator.TryGetNext(out current);
-//    }
+    //    public static bool TryGetNext<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable, out T current)
+    //        where TEnumerator : struct, IValueEnumerator<T>
+    //#if NET9_0_OR_GREATER
+    //        , allows ref struct
+    //#endif
+    //    {
+    //        return enumerable.Enumerator.TryGetNext(out current);
+    //    }
 
     public static bool TryGetNonEnumeratedCount<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable, out int count)
         where TEnumerator : struct, IValueEnumerator<T>
@@ -61,7 +61,8 @@ public static class TestUtil
         , allows ref struct
 #endif
     {
-        return enumerable.Enumerator.TryGetNonEnumeratedCount(out count);
+        using var e = enumerable.Enumerator;
+        return e.TryGetNonEnumeratedCount(out count);
     }
 
     public static bool TryGetSpan<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable, out ReadOnlySpan<T> span)
@@ -70,16 +71,18 @@ public static class TestUtil
         , allows ref struct
 #endif
     {
-        return enumerable.Enumerator.TryGetSpan(out span);
+        using var e = enumerable.Enumerator;
+        return e.TryGetSpan(out span);
     }
 
-    public static bool TryCopyTo<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable, Span<T> destination, Index offset = default)
+    public static bool TryCopyTo<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable, scoped Span<T> destination, Index offset = default)
         where TEnumerator : struct, IValueEnumerator<T>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        return enumerable.Enumerator.TryCopyTo(destination, offset);
+        using var e = enumerable.Enumerator;
+        return e.TryCopyTo(destination, offset);
     }
 
     public static void Dispose<TEnumerator, T>(this ValueEnumerable<TEnumerator, T> enumerable)
@@ -88,7 +91,8 @@ public static class TestUtil
         , allows ref struct
 #endif
     {
-        enumerable.Enumerator.Dispose();
+        using var e = enumerable.Enumerator;
+        e.Dispose();
     }
 
     public static ValueEnumerable<TEnumerator, T> AsValueEnumerable<TEnumerator, T>(this TEnumerator enumerable, T typeHint)

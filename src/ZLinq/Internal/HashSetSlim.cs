@@ -8,7 +8,7 @@ namespace ZLinq.Internal;
 // Since we're only using it for duplicate checking in set operations, having `bool Add` is sufficient.
 internal sealed class HashSetSlim<T> : IDisposable
 {
-    const int MinimumSize = 16; // minimum arraypool size
+    const int MinimumSize = 16; // minimum arraypool size(power of 2)
     const double LoadFactor = 0.72;
 
     readonly IEqualityComparer<T> comparer;
@@ -20,11 +20,18 @@ internal sealed class HashSetSlim<T> : IDisposable
     int resizeThreshold;
 
     public HashSetSlim(IEqualityComparer<T>? comparer)
+        : this(MinimumSize, comparer)
     {
+    }
+
+    public HashSetSlim(int capacity, IEqualityComparer<T>? comparer)
+    {
+        capacity = Math.Max((int)System.Numerics.BitOperations.RoundUpToPowerOf2((uint)capacity), MinimumSize);
+
         this.comparer = comparer ?? EqualityComparer<T>.Default;
-        this.buckets = ArrayPool<int>.Shared.Rent(MinimumSize);
-        this.entries = ArrayPool<Entry>.Shared.Rent(MinimumSize);
-        this.bucketsLength = MinimumSize;
+        this.buckets = ArrayPool<int>.Shared.Rent(capacity);
+        this.entries = ArrayPool<Entry>.Shared.Rent(capacity);
+        this.bucketsLength = capacity;
         this.resizeThreshold = (int)(bucketsLength * LoadFactor);
         buckets.AsSpan().Clear(); // 0-clear.
     }
@@ -96,6 +103,46 @@ internal sealed class HashSetSlim<T> : IDisposable
         buckets = newBuckets;
     }
 
+    // special use case for Intercept, only call after completely constructed(don't call Add after Remove called).
+    public bool Remove(T item)
+    {
+        var hashCode = InternalGetHashCode(item);
+        ref var bucket = ref buckets[GetBucketIndex(hashCode)];
+        var index = bucket - 1;
+        var lastIndex = -1;
+
+        // lookup phase
+        while (index != -1)
+        {
+            ref var entry = ref entries[index];
+            if (entry.HashCode == hashCode && comparer.Equals(entry.Value, item))
+            {
+                if (lastIndex == -1)
+                {
+                    // This is the first entry in the bucket
+                    bucket = entry.Next + 1;
+                }
+                else
+                {
+                    // Link the previous entry to the next one, skipping this entry
+                    entries[lastIndex].Next = entry.Next;
+                }
+
+                // Clear the removed entry's value
+                if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+                {
+                    entry.Value = default!;
+                }
+
+                return true;
+            }
+
+            lastIndex = index;
+            index = entry.Next;
+        }
+
+        return false;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     uint InternalGetHashCode(T key)

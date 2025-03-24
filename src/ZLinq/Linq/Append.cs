@@ -49,17 +49,32 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
+            if (destination.Length == 0) return false;
             if (!source.TryGetNonEnumeratedCount(out var srcCount)) return false;
 
-            var srcOffset = offset.GetOffset(srcCount);
-            if ((srcCount - srcOffset + 1) > destination.Length) return false;
+            var totalLength = srcCount + 1;
+            var start = offset.GetOffset(totalLength);
 
-            if (!source.TryCopyTo(destination, offset))
+            if (start >= totalLength)
             {
                 return false;
             }
 
-            destination[srcCount] = element;
+            var destinationOffset = 0;
+            if (start < srcCount)
+            {
+                if (!source.TryCopyTo(destination, start))
+                {
+                    return false;
+                }
+                destinationOffset = Math.Min(srcCount - start, destination.Length);
+            }
+
+            if (destinationOffset < destination.Length && start <= srcCount)
+            {
+                destination[destinationOffset] = element;
+            }
+
             return true;
         }
 

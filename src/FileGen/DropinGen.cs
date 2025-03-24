@@ -5,7 +5,7 @@ using ZLinq;
 
 namespace FileGen;
 
-public class DropinGen
+public class DropInGen
 {
     [Flags]
     enum DropInGenerateTypes
@@ -118,9 +118,9 @@ internal static partial class ZLinqDropInExtensions
         var returnType = BuildType(methodInfo, methodInfo.ReturnType, dropInType.Replacement) + IsNullableReturnParameter(methodInfo);
         var name = methodInfo.Name;
         var genericsTypes = string.Join(", ", methodInfo.GetGenericArguments().Skip(1).Select(x => x.Name).ToArray());
-        var parameters = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{BuildType(methodInfo, x.ParameterType, dropInType.Replacement)} {x.Name}").ToArray());
+        var parameters = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => $"{BuildParameterType(methodInfo, x, dropInType.Replacement)} {x.Name}").ToArray());
         if (parameters != "") parameters = $", {parameters}";
-        var parameterNames = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => x.Name).ToArray());
+        var parameterNames = string.Join(", ", methodInfo.GetParameters().Skip(1).Select(x => BuildParameterName(x)).ToArray());
         var sourceType = BuildSourceType(methodInfo, dropInType.Name, dropInType.IsArray);
         var constraints = BuildConstraints(methodInfo);
 
@@ -135,14 +135,15 @@ internal static partial class ZLinqDropInExtensions
         {
             signature = signature.Replace("Func<TOuter, TInner, TResult> resultSelector", "Func<TOuter, TInner?, TResult> resultSelector");
         }
-        else if ((methodInfo.Name.Contains("ElementAt") && signature.Contains("Index")) || (methodInfo.Name == "Take" && signature.Contains("Range")))
-        {
-            signature = $$"""
-#if NETSTANDARD2_1 || NET5_0_OR_GREATER
-{{signature}}
-#endif
-""";
-        }
+        // Index and Range can support.
+        //        else if ((methodInfo.Name.Contains("ElementAt") && signature.Contains("Index")) || (methodInfo.Name == "Take" && signature.Contains("Range")))
+        //        {
+        //            signature = $$"""
+        //#if NETSTANDARD2_1 || NET5_0_OR_GREATER
+        //{{signature}}
+        //#endif
+        //""";
+        //        }
         else if (methodInfo.Name == "SumUnchecked")
         {
             signature = $$"""
@@ -157,7 +158,7 @@ internal static partial class ZLinqDropInExtensions
 
     string BuildCastAndOfTypeSignature(DropInType dropInType)
     {
-        // for nongeneric IEnumerable only
+        // for non-generic IEnumerable only
         if (dropInType.Name != "IEnumerable") return "";
 
         var enumeratorType = $"{dropInType.Replacement}<object>";
@@ -184,6 +185,34 @@ internal static partial class ZLinqDropInExtensions
         }
 
         return "";
+    }
+
+    string BuildParameterType(MethodInfo methodInfo, ParameterInfo param, string replacement)
+    {
+        bool isOut = param.IsOut;
+        bool isIn = param.GetCustomAttributes(typeof(System.Runtime.InteropServices.InAttribute), false).Length > 0;
+        bool isByRef = param.ParameterType.IsByRef && !param.IsOut;
+
+        var type = (isOut || isIn || isByRef)
+            ? BuildType(methodInfo, param.ParameterType.GetElementType()!, replacement)
+            : BuildType(methodInfo, param.ParameterType, replacement);
+
+        if (isOut) return "out " + type;
+        if (isIn) return "in " + type;
+        if (isByRef) return "ref " + type;
+        return type;
+    }
+
+    string BuildParameterName(ParameterInfo param)
+    {
+        bool isOut = param.IsOut;
+        bool isIn = param.GetCustomAttributes(typeof(System.Runtime.InteropServices.InAttribute), false).Length > 0;
+        bool isByRef = param.ParameterType.IsByRef && !param.IsOut;
+
+        if (isOut) return "out " + param.Name;
+        if (isIn) return "in " + param.Name;
+        if (isByRef) return "ref " + param.Name;
+        return param.Name!;
     }
 
     string BuildType(MethodInfo methodInfo, Type type, string replacement)
@@ -261,7 +290,7 @@ internal static partial class ZLinqDropInExtensions
 
     string BuildConstraints(MethodInfo methodInfo)
     {
-        if (methodInfo.Name is "AggregateBy" or "CountBy" or "ToDictionary")
+        if (methodInfo.Name is "ToDictionary")
         {
             return " where TKey : notnull";
         }

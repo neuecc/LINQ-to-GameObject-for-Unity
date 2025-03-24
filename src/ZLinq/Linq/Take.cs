@@ -11,16 +11,12 @@ namespace ZLinq
 #endif
             => new(new(source.Enumerator, count));
 
-#if !NETSTANDARD2_0
-
         public static ValueEnumerable<TakeRange<TEnumerator, TSource>, TSource> Take<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Range range)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
             => new(new(source.Enumerator, range));
-
-#endif
     }
 }
 
@@ -68,13 +64,16 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination, Index offset) // TODO: impl
+        public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
-            if (TryGetSpan(out var span) && span.Length <= destination.Length)
+            if (TryGetNonEnumeratedCount(out var takeCount))
             {
-                span.CopyTo(destination);
-                return true;
+                if (source.TryCopyTo(destination.Slice(0, Math.Min(destination.Length, takeCount)), offset))
+                {
+                    return true;
+                }
             }
+
             return false;
         }
 
@@ -94,8 +93,6 @@ namespace ZLinq.Linq
             source.Dispose();
         }
     }
-
-#if !NETSTANDARD2_0
 
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -213,12 +210,16 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination, Index offset)  // TODO: impl
+        public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
-            if (TryGetSpan(out var span) && span.Length <= destination.Length) // get self Span
+            // skip-index and remains(count) is valid.
+            if (TryGetNonEnumeratedCount(out var count))
             {
-                span.CopyTo(destination);
-                return true;
+                var skipOffset = offset.GetOffset(count) + skipIndex;
+                if (source.TryCopyTo(destination.Slice(0, Math.Min(destination.Length, count)), skipOffset))
+                {
+                    return true;
+                }
             }
 
             return false;
@@ -317,6 +318,4 @@ namespace ZLinq.Linq
             source.Dispose();
         }
     }
-
-#endif
 }
