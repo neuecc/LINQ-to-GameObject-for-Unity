@@ -25,7 +25,7 @@ using ZLinq.Traversables;
 
 [assembly: ZLinq.ZLinqDropInAttribute("", ZLinq.DropInGenerateTypes.Everything, DisableEmitSource = true)]
 
-
+Enumerable.Range(1, 10).ToDictionary();
 //var tako = ValueEnumerable.Range(1, 10).Select(x => x.ToString());
 //var ok = string.Join(',', tako);
 
