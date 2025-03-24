@@ -118,21 +118,19 @@ namespace ZLinq.Linq
             while (source.TryGetNext(out var value))
             {
                 var key = outerKeySelector(value);
-                if (key is null) //  // The difference with Join is how nulls are handled.
+                var group = innerLookup.GetGroup(key);
+                if (group != null)
                 {
-                    current = resultSelector(value, default);
-                    return true;
+                    currentOuter = value;
+                    currentGroup = group;
+                    currentGroupIndex = 0;
+                    goto ITERATE;
                 }
                 else
                 {
-                    var group = innerLookup.GetGroup(key);
-                    if (group != null)
-                    {
-                        currentOuter = value;
-                        currentGroup = group;
-                        currentGroupIndex = 0;
-                        goto ITERATE;
-                    }
+                    // The difference with Join is how nulls are handled.
+                    current = resultSelector(value, default);
+                    return true;
                 }
             }
 
