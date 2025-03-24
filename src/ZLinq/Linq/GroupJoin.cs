@@ -95,11 +95,6 @@ namespace ZLinq.Linq
                 }
             }
 
-            if (innerLookup.Count == 0)
-            {
-                goto END;
-            }
-
             while (source.TryGetNext(out var value))
             {
                 var key = outerKeySelector(value);
@@ -110,15 +105,21 @@ namespace ZLinq.Linq
                     current = resultSelector(value, group);
                     return true;
                 }
+                else
+                {
+                    // return empty grouping
+                    current = resultSelector(value, []);
+                    return true;
+                }
             }
 
-        END:
             Unsafe.SkipInit(out current);
             return false;
         }
 
         public void Dispose()
         {
+            inner.Dispose();
             source.Dispose();
         }
     }
