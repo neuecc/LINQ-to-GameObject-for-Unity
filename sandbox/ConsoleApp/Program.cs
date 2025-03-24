@@ -30,14 +30,28 @@ using ZLinq.Traversables;
 //var ok = string.Join(',', tako);
 
 
-var seq = ValueEnumerable.Range(1, 10).SelectMany(x => new[] { x, x });
-foreach (var item in seq)
+
+var srcFiles = new DirectoryInfo("../../../../../src/ZLinq/Linq/").GetFiles();
+var tstFiles = new DirectoryInfo("../../../../../tests/ZLinq.Tests/Linq/").GetFiles();
+
+var grouping = srcFiles.AsValueEnumerable()
+    .LeftJoin(tstFiles,
+        x => x.Name,
+        x => x.Name.Replace("Test", ""),
+        (outer, inner) => new { Name = outer.Name, IsTested = inner != null })
+    .GroupBy(x => x.IsTested);
+
+foreach (var g in grouping)
 {
-    Console.WriteLine(item);
+    Console.WriteLine(g.Key ? "Tested::::::::::::::::::" : "NotTested::::::::::::::::::");
+    foreach (var item in g)
+    {
+        Console.WriteLine(item.Name);
+    }
 }
 
+
 return;
-ValueEnumerable.Range(1, 10).Concat(Enumerable.Range(1, 10)).ToArray();
 
 var xssss = new[] { 1, 2, 3 };
 

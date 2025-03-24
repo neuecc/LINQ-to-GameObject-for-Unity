@@ -140,6 +140,7 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
+            inner.Dispose();
             source.Dispose();
         }
     }
