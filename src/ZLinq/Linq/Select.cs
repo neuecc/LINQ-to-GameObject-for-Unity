@@ -67,8 +67,6 @@ namespace ZLinq.Linq
                     }
                     return true;
                 }
-
-                return true;
             }
 
             //  First/ElementAt/Last
@@ -77,6 +75,7 @@ namespace ZLinq.Linq
                 if (EnumeratorHelper.TryConsumeGetAt(ref source, offset, out TSource value))
                 {
                     destination[0] = selector(value);
+                    return true;
                 }
             }
 
