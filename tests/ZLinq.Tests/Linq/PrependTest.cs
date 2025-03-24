@@ -64,10 +64,6 @@ public class PrependTest
 
         var expected = xs.Prepend(element).ToArray();
         destination.ShouldBe(expected);
-
-        // Test with insufficient space
-        var smallDestination = new int[xs.Length];
-        enumerable.TryCopyTo(smallDestination).ShouldBeFalse();
     }
 
     [Fact]
@@ -129,4 +125,54 @@ public class PrependTest
 
         xs.ToValueEnumerable().Prepend(element).ToArray().ShouldBe(expected);
     }
+
+#if NET8_0_OR_GREATER
+
+    [Fact]
+    public void WithElementAt()
+    {
+        int value = default;
+        var span = new Span<int>(ref value);
+
+        var emptyPrepend = Array.Empty<int>().AsValueEnumerable().Prepend(10);
+        emptyPrepend.TryCopyTo(span, 0).ShouldBeTrue();
+        value.ShouldBe(10);
+
+        var xs = new[] { 1, 2, 3, 4, 5 }.AsValueEnumerable().Prepend(10);
+
+        xs.TryCopyTo(span, 0).ShouldBeTrue(); value.ShouldBe(10);
+        xs.TryCopyTo(span, 1).ShouldBeTrue(); value.ShouldBe(1);
+        xs.TryCopyTo(span, 2).ShouldBeTrue(); value.ShouldBe(2);
+        xs.TryCopyTo(span, 3).ShouldBeTrue(); value.ShouldBe(3);
+        xs.TryCopyTo(span, 4).ShouldBeTrue(); value.ShouldBe(4);
+        xs.TryCopyTo(span, 5).ShouldBeTrue(); value.ShouldBe(5);
+        xs.TryCopyTo(span, 6).ShouldBeFalse();
+
+        xs.ToArray().ShouldBe([10, 1, 2, 3, 4, 5]);
+    }
+
+    [Fact]
+    public void WithTake()
+    {
+        var dest = new[] { 0, 0, 0 };
+
+        var emptyPrepend = Array.Empty<int>().AsValueEnumerable().Prepend(10);
+        emptyPrepend.TryCopyTo(dest, 0).ShouldBeTrue();
+        dest.ShouldBe([10, 0, 0]);
+
+        var xs = new[] { 1, 2, 3, 4, 5 }.AsValueEnumerable().Prepend(10);
+
+        xs.TryCopyTo(dest, 0).ShouldBeTrue(); dest.ShouldBe([10, 1, 2]);
+        xs.TryCopyTo(dest, 1).ShouldBeTrue(); dest.ShouldBe([1, 2, 3]);
+        xs.TryCopyTo(dest, 2).ShouldBeTrue(); dest.ShouldBe([2, 3, 4]);
+        Array.Clear(dest);
+        xs.TryCopyTo(dest, 3).ShouldBeTrue(); dest.ShouldBe([3, 4, 5]);
+        Array.Clear(dest);
+        xs.TryCopyTo(dest, 4).ShouldBeTrue(); dest.ShouldBe([4, 5, 0]);
+        Array.Clear(dest);
+        xs.TryCopyTo(dest, 5).ShouldBeTrue(); dest.ShouldBe([5, 0, 0]);
+        xs.TryCopyTo(dest, 6).ShouldBeFalse();
+    }
+
+#endif
 }
