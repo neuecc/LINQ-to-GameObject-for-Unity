@@ -252,6 +252,10 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
+    public static ValueEnumerable<SelectMany<FromMemory<TSource>, TSource, TResult>, TResult> SelectMany<TSource, TResult>(this Memory<TSource> source, Func<TSource, IEnumerable<TResult>> selector) => source.AsValueEnumerable().SelectMany(selector);
+    public static ValueEnumerable<SelectMany2<FromMemory<TSource>, TSource, TResult>, TResult> SelectMany<TSource, TResult>(this Memory<TSource> source, Func<TSource, Int32, IEnumerable<TResult>> selector) => source.AsValueEnumerable().SelectMany(selector);
+    public static ValueEnumerable<SelectMany3<FromMemory<TSource>, TSource, TCollection, TResult>, TResult> SelectMany<TSource, TCollection, TResult>(this Memory<TSource> source, Func<TSource, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector) => source.AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
+    public static ValueEnumerable<SelectMany4<FromMemory<TSource>, TSource, TCollection, TResult>, TResult> SelectMany<TSource, TCollection, TResult>(this Memory<TSource> source, Func<TSource, Int32, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector) => source.AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
     public static Boolean SequenceEqual<TSource>(this Memory<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().SequenceEqual(second);
     public static Boolean SequenceEqual<TSource>(this Memory<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().SequenceEqual(second, comparer);
     public static Boolean SequenceEqual<TEnumerator2, TSource>(this Memory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second)

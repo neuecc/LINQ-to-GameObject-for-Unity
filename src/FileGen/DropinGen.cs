@@ -112,6 +112,11 @@ internal static partial class ZLinqDropInExtensions
             return null;
         }
 
+        if (methodInfo.Name is "SelectMany")
+        {
+            Console.WriteLine(methodInfo.Name);
+        }
+
         // debugging stop condition
         // if (methodInfo.Name is not "Select") continue;
 
