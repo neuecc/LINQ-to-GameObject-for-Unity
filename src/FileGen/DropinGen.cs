@@ -112,11 +112,6 @@ internal static partial class ZLinqDropInExtensions
             return null;
         }
 
-        if (methodInfo.Name is "SelectMany")
-        {
-            Console.WriteLine(methodInfo.Name);
-        }
-
         // debugging stop condition
         // if (methodInfo.Name is not "Select") continue;
 
@@ -140,14 +135,15 @@ internal static partial class ZLinqDropInExtensions
         {
             signature = signature.Replace("Func<TOuter, TInner, TResult> resultSelector", "Func<TOuter, TInner?, TResult> resultSelector");
         }
-        else if ((methodInfo.Name.Contains("ElementAt") && signature.Contains("Index")) || (methodInfo.Name == "Take" && signature.Contains("Range")))
-        {
-            signature = $$"""
-#if NETSTANDARD2_1 || NET5_0_OR_GREATER
-{{signature}}
-#endif
-""";
-        }
+        // Index and Range can support.
+        //        else if ((methodInfo.Name.Contains("ElementAt") && signature.Contains("Index")) || (methodInfo.Name == "Take" && signature.Contains("Range")))
+        //        {
+        //            signature = $$"""
+        //#if NETSTANDARD2_1 || NET5_0_OR_GREATER
+        //{{signature}}
+        //#endif
+        //""";
+        //        }
         else if (methodInfo.Name == "SumUnchecked")
         {
             signature = $$"""

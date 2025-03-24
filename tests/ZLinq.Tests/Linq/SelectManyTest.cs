@@ -389,7 +389,7 @@ public class SelectManyTest
         Should.Throw<NullReferenceException>(() =>
         {
             source.AsValueEnumerable()
-                .SelectMany(x => x.Values.AsValueEnumerable())
+                .SelectMany(x => x!.Values.AsValueEnumerable())
                 .ToArray();
         });
     }
