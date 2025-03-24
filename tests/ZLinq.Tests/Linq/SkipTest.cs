@@ -168,4 +168,16 @@ public class SkipTest
         // Should return false since all elements were skipped
         enumerator.TryGetNext(out _).ShouldBeFalse();
     }
+
+    [Fact]
+    public void SkipSkipSkip()
+    {
+        var seq = ValueEnumerable.Range(1, 100);
+        var expected = Enumerable.Range(1, 100).Skip(5).Skip(10).Skip(5).Take(20).ToArray();
+
+        var actual = seq.Skip(5).Skip(10).Skip(5).Take(20).ToArray();
+
+        Assert.Equal(actual, expected);
+
+    }
 }

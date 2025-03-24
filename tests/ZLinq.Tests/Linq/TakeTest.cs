@@ -132,4 +132,35 @@ public class TakeTest
         result.ShouldBeTrue();
         destination.ToArray().ShouldBe(new[] { 1, 2, 3, 4, 5 });
     }
+
+    [Fact]
+    public void TryCopyTo2()
+    {
+        var take = ValueEnumerable.Range(1, 5).Take(3);
+
+        var dest = new int[5];
+
+        Array.Clear(dest);
+        take.TryCopyTo(dest, 0).ShouldBeTrue();
+        dest.ShouldBe([1, 2, 3, 0, 0]);
+
+        Array.Clear(dest);
+        take.TryCopyTo(dest, 1).ShouldBeTrue();
+        dest.ShouldBe([2, 3, 4, 0, 0]);
+
+        Array.Clear(dest);
+        take.TryCopyTo(dest, 2).ShouldBeTrue();
+        dest.ShouldBe([3, 4, 5, 0, 0]);
+
+        Array.Clear(dest);
+        take.TryCopyTo(dest, 3).ShouldBeTrue();
+        dest.ShouldBe([4, 5, 0, 0, 0]);
+
+        Array.Clear(dest);
+        take.TryCopyTo(dest, 4).ShouldBeTrue();
+        dest.ShouldBe([5, 0, 0, 0, 0]);
+
+        Array.Clear(dest);
+        take.TryCopyTo(dest, 5).ShouldBeFalse();
+    }
 }

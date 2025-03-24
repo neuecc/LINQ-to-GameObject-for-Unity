@@ -122,19 +122,6 @@ public class SkipLastTest
     }
 
     [Fact]
-    public void SkipLast_TryCopyTo()
-    {
-        var sequence = Enumerable.Range(1, 10).ToArray();
-        var valueEnumerable = sequence.AsValueEnumerable().SkipLast(3);
-
-        var destination = new int[7];
-        var result = valueEnumerable.TryCopyTo(destination);
-
-        // TryCopyTo returns false for SkipLast as per implementation
-        result.ShouldBeFalse();
-    }
-
-    [Fact]
     public void SkipLast_EnumerationImplementation()
     {
         var sequence = Enumerable.Range(1, 5).ToArray();
@@ -193,6 +180,48 @@ public class SkipLastTest
         array.ShouldBe(new[] { 1, 2, 3 });
 
         disposed.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void SkipLastTryCopyTo()
+    {
+        var source = new[] { 1, 2, 3, 4, 5 }.AsValueEnumerable();
+        var dest = new int[5];
+        source.SkipLast(1).TryCopyTo(dest, 0).ShouldBeTrue();
+        dest.ShouldBe([1, 2, 3, 4, 0]);
+
+        Array.Clear(dest);
+        source.SkipLast(2).TryCopyTo(dest, 0).ShouldBeTrue();
+        dest.ShouldBe([1, 2, 3, 0, 0]);
+
+        Array.Clear(dest);
+        source.SkipLast(2).TryCopyTo(dest, 1).ShouldBeTrue();
+        dest.ShouldBe([2, 3, 0, 0, 0]);
+
+        Array.Clear(dest);
+        source.SkipLast(2).TryCopyTo(dest, 2).ShouldBeTrue();
+        dest.ShouldBe([3, 0, 0, 0, 0]);
+
+        Array.Clear(dest);
+        source.SkipLast(2).TryCopyTo(dest, 3).ShouldBeTrue();
+        dest.ShouldBe([0, 0, 0, 0, 0]);
+
+        Array.Clear(dest);
+        source.SkipLast(3).TryCopyTo(dest, 2).ShouldBeTrue();
+        dest.ShouldBe([0, 0, 0, 0, 0]);
+    }
+
+    [Fact]
+    public void SkipLastTryCopyTo2()
+    {
+        var source1 = new[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+        var source2 = new[] { 1, 2, 3, 4, 5, 6, 7, 8 }.AsValueEnumerable();
+
+        var expected = source1.SkipLast(2).SkipLast(3).ToArray();
+        source2.SkipLast(2).SkipLast(3).ToArray().ShouldBe(expected);
+
+        var expected2 = source1.Take(7).SkipLast(2).SkipLast(3).ToArray();
+        source2.Take(7).SkipLast(2).SkipLast(3).ToArray().ShouldBe(expected2);
     }
 
     // Helper class to test disposal behavior

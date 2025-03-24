@@ -68,13 +68,16 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination, Index offset) // TODO: impl
+        public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
-            if (TryGetSpan(out var span) && span.Length <= destination.Length)
+            if (TryGetNonEnumeratedCount(out var takeCount))
             {
-                span.CopyTo(destination);
-                return true;
+                if (source.TryCopyTo(destination.Slice(0, Math.Min(destination.Length, takeCount)), offset))
+                {
+                    return true;
+                }
             }
+
             return false;
         }
 

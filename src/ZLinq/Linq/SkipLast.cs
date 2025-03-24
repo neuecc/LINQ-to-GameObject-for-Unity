@@ -61,7 +61,20 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination, Index offset) => false;
+        public bool TryCopyTo(Span<TSource> destination, Index offset)
+        {
+            if (source.TryGetNonEnumeratedCount(out var count))
+            {
+                Index skipFromLast = ^skipCount;
+                var offset1 = offset.GetOffset(count);
+                var takeCount = skipFromLast.GetOffset(count - offset1);
+                if (source.TryCopyTo(destination.Slice(0, Math.Min(takeCount, destination.Length)), offset))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         public bool TryGetNext(out TSource current)
         {
