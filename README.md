@@ -384,6 +384,10 @@ var ancestors = root.Ancestors().TakeWhile(x => x is not Window);
 var fooScripts = root.ChildrenAndSelf().OfType(default(FooScript));
 ```
 
+Acknowledgement
+---
+Since the preview version release, we have received multiple ideas for fundamental interface revisions leading to performance improvements from [@Akeit0](https://github.com/Akeit0), and test and benchmark infrastructure from [@filzrev](https://github.com/filzrev). We are grateful for their many contributions.
+
 License
 ---
 This library is under MIT License.
