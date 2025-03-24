@@ -216,12 +216,16 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination, Index offset)  // TODO: impl
+        public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
-            if (TryGetSpan(out var span) && span.Length <= destination.Length) // get self Span
+            // skip-index and remains(count) is valid.
+            if (TryGetNonEnumeratedCount(out var count))
             {
-                span.CopyTo(destination);
-                return true;
+                var skipOffset = offset.GetOffset(count) + skipIndex;
+                if (source.TryCopyTo(destination.Slice(0, Math.Min(destination.Length, count)), skipOffset))
+                {
+                    return true;
+                }
             }
 
             return false;
