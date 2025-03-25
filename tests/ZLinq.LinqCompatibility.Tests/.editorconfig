@@ -1,0 +1,22 @@
+root = false
+
+[*]
+charset = utf-8  # Use utf-8 (no-BOM)
+
+[LinqTests/*.cs]
+dotnet_diagnostic.CS8600.severity = none # CS8600: Converting null literal or possible null value to non-nullable type.
+dotnet_diagnostic.CS8601.severity = none # CS8601: Possible null reference assignment.
+dotnet_diagnostic.CS8602.severity = none # CS8602: Dereference of a possibly null reference.
+dotnet_diagnostic.CS8603.severity = none # CS8603: Possible null reference return.
+dotnet_diagnostic.CS8604.severity = none # CS8604: Possible null reference argument for parameter.
+dotnet_diagnostic.CS8618.severity = none # CS8618: Non-nullable variable must contain a non-null value when exiting constructor. Consider declaring it as nullable.
+dotnet_diagnostic.CS8619.severity = none # CS8619: Nullability of reference types in value doesn't match target type.
+dotnet_diagnostic.CS8620.severity = none # CS8620: Argument cannot be used for parameter due to differences in the nullability of reference types.
+dotnet_diagnostic.CS8625.severity = none # CS8625: Cannot convert null literal to non-nullable reference type.
+dotnet_diagnostic.CS8629.severity = none # CS8629: Nullable value type may be null.
+dotnet_diagnostic.CS8714.severity = none # CS8714: The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+dotnet_diagnostic.CS8765.severity = none # CS8765: Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
+dotnet_diagnostic.CS8767.severity = none # CS8767: Nullability of reference types in type of parameter of doesn't match implicitly implemented member (possibly because of nullability attributes).
+
+dotnet_diagnostic.CA2021.severity = none # CA2021: This call will always result in an empty sequence.
+
