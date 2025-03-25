@@ -284,7 +284,13 @@ internal static partial class ZLinqDropInExtensions
         , INumber<TResult>
 #endif
  => source.AsValueEnumerable().Sum(selector);
-    public static TSource Sum<TSource>(this ReadOnlySpan<Nullable<TSource>> source)
+    public static Nullable<TResult> Sum<TSource, TResult>(this ReadOnlySpan<TSource> source, Func<TSource, Nullable<TResult>> selector)
+        where TResult : struct
+#if NET8_0_OR_GREATER
+        , INumber<TResult>
+#endif
+ => source.AsValueEnumerable().Sum(selector);
+    public static Nullable<TSource> Sum<TSource>(this ReadOnlySpan<Nullable<TSource>> source)
         where TSource : struct
 #if NET8_0_OR_GREATER
         , INumber<TSource>

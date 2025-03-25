@@ -37,7 +37,39 @@ partial class ValueEnumerableExtensions
 #endif
     }
 
-    public static TSource Sum<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, Nullable<TSource>> source)
+    public static Nullable<TResult> Sum<TEnumerator, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Nullable<TResult>> selector)
+        where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+        where TResult : struct
+#if NET8_0_OR_GREATER
+        , INumber<TResult>
+#endif
+    {
+        ArgumentNullException.ThrowIfNull(selector);
+
+#if NET8_0_OR_GREATER
+        using (var enumerator = source.Enumerator)
+        {
+            var sum = TResult.Zero;
+            while (enumerator.TryGetNext(out var item))
+            {
+                var value = selector(item);
+                if (value is not null)
+                {
+                    checked { sum += TResult.CreateChecked(value.GetValueOrDefault()); }
+                }
+            }
+            return sum;
+        }
+#else
+        // While performance improvements can be expected by inlining, within ZLinq's zero-allocation iteration, the value of doing so cannot be justified.
+        return source.Select(selector).Sum();
+#endif
+    }
+
+    public static Nullable<TSource> Sum<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, Nullable<TSource>> source)
         where TEnumerator : struct, IValueEnumerator<Nullable<TSource>>
 #if NET9_0_OR_GREATER
         , allows ref struct

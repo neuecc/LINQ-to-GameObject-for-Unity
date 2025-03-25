@@ -215,4 +215,21 @@ public class SumTest
         ints.AsValueEnumerable().Sum().ShouldBe(0);
         ints.ToValueEnumerable().Sum().ShouldBe(0);
     }
+
+    [Fact]
+    public void SelectorOverload()
+    {
+        IEnumerable<double?> source = [double.MaxValue, null, double.MaxValue];
+        var expected = double.PositiveInfinity;
+        //LINQ
+        {
+            Assert.Equal(expected, source.Sum()!.Value);
+            Assert.Equal(expected, source.Sum(x => x)!.Value);
+        }
+        // ZLinq
+        {
+            Assert.Equal(expected, source.AsValueEnumerable().Sum()!.Value);
+            Assert.Equal(expected, source.AsValueEnumerable().Sum(x => x)!.Value);
+        }
+    }
 }

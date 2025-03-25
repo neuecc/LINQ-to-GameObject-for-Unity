@@ -278,7 +278,7 @@ internal static partial class ZLinqDropInExtensions
         {
             sourceGenericTypeName = "Nullable<" + sourceGenericTypeName + ">";
         }
-        else if (methodInfo.Name is "Sum" && methodInfo.ToString()!.Contains("Nullable"))
+        else if (methodInfo.Name is "Sum" && methodInfo.ToString()!.Contains("Nullable") && !methodInfo.GetParameters().Any(x => x.Name == "selector"))
         {
             sourceGenericTypeName = "Nullable<" + sourceGenericTypeName + ">";
         }
