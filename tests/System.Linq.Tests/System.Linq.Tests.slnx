@@ -3,5 +3,5 @@
     <Project Path="../../src/ZLinq.DropInGenerator/ZLinq.DropInGenerator.csproj" />
     <Project Path="../../src/ZLinq/ZLinq.csproj" />
   </Folder>
-  <Project Path="ZLinq.LinqCompatibility.Tests.csproj" />
+  <Project Path="System.Linq.Tests.csproj" />
 </Solution>
