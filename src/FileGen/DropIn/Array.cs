@@ -123,7 +123,7 @@ internal static partial class ZLinqDropInExtensions
  => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
     public static ValueEnumerable<GroupJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
     public static ValueEnumerable<GroupJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
-    public static ValueEnumerable<Index<FromArray<TSource>, TSource>, ValueTuple<Int32, TSource>> Index<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Index();
+    public static ValueEnumerable<Index<FromArray<TSource>, TSource>, (int Index, TSource Item)> Index<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Index();
     public static ValueEnumerable<Intersect<FromArray<TSource>, TEnumerator2, TSource>, TSource> Intersect<TEnumerator2, TSource>(this TSource[] source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
@@ -315,7 +315,7 @@ internal static partial class ZLinqDropInExtensions
     public static ValueEnumerable<TakeWhile<FromArray<TSource>, TSource>, TSource> TakeWhile<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().TakeWhile(predicate);
     public static ValueEnumerable<TakeWhile2<FromArray<TSource>, TSource>, TSource> TakeWhile<TSource>(this TSource[] source, Func<TSource, Int32, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().TakeWhile(predicate);
     public static TSource[] ToArray<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToArray();
-    public static ValueTuple<TSource[], Int32> ToArrayPool<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToArrayPool();
+    public static (TSource[] Array, int Size) ToArrayPool<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToArrayPool();
     public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this KeyValuePair<TKey, TValue>[] source) where TKey : notnull => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToDictionary();
     public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this KeyValuePair<TKey, TValue>[] source, IEqualityComparer<TKey> comparer) where TKey : notnull => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToDictionary(comparer);
     public static Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) where TKey : notnull => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToDictionary(keySelector);
@@ -360,13 +360,13 @@ internal static partial class ZLinqDropInExtensions
     public static ValueEnumerable<UnionBy<FromArray<TSource>, FromEnumerable<TSource>, TSource, TKey>, TSource> UnionBy<TSource, TKey>(this TSource[] source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().UnionBy(second, keySelector, comparer);
     public static ValueEnumerable<Where<FromArray<TSource>, TSource>, TSource> Where<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Where(predicate);
     public static ValueEnumerable<Where2<FromArray<TSource>, TSource>, TSource> Where<TSource>(this TSource[] source, Func<TSource, Int32, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Where(predicate);
-    public static ValueEnumerable<Zip<FromArray<TFirst>, TEnumerator2, TFirst, TSecond>, ValueTuple<TFirst, TSecond>> Zip<TEnumerator2, TFirst, TSecond>(this TFirst[] source, ValueEnumerable<TEnumerator2, TSecond> second)
+    public static ValueEnumerable<Zip<FromArray<TFirst>, TEnumerator2, TFirst, TSecond>, (TFirst First, TSecond Second)> Zip<TEnumerator2, TFirst, TSecond>(this TFirst[] source, ValueEnumerable<TEnumerator2, TSecond> second)
         where TEnumerator2 : struct, IValueEnumerator<TSecond>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Zip(second);
-    public static ValueEnumerable<Zip<FromArray<TFirst>, TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>, ValueTuple<TFirst, TSecond, TThird>> Zip<TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>(this TFirst[] source, ValueEnumerable<TEnumerator2, TSecond> second, ValueEnumerable<TEnumerator3, TThird> third)
+    public static ValueEnumerable<Zip<FromArray<TFirst>, TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>, (TFirst First, TSecond Second, TThird Third)> Zip<TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>(this TFirst[] source, ValueEnumerable<TEnumerator2, TSecond> second, ValueEnumerable<TEnumerator3, TThird> third)
         where TEnumerator2 : struct, IValueEnumerator<TSecond>
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -382,8 +382,8 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Zip(second, resultSelector);
-    public static ValueEnumerable<Zip<FromArray<TFirst>, FromEnumerable<TSecond>, TFirst, TSecond>, ValueTuple<TFirst, TSecond>> Zip<TFirst, TSecond>(this TFirst[] source, IEnumerable<TSecond> second) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Zip(second);
-    public static ValueEnumerable<Zip<FromArray<TFirst>, FromEnumerable<TSecond>, FromEnumerable<TThird>, TFirst, TSecond, TThird>, ValueTuple<TFirst, TSecond, TThird>> Zip<TFirst, TSecond, TThird>(this TFirst[] source, IEnumerable<TSecond> second, IEnumerable<TThird> third) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Zip(second, third);
+    public static ValueEnumerable<Zip<FromArray<TFirst>, FromEnumerable<TSecond>, TFirst, TSecond>, (TFirst First, TSecond Second)> Zip<TFirst, TSecond>(this TFirst[] source, IEnumerable<TSecond> second) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Zip(second);
+    public static ValueEnumerable<Zip<FromArray<TFirst>, FromEnumerable<TSecond>, FromEnumerable<TThird>, TFirst, TSecond, TThird>, (TFirst First, TSecond Second, TThird Third)> Zip<TFirst, TSecond, TThird>(this TFirst[] source, IEnumerable<TSecond> second, IEnumerable<TThird> third) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Zip(second, third);
     public static ValueEnumerable<Zip<FromArray<TFirst>, FromEnumerable<TSecond>, TFirst, TSecond, TResult>, TResult> Zip<TFirst, TSecond, TResult>(this TFirst[] source, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Zip(second, resultSelector);
 
 }

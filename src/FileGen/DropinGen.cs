@@ -141,15 +141,6 @@ internal static partial class ZLinqDropInExtensions
         {
             signature = signature.Replace("Func<TOuter, TInner, TResult> resultSelector", "Func<TOuter, TInner?, TResult> resultSelector");
         }
-        // Index and Range can support.
-        //        else if ((methodInfo.Name.Contains("ElementAt") && signature.Contains("Index")) || (methodInfo.Name == "Take" && signature.Contains("Range")))
-        //        {
-        //            signature = $$"""
-        //#if NETSTANDARD2_1 || NET5_0_OR_GREATER
-        //{{signature}}
-        //#endif
-        //""";
-        //        }
         else if (methodInfo.Name == "SumUnchecked")
         {
             signature = $$"""
@@ -246,6 +237,35 @@ internal static partial class ZLinqDropInExtensions
             else
             {
                 builder.Append(type.Name);
+            }
+            return;
+        }
+
+        if (type.Name.Contains("ValueTuple")) // make adhoc named tuple
+        {
+            var currentString = builder.ToString();
+            if (currentString.Contains("Index"))
+            {
+                builder.Append("(int Index, TSource Item)");
+            }
+            else if (currentString.Contains("Zip"))
+            {
+                if (currentString.Contains("TThird"))
+                {
+                    builder.Append("(TFirst First, TSecond Second, TThird Third)");
+                }
+                else
+                {
+                    builder.Append("(TFirst First, TSecond Second)");
+                }
+            }
+            else if (currentString == "") // ToArrayPool
+            {
+                builder.Append("(TSource[] Array, int Size)");
+            }
+            else
+            {
+                throw new InvalidOperationException("ValueTuple needs modify name:" + currentString);
             }
             return;
         }
