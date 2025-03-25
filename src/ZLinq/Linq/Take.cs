@@ -66,11 +66,38 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
-            if (TryGetNonEnumeratedCount(out var takeCount))
+            if (source.TryGetNonEnumeratedCount(out var count))
             {
-                if (source.TryCopyTo(destination.Slice(0, Math.Min(destination.Length, takeCount)), offset))
+                var actualTakeCount = Math.Min(count, takeCount);
+          
+                if (!offset.IsFromEnd)
                 {
-                    return true;
+                    var sourceOffset = offset.Value;
+                    if (sourceOffset >= actualTakeCount)
+                    {
+                        return false;
+                    }
+
+                    var elementsToCopy = Math.Min(actualTakeCount - sourceOffset, destination.Length);
+                    if (source.TryCopyTo(destination.Slice(0, elementsToCopy), sourceOffset))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    var sourceOffset = offset.Value;
+                    if (sourceOffset > actualTakeCount)
+                    {
+                        return false;
+                    }
+
+                    var actualPosition = actualTakeCount - sourceOffset;
+                    var elementsToCopy = Math.Min(sourceOffset, destination.Length);
+                    if (source.TryCopyTo(destination.Slice(0, elementsToCopy), actualPosition))
+                    {
+                        return true;
+                    }
                 }
             }
 

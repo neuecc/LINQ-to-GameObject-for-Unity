@@ -136,7 +136,7 @@ public class TakeTest
     [Fact]
     public void TryCopyTo2()
     {
-        var take = ValueEnumerable.Range(1, 5).Take(3);
+        var take = ValueEnumerable.Range(1, 5).Take(3); // 1, 2, 3
 
         var dest = new int[5];
 
@@ -146,21 +146,119 @@ public class TakeTest
 
         Array.Clear(dest);
         take.TryCopyTo(dest, 1).ShouldBeTrue();
-        dest.ShouldBe([2, 3, 4, 0, 0]);
+        dest.ShouldBe([2, 3, 0, 0, 0]);
 
         Array.Clear(dest);
         take.TryCopyTo(dest, 2).ShouldBeTrue();
-        dest.ShouldBe([3, 4, 5, 0, 0]);
+        dest.ShouldBe([3, 0, 0, 0, 0]);
 
         Array.Clear(dest);
         take.TryCopyTo(dest, 3).ShouldBeTrue();
-        dest.ShouldBe([4, 5, 0, 0, 0]);
+        dest.ShouldBe([0, 0, 0, 0, 0]);
 
         Array.Clear(dest);
-        take.TryCopyTo(dest, 4).ShouldBeTrue();
-        dest.ShouldBe([5, 0, 0, 0, 0]);
+        take.TryCopyTo(dest, 4).ShouldBeFalse();
+    }
 
-        Array.Clear(dest);
-        take.TryCopyTo(dest, 5).ShouldBeFalse();
+    [Fact]
+    public void Take_TryCopyTo_SmallDestination()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var takeOperation = sequence.AsValueEnumerable().Take(5);
+
+        Span<int> smallDestination = new int[3];
+        bool result = takeOperation.TryCopyTo(smallDestination);
+
+        result.ShouldBeTrue();
+        smallDestination.ToArray().ShouldBe(new[] { 1, 2, 3 }); // Should only copy what fits
+    }
+
+    [Fact]
+    public void Take_TryCopyTo_LargeDestination()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var takeOperation = sequence.AsValueEnumerable().Take(5);
+
+        Span<int> largeDestination = new int[10];
+        Array.Fill(largeDestination.ToArray(), -1); // Fill with placeholder values
+        bool result = takeOperation.TryCopyTo(largeDestination);
+
+        result.ShouldBeTrue();
+        // Only the first 5 elements should be copied, rest should remain unchanged
+        largeDestination.Slice(0, 5).ToArray().ShouldBe(new[] { 1, 2, 3, 4, 5 });
+    }
+
+    [Fact]
+    public void Take_TryCopyTo_WithOffset()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var takeOperation = sequence.AsValueEnumerable().Take(5);
+
+        Span<int> destination = new int[5];
+        bool result = takeOperation.TryCopyTo(destination, 2); // Start from the third element
+
+        result.ShouldBeTrue();
+        destination.ToArray().ShouldBe(new[] { 3, 4, 5, 0, 0 });
+    }
+
+    [Fact]
+    public void Take_TryCopyTo_EmptyDestination()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var takeOperation = sequence.AsValueEnumerable().Take(5);
+
+        Span<int> emptyDestination = Span<int>.Empty;
+        bool result = takeOperation.TryCopyTo(emptyDestination);
+
+        result.ShouldBeTrue(); // Should succeed since we're copying 0 elements
+    }
+
+    [Fact]
+    public void Take_TryCopyTo_ZeroTake()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var takeOperation = sequence.AsValueEnumerable().Take(0);
+
+        Span<int> destination = new int[5];
+        destination.Fill(-1);
+        bool result = takeOperation.TryCopyTo(destination);
+
+        result.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Take_TryCopyTo_SourceDoesNotSupportNonEnumeratedCount()
+    {
+        // Create a source that doesn't support TryGetNonEnumeratedCount
+        var nonCountableSource = new[] { 1, 2, 3, 4, 5 }
+            .AsValueEnumerable()
+            .Where(x => true); // Where operation doesn't support non-enumerated count
+
+        var takeOperation = nonCountableSource.Take(3);
+
+        Span<int> destination = new int[5];
+        bool result = takeOperation.TryCopyTo(destination);
+
+        result.ShouldBeFalse(); // Should fail as we need count information
+    }
+
+    [Fact]
+    public void TakeAnd()
+    {
+        int[] source = [1, 2, 3, 4, 5];
+        {
+            var expected = source.Take(1).Last();
+            var actual = source.AsValueEnumerable().Take(1).Last();
+            actual.ShouldBe(expected);
+        }
+        {
+            var expected = source.Take(3).ElementAt(1);
+            var actual = source.AsValueEnumerable().Take(3).ElementAt(1);
+            actual.ShouldBe(expected);
+        }
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => source.Take(3).ElementAt(9999)); // expected
+            Assert.Throws<ArgumentOutOfRangeException>(() => source.AsValueEnumerable().Take(3).ElementAt(9999)); // actual
+        }
     }
 }
