@@ -12,14 +12,14 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, keySelector, null));
+            => new(new(source.Enumerator, Throws.IfNull(keySelector), null));
 
         public static ValueEnumerable<CountBy<TEnumerator, TSource, TKey>, KeyValuePair<TKey, int>> CountBy<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? keyComparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, keySelector, keyComparer));
+            => new(new(source.Enumerator, Throws.IfNull(keySelector), keyComparer));
     }
 }
 

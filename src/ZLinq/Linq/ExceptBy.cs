@@ -11,7 +11,7 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, second, keySelector, null));
+            => new(new(source.Enumerator, second, Throws.IfNull(keySelector), null));
 
         public static ValueEnumerable<ExceptBy<TEnumerator, TEnumerator2, TSource, TKey>, TSource> ExceptBy<TEnumerator, TEnumerator2, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
@@ -22,23 +22,21 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, second, keySelector, comparer));
-
-
+            => new(new(source.Enumerator, second, Throws.IfNull(keySelector), comparer));
 
         public static ValueEnumerable<ExceptBy<TEnumerator, FromEnumerable<TKey>, TSource, TKey>, TSource> ExceptBy<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, second.AsValueEnumerable(), keySelector, null));
+            => new(new(source.Enumerator, second.AsValueEnumerable(), Throws.IfNull(keySelector), null));
 
         public static ValueEnumerable<ExceptBy<TEnumerator, FromEnumerable<TKey>, TSource, TKey>, TSource> ExceptBy<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, second.AsValueEnumerable(), keySelector, comparer));
+            => new(new(source.Enumerator, second.AsValueEnumerable(), Throws.IfNull(keySelector), comparer));
     }
 }
 

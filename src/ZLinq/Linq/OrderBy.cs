@@ -39,28 +39,34 @@ namespace ZLinq
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(new(source.Enumerator, keySelector, null, null, descending: false));
+            => new(new(source.Enumerator, Throws.IfNull(keySelector), null, null, false));
 
         public static ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> OrderBy<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(new(source.Enumerator, keySelector, comparer, null, descending: false));
+        {
+            ArgumentNullException.ThrowIfNull(keySelector);
+            return new(new(source.Enumerator, keySelector, comparer, null, descending: false));
+        }
 
         public static ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> OrderByDescending<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(new(source.Enumerator, keySelector, null, null, descending: true));
+            => new(new(source.Enumerator, Throws.IfNull(keySelector), null, null, true));
 
         public static ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> OrderByDescending<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(new(source.Enumerator, keySelector, comparer, null, descending: true));
+        {
+            ArgumentNullException.ThrowIfNull(keySelector);
+            return new(new(source.Enumerator, keySelector, comparer, null, descending: true));
+        }
 
         // ThenBy
 
@@ -69,28 +75,28 @@ namespace ZLinq
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(source.Enumerator.ThenBy(keySelector));
+            => new(source.Enumerator.ThenBy(Throws.IfNull(keySelector)));
 
         public static ValueEnumerable<OrderBy<TEnumerator, TSource, TSecondKey>, TSource> ThenBy<TEnumerator, TSource, TKey, TSecondKey>(this ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> source, Func<TSource, TSecondKey> keySelector, IComparer<TSecondKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(source.Enumerator.ThenBy(keySelector, comparer));
+            => new(source.Enumerator.ThenBy(Throws.IfNull(keySelector), comparer));
 
         public static ValueEnumerable<OrderBy<TEnumerator, TSource, TSecondKey>, TSource> ThenByDescending<TEnumerator, TSource, TKey, TSecondKey>(this ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> source, Func<TSource, TSecondKey> keySelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(source.Enumerator.ThenByDescending(keySelector));
+            => new(source.Enumerator.ThenByDescending(Throws.IfNull(keySelector)));
 
         public static ValueEnumerable<OrderBy<TEnumerator, TSource, TSecondKey>, TSource> ThenByDescending<TEnumerator, TSource, TKey, TSecondKey>(this ValueEnumerable<OrderBy<TEnumerator, TSource, TKey>, TSource> source, Func<TSource, TSecondKey> keySelector, IComparer<TSecondKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
                 , allows ref struct
 #endif
-            => new(source.Enumerator.ThenByDescending(keySelector, comparer));
+            => new(source.Enumerator.ThenByDescending(Throws.IfNull(keySelector), comparer));
     }
 }
 
@@ -263,11 +269,13 @@ namespace ZLinq.Linq
 
         public OrderBy<TEnumerator, TSource, TSecondKey> ThenBy<TSecondKey>(Func<TSource, TSecondKey> keySelector, IComparer<TSecondKey>? comparer = null)
         {
+            ArgumentNullException.ThrowIfNull(keySelector);
             return new OrderBy<TEnumerator, TSource, TSecondKey>(source, keySelector, comparer, this.comparable, descending: false);
         }
 
         public OrderBy<TEnumerator, TSource, TSecondKey> ThenByDescending<TSecondKey>(Func<TSource, TSecondKey> keySelector, IComparer<TSecondKey>? comparer = null)
         {
+            ArgumentNullException.ThrowIfNull(keySelector);
             return new OrderBy<TEnumerator, TSource, TSecondKey>(source, keySelector, comparer, this.comparable, descending: true);
         }
 
