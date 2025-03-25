@@ -114,27 +114,31 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct TakeRange<TEnumerator, TSource>
+    struct TakeRange<TEnumerator, TSource>(TEnumerator source, Range range)
         : IValueEnumerator<TSource>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
     {
-        TEnumerator source;
-        readonly Range range;
+        TEnumerator source = source;
+        readonly Range range = range;
 
         int index;
         int remains;
-        readonly int skipIndex;
-        readonly int fromEndQueueCount; // 0 is not use q
-        Queue<TSource>? q; // TODO:RefBox<ValueQUeue>>
+        int skipIndex;
+        int fromEndQueueCount; // 0 is not use q
+        RefBox<ValueQueue<TSource>>? q;
+        bool isInitialized;
 
-        public TakeRange(TEnumerator source, Range range)
+        void Init()
         {
-            // initialize before run.
-            this.source = source;
-            this.range = range;
+            if (isInitialized)
+            {
+                return;
+            }
+            isInitialized = true;
+
             this.fromEndQueueCount = 0;
             this.remains = -1; // unknown
 
@@ -172,7 +176,7 @@ namespace ZLinq.Linq
                     }
 
                     this.fromEndQueueCount = int.MaxValue; // unknown queue count
-                    this.q = new();
+                    this.q = new(new(4));
                 }
                 else if (range.Start.IsFromEnd && !range.End.IsFromEnd) // start-fromend
                 {
@@ -180,7 +184,7 @@ namespace ZLinq.Linq
                     this.skipIndex = 0;
                     this.fromEndQueueCount = range.Start.Value; //queue size is fixed from end-of-start
                     if (this.fromEndQueueCount == 0) fromEndQueueCount = 1;
-                    this.q = new();
+                    this.q = new(new(4));
                 }
                 else if (range.Start.IsFromEnd && range.End.IsFromEnd) // both fromend
                 {
@@ -195,13 +199,15 @@ namespace ZLinq.Linq
                     }
                     this.fromEndQueueCount = range.Start.Value;
                     if (this.fromEndQueueCount == 0) fromEndQueueCount = 1;
-                    this.q = new();
+                    this.q = new(new(4));
                 }
             }
         }
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
+            Init();
+
             if (source.TryGetNonEnumeratedCount(out _))
             {
                 count = remains;
@@ -213,6 +219,8 @@ namespace ZLinq.Linq
 
         public bool TryGetSpan(out ReadOnlySpan<TSource> span)
         {
+            Init();
+
             if (source.TryGetSpan(out span))
             {
                 span = span.Slice(skipIndex, remains);
@@ -225,6 +233,8 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
+            Init();
+
             if (source.TryGetNonEnumeratedCount(out var totalCount))
             {
                 var effectiveRemains = skipIndex < totalCount
@@ -262,13 +272,15 @@ namespace ZLinq.Linq
 
         public bool TryGetNext(out TSource current)
         {
+            Init();
+
             if (remains == 0)
             {
                 goto END;
             }
 
         DEQUEUE:
-            if (q != null && q.Count != 0)
+            if (q != null && q.GetValueRef().Count != 0)
             {
                 if (remains == -1)
                 {
@@ -284,18 +296,18 @@ namespace ZLinq.Linq
                     }
 
                     // q.Count is fromEnd
-                    var offset = count - q.Count;
+                    var offset = count - q.GetValueRef().Count;
                     var skipIndex = Math.Max(0, start - offset);
                     while (skipIndex > 0)
                     {
-                        q.Dequeue();
+                        q.GetValueRef().Dequeue();
                         skipIndex--;
                     }
                 }
 
                 if (remains-- > 0)
                 {
-                    current = q.Dequeue();
+                    current = q.GetValueRef().Dequeue();
                     return true;
                 }
                 else
@@ -329,15 +341,15 @@ namespace ZLinq.Linq
                         continue;
                     }
 
-                    if (q.Count == fromEndQueueCount)
+                    if (q.GetValueRef().Count == fromEndQueueCount)
                     {
-                        q.Dequeue();
+                        q.GetValueRef().Dequeue();
                     }
-                    q.Enqueue(current);
+                    q.GetValueRef().Enqueue(current);
                 }
             }
 
-            if (q != null && q.Count != 0)
+            if (q != null && q.GetValueRef().Count != 0)
             {
                 goto DEQUEUE;
             }
@@ -350,6 +362,7 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
+            q?.Dispose();
             source.Dispose();
         }
     }

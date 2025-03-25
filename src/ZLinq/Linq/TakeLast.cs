@@ -30,7 +30,7 @@ namespace ZLinq.Linq
     {
         TEnumerator source = source;
         readonly int takeCount = Math.Max(0, count);
-        Queue<TSource>? q; // TODO:RefBox<ValueQUeue>>
+        RefBox<ValueQueue<TSource>>? q;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -101,26 +101,26 @@ namespace ZLinq.Linq
 
             if (q == null)
             {
-                q = new Queue<TSource>();
+                q = new(new(4));
             }
 
         DEQUEUE:
-            if (q.Count != 0)
+            if (q.GetValueRef().Count != 0)
             {
-                current = q.Dequeue();
+                current = q.GetValueRef().Dequeue();
                 return true;
             }
 
             while (source.TryGetNext(out current))
             {
-                if (q.Count == takeCount)
+                if (q.GetValueRef().Count == takeCount)
                 {
-                    q.Dequeue();
+                    q.GetValueRef().Dequeue();
                 }
-                q.Enqueue(current);
+                q.GetValueRef().Enqueue(current);
             }
 
-            if (q.Count != 0) goto DEQUEUE;
+            if (q.GetValueRef().Count != 0) goto DEQUEUE;
 
             Unsafe.SkipInit(out current);
             return false;
@@ -128,6 +128,7 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
+            q?.Dispose();
             source.Dispose();
         }
     }

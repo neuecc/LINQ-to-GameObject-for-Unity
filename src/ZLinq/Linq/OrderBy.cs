@@ -113,7 +113,7 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerator source = source;
-        OrderByComparable<TSource, TKey> comparable = new(keySelector, comparer, parent, descending); // boxed
+        OrderByComparable<TSource, TKey> comparable = new(keySelector, comparer, parent, descending); // boxed, this is safe to copy as struct state
 
         RentedArrayBox<TSource>? buffer;
         int index;

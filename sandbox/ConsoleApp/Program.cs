@@ -30,41 +30,37 @@ using ZLinq.Traversables;
 //var ok = string.Join(',', tako);
 
 
+IEnumerable<int> source = ForceNotCollection([1, 2, 3, 4, 5]);
+
+var values = source.AsValueEnumerable().Take(^5..3); // 1,2,3
+var a = values.ToArray();
+var b = values.ToArray();
 
 
-
-IEnumerable<double?> source = [double.MaxValue, null, double.MaxValue];
-var expected = double.PositiveInfinity;
-
-
-
-
-var a = source.Sum();
-var b = source.Sum(x => x);
-
-
-
-
-
-
-var srcFiles = new DirectoryInfo("../../../../../src/ZLinq/Linq/").GetFiles();
-var tstFiles = new DirectoryInfo("../../../../../tests/ZLinq.Tests/Linq/").GetFiles();
-
-var grouping = srcFiles.AsValueEnumerable()
-    .LeftJoin(tstFiles,
-        x => x.Name,
-        x => x.Name.Replace("Test", ""),
-        (outer, inner) => new { Name = outer.Name, IsTested = inner != null })
-    .GroupBy(x => x.IsTested);
-
-foreach (var g in grouping)
+static IEnumerable<T> ForceNotCollection<T>(IEnumerable<T> source)
 {
-    Console.WriteLine(g.Key ? "Tested::::::::::::::::::" : "NotTested::::::::::::::::::");
-    foreach (var item in g)
-    {
-        Console.WriteLine(item.Name);
-    }
+    foreach (T item in source)
+        yield return item;
 }
+
+//var srcFiles = new DirectoryInfo("../../../../../src/ZLinq/Linq/").GetFiles();
+//var tstFiles = new DirectoryInfo("../../../../../tests/ZLinq.Tests/Linq/").GetFiles();
+
+//var grouping = srcFiles.AsValueEnumerable()
+//    .LeftJoin(tstFiles,
+//        x => x.Name,
+//        x => x.Name.Replace("Test", ""),
+//        (outer, inner) => new { Name = outer.Name, IsTested = inner != null })
+//    .GroupBy(x => x.IsTested);
+
+//foreach (var g in grouping)
+//{
+//    Console.WriteLine(g.Key ? "Tested::::::::::::::::::" : "NotTested::::::::::::::::::");
+//    foreach (var item in g)
+//    {
+//        Console.WriteLine(item.Name);
+//    }
+//}
 
 
 return;

@@ -272,4 +272,41 @@ public class TakeTest
         source.AsValueEnumerable().Take(3).Skip(1).ToArray().ShouldBe([2, 3]);
         source.AsValueEnumerable().Skip(1).Take(3).ToArray().ShouldBe([2, 3, 4]);
     }
+
+    [Fact]
+    public void T3()
+    {
+        IEnumerable<int> source = ForceNotCollection([1, 2, 3, 4, 5]);
+
+        // LINQ
+        {
+            var values = source.Take(^5..3); // 1,2,3
+            Assert.Equal(values.ToArray(), values.ToArray());
+        }
+
+        // ZLinq
+        {
+            var values = source.AsValueEnumerable().Take(^5..3); // 1,2,3
+            Assert.Equal(values.ToArray(), values.ToArray()); 
+        }
+
+        static IEnumerable<T> ForceNotCollection<T>(IEnumerable<T> source)
+        {
+            foreach (T item in source)
+                yield return item;
+        }
+
+    }
+
+    [Fact]
+    public void T4()
+    {
+        int[] source = [1, 2, 3, 4, 5];
+
+        // LINQ
+        Assert.Equal(0, source.Take(0..0).LastOrDefault());
+
+        // ZLinq
+        Assert.Equal(0, source.AsValueEnumerable().Take(0..0).LastOrDefault());
+    }
 }
