@@ -151,13 +151,6 @@ public class TakeTest
         Array.Clear(dest);
         take.TryCopyTo(dest, 2).ShouldBeTrue();
         dest.ShouldBe([3, 0, 0, 0, 0]);
-
-        Array.Clear(dest);
-        take.TryCopyTo(dest, 3).ShouldBeTrue();
-        dest.ShouldBe([0, 0, 0, 0, 0]);
-
-        Array.Clear(dest);
-        take.TryCopyTo(dest, 4).ShouldBeFalse();
     }
 
     [Fact]
@@ -260,5 +253,23 @@ public class TakeTest
             Assert.Throws<ArgumentOutOfRangeException>(() => source.Take(3).ElementAt(9999)); // expected
             Assert.Throws<ArgumentOutOfRangeException>(() => source.AsValueEnumerable().Take(3).ElementAt(9999)); // actual
         }
+    }
+
+    [Fact]
+    public void T()
+    {
+        int[] source = [1, 2, 3, 4, 5];
+        source.AsValueEnumerable().Take(3).ElementAt(0).ShouldBe(1);
+        source.AsValueEnumerable().Take(3).ElementAt(1).ShouldBe(2);
+        source.AsValueEnumerable().Take(3).ElementAt(2).ShouldBe(3);
+        source.AsValueEnumerable().Take(3).ElementAtOrDefault(3).ShouldBe(0);
+    }
+
+    [Fact]
+    public void T2()
+    {
+        int[] source = [1, 2, 3, 4, 5];
+        source.AsValueEnumerable().Take(3).Skip(1).ToArray().ShouldBe([2, 3]);
+        source.AsValueEnumerable().Skip(1).Take(3).ToArray().ShouldBe([2, 3, 4]);
     }
 }

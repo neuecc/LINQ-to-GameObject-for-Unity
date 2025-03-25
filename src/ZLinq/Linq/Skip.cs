@@ -47,11 +47,14 @@ namespace ZLinq.Linq
         {
             if (source.TryGetNonEnumeratedCount(out var count))
             {
-                var skipOffset = offset.GetOffset(count) + skipCount;
-                if (source.TryCopyTo(destination, skipOffset))
+                var sourceOffset = offset.GetOffset(count);
+                var skipOffset = sourceOffset + skipCount;
+                if (skipOffset >= count)
                 {
-                    return true;
+                    return false;
                 }
+
+                return source.TryCopyTo(destination, skipOffset);
             }
             return false;
         }

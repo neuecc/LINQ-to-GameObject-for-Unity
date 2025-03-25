@@ -145,16 +145,55 @@ internal sealed class DictionarySlim<TKey, TValue> : IDisposable // allows TKey 
     {
         int index;
 
-        public bool TryGetNext(out KeyValuePair<TKey, TValue> item)
+        // no needs ref style in this repository
+
+        //public bool TryGetNextKeyRef(ref readonly TKey keyRef)
+        //{
+        //    if (index < dictionary.entryIndex)
+        //    {
+        //        ref var entry = ref dictionary.entries[index];
+        //        index++;
+        //        keyRef = ref entry.Key;
+        //        return true;
+        //    }
+        //    return false;
+        //}
+
+        //public bool TryGetNextValueRef(ref readonly TValue valueRef)
+        //{
+        //    if (index < dictionary.entryIndex)
+        //    {
+        //        ref var entry = ref dictionary.entries[index];
+        //        index++;
+        //        valueRef = ref entry.Value;
+        //        return true;
+        //    }
+        //    return false;
+        //}
+
+        //public bool TryGetNextRef(ref readonly TKey keyRef, ref readonly TValue valueRef)
+        //{
+        //    if (index < dictionary.entryIndex)
+        //    {
+        //        ref var entry = ref dictionary.entries[index];
+        //        index++;
+        //        keyRef = ref entry.Key;
+        //        valueRef = ref entry.Value!;
+        //        return true;
+        //    }
+        //    return false;
+        //}
+
+        public bool TryGetNext(out KeyValuePair<TKey, TValue> current)
         {
             if (index < dictionary.entryIndex)
             {
                 ref var entry = ref dictionary.entries[index];
                 index++;
-                item = new KeyValuePair<TKey, TValue>(entry.Key, entry.Value!);
+                current = new(entry.Key, entry.Value!);
                 return true;
             }
-            item = default!;
+            current = default;
             return false;
         }
     }

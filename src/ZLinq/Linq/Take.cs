@@ -69,36 +69,22 @@ namespace ZLinq.Linq
             if (source.TryGetNonEnumeratedCount(out var count))
             {
                 var actualTakeCount = Math.Min(count, takeCount);
-          
-                if (!offset.IsFromEnd)
-                {
-                    var sourceOffset = offset.Value;
-                    if (sourceOffset >= actualTakeCount)
-                    {
-                        return false;
-                    }
 
-                    var elementsToCopy = Math.Min(actualTakeCount - sourceOffset, destination.Length);
-                    if (source.TryCopyTo(destination.Slice(0, elementsToCopy), sourceOffset))
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    var sourceOffset = offset.Value;
-                    if (sourceOffset > actualTakeCount)
-                    {
-                        return false;
-                    }
+                // When offset IsFromEnd, calculate the source offset from take count.
+                var sourceOffset = offset.GetOffset(actualTakeCount);
 
-                    var actualPosition = actualTakeCount - sourceOffset;
-                    var elementsToCopy = Math.Min(sourceOffset, destination.Length);
-                    if (source.TryCopyTo(destination.Slice(0, elementsToCopy), actualPosition))
-                    {
-                        return true;
-                    }
+                if (sourceOffset < 0 || sourceOffset >= actualTakeCount)
+                {
+                    return false; // out of range mark as fail(for example ElementAt needs failed information).
                 }
+
+                // Remaining differs depending on whether it's from the beginning or from the end.
+                var remainingElements = offset.IsFromEnd
+                    ? offset.Value
+                    : actualTakeCount - sourceOffset;
+
+                var elementsToCopy = Math.Min(remainingElements, destination.Length);
+                return source.TryCopyTo(destination.Slice(0, elementsToCopy), sourceOffset);
             }
 
             return false;
