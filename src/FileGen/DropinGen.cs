@@ -124,7 +124,13 @@ internal static partial class ZLinqDropInExtensions
         var sourceType = BuildSourceType(methodInfo, dropInType.Name, dropInType.IsArray);
         var constraints = BuildConstraints(methodInfo);
 
-        var signature = $"    public static {returnType} {name}<{genericsTypes}>(this {sourceType} source{parameters}){constraints} => source.AsValueEnumerable().{name}({parameterNames});";
+        var source = "source";
+        if (dropInType.Name is "Array" or "List" or "IEnumerable")
+        {
+            source = "(source ?? throw new ArgumentNullException(\"source\"))";
+        }
+
+        var signature = $"    public static {returnType} {name}<{genericsTypes}>(this {sourceType} source{parameters}){constraints} => {source}.AsValueEnumerable().{name}({parameterNames});";
 
         // quick fix
         if (signature.Contains("RightJoin"))

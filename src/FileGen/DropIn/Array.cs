@@ -12,354 +12,354 @@ using ZLinq.Linq;
 
 internal static partial class ZLinqDropInExtensions
 {
-    public static TSource Aggregate<TSource>(this TSource[] source, Func<TSource, TSource, TSource> func) => source.AsValueEnumerable().Aggregate(func);
-    public static TAccumulate Aggregate<TSource, TAccumulate>(this TSource[] source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func) => source.AsValueEnumerable().Aggregate(seed, func);
-    public static TResult Aggregate<TSource, TAccumulate, TResult>(this TSource[] source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, Func<TAccumulate, TResult> resultSelector) => source.AsValueEnumerable().Aggregate(seed, func, resultSelector);
-    public static ValueEnumerable<AggregateBy<FromArray<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this TSource[] source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func) => source.AsValueEnumerable().AggregateBy(keySelector, seed, func);
-    public static ValueEnumerable<AggregateBy<FromArray<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this TSource[] source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer) => source.AsValueEnumerable().AggregateBy(keySelector, seed, func, keyComparer);
-    public static ValueEnumerable<AggregateBy2<FromArray<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func) => source.AsValueEnumerable().AggregateBy(keySelector, seedSelector, func);
-    public static ValueEnumerable<AggregateBy2<FromArray<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer) => source.AsValueEnumerable().AggregateBy(keySelector, seedSelector, func, keyComparer);
-    public static Boolean All<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().All(predicate);
-    public static Boolean Any<TSource>(this TSource[] source) => source.AsValueEnumerable().Any();
-    public static Boolean Any<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Any(predicate);
-    public static ValueEnumerable<Append<FromArray<TSource>, TSource>, TSource> Append<TSource>(this TSource[] source, TSource element) => source.AsValueEnumerable().Append(element);
+    public static TSource Aggregate<TSource>(this TSource[] source, Func<TSource, TSource, TSource> func) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Aggregate(func);
+    public static TAccumulate Aggregate<TSource, TAccumulate>(this TSource[] source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Aggregate(seed, func);
+    public static TResult Aggregate<TSource, TAccumulate, TResult>(this TSource[] source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, Func<TAccumulate, TResult> resultSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Aggregate(seed, func, resultSelector);
+    public static ValueEnumerable<AggregateBy<FromArray<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this TSource[] source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().AggregateBy(keySelector, seed, func);
+    public static ValueEnumerable<AggregateBy<FromArray<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this TSource[] source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().AggregateBy(keySelector, seed, func, keyComparer);
+    public static ValueEnumerable<AggregateBy2<FromArray<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().AggregateBy(keySelector, seedSelector, func);
+    public static ValueEnumerable<AggregateBy2<FromArray<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().AggregateBy(keySelector, seedSelector, func, keyComparer);
+    public static Boolean All<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().All(predicate);
+    public static Boolean Any<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Any();
+    public static Boolean Any<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Any(predicate);
+    public static ValueEnumerable<Append<FromArray<TSource>, TSource>, TSource> Append<TSource>(this TSource[] source, TSource element) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Append(element);
     public static Double Average<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector)
         where TResult : struct
 #if NET8_0_OR_GREATER
         , INumber<TResult>
 #endif
- => source.AsValueEnumerable().Average(selector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average(selector);
     public static Nullable<Double> Average<TSource>(this Nullable<TSource>[] source)
         where TSource : struct
 #if NET8_0_OR_GREATER
         , INumber<TSource>
 #endif
- => source.AsValueEnumerable().Average();
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average();
     public static Double Average<TSource>(this TSource[] source)
         where TSource : struct
 #if NET8_0_OR_GREATER
         , INumber<TSource>
 #endif
- => source.AsValueEnumerable().Average();
-    public static ValueEnumerable<Chunk<FromArray<TSource>, TSource>, TSource[]> Chunk<TSource>(this TSource[] source, Int32 size) => source.AsValueEnumerable().Chunk(size);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average();
+    public static ValueEnumerable<Chunk<FromArray<TSource>, TSource>, TSource[]> Chunk<TSource>(this TSource[] source, Int32 size) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Chunk(size);
     public static ValueEnumerable<Concat<FromArray<TSource>, TEnumerator2, TSource>, TSource> Concat<TEnumerator2, TSource>(this TSource[] source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().Concat(second);
-    public static ValueEnumerable<Concat<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Concat<TSource>(this TSource[] source, IEnumerable<TSource> second) => source.AsValueEnumerable().Concat(second);
-    public static Boolean Contains<TSource>(this TSource[] source, TSource value) => source.AsValueEnumerable().Contains(value);
-    public static Boolean Contains<TSource>(this TSource[] source, TSource value, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Contains(value, comparer);
-    public static Int32 CopyTo<T>(this T[] source, Span<T> dest) => source.AsValueEnumerable().CopyTo(dest);
-    public static void CopyTo<T>(this T[] source, List<T> list) => source.AsValueEnumerable().CopyTo(list);
-    public static Int32 Count<TSource>(this TSource[] source) => source.AsValueEnumerable().Count();
-    public static Int32 Count<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Count(predicate);
-    public static ValueEnumerable<CountBy<FromArray<TSource>, TSource, TKey>, KeyValuePair<TKey, Int32>> CountBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().CountBy(keySelector);
-    public static ValueEnumerable<CountBy<FromArray<TSource>, TSource, TKey>, KeyValuePair<TKey, Int32>> CountBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> keyComparer) => source.AsValueEnumerable().CountBy(keySelector, keyComparer);
-    public static ValueEnumerable<DefaultIfEmpty<FromArray<TSource>, TSource>, TSource> DefaultIfEmpty<TSource>(this TSource[] source) => source.AsValueEnumerable().DefaultIfEmpty();
-    public static ValueEnumerable<DefaultIfEmpty<FromArray<TSource>, TSource>, TSource> DefaultIfEmpty<TSource>(this TSource[] source, TSource defaultValue) => source.AsValueEnumerable().DefaultIfEmpty(defaultValue);
-    public static ValueEnumerable<Distinct<FromArray<TSource>, TSource>, TSource> Distinct<TSource>(this TSource[] source) => source.AsValueEnumerable().Distinct();
-    public static ValueEnumerable<Distinct<FromArray<TSource>, TSource>, TSource> Distinct<TSource>(this TSource[] source, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Distinct(comparer);
-    public static ValueEnumerable<DistinctBy<FromArray<TSource>, TSource, TKey>, TSource> DistinctBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().DistinctBy(keySelector);
-    public static ValueEnumerable<DistinctBy<FromArray<TSource>, TSource, TKey>, TSource> DistinctBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().DistinctBy(keySelector, comparer);
-    public static TSource ElementAt<TSource>(this TSource[] source, Int32 index) => source.AsValueEnumerable().ElementAt(index);
-    public static TSource ElementAt<TSource>(this TSource[] source, Index index) => source.AsValueEnumerable().ElementAt(index);
-    public static TSource? ElementAtOrDefault<TSource>(this TSource[] source, Int32 index) => source.AsValueEnumerable().ElementAtOrDefault(index);
-    public static TSource? ElementAtOrDefault<TSource>(this TSource[] source, Index index) => source.AsValueEnumerable().ElementAtOrDefault(index);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Concat(second);
+    public static ValueEnumerable<Concat<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Concat<TSource>(this TSource[] source, IEnumerable<TSource> second) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Concat(second);
+    public static Boolean Contains<TSource>(this TSource[] source, TSource value) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Contains(value);
+    public static Boolean Contains<TSource>(this TSource[] source, TSource value, IEqualityComparer<TSource> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Contains(value, comparer);
+    public static Int32 CopyTo<T>(this T[] source, Span<T> dest) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().CopyTo(dest);
+    public static void CopyTo<T>(this T[] source, List<T> list) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().CopyTo(list);
+    public static Int32 Count<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Count();
+    public static Int32 Count<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Count(predicate);
+    public static ValueEnumerable<CountBy<FromArray<TSource>, TSource, TKey>, KeyValuePair<TKey, Int32>> CountBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().CountBy(keySelector);
+    public static ValueEnumerable<CountBy<FromArray<TSource>, TSource, TKey>, KeyValuePair<TKey, Int32>> CountBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> keyComparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().CountBy(keySelector, keyComparer);
+    public static ValueEnumerable<DefaultIfEmpty<FromArray<TSource>, TSource>, TSource> DefaultIfEmpty<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().DefaultIfEmpty();
+    public static ValueEnumerable<DefaultIfEmpty<FromArray<TSource>, TSource>, TSource> DefaultIfEmpty<TSource>(this TSource[] source, TSource defaultValue) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().DefaultIfEmpty(defaultValue);
+    public static ValueEnumerable<Distinct<FromArray<TSource>, TSource>, TSource> Distinct<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Distinct();
+    public static ValueEnumerable<Distinct<FromArray<TSource>, TSource>, TSource> Distinct<TSource>(this TSource[] source, IEqualityComparer<TSource> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Distinct(comparer);
+    public static ValueEnumerable<DistinctBy<FromArray<TSource>, TSource, TKey>, TSource> DistinctBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().DistinctBy(keySelector);
+    public static ValueEnumerable<DistinctBy<FromArray<TSource>, TSource, TKey>, TSource> DistinctBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().DistinctBy(keySelector, comparer);
+    public static TSource ElementAt<TSource>(this TSource[] source, Int32 index) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ElementAt(index);
+    public static TSource ElementAt<TSource>(this TSource[] source, Index index) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ElementAt(index);
+    public static TSource? ElementAtOrDefault<TSource>(this TSource[] source, Int32 index) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ElementAtOrDefault(index);
+    public static TSource? ElementAtOrDefault<TSource>(this TSource[] source, Index index) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ElementAtOrDefault(index);
     public static ValueEnumerable<Except<FromArray<TSource>, TEnumerator2, TSource>, TSource> Except<TEnumerator2, TSource>(this TSource[] source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().Except(second);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Except(second);
     public static ValueEnumerable<Except<FromArray<TSource>, TEnumerator2, TSource>, TSource> Except<TEnumerator2, TSource>(this TSource[] source, ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource> comparer)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().Except(second, comparer);
-    public static ValueEnumerable<Except<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Except<TSource>(this TSource[] source, IEnumerable<TSource> second) => source.AsValueEnumerable().Except(second);
-    public static ValueEnumerable<Except<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Except<TSource>(this TSource[] source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Except(second, comparer);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Except(second, comparer);
+    public static ValueEnumerable<Except<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Except<TSource>(this TSource[] source, IEnumerable<TSource> second) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Except(second);
+    public static ValueEnumerable<Except<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Except<TSource>(this TSource[] source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Except(second, comparer);
     public static ValueEnumerable<ExceptBy<FromArray<TSource>, TEnumerator2, TSource, TKey>, TSource> ExceptBy<TEnumerator2, TSource, TKey>(this TSource[] source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector)
         where TEnumerator2 : struct, IValueEnumerator<TKey>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().ExceptBy(second, keySelector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ExceptBy(second, keySelector);
     public static ValueEnumerable<ExceptBy<FromArray<TSource>, TEnumerator2, TSource, TKey>, TSource> ExceptBy<TEnumerator2, TSource, TKey>(this TSource[] source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
         where TEnumerator2 : struct, IValueEnumerator<TKey>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().ExceptBy(second, keySelector, comparer);
-    public static ValueEnumerable<ExceptBy<FromArray<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> ExceptBy<TSource, TKey>(this TSource[] source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().ExceptBy(second, keySelector);
-    public static ValueEnumerable<ExceptBy<FromArray<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> ExceptBy<TSource, TKey>(this TSource[] source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().ExceptBy(second, keySelector, comparer);
-    public static TSource First<TSource>(this TSource[] source) => source.AsValueEnumerable().First();
-    public static TSource First<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().First(predicate);
-    public static TSource? FirstOrDefault<TSource>(this TSource[] source) => source.AsValueEnumerable().FirstOrDefault();
-    public static TSource FirstOrDefault<TSource>(this TSource[] source, TSource defaultValue) => source.AsValueEnumerable().FirstOrDefault(defaultValue);
-    public static TSource? FirstOrDefault<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().FirstOrDefault(predicate);
-    public static TSource FirstOrDefault<TSource>(this TSource[] source, Func<TSource, Boolean> predicate, TSource defaultValue) => source.AsValueEnumerable().FirstOrDefault(predicate, defaultValue);
-    public static ValueEnumerable<GroupBy<FromArray<TSource>, TSource, TKey>, IGrouping<TKey, TSource>> GroupBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().GroupBy(keySelector);
-    public static ValueEnumerable<GroupBy<FromArray<TSource>, TSource, TKey>, IGrouping<TKey, TSource>> GroupBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().GroupBy(keySelector, comparer);
-    public static ValueEnumerable<GroupBy2<FromArray<TSource>, TSource, TKey, TElement>, IGrouping<TKey, TElement>> GroupBy<TSource, TKey, TElement>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) => source.AsValueEnumerable().GroupBy(keySelector, elementSelector);
-    public static ValueEnumerable<GroupBy2<FromArray<TSource>, TSource, TKey, TElement>, IGrouping<TKey, TElement>> GroupBy<TSource, TKey, TElement>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().GroupBy(keySelector, elementSelector, comparer);
-    public static ValueEnumerable<GroupBy3<FromArray<TSource>, TSource, TKey, TResult>, TResult> GroupBy<TSource, TKey, TResult>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector) => source.AsValueEnumerable().GroupBy(keySelector, resultSelector);
-    public static ValueEnumerable<GroupBy3<FromArray<TSource>, TSource, TKey, TResult>, TResult> GroupBy<TSource, TKey, TResult>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().GroupBy(keySelector, resultSelector, comparer);
-    public static ValueEnumerable<GroupBy4<FromArray<TSource>, TSource, TKey, TElement, TResult>, TResult> GroupBy<TSource, TKey, TElement, TResult>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector) => source.AsValueEnumerable().GroupBy(keySelector, elementSelector, resultSelector);
-    public static ValueEnumerable<GroupBy4<FromArray<TSource>, TSource, TKey, TElement, TResult>, TResult> GroupBy<TSource, TKey, TElement, TResult>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().GroupBy(keySelector, elementSelector, resultSelector, comparer);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ExceptBy(second, keySelector, comparer);
+    public static ValueEnumerable<ExceptBy<FromArray<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> ExceptBy<TSource, TKey>(this TSource[] source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ExceptBy(second, keySelector);
+    public static ValueEnumerable<ExceptBy<FromArray<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> ExceptBy<TSource, TKey>(this TSource[] source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ExceptBy(second, keySelector, comparer);
+    public static TSource First<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().First();
+    public static TSource First<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().First(predicate);
+    public static TSource? FirstOrDefault<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().FirstOrDefault();
+    public static TSource FirstOrDefault<TSource>(this TSource[] source, TSource defaultValue) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().FirstOrDefault(defaultValue);
+    public static TSource? FirstOrDefault<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().FirstOrDefault(predicate);
+    public static TSource FirstOrDefault<TSource>(this TSource[] source, Func<TSource, Boolean> predicate, TSource defaultValue) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().FirstOrDefault(predicate, defaultValue);
+    public static ValueEnumerable<GroupBy<FromArray<TSource>, TSource, TKey>, IGrouping<TKey, TSource>> GroupBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupBy(keySelector);
+    public static ValueEnumerable<GroupBy<FromArray<TSource>, TSource, TKey>, IGrouping<TKey, TSource>> GroupBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupBy(keySelector, comparer);
+    public static ValueEnumerable<GroupBy2<FromArray<TSource>, TSource, TKey, TElement>, IGrouping<TKey, TElement>> GroupBy<TSource, TKey, TElement>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupBy(keySelector, elementSelector);
+    public static ValueEnumerable<GroupBy2<FromArray<TSource>, TSource, TKey, TElement>, IGrouping<TKey, TElement>> GroupBy<TSource, TKey, TElement>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupBy(keySelector, elementSelector, comparer);
+    public static ValueEnumerable<GroupBy3<FromArray<TSource>, TSource, TKey, TResult>, TResult> GroupBy<TSource, TKey, TResult>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupBy(keySelector, resultSelector);
+    public static ValueEnumerable<GroupBy3<FromArray<TSource>, TSource, TKey, TResult>, TResult> GroupBy<TSource, TKey, TResult>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupBy(keySelector, resultSelector, comparer);
+    public static ValueEnumerable<GroupBy4<FromArray<TSource>, TSource, TKey, TElement, TResult>, TResult> GroupBy<TSource, TKey, TElement, TResult>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupBy(keySelector, elementSelector, resultSelector);
+    public static ValueEnumerable<GroupBy4<FromArray<TSource>, TSource, TKey, TElement, TResult>, TResult> GroupBy<TSource, TKey, TElement, TResult>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupBy(keySelector, elementSelector, resultSelector, comparer);
     public static ValueEnumerable<GroupJoin<FromArray<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this TOuter[] source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
     public static ValueEnumerable<GroupJoin<FromArray<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this TOuter[] source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
-    public static ValueEnumerable<GroupJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector) => source.AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
-    public static ValueEnumerable<GroupJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
-    public static ValueEnumerable<Index<FromArray<TSource>, TSource>, ValueTuple<Int32, TSource>> Index<TSource>(this TSource[] source) => source.AsValueEnumerable().Index();
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<GroupJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
+    public static ValueEnumerable<GroupJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<Index<FromArray<TSource>, TSource>, ValueTuple<Int32, TSource>> Index<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Index();
     public static ValueEnumerable<Intersect<FromArray<TSource>, TEnumerator2, TSource>, TSource> Intersect<TEnumerator2, TSource>(this TSource[] source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().Intersect(second);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Intersect(second);
     public static ValueEnumerable<Intersect<FromArray<TSource>, TEnumerator2, TSource>, TSource> Intersect<TEnumerator2, TSource>(this TSource[] source, ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource> comparer)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().Intersect(second, comparer);
-    public static ValueEnumerable<Intersect<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Intersect<TSource>(this TSource[] source, IEnumerable<TSource> second) => source.AsValueEnumerable().Intersect(second);
-    public static ValueEnumerable<Intersect<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Intersect<TSource>(this TSource[] source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Intersect(second, comparer);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Intersect(second, comparer);
+    public static ValueEnumerable<Intersect<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Intersect<TSource>(this TSource[] source, IEnumerable<TSource> second) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Intersect(second);
+    public static ValueEnumerable<Intersect<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Intersect<TSource>(this TSource[] source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Intersect(second, comparer);
     public static ValueEnumerable<IntersectBy<FromArray<TSource>, TEnumerator2, TSource, TKey>, TSource> IntersectBy<TEnumerator2, TSource, TKey>(this TSource[] source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector)
         where TEnumerator2 : struct, IValueEnumerator<TKey>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().IntersectBy(second, keySelector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().IntersectBy(second, keySelector);
     public static ValueEnumerable<IntersectBy<FromArray<TSource>, TEnumerator2, TSource, TKey>, TSource> IntersectBy<TEnumerator2, TSource, TKey>(this TSource[] source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
         where TEnumerator2 : struct, IValueEnumerator<TKey>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().IntersectBy(second, keySelector, comparer);
-    public static ValueEnumerable<IntersectBy<FromArray<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> IntersectBy<TSource, TKey>(this TSource[] source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().IntersectBy(second, keySelector);
-    public static ValueEnumerable<IntersectBy<FromArray<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> IntersectBy<TSource, TKey>(this TSource[] source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().IntersectBy(second, keySelector, comparer);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().IntersectBy(second, keySelector, comparer);
+    public static ValueEnumerable<IntersectBy<FromArray<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> IntersectBy<TSource, TKey>(this TSource[] source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().IntersectBy(second, keySelector);
+    public static ValueEnumerable<IntersectBy<FromArray<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> IntersectBy<TSource, TKey>(this TSource[] source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().IntersectBy(second, keySelector, comparer);
     public static ValueEnumerable<Join<FromArray<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> Join<TEnumerator2, TOuter, TInner, TKey, TResult>(this TOuter[] source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector);
     public static ValueEnumerable<Join<FromArray<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> Join<TEnumerator2, TOuter, TInner, TKey, TResult>(this TOuter[] source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
-    public static ValueEnumerable<Join<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> Join<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector) => source.AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector);
-    public static ValueEnumerable<Join<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> Join<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
-    public static TSource Last<TSource>(this TSource[] source) => source.AsValueEnumerable().Last();
-    public static TSource Last<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Last(predicate);
-    public static TSource? LastOrDefault<TSource>(this TSource[] source) => source.AsValueEnumerable().LastOrDefault();
-    public static TSource LastOrDefault<TSource>(this TSource[] source, TSource defaultValue) => source.AsValueEnumerable().LastOrDefault(defaultValue);
-    public static TSource? LastOrDefault<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().LastOrDefault(predicate);
-    public static TSource LastOrDefault<TSource>(this TSource[] source, Func<TSource, Boolean> predicate, TSource defaultValue) => source.AsValueEnumerable().LastOrDefault(predicate, defaultValue);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<Join<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> Join<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector);
+    public static ValueEnumerable<Join<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> Join<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static TSource Last<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Last();
+    public static TSource Last<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Last(predicate);
+    public static TSource? LastOrDefault<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().LastOrDefault();
+    public static TSource LastOrDefault<TSource>(this TSource[] source, TSource defaultValue) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().LastOrDefault(defaultValue);
+    public static TSource? LastOrDefault<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().LastOrDefault(predicate);
+    public static TSource LastOrDefault<TSource>(this TSource[] source, Func<TSource, Boolean> predicate, TSource defaultValue) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().LastOrDefault(predicate, defaultValue);
     public static ValueEnumerable<LeftJoin<FromArray<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> LeftJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this TOuter[] source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner?, TResult> resultSelector)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
     public static ValueEnumerable<LeftJoin<FromArray<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> LeftJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this TOuter[] source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner?, TResult> resultSelector, IEqualityComparer<TKey> comparer)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
-    public static ValueEnumerable<LeftJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner?, TResult> resultSelector) => source.AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
-    public static ValueEnumerable<LeftJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner?, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
-    public static Int64 LongCount<TSource>(this TSource[] source) => source.AsValueEnumerable().LongCount();
-    public static Int64 LongCount<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().LongCount(predicate);
-    public static TResult? Max<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector) => source.AsValueEnumerable().Max(selector);
-    public static TSource? Max<TSource>(this TSource[] source) => source.AsValueEnumerable().Max();
-    public static TSource? Max<TSource>(this TSource[] source, IComparer<TSource> comparer) => source.AsValueEnumerable().Max(comparer);
-    public static TSource? MaxBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().MaxBy(keySelector);
-    public static TSource? MaxBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer) => source.AsValueEnumerable().MaxBy(keySelector, comparer);
-    public static TResult? Min<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector) => source.AsValueEnumerable().Min(selector);
-    public static TSource? Min<TSource>(this TSource[] source) => source.AsValueEnumerable().Min();
-    public static TSource? Min<TSource>(this TSource[] source, IComparer<TSource> comparer) => source.AsValueEnumerable().Min(comparer);
-    public static TSource? MinBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().MinBy(keySelector);
-    public static TSource? MinBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer) => source.AsValueEnumerable().MinBy(keySelector, comparer);
-    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TSource>, TSource> Order<TSource>(this TSource[] source) => source.AsValueEnumerable().Order();
-    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TSource>, TSource> Order<TSource>(this TSource[] source, IComparer<TSource> comparer) => source.AsValueEnumerable().Order(comparer);
-    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TSource>, TSource> OrderDescending<TSource>(this TSource[] source) => source.AsValueEnumerable().OrderDescending();
-    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TSource>, TSource> OrderDescending<TSource>(this TSource[] source, IComparer<TSource> comparer) => source.AsValueEnumerable().OrderDescending(comparer);
-    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TKey>, TSource> OrderBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().OrderBy(keySelector);
-    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TKey>, TSource> OrderBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer) => source.AsValueEnumerable().OrderBy(keySelector, comparer);
-    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TKey>, TSource> OrderByDescending<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().OrderByDescending(keySelector);
-    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TKey>, TSource> OrderByDescending<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer) => source.AsValueEnumerable().OrderByDescending(keySelector, comparer);
-    public static ValueEnumerable<Prepend<FromArray<TSource>, TSource>, TSource> Prepend<TSource>(this TSource[] source, TSource element) => source.AsValueEnumerable().Prepend(element);
-    public static ValueEnumerable<Reverse<FromArray<TSource>, TSource>, TSource> Reverse<TSource>(this TSource[] source) => source.AsValueEnumerable().Reverse();
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<LeftJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner?, TResult> resultSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
+    public static ValueEnumerable<LeftJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner?, TResult> resultSelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static Int64 LongCount<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().LongCount();
+    public static Int64 LongCount<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().LongCount(predicate);
+    public static TResult? Max<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Max(selector);
+    public static TSource? Max<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Max();
+    public static TSource? Max<TSource>(this TSource[] source, IComparer<TSource> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Max(comparer);
+    public static TSource? MaxBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().MaxBy(keySelector);
+    public static TSource? MaxBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().MaxBy(keySelector, comparer);
+    public static TResult? Min<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Min(selector);
+    public static TSource? Min<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Min();
+    public static TSource? Min<TSource>(this TSource[] source, IComparer<TSource> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Min(comparer);
+    public static TSource? MinBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().MinBy(keySelector);
+    public static TSource? MinBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().MinBy(keySelector, comparer);
+    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TSource>, TSource> Order<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Order();
+    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TSource>, TSource> Order<TSource>(this TSource[] source, IComparer<TSource> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Order(comparer);
+    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TSource>, TSource> OrderDescending<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().OrderDescending();
+    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TSource>, TSource> OrderDescending<TSource>(this TSource[] source, IComparer<TSource> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().OrderDescending(comparer);
+    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TKey>, TSource> OrderBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().OrderBy(keySelector);
+    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TKey>, TSource> OrderBy<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().OrderBy(keySelector, comparer);
+    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TKey>, TSource> OrderByDescending<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().OrderByDescending(keySelector);
+    public static ValueEnumerable<OrderBy<FromArray<TSource>, TSource, TKey>, TSource> OrderByDescending<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().OrderByDescending(keySelector, comparer);
+    public static ValueEnumerable<Prepend<FromArray<TSource>, TSource>, TSource> Prepend<TSource>(this TSource[] source, TSource element) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Prepend(element);
+    public static ValueEnumerable<Reverse<FromArray<TSource>, TSource>, TSource> Reverse<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Reverse();
     public static ValueEnumerable<RightJoin<FromArray<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this TOuter[] source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
     public static ValueEnumerable<RightJoin<FromArray<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this TOuter[] source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
-    public static ValueEnumerable<RightJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector) => source.AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
-    public static ValueEnumerable<RightJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
-    public static ValueEnumerable<Select<FromArray<TSource>, TSource, TResult>, TResult> Select<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector) => source.AsValueEnumerable().Select(selector);
-    public static ValueEnumerable<Select2<FromArray<TSource>, TSource, TResult>, TResult> Select<TSource, TResult>(this TSource[] source, Func<TSource, Int32, TResult> selector) => source.AsValueEnumerable().Select(selector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<RightJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
+    public static ValueEnumerable<RightJoin<FromArray<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TOuter, TInner, TKey, TResult>(this TOuter[] source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<Select<FromArray<TSource>, TSource, TResult>, TResult> Select<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Select(selector);
+    public static ValueEnumerable<Select2<FromArray<TSource>, TSource, TResult>, TResult> Select<TSource, TResult>(this TSource[] source, Func<TSource, Int32, TResult> selector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Select(selector);
     public static ValueEnumerable<SelectMany<FromArray<TSource>, TEnumerator2, TSource, TResult>, TResult> SelectMany<TEnumerator2, TSource, TResult>(this TSource[] source, Func<TSource, ValueEnumerable<TEnumerator2, TResult>> selector)
         where TEnumerator2 : struct, IValueEnumerator<TResult>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().SelectMany(selector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SelectMany(selector);
     public static ValueEnumerable<SelectMany2<FromArray<TSource>, TEnumerator2, TSource, TResult>, TResult> SelectMany<TEnumerator2, TSource, TResult>(this TSource[] source, Func<TSource, Int32, ValueEnumerable<TEnumerator2, TResult>> selector)
         where TEnumerator2 : struct, IValueEnumerator<TResult>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().SelectMany(selector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SelectMany(selector);
     public static ValueEnumerable<SelectMany3<FromArray<TSource>, TEnumerator2, TSource, TCollection, TResult>, TResult> SelectMany<TEnumerator2, TSource, TCollection, TResult>(this TSource[] source, Func<TSource, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
         where TEnumerator2 : struct, IValueEnumerator<TCollection>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
     public static ValueEnumerable<SelectMany4<FromArray<TSource>, TEnumerator2, TSource, TCollection, TResult>, TResult> SelectMany<TEnumerator2, TSource, TCollection, TResult>(this TSource[] source, Func<TSource, Int32, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
         where TEnumerator2 : struct, IValueEnumerator<TCollection>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
-    public static ValueEnumerable<SelectMany<FromArray<TSource>, TSource, TResult>, TResult> SelectMany<TSource, TResult>(this TSource[] source, Func<TSource, IEnumerable<TResult>> selector) => source.AsValueEnumerable().SelectMany(selector);
-    public static ValueEnumerable<SelectMany2<FromArray<TSource>, TSource, TResult>, TResult> SelectMany<TSource, TResult>(this TSource[] source, Func<TSource, Int32, IEnumerable<TResult>> selector) => source.AsValueEnumerable().SelectMany(selector);
-    public static ValueEnumerable<SelectMany3<FromArray<TSource>, TSource, TCollection, TResult>, TResult> SelectMany<TSource, TCollection, TResult>(this TSource[] source, Func<TSource, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector) => source.AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
-    public static ValueEnumerable<SelectMany4<FromArray<TSource>, TSource, TCollection, TResult>, TResult> SelectMany<TSource, TCollection, TResult>(this TSource[] source, Func<TSource, Int32, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector) => source.AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
-    public static Boolean SequenceEqual<TSource>(this TSource[] source, IEnumerable<TSource> second) => source.AsValueEnumerable().SequenceEqual(second);
-    public static Boolean SequenceEqual<TSource>(this TSource[] source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().SequenceEqual(second, comparer);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
+    public static ValueEnumerable<SelectMany<FromArray<TSource>, TSource, TResult>, TResult> SelectMany<TSource, TResult>(this TSource[] source, Func<TSource, IEnumerable<TResult>> selector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SelectMany(selector);
+    public static ValueEnumerable<SelectMany2<FromArray<TSource>, TSource, TResult>, TResult> SelectMany<TSource, TResult>(this TSource[] source, Func<TSource, Int32, IEnumerable<TResult>> selector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SelectMany(selector);
+    public static ValueEnumerable<SelectMany3<FromArray<TSource>, TSource, TCollection, TResult>, TResult> SelectMany<TSource, TCollection, TResult>(this TSource[] source, Func<TSource, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
+    public static ValueEnumerable<SelectMany4<FromArray<TSource>, TSource, TCollection, TResult>, TResult> SelectMany<TSource, TCollection, TResult>(this TSource[] source, Func<TSource, Int32, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
+    public static Boolean SequenceEqual<TSource>(this TSource[] source, IEnumerable<TSource> second) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SequenceEqual(second);
+    public static Boolean SequenceEqual<TSource>(this TSource[] source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SequenceEqual(second, comparer);
     public static Boolean SequenceEqual<TEnumerator2, TSource>(this TSource[] source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().SequenceEqual(second);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SequenceEqual(second);
     public static Boolean SequenceEqual<TEnumerator2, TSource>(this TSource[] source, ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource> comparer)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().SequenceEqual(second, comparer);
-    public static ValueEnumerable<Shuffle<FromArray<TSource>, TSource>, TSource> Shuffle<TSource>(this TSource[] source) => source.AsValueEnumerable().Shuffle();
-    public static TSource Single<TSource>(this TSource[] source) => source.AsValueEnumerable().Single();
-    public static TSource Single<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Single(predicate);
-    public static TSource? SingleOrDefault<TSource>(this TSource[] source) => source.AsValueEnumerable().SingleOrDefault();
-    public static TSource SingleOrDefault<TSource>(this TSource[] source, TSource defaultValue) => source.AsValueEnumerable().SingleOrDefault(defaultValue);
-    public static TSource? SingleOrDefault<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().SingleOrDefault(predicate);
-    public static TSource SingleOrDefault<TSource>(this TSource[] source, Func<TSource, Boolean> predicate, TSource defaultValue) => source.AsValueEnumerable().SingleOrDefault(predicate, defaultValue);
-    public static ValueEnumerable<Skip<FromArray<TSource>, TSource>, TSource> Skip<TSource>(this TSource[] source, Int32 count) => source.AsValueEnumerable().Skip(count);
-    public static ValueEnumerable<SkipLast<FromArray<TSource>, TSource>, TSource> SkipLast<TSource>(this TSource[] source, Int32 count) => source.AsValueEnumerable().SkipLast(count);
-    public static ValueEnumerable<SkipWhile<FromArray<TSource>, TSource>, TSource> SkipWhile<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().SkipWhile(predicate);
-    public static ValueEnumerable<SkipWhile2<FromArray<TSource>, TSource>, TSource> SkipWhile<TSource>(this TSource[] source, Func<TSource, Int32, Boolean> predicate) => source.AsValueEnumerable().SkipWhile(predicate);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SequenceEqual(second, comparer);
+    public static ValueEnumerable<Shuffle<FromArray<TSource>, TSource>, TSource> Shuffle<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Shuffle();
+    public static TSource Single<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Single();
+    public static TSource Single<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Single(predicate);
+    public static TSource? SingleOrDefault<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SingleOrDefault();
+    public static TSource SingleOrDefault<TSource>(this TSource[] source, TSource defaultValue) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SingleOrDefault(defaultValue);
+    public static TSource? SingleOrDefault<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SingleOrDefault(predicate);
+    public static TSource SingleOrDefault<TSource>(this TSource[] source, Func<TSource, Boolean> predicate, TSource defaultValue) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SingleOrDefault(predicate, defaultValue);
+    public static ValueEnumerable<Skip<FromArray<TSource>, TSource>, TSource> Skip<TSource>(this TSource[] source, Int32 count) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Skip(count);
+    public static ValueEnumerable<SkipLast<FromArray<TSource>, TSource>, TSource> SkipLast<TSource>(this TSource[] source, Int32 count) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SkipLast(count);
+    public static ValueEnumerable<SkipWhile<FromArray<TSource>, TSource>, TSource> SkipWhile<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SkipWhile(predicate);
+    public static ValueEnumerable<SkipWhile2<FromArray<TSource>, TSource>, TSource> SkipWhile<TSource>(this TSource[] source, Func<TSource, Int32, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SkipWhile(predicate);
     public static TResult Sum<TSource, TResult>(this TSource[] source, Func<TSource, TResult> selector)
         where TResult : struct
 #if NET8_0_OR_GREATER
         , INumber<TResult>
 #endif
- => source.AsValueEnumerable().Sum(selector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Sum(selector);
     public static TSource Sum<TSource>(this Nullable<TSource>[] source)
         where TSource : struct
 #if NET8_0_OR_GREATER
         , INumber<TSource>
 #endif
- => source.AsValueEnumerable().Sum();
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Sum();
     public static TSource Sum<TSource>(this TSource[] source)
         where TSource : struct
 #if NET8_0_OR_GREATER
         , INumber<TSource>
 #endif
- => source.AsValueEnumerable().Sum();
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Sum();
 #if NET8_0_OR_GREATER
     public static TSource SumUnchecked<TSource>(this TSource[] source)
         where TSource : struct
 #if NET8_0_OR_GREATER
         , INumber<TSource>
 #endif
- => source.AsValueEnumerable().SumUnchecked();
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().SumUnchecked();
 #endif
-    public static ValueEnumerable<Take<FromArray<TSource>, TSource>, TSource> Take<TSource>(this TSource[] source, Int32 count) => source.AsValueEnumerable().Take(count);
-    public static ValueEnumerable<TakeRange<FromArray<TSource>, TSource>, TSource> Take<TSource>(this TSource[] source, Range range) => source.AsValueEnumerable().Take(range);
-    public static ValueEnumerable<TakeLast<FromArray<TSource>, TSource>, TSource> TakeLast<TSource>(this TSource[] source, Int32 count) => source.AsValueEnumerable().TakeLast(count);
-    public static ValueEnumerable<TakeWhile<FromArray<TSource>, TSource>, TSource> TakeWhile<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().TakeWhile(predicate);
-    public static ValueEnumerable<TakeWhile2<FromArray<TSource>, TSource>, TSource> TakeWhile<TSource>(this TSource[] source, Func<TSource, Int32, Boolean> predicate) => source.AsValueEnumerable().TakeWhile(predicate);
-    public static TSource[] ToArray<TSource>(this TSource[] source) => source.AsValueEnumerable().ToArray();
-    public static ValueTuple<TSource[], Int32> ToArrayPool<TSource>(this TSource[] source) => source.AsValueEnumerable().ToArrayPool();
-    public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this KeyValuePair<TKey, TValue>[] source) where TKey : notnull => source.AsValueEnumerable().ToDictionary();
-    public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this KeyValuePair<TKey, TValue>[] source, IEqualityComparer<TKey> comparer) where TKey : notnull => source.AsValueEnumerable().ToDictionary(comparer);
-    public static Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) where TKey : notnull => source.AsValueEnumerable().ToDictionary(keySelector);
-    public static Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) where TKey : notnull => source.AsValueEnumerable().ToDictionary(keySelector, comparer);
-    public static Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) where TKey : notnull => source.AsValueEnumerable().ToDictionary(keySelector, elementSelector);
-    public static Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer) where TKey : notnull => source.AsValueEnumerable().ToDictionary(keySelector, elementSelector, comparer);
-    public static HashSet<TSource> ToHashSet<TSource>(this TSource[] source) => source.AsValueEnumerable().ToHashSet();
-    public static HashSet<TSource> ToHashSet<TSource>(this TSource[] source, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().ToHashSet(comparer);
-    public static List<TSource> ToList<TSource>(this TSource[] source) => source.AsValueEnumerable().ToList();
-    public static ILookup<TKey, TSource> ToLookup<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().ToLookup(keySelector);
-    public static ILookup<TKey, TSource> ToLookup<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().ToLookup(keySelector, comparer);
-    public static ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) => source.AsValueEnumerable().ToLookup(keySelector, elementSelector);
-    public static ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().ToLookup(keySelector, elementSelector, comparer);
-    public static Boolean TryGetNonEnumeratedCount<TSource>(this TSource[] source, out Int32 count) => source.AsValueEnumerable().TryGetNonEnumeratedCount(out count);
+    public static ValueEnumerable<Take<FromArray<TSource>, TSource>, TSource> Take<TSource>(this TSource[] source, Int32 count) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Take(count);
+    public static ValueEnumerable<TakeRange<FromArray<TSource>, TSource>, TSource> Take<TSource>(this TSource[] source, Range range) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Take(range);
+    public static ValueEnumerable<TakeLast<FromArray<TSource>, TSource>, TSource> TakeLast<TSource>(this TSource[] source, Int32 count) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().TakeLast(count);
+    public static ValueEnumerable<TakeWhile<FromArray<TSource>, TSource>, TSource> TakeWhile<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().TakeWhile(predicate);
+    public static ValueEnumerable<TakeWhile2<FromArray<TSource>, TSource>, TSource> TakeWhile<TSource>(this TSource[] source, Func<TSource, Int32, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().TakeWhile(predicate);
+    public static TSource[] ToArray<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToArray();
+    public static ValueTuple<TSource[], Int32> ToArrayPool<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToArrayPool();
+    public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this KeyValuePair<TKey, TValue>[] source) where TKey : notnull => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToDictionary();
+    public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this KeyValuePair<TKey, TValue>[] source, IEqualityComparer<TKey> comparer) where TKey : notnull => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToDictionary(comparer);
+    public static Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) where TKey : notnull => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToDictionary(keySelector);
+    public static Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) where TKey : notnull => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToDictionary(keySelector, comparer);
+    public static Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) where TKey : notnull => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToDictionary(keySelector, elementSelector);
+    public static Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer) where TKey : notnull => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToDictionary(keySelector, elementSelector, comparer);
+    public static HashSet<TSource> ToHashSet<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToHashSet();
+    public static HashSet<TSource> ToHashSet<TSource>(this TSource[] source, IEqualityComparer<TSource> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToHashSet(comparer);
+    public static List<TSource> ToList<TSource>(this TSource[] source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToList();
+    public static ILookup<TKey, TSource> ToLookup<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToLookup(keySelector);
+    public static ILookup<TKey, TSource> ToLookup<TSource, TKey>(this TSource[] source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToLookup(keySelector, comparer);
+    public static ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToLookup(keySelector, elementSelector);
+    public static ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(this TSource[] source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().ToLookup(keySelector, elementSelector, comparer);
+    public static Boolean TryGetNonEnumeratedCount<TSource>(this TSource[] source, out Int32 count) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().TryGetNonEnumeratedCount(out count);
     public static ValueEnumerable<Union<FromArray<TSource>, TEnumerator2, TSource>, TSource> Union<TEnumerator2, TSource>(this TSource[] source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().Union(second);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Union(second);
     public static ValueEnumerable<Union<FromArray<TSource>, TEnumerator2, TSource>, TSource> Union<TEnumerator2, TSource>(this TSource[] source, ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource> comparer)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().Union(second, comparer);
-    public static ValueEnumerable<Union<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Union<TSource>(this TSource[] source, IEnumerable<TSource> second) => source.AsValueEnumerable().Union(second);
-    public static ValueEnumerable<Union<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Union<TSource>(this TSource[] source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Union(second, comparer);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Union(second, comparer);
+    public static ValueEnumerable<Union<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Union<TSource>(this TSource[] source, IEnumerable<TSource> second) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Union(second);
+    public static ValueEnumerable<Union<FromArray<TSource>, FromEnumerable<TSource>, TSource>, TSource> Union<TSource>(this TSource[] source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Union(second, comparer);
     public static ValueEnumerable<UnionBy<FromArray<TSource>, TEnumerator2, TSource, TKey>, TSource> UnionBy<TEnumerator2, TSource, TKey>(this TSource[] source, ValueEnumerable<TEnumerator2, TSource> second, Func<TSource, TKey> keySelector)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().UnionBy(second, keySelector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().UnionBy(second, keySelector);
     public static ValueEnumerable<UnionBy<FromArray<TSource>, TEnumerator2, TSource, TKey>, TSource> UnionBy<TEnumerator2, TSource, TKey>(this TSource[] source, ValueEnumerable<TEnumerator2, TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().UnionBy(second, keySelector, comparer);
-    public static ValueEnumerable<UnionBy<FromArray<TSource>, FromEnumerable<TSource>, TSource, TKey>, TSource> UnionBy<TSource, TKey>(this TSource[] source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().UnionBy(second, keySelector);
-    public static ValueEnumerable<UnionBy<FromArray<TSource>, FromEnumerable<TSource>, TSource, TKey>, TSource> UnionBy<TSource, TKey>(this TSource[] source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().UnionBy(second, keySelector, comparer);
-    public static ValueEnumerable<Where<FromArray<TSource>, TSource>, TSource> Where<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Where(predicate);
-    public static ValueEnumerable<Where2<FromArray<TSource>, TSource>, TSource> Where<TSource>(this TSource[] source, Func<TSource, Int32, Boolean> predicate) => source.AsValueEnumerable().Where(predicate);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().UnionBy(second, keySelector, comparer);
+    public static ValueEnumerable<UnionBy<FromArray<TSource>, FromEnumerable<TSource>, TSource, TKey>, TSource> UnionBy<TSource, TKey>(this TSource[] source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().UnionBy(second, keySelector);
+    public static ValueEnumerable<UnionBy<FromArray<TSource>, FromEnumerable<TSource>, TSource, TKey>, TSource> UnionBy<TSource, TKey>(this TSource[] source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().UnionBy(second, keySelector, comparer);
+    public static ValueEnumerable<Where<FromArray<TSource>, TSource>, TSource> Where<TSource>(this TSource[] source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Where(predicate);
+    public static ValueEnumerable<Where2<FromArray<TSource>, TSource>, TSource> Where<TSource>(this TSource[] source, Func<TSource, Int32, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Where(predicate);
     public static ValueEnumerable<Zip<FromArray<TFirst>, TEnumerator2, TFirst, TSecond>, ValueTuple<TFirst, TSecond>> Zip<TEnumerator2, TFirst, TSecond>(this TFirst[] source, ValueEnumerable<TEnumerator2, TSecond> second)
         where TEnumerator2 : struct, IValueEnumerator<TSecond>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().Zip(second);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Zip(second);
     public static ValueEnumerable<Zip<FromArray<TFirst>, TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>, ValueTuple<TFirst, TSecond, TThird>> Zip<TEnumerator2, TEnumerator3, TFirst, TSecond, TThird>(this TFirst[] source, ValueEnumerable<TEnumerator2, TSecond> second, ValueEnumerable<TEnumerator3, TThird> third)
         where TEnumerator2 : struct, IValueEnumerator<TSecond>
 #if NET9_0_OR_GREATER
@@ -369,15 +369,15 @@ internal static partial class ZLinqDropInExtensions
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().Zip(second, third);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Zip(second, third);
     public static ValueEnumerable<Zip<FromArray<TFirst>, TEnumerator2, TFirst, TSecond, TResult>, TResult> Zip<TEnumerator2, TFirst, TSecond, TResult>(this TFirst[] source, ValueEnumerable<TEnumerator2, TSecond> second, Func<TFirst, TSecond, TResult> resultSelector)
         where TEnumerator2 : struct, IValueEnumerator<TSecond>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
- => source.AsValueEnumerable().Zip(second, resultSelector);
-    public static ValueEnumerable<Zip<FromArray<TFirst>, FromEnumerable<TSecond>, TFirst, TSecond>, ValueTuple<TFirst, TSecond>> Zip<TFirst, TSecond>(this TFirst[] source, IEnumerable<TSecond> second) => source.AsValueEnumerable().Zip(second);
-    public static ValueEnumerable<Zip<FromArray<TFirst>, FromEnumerable<TSecond>, FromEnumerable<TThird>, TFirst, TSecond, TThird>, ValueTuple<TFirst, TSecond, TThird>> Zip<TFirst, TSecond, TThird>(this TFirst[] source, IEnumerable<TSecond> second, IEnumerable<TThird> third) => source.AsValueEnumerable().Zip(second, third);
-    public static ValueEnumerable<Zip<FromArray<TFirst>, FromEnumerable<TSecond>, TFirst, TSecond, TResult>, TResult> Zip<TFirst, TSecond, TResult>(this TFirst[] source, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector) => source.AsValueEnumerable().Zip(second, resultSelector);
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Zip(second, resultSelector);
+    public static ValueEnumerable<Zip<FromArray<TFirst>, FromEnumerable<TSecond>, TFirst, TSecond>, ValueTuple<TFirst, TSecond>> Zip<TFirst, TSecond>(this TFirst[] source, IEnumerable<TSecond> second) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Zip(second);
+    public static ValueEnumerable<Zip<FromArray<TFirst>, FromEnumerable<TSecond>, FromEnumerable<TThird>, TFirst, TSecond, TThird>, ValueTuple<TFirst, TSecond, TThird>> Zip<TFirst, TSecond, TThird>(this TFirst[] source, IEnumerable<TSecond> second, IEnumerable<TThird> third) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Zip(second, third);
+    public static ValueEnumerable<Zip<FromArray<TFirst>, FromEnumerable<TSecond>, TFirst, TSecond, TResult>, TResult> Zip<TFirst, TSecond, TResult>(this TFirst[] source, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Zip(second, resultSelector);
 
 }
