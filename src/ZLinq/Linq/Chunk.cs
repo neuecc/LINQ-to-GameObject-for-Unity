@@ -8,7 +8,13 @@
             , allows ref struct
 #endif
         {
+            const int ArrayMaxLength = 0X7FFFFFC7;
+
             if (size < 1) Throws.ArgumentOutOfRange(nameof(size));
+
+            // I think it would be better to throw an exception, but adjusting to Array.MaxLength.
+            // Related discussion in https://github.com/dotnet/runtime/issues/67132
+            size = Math.Min(size, ArrayMaxLength);
 
             return new(new(source.Enumerator, size));
         }
@@ -36,7 +42,6 @@ namespace ZLinq.Linq
 #if NET9_0_OR_GREATER
         ReadOnlySpan<TSource> sourceSpan;
 #endif
-        // 3byte(Considering the padding, this is good in terms of memory.)
         bool isInitialized;
         bool isCompleted;
         bool isCanGetSpan;
@@ -72,6 +77,11 @@ namespace ZLinq.Linq
             if (!isInitialized)
             {
                 isInitialized = true;
+
+                if (source.TryGetNonEnumeratedCount(out var count))
+                {
+                    size = Math.Min(size, count); // no needs large buffer
+                }
 
                 if (source.TryGetSpan(out var span))
                 {

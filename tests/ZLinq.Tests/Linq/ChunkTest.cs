@@ -119,4 +119,49 @@ public class ChunkTest
 
         TestUtil.NoThrow(() => xs.Chunk(1), () => xs.AsValueEnumerable().Chunk(1));
     }
+
+#if NET9_0_OR_GREATER
+
+    [Fact]
+    public void DoesNotPrematurelyAllocateHugeArray()
+    {
+        var source = Enumerable.Range(0, 10);
+
+        var results1 = source.Chunk(int.MaxValue).ToArray();
+        var results2 = source.AsValueEnumerable()
+                             .Chunk(10).ToArray();
+
+        Assert.Equal(results1, results2);
+    }
+
+    [Fact(Skip = "allocate huge memory")]
+    public void NoCountEnumerableSource_With_HugeChunkSize()
+    {
+        var source = new NoCountEnumerable<int>(Enumerable.Range(0, 10));
+
+        var results1 = source.Chunk(int.MaxValue).ToArray();
+        var results2 = source.AsValueEnumerable()
+                             .Chunk(int.MaxValue).ToArray();
+
+        Assert.Equal(results1, results2);
+    }
+
+    public class NoCountEnumerable<T> : IEnumerable<T>
+    {
+        private readonly List<T> _items;
+
+        public NoCountEnumerable(IEnumerable<T> items)
+        {
+            _items = new List<T>(items);
+        }
+
+        public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+
+#endif
 }
