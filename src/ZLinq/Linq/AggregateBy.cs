@@ -12,28 +12,28 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, keySelector, seed, func, null));
+            => new(new(source.Enumerator, Throws.IfNull(keySelector), seed, Throws.IfNull(func), null));
 
         public static ValueEnumerable<AggregateBy<TEnumerator, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TEnumerator, TSource, TKey, TAccumulate>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey>? keyComparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, keySelector, seed, func, keyComparer));
+            => new(new(source.Enumerator, Throws.IfNull(keySelector), seed, Throws.IfNull(func), keyComparer));
 
         public static ValueEnumerable<AggregateBy2<TEnumerator, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TEnumerator, TSource, TKey, TAccumulate>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, keySelector, seedSelector, func, null));
+            => new(new(source.Enumerator, Throws.IfNull(keySelector), Throws.IfNull(seedSelector), Throws.IfNull(func), null));
 
         public static ValueEnumerable<AggregateBy2<TEnumerator, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TEnumerator, TSource, TKey, TAccumulate>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey>? keyComparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, keySelector, seedSelector, func, keyComparer));
+            => new(new(source.Enumerator, Throws.IfNull(keySelector), Throws.IfNull(seedSelector), Throws.IfNull(func), keyComparer));
     }
 }
 

@@ -36,4 +36,12 @@ internal static class Throws
 
     [DoesNotReturn]
     public static void VectorSmallOverlap<T>() where T : struct => throw new ArgumentException($"Span length must be at least {System.Numerics.Vector<T>.Count} for OverlapOrThrow mode");
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T IfNull<T>(T? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        where T : class
+    {
+        ArgumentNullException.ThrowIfNull(argument, paramName);
+        return argument;
+    }
 }

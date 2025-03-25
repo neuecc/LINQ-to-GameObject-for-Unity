@@ -8,6 +8,8 @@ partial class ValueEnumerableExtensions
         , allows ref struct
 #endif
     {
+        ArgumentNullException.ThrowIfNull(func);
+
         using (var enumerator = source.Enumerator)
         {
             if (enumerator.TryGetSpan(out var span))
@@ -48,6 +50,8 @@ partial class ValueEnumerableExtensions
         , allows ref struct
 #endif
     {
+        ArgumentNullException.ThrowIfNull(func);
+
         using (var enumerator = source.Enumerator)
         {
             if (enumerator.TryGetSpan(out var span))
@@ -80,6 +84,9 @@ partial class ValueEnumerableExtensions
         , allows ref struct
 #endif
     {
+        ArgumentNullException.ThrowIfNull(func);
+        ArgumentNullException.ThrowIfNull(resultSelector);
+
         using (var enumerator = source.Enumerator)
         {
             if (enumerator.TryGetSpan(out var span))
