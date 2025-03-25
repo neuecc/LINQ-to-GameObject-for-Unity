@@ -29,12 +29,13 @@ using ZLinq.Traversables;
 //var tako = ValueEnumerable.Range(1, 10).Select(x => x.ToString());
 //var ok = string.Join(',', tako);
 
+string[]? source = [];
 
-IEnumerable<int> source = ForceNotCollection([1, 2, 3, 4, 5]);
+// ZLinq
+source.AsValueEnumerable().Order(comparer: null); // No warning
 
-var values = source.AsValueEnumerable().Take(^5..3); // 1,2,3
-var a = values.ToArray();
-var b = values.ToArray();
+// ZLinq (with Drop-in replacement)
+source.Order(comparer: null);
 
 
 static IEnumerable<T> ForceNotCollection<T>(IEnumerable<T> source)

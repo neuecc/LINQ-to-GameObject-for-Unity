@@ -219,7 +219,13 @@ internal static partial class ZLinqDropInExtensions
 
         var sb = new StringBuilder();
         BuildTypeCore(sb, type, replacement);
-        return sb.ToString();
+
+        var str = sb.ToString();
+        if (str.Contains("IComparer") || str.Contains("IEqualityComparer"))
+        {
+            str = str + "?";
+        }
+        return str;
     }
 
     void BuildTypeCore(StringBuilder builder, Type type, string replacement)

@@ -16,9 +16,9 @@ internal static partial class ZLinqDropInExtensions
     public static TAccumulate Aggregate<TSource, TAccumulate>(this ReadOnlyMemory<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func) => source.AsValueEnumerable().Aggregate(seed, func);
     public static TResult Aggregate<TSource, TAccumulate, TResult>(this ReadOnlyMemory<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, Func<TAccumulate, TResult> resultSelector) => source.AsValueEnumerable().Aggregate(seed, func, resultSelector);
     public static ValueEnumerable<AggregateBy<FromMemory<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func) => source.AsValueEnumerable().AggregateBy(keySelector, seed, func);
-    public static ValueEnumerable<AggregateBy<FromMemory<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer) => source.AsValueEnumerable().AggregateBy(keySelector, seed, func, keyComparer);
+    public static ValueEnumerable<AggregateBy<FromMemory<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, TAccumulate seed, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey>? keyComparer) => source.AsValueEnumerable().AggregateBy(keySelector, seed, func, keyComparer);
     public static ValueEnumerable<AggregateBy2<FromMemory<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func) => source.AsValueEnumerable().AggregateBy(keySelector, seedSelector, func);
-    public static ValueEnumerable<AggregateBy2<FromMemory<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey> keyComparer) => source.AsValueEnumerable().AggregateBy(keySelector, seedSelector, func, keyComparer);
+    public static ValueEnumerable<AggregateBy2<FromMemory<TSource>, TSource, TKey, TAccumulate>, KeyValuePair<TKey, TAccumulate>> AggregateBy<TSource, TKey, TAccumulate>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TKey, TAccumulate> seedSelector, Func<TAccumulate, TSource, TAccumulate> func, IEqualityComparer<TKey>? keyComparer) => source.AsValueEnumerable().AggregateBy(keySelector, seedSelector, func, keyComparer);
     public static Boolean All<TSource>(this ReadOnlyMemory<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().All(predicate);
     public static Boolean Any<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().Any();
     public static Boolean Any<TSource>(this ReadOnlyMemory<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Any(predicate);
@@ -50,19 +50,19 @@ internal static partial class ZLinqDropInExtensions
  => source.AsValueEnumerable().Concat(second);
     public static ValueEnumerable<Concat<FromMemory<TSource>, FromEnumerable<TSource>, TSource>, TSource> Concat<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().Concat(second);
     public static Boolean Contains<TSource>(this ReadOnlyMemory<TSource> source, TSource value) => source.AsValueEnumerable().Contains(value);
-    public static Boolean Contains<TSource>(this ReadOnlyMemory<TSource> source, TSource value, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Contains(value, comparer);
+    public static Boolean Contains<TSource>(this ReadOnlyMemory<TSource> source, TSource value, IEqualityComparer<TSource>? comparer) => source.AsValueEnumerable().Contains(value, comparer);
     public static Int32 CopyTo<T>(this ReadOnlyMemory<T> source, Span<T> dest) => source.AsValueEnumerable().CopyTo(dest);
     public static void CopyTo<T>(this ReadOnlyMemory<T> source, List<T> list) => source.AsValueEnumerable().CopyTo(list);
     public static Int32 Count<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().Count();
     public static Int32 Count<TSource>(this ReadOnlyMemory<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Count(predicate);
     public static ValueEnumerable<CountBy<FromMemory<TSource>, TSource, TKey>, KeyValuePair<TKey, Int32>> CountBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().CountBy(keySelector);
-    public static ValueEnumerable<CountBy<FromMemory<TSource>, TSource, TKey>, KeyValuePair<TKey, Int32>> CountBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> keyComparer) => source.AsValueEnumerable().CountBy(keySelector, keyComparer);
+    public static ValueEnumerable<CountBy<FromMemory<TSource>, TSource, TKey>, KeyValuePair<TKey, Int32>> CountBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? keyComparer) => source.AsValueEnumerable().CountBy(keySelector, keyComparer);
     public static ValueEnumerable<DefaultIfEmpty<FromMemory<TSource>, TSource>, TSource> DefaultIfEmpty<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().DefaultIfEmpty();
     public static ValueEnumerable<DefaultIfEmpty<FromMemory<TSource>, TSource>, TSource> DefaultIfEmpty<TSource>(this ReadOnlyMemory<TSource> source, TSource defaultValue) => source.AsValueEnumerable().DefaultIfEmpty(defaultValue);
     public static ValueEnumerable<Distinct<FromMemory<TSource>, TSource>, TSource> Distinct<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().Distinct();
-    public static ValueEnumerable<Distinct<FromMemory<TSource>, TSource>, TSource> Distinct<TSource>(this ReadOnlyMemory<TSource> source, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Distinct(comparer);
+    public static ValueEnumerable<Distinct<FromMemory<TSource>, TSource>, TSource> Distinct<TSource>(this ReadOnlyMemory<TSource> source, IEqualityComparer<TSource>? comparer) => source.AsValueEnumerable().Distinct(comparer);
     public static ValueEnumerable<DistinctBy<FromMemory<TSource>, TSource, TKey>, TSource> DistinctBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().DistinctBy(keySelector);
-    public static ValueEnumerable<DistinctBy<FromMemory<TSource>, TSource, TKey>, TSource> DistinctBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().DistinctBy(keySelector, comparer);
+    public static ValueEnumerable<DistinctBy<FromMemory<TSource>, TSource, TKey>, TSource> DistinctBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().DistinctBy(keySelector, comparer);
     public static TSource ElementAt<TSource>(this ReadOnlyMemory<TSource> source, Int32 index) => source.AsValueEnumerable().ElementAt(index);
     public static TSource ElementAt<TSource>(this ReadOnlyMemory<TSource> source, Index index) => source.AsValueEnumerable().ElementAt(index);
     public static TSource? ElementAtOrDefault<TSource>(this ReadOnlyMemory<TSource> source, Int32 index) => source.AsValueEnumerable().ElementAtOrDefault(index);
@@ -73,28 +73,28 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Except(second);
-    public static ValueEnumerable<Except<FromMemory<TSource>, TEnumerator2, TSource>, TSource> Except<TEnumerator2, TSource>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource> comparer)
+    public static ValueEnumerable<Except<FromMemory<TSource>, TEnumerator2, TSource>, TSource> Except<TEnumerator2, TSource>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource>? comparer)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Except(second, comparer);
     public static ValueEnumerable<Except<FromMemory<TSource>, FromEnumerable<TSource>, TSource>, TSource> Except<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().Except(second);
-    public static ValueEnumerable<Except<FromMemory<TSource>, FromEnumerable<TSource>, TSource>, TSource> Except<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Except(second, comparer);
+    public static ValueEnumerable<Except<FromMemory<TSource>, FromEnumerable<TSource>, TSource>, TSource> Except<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer) => source.AsValueEnumerable().Except(second, comparer);
     public static ValueEnumerable<ExceptBy<FromMemory<TSource>, TEnumerator2, TSource, TKey>, TSource> ExceptBy<TEnumerator2, TSource, TKey>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector)
         where TEnumerator2 : struct, IValueEnumerator<TKey>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().ExceptBy(second, keySelector);
-    public static ValueEnumerable<ExceptBy<FromMemory<TSource>, TEnumerator2, TSource, TKey>, TSource> ExceptBy<TEnumerator2, TSource, TKey>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+    public static ValueEnumerable<ExceptBy<FromMemory<TSource>, TEnumerator2, TSource, TKey>, TSource> ExceptBy<TEnumerator2, TSource, TKey>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
         where TEnumerator2 : struct, IValueEnumerator<TKey>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().ExceptBy(second, keySelector, comparer);
     public static ValueEnumerable<ExceptBy<FromMemory<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> ExceptBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().ExceptBy(second, keySelector);
-    public static ValueEnumerable<ExceptBy<FromMemory<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> ExceptBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().ExceptBy(second, keySelector, comparer);
+    public static ValueEnumerable<ExceptBy<FromMemory<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> ExceptBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().ExceptBy(second, keySelector, comparer);
     public static TSource First<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().First();
     public static TSource First<TSource>(this ReadOnlyMemory<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().First(predicate);
     public static TSource? FirstOrDefault<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().FirstOrDefault();
@@ -102,27 +102,27 @@ internal static partial class ZLinqDropInExtensions
     public static TSource? FirstOrDefault<TSource>(this ReadOnlyMemory<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().FirstOrDefault(predicate);
     public static TSource FirstOrDefault<TSource>(this ReadOnlyMemory<TSource> source, Func<TSource, Boolean> predicate, TSource defaultValue) => source.AsValueEnumerable().FirstOrDefault(predicate, defaultValue);
     public static ValueEnumerable<GroupBy<FromMemory<TSource>, TSource, TKey>, IGrouping<TKey, TSource>> GroupBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().GroupBy(keySelector);
-    public static ValueEnumerable<GroupBy<FromMemory<TSource>, TSource, TKey>, IGrouping<TKey, TSource>> GroupBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().GroupBy(keySelector, comparer);
+    public static ValueEnumerable<GroupBy<FromMemory<TSource>, TSource, TKey>, IGrouping<TKey, TSource>> GroupBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().GroupBy(keySelector, comparer);
     public static ValueEnumerable<GroupBy2<FromMemory<TSource>, TSource, TKey, TElement>, IGrouping<TKey, TElement>> GroupBy<TSource, TKey, TElement>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) => source.AsValueEnumerable().GroupBy(keySelector, elementSelector);
-    public static ValueEnumerable<GroupBy2<FromMemory<TSource>, TSource, TKey, TElement>, IGrouping<TKey, TElement>> GroupBy<TSource, TKey, TElement>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().GroupBy(keySelector, elementSelector, comparer);
+    public static ValueEnumerable<GroupBy2<FromMemory<TSource>, TSource, TKey, TElement>, IGrouping<TKey, TElement>> GroupBy<TSource, TKey, TElement>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().GroupBy(keySelector, elementSelector, comparer);
     public static ValueEnumerable<GroupBy3<FromMemory<TSource>, TSource, TKey, TResult>, TResult> GroupBy<TSource, TKey, TResult>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector) => source.AsValueEnumerable().GroupBy(keySelector, resultSelector);
-    public static ValueEnumerable<GroupBy3<FromMemory<TSource>, TSource, TKey, TResult>, TResult> GroupBy<TSource, TKey, TResult>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().GroupBy(keySelector, resultSelector, comparer);
+    public static ValueEnumerable<GroupBy3<FromMemory<TSource>, TSource, TKey, TResult>, TResult> GroupBy<TSource, TKey, TResult>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().GroupBy(keySelector, resultSelector, comparer);
     public static ValueEnumerable<GroupBy4<FromMemory<TSource>, TSource, TKey, TElement, TResult>, TResult> GroupBy<TSource, TKey, TElement, TResult>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector) => source.AsValueEnumerable().GroupBy(keySelector, elementSelector, resultSelector);
-    public static ValueEnumerable<GroupBy4<FromMemory<TSource>, TSource, TKey, TElement, TResult>, TResult> GroupBy<TSource, TKey, TElement, TResult>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().GroupBy(keySelector, elementSelector, resultSelector, comparer);
+    public static ValueEnumerable<GroupBy4<FromMemory<TSource>, TSource, TKey, TElement, TResult>, TResult> GroupBy<TSource, TKey, TElement, TResult>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().GroupBy(keySelector, elementSelector, resultSelector, comparer);
     public static ValueEnumerable<GroupJoin<FromMemory<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
-    public static ValueEnumerable<GroupJoin<FromMemory<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
+    public static ValueEnumerable<GroupJoin<FromMemory<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey>? comparer)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
     public static ValueEnumerable<GroupJoin<FromMemory<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector) => source.AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
-    public static ValueEnumerable<GroupJoin<FromMemory<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<GroupJoin<FromMemory<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> GroupJoin<TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, IEnumerable<TInner>, TResult> resultSelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().GroupJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
     public static ValueEnumerable<Index<FromMemory<TSource>, TSource>, (int Index, TSource Item)> Index<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().Index();
     public static ValueEnumerable<Intersect<FromMemory<TSource>, TEnumerator2, TSource>, TSource> Intersect<TEnumerator2, TSource>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
@@ -130,42 +130,42 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Intersect(second);
-    public static ValueEnumerable<Intersect<FromMemory<TSource>, TEnumerator2, TSource>, TSource> Intersect<TEnumerator2, TSource>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource> comparer)
+    public static ValueEnumerable<Intersect<FromMemory<TSource>, TEnumerator2, TSource>, TSource> Intersect<TEnumerator2, TSource>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource>? comparer)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Intersect(second, comparer);
     public static ValueEnumerable<Intersect<FromMemory<TSource>, FromEnumerable<TSource>, TSource>, TSource> Intersect<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().Intersect(second);
-    public static ValueEnumerable<Intersect<FromMemory<TSource>, FromEnumerable<TSource>, TSource>, TSource> Intersect<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Intersect(second, comparer);
+    public static ValueEnumerable<Intersect<FromMemory<TSource>, FromEnumerable<TSource>, TSource>, TSource> Intersect<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer) => source.AsValueEnumerable().Intersect(second, comparer);
     public static ValueEnumerable<IntersectBy<FromMemory<TSource>, TEnumerator2, TSource, TKey>, TSource> IntersectBy<TEnumerator2, TSource, TKey>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector)
         where TEnumerator2 : struct, IValueEnumerator<TKey>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().IntersectBy(second, keySelector);
-    public static ValueEnumerable<IntersectBy<FromMemory<TSource>, TEnumerator2, TSource, TKey>, TSource> IntersectBy<TEnumerator2, TSource, TKey>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+    public static ValueEnumerable<IntersectBy<FromMemory<TSource>, TEnumerator2, TSource, TKey>, TSource> IntersectBy<TEnumerator2, TSource, TKey>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
         where TEnumerator2 : struct, IValueEnumerator<TKey>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().IntersectBy(second, keySelector, comparer);
     public static ValueEnumerable<IntersectBy<FromMemory<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> IntersectBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().IntersectBy(second, keySelector);
-    public static ValueEnumerable<IntersectBy<FromMemory<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> IntersectBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().IntersectBy(second, keySelector, comparer);
+    public static ValueEnumerable<IntersectBy<FromMemory<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> IntersectBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().IntersectBy(second, keySelector, comparer);
     public static ValueEnumerable<Join<FromMemory<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> Join<TEnumerator2, TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector);
-    public static ValueEnumerable<Join<FromMemory<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> Join<TEnumerator2, TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer)
+    public static ValueEnumerable<Join<FromMemory<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> Join<TEnumerator2, TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey>? comparer)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
     public static ValueEnumerable<Join<FromMemory<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> Join<TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector) => source.AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector);
-    public static ValueEnumerable<Join<FromMemory<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> Join<TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<Join<FromMemory<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> Join<TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().Join(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
     public static TSource Last<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().Last();
     public static TSource Last<TSource>(this ReadOnlyMemory<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Last(predicate);
     public static TSource? LastOrDefault<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().LastOrDefault();
@@ -178,34 +178,34 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
-    public static ValueEnumerable<LeftJoin<FromMemory<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> LeftJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner?, TResult> resultSelector, IEqualityComparer<TKey> comparer)
+    public static ValueEnumerable<LeftJoin<FromMemory<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> LeftJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner?, TResult> resultSelector, IEqualityComparer<TKey>? comparer)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
     public static ValueEnumerable<LeftJoin<FromMemory<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner?, TResult> resultSelector) => source.AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
-    public static ValueEnumerable<LeftJoin<FromMemory<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner?, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<LeftJoin<FromMemory<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner?, TResult> resultSelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().LeftJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
     public static Int64 LongCount<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().LongCount();
     public static Int64 LongCount<TSource>(this ReadOnlyMemory<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().LongCount(predicate);
     public static TResult? Max<TSource, TResult>(this ReadOnlyMemory<TSource> source, Func<TSource, TResult> selector) => source.AsValueEnumerable().Max(selector);
     public static TSource? Max<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().Max();
-    public static TSource? Max<TSource>(this ReadOnlyMemory<TSource> source, IComparer<TSource> comparer) => source.AsValueEnumerable().Max(comparer);
+    public static TSource? Max<TSource>(this ReadOnlyMemory<TSource> source, IComparer<TSource>? comparer) => source.AsValueEnumerable().Max(comparer);
     public static TSource? MaxBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().MaxBy(keySelector);
-    public static TSource? MaxBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer) => source.AsValueEnumerable().MaxBy(keySelector, comparer);
+    public static TSource? MaxBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer) => source.AsValueEnumerable().MaxBy(keySelector, comparer);
     public static TResult? Min<TSource, TResult>(this ReadOnlyMemory<TSource> source, Func<TSource, TResult> selector) => source.AsValueEnumerable().Min(selector);
     public static TSource? Min<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().Min();
-    public static TSource? Min<TSource>(this ReadOnlyMemory<TSource> source, IComparer<TSource> comparer) => source.AsValueEnumerable().Min(comparer);
+    public static TSource? Min<TSource>(this ReadOnlyMemory<TSource> source, IComparer<TSource>? comparer) => source.AsValueEnumerable().Min(comparer);
     public static TSource? MinBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().MinBy(keySelector);
-    public static TSource? MinBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer) => source.AsValueEnumerable().MinBy(keySelector, comparer);
+    public static TSource? MinBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer) => source.AsValueEnumerable().MinBy(keySelector, comparer);
     public static ValueEnumerable<OrderBy<FromMemory<TSource>, TSource, TSource>, TSource> Order<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().Order();
-    public static ValueEnumerable<OrderBy<FromMemory<TSource>, TSource, TSource>, TSource> Order<TSource>(this ReadOnlyMemory<TSource> source, IComparer<TSource> comparer) => source.AsValueEnumerable().Order(comparer);
+    public static ValueEnumerable<OrderBy<FromMemory<TSource>, TSource, TSource>, TSource> Order<TSource>(this ReadOnlyMemory<TSource> source, IComparer<TSource>? comparer) => source.AsValueEnumerable().Order(comparer);
     public static ValueEnumerable<OrderBy<FromMemory<TSource>, TSource, TSource>, TSource> OrderDescending<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().OrderDescending();
-    public static ValueEnumerable<OrderBy<FromMemory<TSource>, TSource, TSource>, TSource> OrderDescending<TSource>(this ReadOnlyMemory<TSource> source, IComparer<TSource> comparer) => source.AsValueEnumerable().OrderDescending(comparer);
+    public static ValueEnumerable<OrderBy<FromMemory<TSource>, TSource, TSource>, TSource> OrderDescending<TSource>(this ReadOnlyMemory<TSource> source, IComparer<TSource>? comparer) => source.AsValueEnumerable().OrderDescending(comparer);
     public static ValueEnumerable<OrderBy<FromMemory<TSource>, TSource, TKey>, TSource> OrderBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().OrderBy(keySelector);
-    public static ValueEnumerable<OrderBy<FromMemory<TSource>, TSource, TKey>, TSource> OrderBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer) => source.AsValueEnumerable().OrderBy(keySelector, comparer);
+    public static ValueEnumerable<OrderBy<FromMemory<TSource>, TSource, TKey>, TSource> OrderBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer) => source.AsValueEnumerable().OrderBy(keySelector, comparer);
     public static ValueEnumerable<OrderBy<FromMemory<TSource>, TSource, TKey>, TSource> OrderByDescending<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().OrderByDescending(keySelector);
-    public static ValueEnumerable<OrderBy<FromMemory<TSource>, TSource, TKey>, TSource> OrderByDescending<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey> comparer) => source.AsValueEnumerable().OrderByDescending(keySelector, comparer);
+    public static ValueEnumerable<OrderBy<FromMemory<TSource>, TSource, TKey>, TSource> OrderByDescending<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer) => source.AsValueEnumerable().OrderByDescending(keySelector, comparer);
     public static ValueEnumerable<Prepend<FromMemory<TSource>, TSource>, TSource> Prepend<TSource>(this ReadOnlyMemory<TSource> source, TSource element) => source.AsValueEnumerable().Prepend(element);
     public static ValueEnumerable<Reverse<FromMemory<TSource>, TSource>, TSource> Reverse<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().Reverse();
     public static ValueEnumerable<RightJoin<FromMemory<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector)
@@ -214,14 +214,14 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
-    public static ValueEnumerable<RightJoin<FromMemory<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer)
+    public static ValueEnumerable<RightJoin<FromMemory<TOuter>, TEnumerator2, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TEnumerator2, TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, ValueEnumerable<TEnumerator2, TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector, IEqualityComparer<TKey>? comparer)
         where TEnumerator2 : struct, IValueEnumerator<TInner>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
     public static ValueEnumerable<RightJoin<FromMemory<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector) => source.AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector);
-    public static ValueEnumerable<RightJoin<FromMemory<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
+    public static ValueEnumerable<RightJoin<FromMemory<TOuter>, FromEnumerable<TInner>, TOuter, TInner, TKey, TResult>, TResult> RightJoin<TOuter, TInner, TKey, TResult>(this ReadOnlyMemory<TOuter> source, IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter?, TInner, TResult> resultSelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().RightJoin(inner, outerKeySelector, innerKeySelector, resultSelector, comparer);
     public static ValueEnumerable<Select<FromMemory<TSource>, TSource, TResult>, TResult> Select<TSource, TResult>(this ReadOnlyMemory<TSource> source, Func<TSource, TResult> selector) => source.AsValueEnumerable().Select(selector);
     public static ValueEnumerable<Select2<FromMemory<TSource>, TSource, TResult>, TResult> Select<TSource, TResult>(this ReadOnlyMemory<TSource> source, Func<TSource, Int32, TResult> selector) => source.AsValueEnumerable().Select(selector);
     public static ValueEnumerable<SelectMany<FromMemory<TSource>, TEnumerator2, TSource, TResult>, TResult> SelectMany<TEnumerator2, TSource, TResult>(this ReadOnlyMemory<TSource> source, Func<TSource, ValueEnumerable<TEnumerator2, TResult>> selector)
@@ -253,14 +253,14 @@ internal static partial class ZLinqDropInExtensions
     public static ValueEnumerable<SelectMany3<FromMemory<TSource>, TSource, TCollection, TResult>, TResult> SelectMany<TSource, TCollection, TResult>(this ReadOnlyMemory<TSource> source, Func<TSource, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector) => source.AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
     public static ValueEnumerable<SelectMany4<FromMemory<TSource>, TSource, TCollection, TResult>, TResult> SelectMany<TSource, TCollection, TResult>(this ReadOnlyMemory<TSource> source, Func<TSource, Int32, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector) => source.AsValueEnumerable().SelectMany(collectionSelector, resultSelector);
     public static Boolean SequenceEqual<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().SequenceEqual(second);
-    public static Boolean SequenceEqual<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().SequenceEqual(second, comparer);
+    public static Boolean SequenceEqual<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer) => source.AsValueEnumerable().SequenceEqual(second, comparer);
     public static Boolean SequenceEqual<TEnumerator2, TSource>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().SequenceEqual(second);
-    public static Boolean SequenceEqual<TEnumerator2, TSource>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource> comparer)
+    public static Boolean SequenceEqual<TEnumerator2, TSource>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource>? comparer)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -317,18 +317,18 @@ internal static partial class ZLinqDropInExtensions
     public static TSource[] ToArray<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().ToArray();
     public static (TSource[] Array, int Size) ToArrayPool<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().ToArrayPool();
     public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this ReadOnlyMemory<KeyValuePair<TKey, TValue>> source) where TKey : notnull => source.AsValueEnumerable().ToDictionary();
-    public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this ReadOnlyMemory<KeyValuePair<TKey, TValue>> source, IEqualityComparer<TKey> comparer) where TKey : notnull => source.AsValueEnumerable().ToDictionary(comparer);
+    public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this ReadOnlyMemory<KeyValuePair<TKey, TValue>> source, IEqualityComparer<TKey>? comparer) where TKey : notnull => source.AsValueEnumerable().ToDictionary(comparer);
     public static Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector) where TKey : notnull => source.AsValueEnumerable().ToDictionary(keySelector);
-    public static Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) where TKey : notnull => source.AsValueEnumerable().ToDictionary(keySelector, comparer);
+    public static Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer) where TKey : notnull => source.AsValueEnumerable().ToDictionary(keySelector, comparer);
     public static Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) where TKey : notnull => source.AsValueEnumerable().ToDictionary(keySelector, elementSelector);
-    public static Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer) where TKey : notnull => source.AsValueEnumerable().ToDictionary(keySelector, elementSelector, comparer);
+    public static Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey>? comparer) where TKey : notnull => source.AsValueEnumerable().ToDictionary(keySelector, elementSelector, comparer);
     public static HashSet<TSource> ToHashSet<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().ToHashSet();
-    public static HashSet<TSource> ToHashSet<TSource>(this ReadOnlyMemory<TSource> source, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().ToHashSet(comparer);
+    public static HashSet<TSource> ToHashSet<TSource>(this ReadOnlyMemory<TSource> source, IEqualityComparer<TSource>? comparer) => source.AsValueEnumerable().ToHashSet(comparer);
     public static List<TSource> ToList<TSource>(this ReadOnlyMemory<TSource> source) => source.AsValueEnumerable().ToList();
     public static ILookup<TKey, TSource> ToLookup<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().ToLookup(keySelector);
-    public static ILookup<TKey, TSource> ToLookup<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().ToLookup(keySelector, comparer);
+    public static ILookup<TKey, TSource> ToLookup<TSource, TKey>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().ToLookup(keySelector, comparer);
     public static ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) => source.AsValueEnumerable().ToLookup(keySelector, elementSelector);
-    public static ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().ToLookup(keySelector, elementSelector, comparer);
+    public static ILookup<TKey, TElement> ToLookup<TSource, TKey, TElement>(this ReadOnlyMemory<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().ToLookup(keySelector, elementSelector, comparer);
     public static Boolean TryGetNonEnumeratedCount<TSource>(this ReadOnlyMemory<TSource> source, out Int32 count) => source.AsValueEnumerable().TryGetNonEnumeratedCount(out count);
     public static ValueEnumerable<Union<FromMemory<TSource>, TEnumerator2, TSource>, TSource> Union<TEnumerator2, TSource>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
@@ -336,28 +336,28 @@ internal static partial class ZLinqDropInExtensions
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Union(second);
-    public static ValueEnumerable<Union<FromMemory<TSource>, TEnumerator2, TSource>, TSource> Union<TEnumerator2, TSource>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource> comparer)
+    public static ValueEnumerable<Union<FromMemory<TSource>, TEnumerator2, TSource>, TSource> Union<TEnumerator2, TSource>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second, IEqualityComparer<TSource>? comparer)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().Union(second, comparer);
     public static ValueEnumerable<Union<FromMemory<TSource>, FromEnumerable<TSource>, TSource>, TSource> Union<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second) => source.AsValueEnumerable().Union(second);
-    public static ValueEnumerable<Union<FromMemory<TSource>, FromEnumerable<TSource>, TSource>, TSource> Union<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource> comparer) => source.AsValueEnumerable().Union(second, comparer);
+    public static ValueEnumerable<Union<FromMemory<TSource>, FromEnumerable<TSource>, TSource>, TSource> Union<TSource>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer) => source.AsValueEnumerable().Union(second, comparer);
     public static ValueEnumerable<UnionBy<FromMemory<TSource>, TEnumerator2, TSource, TKey>, TSource> UnionBy<TEnumerator2, TSource, TKey>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second, Func<TSource, TKey> keySelector)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().UnionBy(second, keySelector);
-    public static ValueEnumerable<UnionBy<FromMemory<TSource>, TEnumerator2, TSource, TKey>, TSource> UnionBy<TEnumerator2, TSource, TKey>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+    public static ValueEnumerable<UnionBy<FromMemory<TSource>, TEnumerator2, TSource, TKey>, TSource> UnionBy<TEnumerator2, TSource, TKey>(this ReadOnlyMemory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
         where TEnumerator2 : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
 #endif
  => source.AsValueEnumerable().UnionBy(second, keySelector, comparer);
     public static ValueEnumerable<UnionBy<FromMemory<TSource>, FromEnumerable<TSource>, TSource, TKey>, TSource> UnionBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector) => source.AsValueEnumerable().UnionBy(second, keySelector);
-    public static ValueEnumerable<UnionBy<FromMemory<TSource>, FromEnumerable<TSource>, TSource, TKey>, TSource> UnionBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer) => source.AsValueEnumerable().UnionBy(second, keySelector, comparer);
+    public static ValueEnumerable<UnionBy<FromMemory<TSource>, FromEnumerable<TSource>, TSource, TKey>, TSource> UnionBy<TSource, TKey>(this ReadOnlyMemory<TSource> source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer) => source.AsValueEnumerable().UnionBy(second, keySelector, comparer);
     public static ValueEnumerable<Where<FromMemory<TSource>, TSource>, TSource> Where<TSource>(this ReadOnlyMemory<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Where(predicate);
     public static ValueEnumerable<Where2<FromMemory<TSource>, TSource>, TSource> Where<TSource>(this ReadOnlyMemory<TSource> source, Func<TSource, Int32, Boolean> predicate) => source.AsValueEnumerable().Where(predicate);
     public static ValueEnumerable<Zip<FromMemory<TFirst>, TEnumerator2, TFirst, TSecond>, (TFirst First, TSecond Second)> Zip<TEnumerator2, TFirst, TSecond>(this ReadOnlyMemory<TFirst> source, ValueEnumerable<TEnumerator2, TSecond> second)
