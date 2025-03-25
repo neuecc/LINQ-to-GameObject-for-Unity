@@ -14,6 +14,7 @@
     <Project Path="src/ZLinq/ZLinq.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/System.Linq.Tests/System.Linq.Tests.csproj" />
     <Project Path="tests/ZLinq.Tests/ZLinq.Tests.csproj" />
   </Folder>
 </Solution>

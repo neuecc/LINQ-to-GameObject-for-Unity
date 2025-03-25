@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- net9.0 is ref struct so use net8.0 -->
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <LangVersion>13</LangVersion>
+    <IsPackable>false</IsPackable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>8632</NoWarn>
+
+    <!-- Microsoft.Testing.Platform Support -->
+    <OutputType>Exe</OutputType>
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+  </PropertyGroup>
+  <!-- Add .NET 10 support when running build inside Visual Studio Preview-->
+  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != '' AND $(VisualStudioDir.Contains('Preview'))">
+    <TargetFrameworks>$(TargetFrameworks);net10.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <PackageReference Include="xunit.core" Version="2.9.2" IsImplicitlyDefined="true" PrivateAssets="all" Publish="true" ExcludeAssets="build" />
+    <!--<PackageReference Include="xunit.analyzers" Version="1.4.0" IsImplicitlyDefined="true" PrivateAssets="all" Publish="true" />-->
+
+    <PackageReference Include="xunit.assert" Version="$2.9.2" IsImplicitlyDefined="true" PrivateAssets="all" Publish="true" Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'" />
+    <PackageReference Include="Microsoft.DotNet.XUnitAssert" Version="2.9.2-beta.25157.1" IsImplicitlyDefined="true" PrivateAssets="all" Publish="true" Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'" />
+
+    <PackageReference Include="Microsoft.DotNet.XUnitExtensions" Version="10.0.0-beta.25157.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ZLinq.DropInGenerator\ZLinq.DropInGenerator.csproj">
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="ZLinq" />
+    <Using Include="ZLinq.Linq" />
+    <Using Include="System" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Linq.Tests" />
+  </ItemGroup>
+</Project>
