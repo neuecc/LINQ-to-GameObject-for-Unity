@@ -309,4 +309,16 @@ public class TakeTest
         // ZLinq
         Assert.Equal(0, source.AsValueEnumerable().Take(0..0).LastOrDefault());
     }
+
+    [Fact]
+    public void T5()
+    {
+        int[] source = [1, 2, 3, 4, 5];
+
+        // System.Linq
+        Assert.Empty(source.Take(int.MaxValue..^int.MaxValue).ToArray());
+
+        // ZLinq
+        Assert.Empty(source.AsValueEnumerable().Take(int.MaxValue..^int.MaxValue).ToArray());
+    }
 }

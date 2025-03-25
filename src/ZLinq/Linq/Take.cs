@@ -149,7 +149,7 @@ namespace ZLinq.Linq
 
                 this.skipIndex = start;
                 this.remains = end - start;
-                if (remains < 0)
+                if (end <= 0 || remains < 0)
                 {
                     this.remains = 0; // isEmpty
                 }

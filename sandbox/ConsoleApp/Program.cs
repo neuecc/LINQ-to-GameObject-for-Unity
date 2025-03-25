@@ -23,19 +23,18 @@ using ZLinq.Traversables;
 //byte.MaxValue
 // 2147483647
 
-[assembly: ZLinq.ZLinqDropInAttribute("", ZLinq.DropInGenerateTypes.Everything, DisableEmitSource = false)]
+[assembly: ZLinq.ZLinqDropInAttribute("", ZLinq.DropInGenerateTypes.Everything, DisableEmitSource = true)]
 
 // Enumerable.Range(1, 10).ToDictionary();
 //var tako = ValueEnumerable.Range(1, 10).Select(x => x.ToString());
 //var ok = string.Join(',', tako);
 
-string[]? source = [];
 
-// ZLinq
-source.AsValueEnumerable().Order(comparer: null); // No warning
+int[] source = [1, 2, 3, 4, 5];
 
-// ZLinq (with Drop-in replacement)
-source.Order(comparer: null);
+// System.Linq
+source.Take(int.MaxValue..^int.MaxValue).ToArray();
+source.AsValueEnumerable().Take(int.MaxValue..^int.MaxValue).ToArray();
 
 
 static IEnumerable<T> ForceNotCollection<T>(IEnumerable<T> source)
