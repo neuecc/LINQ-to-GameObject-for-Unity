@@ -1,4 +1,6 @@
-﻿namespace ZLinq
+﻿using System;
+
+namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -27,6 +29,7 @@
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(predicate);
             var enumerator = source.Enumerator;
             try
             {
@@ -84,6 +87,7 @@
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(predicate);
             var enumerator = source.Enumerator;
             try
             {
@@ -103,6 +107,7 @@
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(predicate);
             var enumerator = source.Enumerator;
             try
             {

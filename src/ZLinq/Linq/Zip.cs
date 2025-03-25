@@ -37,7 +37,7 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, second.Enumerator, resultSelector));
+            => new(new(source.Enumerator, second.Enumerator, Throws.IfNull(resultSelector)));
 
 
         public static ValueEnumerable<Zip<TEnumerator, FromEnumerable<TSecond>, TFirst, TSecond>, (TFirst First, TSecond Second)> Zip<TEnumerator, TFirst, TSecond>(this ValueEnumerable<TEnumerator, TFirst> source, IEnumerable<TSecond> second)
@@ -45,21 +45,21 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, second.AsValueEnumerable().Enumerator));
+            => new(new(source.Enumerator, Throws.IfNull(second).AsValueEnumerable().Enumerator));
 
         public static ValueEnumerable<Zip<TEnumerator, FromEnumerable<TSecond>, FromEnumerable<TThird>, TFirst, TSecond, TThird>, (TFirst First, TSecond Second, TThird Third)> Zip<TEnumerator, TFirst, TSecond, TThird>(this ValueEnumerable<TEnumerator, TFirst> source, IEnumerable<TSecond> second, IEnumerable<TThird> third)
             where TEnumerator : struct, IValueEnumerator<TFirst>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, second.AsValueEnumerable().Enumerator, third.AsValueEnumerable().Enumerator));
+            => new(new(source.Enumerator, Throws.IfNull(second).AsValueEnumerable().Enumerator, Throws.IfNull(third).AsValueEnumerable().Enumerator));
 
         public static ValueEnumerable<Zip<TEnumerator, FromEnumerable<TSecond>, TFirst, TSecond, TResult>, TResult> Zip<TEnumerator, TFirst, TSecond, TResult>(this ValueEnumerable<TEnumerator, TFirst> source, IEnumerable<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector)
             where TEnumerator : struct, IValueEnumerator<TFirst>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, second.AsValueEnumerable().Enumerator, resultSelector));
+            => new(new(source.Enumerator, Throws.IfNull(second).AsValueEnumerable().Enumerator, Throws.IfNull(resultSelector)));
     }
 }
 

@@ -11,7 +11,7 @@
 #if NET9_0_OR_GREATER
            , allows ref struct
 #endif
-            => new(new(source.Enumerator, selector));
+            => new(new(source.Enumerator, Throws.IfNull(selector)));
 
         public static ValueEnumerable<SelectMany2<TEnumerator, TEnumerator2, TSource, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, int, ValueEnumerable<TEnumerator2, TResult>> selector)
             where TEnumerator : struct, IValueEnumerator<TSource>
@@ -22,7 +22,7 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, selector));
+            => new(new(source.Enumerator, Throws.IfNull(selector)));
 
         public static ValueEnumerable<SelectMany3<TEnumerator, TEnumerator2, TSource, TCollection, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
@@ -33,7 +33,7 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, collectionSelector, resultSelector));
+            => new(new(source.Enumerator, Throws.IfNull(collectionSelector), Throws.IfNull(resultSelector)));
 
         public static ValueEnumerable<SelectMany4<TEnumerator, TEnumerator2, TSource, TCollection, TResult>, TResult> SelectMany<TEnumerator, TEnumerator2, TSource, TCollection, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, int, ValueEnumerable<TEnumerator2, TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
@@ -44,7 +44,7 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, collectionSelector, resultSelector));
+            => new(new(source.Enumerator, Throws.IfNull(collectionSelector), Throws.IfNull(resultSelector)));
 
         // IEnumerable<T> valiation
 
@@ -53,28 +53,28 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, selector));
+            => new(new(source.Enumerator, Throws.IfNull(selector)));
 
         public static ValueEnumerable<SelectMany2<TEnumerator, TSource, TResult>, TResult> SelectMany<TEnumerator, TSource, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, int, IEnumerable<TResult>> selector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, selector));
+            => new(new(source.Enumerator, Throws.IfNull(selector)));
 
         public static ValueEnumerable<SelectMany3<TEnumerator, TSource, TCollection, TResult>, TResult> SelectMany<TEnumerator, TSource, TCollection, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, collectionSelector, resultSelector));
+            => new(new(source.Enumerator, Throws.IfNull(collectionSelector), Throws.IfNull(resultSelector)));
 
         public static ValueEnumerable<SelectMany4<TEnumerator, TSource, TCollection, TResult>, TResult> SelectMany<TEnumerator, TSource, TCollection, TResult>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, int, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, collectionSelector, resultSelector));
+            => new(new(source.Enumerator, Throws.IfNull(collectionSelector), Throws.IfNull(resultSelector)));
     }
 }
 

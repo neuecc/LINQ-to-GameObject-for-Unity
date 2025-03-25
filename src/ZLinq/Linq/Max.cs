@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace ZLinq;
@@ -11,6 +12,8 @@ partial class ValueEnumerableExtensions
             , allows ref struct
 #endif
     {
+        ArgumentNullException.ThrowIfNull(selector);
+
         // If inlined, we could expect a slight performance improvement,
         // but since ZLinq's iteration is already sufficiently fast with no allocations, we'll use Select as is.
         return source.Select(selector).Max();

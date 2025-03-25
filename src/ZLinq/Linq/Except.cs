@@ -30,14 +30,14 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-    => new(new(source.Enumerator, second.AsValueEnumerable(), null));
+    => new(new(source.Enumerator, Throws.IfNull(second).AsValueEnumerable(), null));
 
         public static ValueEnumerable<Except<TEnumerator, FromEnumerable<TSource>, TSource>, TSource> Except<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, second.AsValueEnumerable(), comparer));
+            => new(new(source.Enumerator, Throws.IfNull(second).AsValueEnumerable(), comparer));
     }
 }
 

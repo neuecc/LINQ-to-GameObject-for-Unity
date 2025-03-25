@@ -27,6 +27,7 @@
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(predicate);
             var enumerator = source.Enumerator;
             try
             {
@@ -84,6 +85,7 @@
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(predicate);
             var enumerator = source.Enumerator;
             try
             {
@@ -103,6 +105,7 @@
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(predicate);
             var enumerator = source.Enumerator;
             try
             {

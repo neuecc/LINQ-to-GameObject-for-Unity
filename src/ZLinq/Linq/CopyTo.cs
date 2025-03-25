@@ -44,6 +44,8 @@ partial class ValueEnumerableExtensions
     , allows ref struct
 #endif
     {
+        ArgumentNullException.ThrowIfNull(list);
+
         list.Clear(); // clear before fill.
 
         using var enumerator = source.Enumerator;

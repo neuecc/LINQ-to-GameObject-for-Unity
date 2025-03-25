@@ -59,6 +59,8 @@
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(keySelector);
+
             using var enumerator = source.Enumerator;
             if (enumerator.TryGetSpan(out var span))
             {
@@ -99,6 +101,9 @@
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(keySelector);
+            ArgumentNullException.ThrowIfNull(elementSelector);
+
             using var enumerator = source.Enumerator;
             if (enumerator.TryGetSpan(out var span))
             {

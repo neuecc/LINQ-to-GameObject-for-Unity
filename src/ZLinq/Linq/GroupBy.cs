@@ -70,7 +70,7 @@ namespace ZLinq.Linq
 #else
     public
 #endif
-    struct GroupBy<TEnumerator, TSource, TKey>(TEnumerator source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
+    struct GroupBy<TEnumerator, TSource, TKey>(TEnumerator source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
         : IValueEnumerator<IGrouping<TKey, TSource>>
         where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER

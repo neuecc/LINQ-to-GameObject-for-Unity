@@ -8,7 +8,7 @@
             , allows ref struct
 #endif
         {
-            return SequenceEqual(source, second.AsValueEnumerable(), null);
+            return SequenceEqual(source, Throws.IfNull(second).AsValueEnumerable(), null);
         }
 
         public static Boolean SequenceEqual<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second, IEqualityComparer<TSource>? comparer) // comaprer is nullable
@@ -17,7 +17,7 @@
             , allows ref struct
 #endif
         {
-            return SequenceEqual(source, second.AsValueEnumerable(), comparer);
+            return SequenceEqual(source, Throws.IfNull(second).AsValueEnumerable(), comparer);
         }
 
         public static Boolean SequenceEqual<TEnumerator, TEnumerator2, TSource>(this ValueEnumerable<TEnumerator, TSource> source, ValueEnumerable<TEnumerator2, TSource> second)

@@ -1,4 +1,6 @@
-﻿namespace ZLinq
+﻿using System;
+
+namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -7,21 +9,21 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, predicate));
+            => new(new(source.Enumerator, Throws.IfNull(predicate)));
 
         public static ValueEnumerable<Where2<TEnumerator, TSource>, TSource> Where<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source, Func<TSource, Int32, Boolean> predicate)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, predicate));
+            => new(new(source.Enumerator, Throws.IfNull(predicate)));
 
         public static ValueEnumerable<WhereSelect<TEnumerator, TSource, TResult>, TResult> Select<TEnumerator, TSource, TResult>(this ValueEnumerable<Where<TEnumerator, TSource>, TSource> source, Func<TSource, TResult> selector)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(source.Enumerator.Select(selector));
+            => new(source.Enumerator.Select(Throws.IfNull(selector)));
     }
 }
 

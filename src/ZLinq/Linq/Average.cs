@@ -18,6 +18,7 @@ partial class ValueEnumerableExtensions
         , INumber<TResult>
 #endif
     {
+        ArgumentNullException.ThrowIfNull(selector);
         return source.Select(selector).Average();
     }
 

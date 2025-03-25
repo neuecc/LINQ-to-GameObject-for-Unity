@@ -11,7 +11,7 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, second, Throws.IfNull(keySelector), null));
+            => new(new(source.Enumerator, second.Enumerator, Throws.IfNull(keySelector), null));
 
         public static ValueEnumerable<UnionBy<TEnumerator, TEnumerator2, TSource, TKey>, TSource> UnionBy<TEnumerator, TEnumerator2, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, ValueEnumerable<TEnumerator2, TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
@@ -22,7 +22,7 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, second, Throws.IfNull(keySelector), comparer));
+            => new(new(source.Enumerator, second.Enumerator, Throws.IfNull(keySelector), comparer));
 
         public static ValueEnumerable<UnionBy<TEnumerator, FromEnumerable<TSource>, TSource, TKey>, TSource> UnionBy<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector)
             where TEnumerator : struct, IValueEnumerator<TSource>
@@ -30,9 +30,8 @@
             , allows ref struct
 #endif
         {
-            ArgumentNullException.ThrowIfNull(second);
             ArgumentNullException.ThrowIfNull(keySelector);
-            return new(new(source.Enumerator, second.AsValueEnumerable().Enumerator, keySelector, null));
+            return new(new(source.Enumerator, Throws.IfNull(second).AsValueEnumerable().Enumerator, Throws.IfNull(keySelector), null));
         }
 
         public static ValueEnumerable<UnionBy<TEnumerator, FromEnumerable<TSource>, TSource, TKey>, TSource> UnionBy<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TSource> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
@@ -41,10 +40,8 @@
             , allows ref struct
 #endif
         {
-            ArgumentNullException.ThrowIfNull(second);
             ArgumentNullException.ThrowIfNull(keySelector);
-            ArgumentNullException.ThrowIfNull(comparer);
-            return new(new(source.Enumerator, second.AsValueEnumerable().Enumerator, keySelector, comparer));
+            return new(new(source.Enumerator, Throws.IfNull(second).AsValueEnumerable().Enumerator, Throws.IfNull(keySelector), comparer));
         }
     }
 }

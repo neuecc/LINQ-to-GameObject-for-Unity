@@ -18,6 +18,8 @@ partial class ValueEnumerableExtensions
         , INumber<TResult>
 #endif
     {
+        ArgumentNullException.ThrowIfNull(selector);
+
 #if NET8_0_OR_GREATER
         using (var enumerator = source.Enumerator)
         {

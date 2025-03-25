@@ -8,6 +8,7 @@
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(keySelector);
             return MinBy(source, keySelector, null);
         }
 
@@ -17,6 +18,7 @@
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(keySelector);
             comparer ??= Comparer<TKey>.Default;
 
             using (var enumerator = source.Enumerator)

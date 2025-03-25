@@ -23,6 +23,8 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(keySelector);
+
             var lookupBuilder = new LookupBuilder<TKey, TSource>(comparer ?? EqualityComparer<TKey>.Default);
             using (var enumerator = source.Enumerator)
             {
@@ -60,6 +62,9 @@ namespace ZLinq
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(keySelector);
+            ArgumentNullException.ThrowIfNull(elementSelector);
+
             var lookupBuilder = new LookupBuilder<TKey, TElement>(comparer ?? EqualityComparer<TKey>.Default);
             using (var enumerator = source.Enumerator)
             {

@@ -11,17 +11,17 @@ namespace ZLinq
     {
         public static ValueEnumerable<FromEnumerable<T>, T> AsValueEnumerable<T>(this IEnumerable<T> source)
         {
-            return new(new(source));
+            return new(new(Throws.IfNull(source)));
         }
 
         public static ValueEnumerable<FromArray<T>, T> AsValueEnumerable<T>(this T[] source)
         {
-            return new(new(source));
+            return new(new(Throws.IfNull(source)));
         }
 
         public static ValueEnumerable<FromList<T>, T> AsValueEnumerable<T>(this List<T> source)
         {
-            return new(new(source));
+            return new(new(Throws.IfNull(source)));
         }
 
         public static ValueEnumerable<FromMemory<T>, T> AsValueEnumerable<T>(this ArraySegment<T> source)
@@ -49,27 +49,27 @@ namespace ZLinq
         public static ValueEnumerable<FromDictionary<TKey, TValue>, KeyValuePair<TKey, TValue>> AsValueEnumerable<TKey, TValue>(this Dictionary<TKey, TValue> source)
             where TKey : notnull
         {
-            return new(new(source));
+            return new(new(Throws.IfNull(source)));
         }
 
         public static ValueEnumerable<FromQueue<T>, T> AsValueEnumerable<T>(this Queue<T> source)
         {
-            return new(new(source));
+            return new(new(Throws.IfNull(source)));
         }
 
         public static ValueEnumerable<FromStack<T>, T> AsValueEnumerable<T>(this Stack<T> source)
         {
-            return new(new(source));
+            return new(new(Throws.IfNull(source)));
         }
 
         public static ValueEnumerable<FromLinkedList<T>, T> AsValueEnumerable<T>(this LinkedList<T> source)
         {
-            return new(new(source));
+            return new(new(Throws.IfNull(source)));
         }
 
         public static ValueEnumerable<FromHashSet<T>, T> AsValueEnumerable<T>(this HashSet<T> source)
         {
-            return new(new(source));
+            return new(new(Throws.IfNull(source)));
         }
 
 #if NET8_0_OR_GREATER

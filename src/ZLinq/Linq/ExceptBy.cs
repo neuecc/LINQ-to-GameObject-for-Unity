@@ -29,14 +29,14 @@
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, second.AsValueEnumerable(), Throws.IfNull(keySelector), null));
+            => new(new(source.Enumerator, Throws.IfNull(second).AsValueEnumerable(), Throws.IfNull(keySelector), null));
 
         public static ValueEnumerable<ExceptBy<TEnumerator, FromEnumerable<TKey>, TSource, TKey>, TSource> ExceptBy<TEnumerator, TSource, TKey>(this ValueEnumerable<TEnumerator, TSource> source, IEnumerable<TKey> second, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer)
             where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
             , allows ref struct
 #endif
-            => new(new(source.Enumerator, second.AsValueEnumerable(), Throws.IfNull(keySelector), comparer));
+            => new(new(source.Enumerator, Throws.IfNull(second).AsValueEnumerable(), Throws.IfNull(keySelector), comparer));
     }
 }
 

@@ -8,6 +8,8 @@
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(predicate);
+
             using (var enumerator = source.Enumerator)
             {
                 if (enumerator.TryGetSpan(out var span))

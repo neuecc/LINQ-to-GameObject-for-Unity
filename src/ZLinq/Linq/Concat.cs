@@ -1,4 +1,6 @@
-﻿namespace ZLinq
+﻿using System;
+
+namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -20,6 +22,7 @@
             , allows ref struct
 #endif
         {
+            ArgumentNullException.ThrowIfNull(second);
             return Concat(source, second.AsValueEnumerable());
         }
     }
