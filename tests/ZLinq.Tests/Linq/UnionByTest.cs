@@ -1,4 +1,6 @@
-﻿using System;
+﻿#pragma warning disable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Shouldly;
@@ -298,12 +300,12 @@ namespace ZLinq.Tests.Linq
         public void TryGetNonEnumeratedCountReturnsFalse()
         {
             // Arrange
-            var first = new[] 
+            var first = new[]
             {
                 new Person("Alice", 25),
                 new Person("Bob", 30)
             }.AsValueEnumerable();
-            var second = new[] 
+            var second = new[]
             {
                 new Person("Charlie", 35)
             }.AsValueEnumerable();
@@ -321,12 +323,12 @@ namespace ZLinq.Tests.Linq
         public void TryGetSpanReturnsFalse()
         {
             // Arrange
-            var first = new[] 
+            var first = new[]
             {
                 new Person("Alice", 25),
                 new Person("Bob", 30)
             }.AsValueEnumerable();
-            var second = new[] 
+            var second = new[]
             {
                 new Person("Charlie", 35)
             }.AsValueEnumerable();
@@ -344,12 +346,12 @@ namespace ZLinq.Tests.Linq
         public void TryCopyToReturnsFalse()
         {
             // Arrange
-            var first = new[] 
+            var first = new[]
             {
                 new Person("Alice", 25),
                 new Person("Bob", 30)
             }.AsValueEnumerable();
-            var second = new[] 
+            var second = new[]
             {
                 new Person("Charlie", 35)
             }.AsValueEnumerable();
@@ -473,7 +475,7 @@ namespace ZLinq.Tests.Linq
         {
             // This test indirectly verifies that the HashSetSlim is disposed,
             // though we can't directly check it since it's an implementation detail
-            
+
             // Arrange
             var first = new[]
             {
@@ -485,11 +487,11 @@ namespace ZLinq.Tests.Linq
                 new Person("Bob", 35),
                 new Person("Charlie", 40)
             };
-            
+
             // Act & Assert - no memory leak or exception
             var unionBy = first.AsValueEnumerable().UnionBy(second, p => p.Name);
             var result = unionBy.ToArray();
-            
+
             result.Length.ShouldBe(3);
             // If there's a memory leak, it won't be caught by this test directly
             // But at least we know the operation completes without throwing
