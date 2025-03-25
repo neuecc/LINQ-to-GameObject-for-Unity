@@ -58,13 +58,36 @@ namespace ZLinq.Linq
             return false;
         }
 
-        public bool TryCopyTo(Span<TSource> destination, Index offset) // TODO: impl
+        public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
-            if (TryGetSpan(out var span) && span.Length <= destination.Length)
+            if (source.TryGetNonEnumeratedCount(out var count))
             {
-                span.CopyTo(destination);
-                return true;
+                var actualTakeCount = Math.Min(count, takeCount);
+                if (actualTakeCount <= 0)
+                {
+                    return false;
+                }
+
+                var takeLastStartIndex = count - actualTakeCount;
+                var offsetInTakeLast = offset.GetOffset(actualTakeCount);
+
+                if (offsetInTakeLast < 0 || offsetInTakeLast >= actualTakeCount)
+                {
+                    return false;
+                }
+
+                var sourceOffset = takeLastStartIndex + offsetInTakeLast;
+                var remainingElements = actualTakeCount - offsetInTakeLast;
+                var elementsToCopy = Math.Min(remainingElements, destination.Length);
+
+                if (elementsToCopy <= 0)
+                {
+                    return false;
+                }
+
+                return source.TryCopyTo(destination.Slice(0, elementsToCopy), sourceOffset);
             }
+
             return false;
         }
 

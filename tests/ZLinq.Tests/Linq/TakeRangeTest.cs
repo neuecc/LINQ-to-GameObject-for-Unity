@@ -102,6 +102,149 @@ public class TakeRangeTest(ITestOutputHelper testOutputHelper)
         span.ToArray().ShouldBe(new[] { 3, 4, 5, 6, 7 });
     }
 
+    [Fact]
+    public void TakeRange_TryCopyTo_Basic()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var takeOperation = sequence.AsValueEnumerable().Take(3..8); // Take items 4,5,6,7,8
+
+        Span<int> destination = new int[5];
+        bool result = takeOperation.TryCopyTo(destination);
+
+        result.ShouldBeTrue();
+        destination.ToArray().ShouldBe(new[] { 4, 5, 6, 7, 8 });
+    }
+
+    [Fact]
+    public void TakeRange_TryCopyTo_WithOffset()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var takeOperation = sequence.AsValueEnumerable().Take(3..8); // Take items 4,5,6,7,8
+
+        Span<int> destination = new int[3];
+        bool result = takeOperation.TryCopyTo(destination, 2); // Start from the third element (6)
+
+        result.ShouldBeTrue();
+        destination.ToArray().ShouldBe(new[] { 6, 7, 8 });
+    }
+
+    [Fact]
+    public void TakeRange_TryCopyTo_FromEnd()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var takeOperation = sequence.AsValueEnumerable().Take(3..8); // Take items 4,5,6,7,8
+
+        Span<int> destination = new int[3];
+        bool result = takeOperation.TryCopyTo(destination, ^3); // Last 3 elements (6,7,8)
+
+        result.ShouldBeTrue();
+        destination.ToArray().ShouldBe(new[] { 6, 7, 8 });
+    }
+
+    [Fact]
+    public void TakeRange_TryCopyTo_SmallDestination()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var takeOperation = sequence.AsValueEnumerable().Take(3..8); // Take items 4,5,6,7,8
+
+        Span<int> smallDestination = new int[2];
+        bool result = takeOperation.TryCopyTo(smallDestination);
+
+        result.ShouldBeTrue();
+        smallDestination.ToArray().ShouldBe(new[] { 4, 5 }); // Should only copy first 2 items
+    }
+
+    [Fact]
+    public void TakeRange_TryCopyTo_EffectiveRemainsZero()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        // Set skipIndex >= totalCount to make effectiveRemains zero
+        var takeOperation = sequence.AsValueEnumerable().Take(10..15); // Beyond array bounds
+
+        Span<int> destination = new int[5];
+        destination.Fill(-1);
+        bool result = takeOperation.TryCopyTo(destination);
+
+        result.ShouldBeFalse(); // Should fail as effectiveRemains <= 0
+        destination.ToArray().ShouldBe(new[] { -1, -1, -1, -1, -1 }); // Destination unchanged
+    }
+
+    [Fact]
+    public void TakeRange_TryCopyTo_OutOfRangeOffset()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var takeOperation = sequence.AsValueEnumerable().Take(3..8); // Take items 4,5,6,7,8
+
+        Span<int> destination = new int[5];
+        destination.Fill(-1);
+
+        // Try with offset beyond the range
+        bool result = takeOperation.TryCopyTo(destination, 10);
+
+        result.ShouldBeFalse(); // Should fail as offset is out of range
+        destination.ToArray().ShouldBe(new[] { -1, -1, -1, -1, -1 }); // Destination unchanged
+    }
+
+    [Fact]
+    public void TakeRange_TryCopyTo_EmptyRange()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var takeOperation = sequence.AsValueEnumerable().Take(5..5); // Empty range
+
+        Span<int> destination = new int[5];
+        destination.Fill(-1);
+        bool result = takeOperation.TryCopyTo(destination);
+
+        result.ShouldBeFalse(); // Should fail as the range is empty
+        destination.ToArray().ShouldBe(new[] { -1, -1, -1, -1, -1 }); // Destination unchanged
+    }
+
+    [Fact]
+    public void TakeRange_TryCopyTo_EndToEndOffsets()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+
+        // Test various range combinations
+        var tests = new[]
+        {
+        (Range: 0..5, ExpectedResult: new[] { 1, 2, 3, 4, 5 }),
+        (Range: 5..10, ExpectedResult: new[] { 6, 7, 8, 9, 10 }),
+        (Range: 0..^0, ExpectedResult: new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }),
+        (Range: ^5..^0, ExpectedResult: new[] { 6, 7, 8, 9, 10 }),
+        (Range: 0..^5, ExpectedResult: new[] { 1, 2, 3, 4, 5 })
+    };
+
+        foreach (var test in tests)
+        {
+            Span<int> destination = new int[test.ExpectedResult.Length];
+            var takeOperation = sequence.AsValueEnumerable().Take(test.Range);
+
+            bool result = takeOperation.TryCopyTo(destination);
+
+            result.ShouldBeTrue();
+            destination.ToArray().ShouldBe(test.ExpectedResult);
+        }
+    }
+
+    [Fact]
+    public void TakeRange_TryCopyTo_NoNonEnumeratedCount()
+    {
+        // Create a source that doesn't support TryGetNonEnumeratedCount
+        var nonCountableSource = new[] { 1, 2, 3, 4, 5 }
+            .AsValueEnumerable()
+            .Where(x => true); // Where operation doesn't support non-enumerated count
+
+        var takeOperation = nonCountableSource.Take(1..4);
+
+        Span<int> destination = new int[5];
+        destination.Fill(-1);
+        bool result = takeOperation.TryCopyTo(destination);
+
+        result.ShouldBeFalse(); // Should fail as we need count information
+        destination.ToArray().ShouldBe(new[] { -1, -1, -1, -1, -1 }); // Destination unchanged
+    }
+
+
     void TestRange(int[] sequence, Range range, string description)
     {
         try

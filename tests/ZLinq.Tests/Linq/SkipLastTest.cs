@@ -201,14 +201,6 @@ public class SkipLastTest
         Array.Clear(dest);
         source.SkipLast(2).TryCopyTo(dest, 2).ShouldBeTrue();
         dest.ShouldBe([3, 0, 0, 0, 0]);
-
-        Array.Clear(dest);
-        source.SkipLast(2).TryCopyTo(dest, 3).ShouldBeTrue();
-        dest.ShouldBe([0, 0, 0, 0, 0]);
-
-        Array.Clear(dest);
-        source.SkipLast(3).TryCopyTo(dest, 2).ShouldBeTrue();
-        dest.ShouldBe([0, 0, 0, 0, 0]);
     }
 
     [Fact]
@@ -223,6 +215,172 @@ public class SkipLastTest
         var expected2 = source1.Take(7).SkipLast(2).SkipLast(3).ToArray();
         source2.Take(7).SkipLast(2).SkipLast(3).ToArray().ShouldBe(expected2);
     }
+
+    [Fact]
+    public void SkipLast_TryCopyTo_EmptyCollection()
+    {
+        var emptySource = Array.Empty<int>().AsValueEnumerable();
+        var dest = new int[5];
+
+        // Empty source with skip
+        emptySource.SkipLast(3).TryCopyTo(dest, 0).ShouldBeFalse();
+        dest.ShouldBe(new int[5]); // Destination should remain unchanged
+    }
+
+    [Fact]
+    public void SkipLast_TryCopyTo_SkipCountExceedsSourceSize()
+    {
+        var source = new[] { 1, 2, 3 }.AsValueEnumerable();
+        var dest = new int[5];
+
+        // Skip more than available
+        source.SkipLast(5).TryCopyTo(dest, 0).ShouldBeFalse();
+        dest.ShouldBe(new int[5]); // Destination should remain unchanged
+    }
+
+    [Fact]
+    public void SkipLast_TryCopyTo_InvalidOffset()
+    {
+        var source = new[] { 1, 2, 3, 4, 5 }.AsValueEnumerable();
+        var dest = new int[3];
+
+        // Negative offset (in equivalent offset form)
+        source.SkipLast(2).TryCopyTo(dest, ^4).ShouldBeFalse();
+
+        // Offset beyond remaining count
+        source.SkipLast(2).TryCopyTo(dest, 3).ShouldBeFalse();
+    }
+
+    [Fact]
+    public void SkipLast_TryCopyTo_DestinationTooSmall()
+    {
+        var source = new[] { 1, 2, 3, 4, 5, 6, 7 }.AsValueEnumerable();
+        var smallDest = new int[2];
+
+        // Partial copy with small destination
+        source.SkipLast(2).TryCopyTo(smallDest, 0).ShouldBeTrue();
+        smallDest.ShouldBe(new[] { 1, 2 }); // Should copy only what fits
+
+        // With offset
+        Array.Clear(smallDest);
+        source.SkipLast(2).TryCopyTo(smallDest, 2).ShouldBeTrue();
+        smallDest.ShouldBe(new[] { 3, 4 });
+    }
+
+    [Fact]
+    public void SkipLast_TryCopyTo_FromEnd()
+    {
+        var source = new[] { 1, 2, 3, 4, 5 }.AsValueEnumerable();
+        var dest = new int[3];
+
+        // Using Index.FromEnd
+        source.SkipLast(2).TryCopyTo(dest, ^3).ShouldBeTrue();
+        dest.ShouldBe(new[] { 1, 2, 3 });
+
+        Array.Clear(dest);
+        source.SkipLast(2).TryCopyTo(dest, ^2).ShouldBeTrue();
+        dest.ShouldBe(new[] { 2, 3, 0 });
+
+        Array.Clear(dest);
+        source.SkipLast(2).TryCopyTo(dest, ^1).ShouldBeTrue();
+        dest.ShouldBe(new[] { 3, 0, 0 });
+    }
+
+    [Fact]
+    public void SkipLast_TryCopyTo_WithZeroElementsAvailable()
+    {
+        var source = new[] { 1, 2, 3 }.AsValueEnumerable();
+        var dest = new int[3];
+
+        // When element count is exactly zero after calculations
+        source.SkipLast(3).TryCopyTo(dest, 0).ShouldBeFalse();
+        dest.ShouldBe(new int[3]); // Destination should remain unchanged
+    }
+
+    [Fact]
+    public void SkipLast_TryCopyTo_WithDestinationSlicing()
+    {
+        var source = new[] { 1, 2, 3, 4, 5, 6 }.AsValueEnumerable();
+        var dest = new int[5];
+
+        // Ensure destination slicing works correctly
+        source.SkipLast(2).TryCopyTo(dest, 1).ShouldBeTrue();
+        dest.ShouldBe(new[] { 2, 3, 4, 0, 0 });
+
+        // Test with partial destination
+        Array.Clear(dest);
+        var slice = dest.AsSpan(1, 3);
+        source.SkipLast(3).TryCopyTo(slice, 0).ShouldBeTrue();
+        dest.ShouldBe(new[] { 0, 1, 2, 3, 0 });
+    }
+
+    [Fact]
+    public void SkipLast_TryCopyTo_ExactElementCount()
+    {
+        var source = new[] { 1, 2, 3, 4, 5 }.AsValueEnumerable();
+        var dest = new int[3];
+
+        // Destination length exactly matches remaining elements
+        source.SkipLast(2).TryCopyTo(dest, 0).ShouldBeTrue();
+        dest.ShouldBe(new[] { 1, 2, 3 });
+    }
+
+    [Fact]
+    public void SkipLast_TryCopyTo_ZeroElementsToCopy()
+    {
+        var source = new[] { 1, 2, 3, 4, 5 }.AsValueEnumerable();
+        var dest = new int[0];
+
+        source.SkipLast(2).TryCopyTo(dest, 2).ShouldBeFalse();
+    }
+
+    [Fact]
+    public void SkipLast_TryCopyTo_ChainedOperations()
+    {
+        var source = Enumerable.Range(1, 10).ToArray().AsValueEnumerable();
+        var dest = new int[5];
+
+        // Chain multiple operations
+        source.Skip(2).SkipLast(3).TryCopyTo(dest, 0).ShouldBeTrue();
+        dest.ShouldBe(new[] { 3, 4, 5, 6, 7 });
+
+        // With different offset
+        Array.Clear(dest);
+        source.Skip(2).SkipLast(3).TryCopyTo(dest, 2).ShouldBeTrue();
+        dest.ShouldBe(new[] { 5, 6, 7, 0, 0 });
+    }
+
+    [Fact]
+    public void SkipLast_TryCopyTo_NonEnumerableSourceCount()
+    {
+        // Create a custom enumerable that doesn't implement TryGetNonEnumeratedCount
+        var nonCountableSource = new[] { 1, 2, 3, 4, 5 }
+            .Select(x => x) // Forces enumeration
+            .AsValueEnumerable();
+
+        var dest = new int[3];
+
+        // Should return false since the source can't provide count without enumeration
+        nonCountableSource.SkipLast(2).TryCopyTo(dest, 0).ShouldBeFalse();
+        dest.ShouldBe(new int[3]); // Destination should remain unchanged
+    }
+
+    [Fact]
+    public void SkipLast_TryCopyTo_BoundaryConditions()
+    {
+        var source = new[] { 1, 2, 3, 4, 5 }.AsValueEnumerable();
+        var dest = new int[3];
+
+        // Skip everything but one element
+        source.SkipLast(4).TryCopyTo(dest, 0).ShouldBeTrue();
+        dest.ShouldBe(new[] { 1, 0, 0 });
+
+        // Skip exactly the right number to leave one element with max offset
+        Array.Clear(dest);
+        source.SkipLast(4).TryCopyTo(dest, 0).ShouldBeTrue();
+        dest.ShouldBe(new[] { 1, 0, 0 });
+    }
+
 
     // Helper class to test disposal behavior
     private class DisposableTestEnumerator<T>(IEnumerable<T> source, Action onDispose) : IEnumerable<T>

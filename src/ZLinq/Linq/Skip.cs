@@ -47,15 +47,36 @@ namespace ZLinq.Linq
         {
             if (source.TryGetNonEnumeratedCount(out var count))
             {
-                var sourceOffset = offset.GetOffset(count);
-                var skipOffset = sourceOffset + skipCount;
-                if (skipOffset >= count)
+                var actualSkipCount = Math.Min(count, skipCount);
+
+                var remainingCount = count - actualSkipCount;
+
+                if (remainingCount <= 0)
                 {
                     return false;
                 }
 
-                return source.TryCopyTo(destination, skipOffset);
+                var offsetInSkipped = offset.GetOffset(remainingCount);
+
+                if (offsetInSkipped < 0 || offsetInSkipped >= remainingCount)
+                {
+                    return false;
+                }
+
+                var sourceOffset = actualSkipCount + offsetInSkipped;
+
+                var elementsAvailable = remainingCount - offsetInSkipped;
+
+                var elementsToCopy = Math.Min(elementsAvailable, destination.Length);
+
+                if (elementsToCopy <= 0)
+                {
+                    return false;
+                }
+
+                return source.TryCopyTo(destination.Slice(0, elementsToCopy), sourceOffset);
             }
+
             return false;
         }
 

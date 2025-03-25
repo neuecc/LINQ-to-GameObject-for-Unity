@@ -225,14 +225,36 @@ namespace ZLinq.Linq
 
         public bool TryCopyTo(Span<TSource> destination, Index offset)
         {
-            // skip-index and remains(count) is valid.
-            if (TryGetNonEnumeratedCount(out var count))
+            if (source.TryGetNonEnumeratedCount(out var totalCount))
             {
-                var skipOffset = offset.GetOffset(count) + skipIndex;
-                if (source.TryCopyTo(destination.Slice(0, Math.Min(destination.Length, count)), skipOffset))
+                var effectiveRemains = skipIndex < totalCount
+                    ? Math.Min(remains, totalCount - skipIndex)
+                    : 0;
+
+                if (effectiveRemains <= 0)
                 {
-                    return true;
+                    return false;
                 }
+
+                var offsetInRange = offset.GetOffset(effectiveRemains);
+
+                if (offsetInRange < 0 || offsetInRange >= effectiveRemains)
+                {
+                    return false;
+                }
+
+                var sourceOffset = skipIndex + offsetInRange;
+
+                var elementsAvailable = effectiveRemains - offsetInRange;
+
+                var elementsToCopy = Math.Min(elementsAvailable, destination.Length);
+
+                if (elementsToCopy <= 0)
+                {
+                    return false;
+                }
+
+                return source.TryCopyTo(destination.Slice(0, elementsToCopy), sourceOffset);
             }
 
             return false;

@@ -179,6 +179,77 @@ public class TakeLastTest
         first.ShouldBe(new[] { 8, 9, 10 });
     }
 
+    [Fact]
+    public void TakeLast_TryCopyTo_WithOffset()
+    {
+        // Arrange
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var valueEnumerable = sequence.AsValueEnumerable().TakeLast(5);
+
+        // Act & Assert
+        // Case 1: Start at beginning of the TakeLast result
+        var destination1 = new int[3];
+        var result1 = valueEnumerable.TryCopyTo(destination1, 0);
+        result1.ShouldBeTrue();
+        destination1.ShouldBe(new[] { 6, 7, 8 });
+
+        // Case 2: Start at specific offset
+        var destination2 = new int[3];
+        var result2 = valueEnumerable.TryCopyTo(destination2, 2);
+        result2.ShouldBeTrue();
+        destination2.ShouldBe(new[] { 8, 9, 10 });
+
+        // Case 3: Use Index.FromEnd
+        var destination3 = new int[2];
+        var result3 = valueEnumerable.TryCopyTo(destination3, ^2);
+        result3.ShouldBeTrue();
+        destination3.ShouldBe(new[] { 9, 10 });
+
+        // Case 4: Destination too small for remaining elements
+        var destination4 = new int[3];
+        var result4 = valueEnumerable.TryCopyTo(destination4, 3);
+        result4.ShouldBeTrue();
+        destination4.ShouldBe(new[] { 9, 10, 0 }); // Last element is default since there are only 2 remaining elements
+
+        // Case 5: Offset out of range (negative after conversion)
+        var destination5 = new int[3];
+        var result5 = valueEnumerable.TryCopyTo(destination5, ^10);
+        result5.ShouldBeFalse();
+
+        // Case 6: Offset equal to or greater than count
+        var destination6 = new int[3];
+        var result6 = valueEnumerable.TryCopyTo(destination6, 5);
+        result6.ShouldBeFalse();
+
+        // Case 7: Destination length zero, valid offset
+        var destination7 = Array.Empty<int>();
+        var result7 = valueEnumerable.TryCopyTo(destination7, 2);
+        result7.ShouldBeFalse();
+
+        // Case 8: Zero take count
+        var emptyTakeLast = sequence.AsValueEnumerable().TakeLast(0);
+        var destination8 = new int[3];
+        var result8 = emptyTakeLast.TryCopyTo(destination8, 0);
+        result8.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Tes()
+    {
+        int[] source = [2];
+
+        // LINQ
+        source.TakeLast(1)
+              .ElementAtOrDefault(3000)
+              .ShouldBe(0);
+
+        // ZLINQ
+        source.AsValueEnumerable()
+              .TakeLast(1)
+              .ElementAtOrDefault(3000)
+              .ShouldBe(0);
+    }
+
     // Helper class to test disposal behavior
     private class DisposableTesTEnumerator<T>(IEnumerable<T> source, Action onDispose) : IEnumerable<T>
     {

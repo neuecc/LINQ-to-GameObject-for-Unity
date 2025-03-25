@@ -180,4 +180,93 @@ public class SkipTest
         Assert.Equal(actual, expected);
 
     }
+
+    [Fact]
+    public void Skip_TryCopyTo_Basic()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var skipOperation = sequence.AsValueEnumerable().Skip(3);
+
+        var destination = new int[5];
+        bool success = skipOperation.TryCopyTo(destination, 0);
+
+        success.ShouldBeTrue();
+        destination.ShouldBe(new[] { 4, 5, 6, 7, 8 });
+    }
+
+    [Fact]
+    public void Skip_TryCopyTo_WithOffset()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var skipOperation = sequence.AsValueEnumerable().Skip(3);
+
+        var destination = new int[3];
+        bool success = skipOperation.TryCopyTo(destination, 2);
+
+        success.ShouldBeTrue();
+        destination.ShouldBe(new[] { 6, 7, 8 });
+    }
+
+    [Fact]
+    public void Skip_TryCopyTo_FromEnd()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray(); // 1,2,3,4,5,6,7,8,9,10
+        var skipOperation = sequence.AsValueEnumerable().Skip(3); // 4,5,6,7,8,9,10
+
+        var destination = new int[3];
+        bool success = skipOperation.TryCopyTo(destination, ^3); // 8, 9, 10
+
+        success.ShouldBeTrue();
+        destination.ShouldBe(new[] { 8, 9, 10 });
+    }
+
+    [Fact]
+    public void Skip_TryCopyTo_EmptyDestination()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var skipOperation = sequence.AsValueEnumerable().Skip(3);
+
+        var destination = Array.Empty<int>();
+        bool success = skipOperation.TryCopyTo(destination, 0);
+
+        success.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Skip_TryCopyTo_SkipAll()
+    {
+        var sequence = Enumerable.Range(1, 5).ToArray();
+        var skipOperation = sequence.AsValueEnumerable().Skip(5);
+
+        var destination = new int[3];
+        bool success = skipOperation.TryCopyTo(destination, 0);
+
+        success.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Skip_TryCopyTo_InvalidOffset()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var skipOperation = sequence.AsValueEnumerable().Skip(3);
+
+        var destination = new int[3];
+        bool success = skipOperation.TryCopyTo(destination, 10); // Offset beyond elements
+
+        success.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Skip_TryCopyTo_DestinationSmallerThanAvailable()
+    {
+        var sequence = Enumerable.Range(1, 10).ToArray();
+        var skipOperation = sequence.AsValueEnumerable().Skip(3);
+
+        var destination = new int[2]; // Smaller than available elements (7)
+        bool success = skipOperation.TryCopyTo(destination, 0);
+
+        success.ShouldBeTrue();
+        destination.ShouldBe(new[] { 4, 5 }); // Should copy only what fits
+    }
+
 }
