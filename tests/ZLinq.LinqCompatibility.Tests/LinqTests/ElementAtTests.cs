@@ -263,7 +263,7 @@ namespace System.Linq.Tests
             Assert.Throws<ArgumentOutOfRangeException>("index", () => ForceNotCollection(source).ElementAt(new Index(10)));
             Assert.Throws<ArgumentOutOfRangeException>("index", () => ForceNotCollection(source).ElementAt(^0));
 
-            
+
 
             Assert.Throws<ArgumentOutOfRangeException>("index", () => ForceNotCollection(source).ElementAt(int.MinValue));
             Assert.Throws<ArgumentOutOfRangeException>("index", () => ForceNotCollection(source).ElementAt(^int.MaxValue));

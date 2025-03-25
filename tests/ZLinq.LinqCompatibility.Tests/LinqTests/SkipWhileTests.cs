@@ -42,7 +42,7 @@ namespace System.Linq.Tests
         public void SkipWhilePassesPredicateExceptionWhenEnumerated()
         {
             var source = Enumerable.Range(-2, 5).SkipWhile(i => 1 / i <= 0);
-            using(var en = source.GetEnumerator())
+            using (var en = source.GetEnumerator())
             {
                 Assert.Throws<DivideByZeroException>(() => en.MoveNext());
             }
@@ -66,7 +66,7 @@ namespace System.Linq.Tests
         public void SkipErrorWhenSourceErrors()
         {
             var source = NumberRangeGuaranteedNotCollectionType(-2, 5).Select(i => (decimal)i).Select(m => 1 / m).Skip(4);
-            using(var en = source.GetEnumerator())
+            using (var en = source.GetEnumerator())
             {
                 Assert.Throws<DivideByZeroException>(() => en.MoveNext());
             }
@@ -151,10 +151,10 @@ namespace System.Linq.Tests
         {
             var skipped = new FastInfiniteEnumerator<int>().SkipWhile((e, i) => true);
 
-            using(var en = skipped.GetEnumerator())
+            using (var en = skipped.GetEnumerator())
                 Assert.Throws<OverflowException>(() =>
                 {
-                    while(en.MoveNext())
+                    while (en.MoveNext())
                     {
                     }
                 });

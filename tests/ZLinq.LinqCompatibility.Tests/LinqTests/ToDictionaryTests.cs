@@ -68,7 +68,7 @@ namespace System.Linq.Tests
                 resultDictionary =>
                 {
                     Assert.NotNull(resultDictionary);
-                    Assert.Equal(0, resultDictionary.Count);
+                    Assert.Empty(resultDictionary);
                 });
         }
 
@@ -133,7 +133,7 @@ namespace System.Linq.Tests
         public void RunOnce()
         {
             Assert.Equal(
-                new Dictionary<int, string> {{1, "0"}, {2, "1"}, {3, "2"}, {4, "3"}},
+                new Dictionary<int, string> { { 1, "0" }, { 2, "1" }, { 3, "2" }, { 4, "3" } },
                 Enumerable.Range(0, 4).RunOnce().ToDictionary(i => i + 1, i => i.ToString()));
 
             Assert.Equal(
@@ -450,7 +450,7 @@ namespace System.Linq.Tests
                     dict.Remove(key);
                 }
                 Assert.False(ke.MoveNext());
-                Assert.Equal(0, dict.Count());
+                Assert.Empty(dict);
             }
         }
 
@@ -469,7 +469,7 @@ namespace System.Linq.Tests
         {
             int[] elements = new int[] { 5 };
             string[] keys = new string[] { "Bob" };
-            var source = new [] { new { Name = keys[0], Score = elements[0] } };
+            var source = new[] { new { Name = keys[0], Score = elements[0] } };
 
             AssertMatches(keys, elements, source.ToDictionary(e => e.Name, e => e.Score, null));
         }
@@ -478,7 +478,7 @@ namespace System.Linq.Tests
         public void SeveralElementsCustomComparerer()
         {
             string[] keys = new string[] { "Bob", "Zen", "Prakash", "Chris", "Sachin" };
-            var source = new []
+            var source = new[]
             {
                 new { Name = "Bbo", Score = 95 },
                 new { Name = keys[1], Score = 45 },

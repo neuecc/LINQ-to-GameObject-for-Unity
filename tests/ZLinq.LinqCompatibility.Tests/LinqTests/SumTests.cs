@@ -372,7 +372,7 @@ namespace System.Linq.Tests
             {
                 for (int verticalOffset = 1; verticalOffset < 6; verticalOffset++)
                 {
-                    yield return new object[] {element, verticalOffset};
+                    yield return new object[] { element, verticalOffset };
                 }
             }
         }

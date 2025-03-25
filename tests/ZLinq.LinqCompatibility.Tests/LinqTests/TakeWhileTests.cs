@@ -114,11 +114,11 @@ namespace System.Linq.Tests
         [Fact]
         public void RunOnce()
         {
-            int[] source = {8, 3, 12, 4, 6, 10};
-            int[] expected = {8};
+            int[] source = { 8, 3, 12, 4, 6, 10 };
+            int[] expected = { 8 };
             Assert.Equal(expected, source.RunOnce().TakeWhile(x => x % 2 == 0));
-            source = new[] {6, 2, 5, 3, 8};
-            expected = new[] {6, 2, 5, 3};
+            source = new[] { 6, 2, 5, 3, 8 };
+            expected = new[] { 6, 2, 5, 3 };
             Assert.Equal(expected, source.RunOnce().TakeWhile((element, index) => index < source.Length - 1));
         }
 
@@ -127,10 +127,10 @@ namespace System.Linq.Tests
         {
             var taken = new FastInfiniteEnumerator<int>().TakeWhile((e, i) => true);
 
-            using(var en = taken.GetEnumerator())
+            using (var en = taken.GetEnumerator())
                 Assert.Throws<OverflowException>(() =>
                 {
-                    while(en.MoveNext())
+                    while (en.MoveNext())
                     {
                     }
                 });

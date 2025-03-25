@@ -99,7 +99,7 @@ namespace System.Linq.Tests
         public void OuterEmptyInnerNonEmpty()
         {
             CustomerRec[] outer = { };
-            OrderRec[] inner = new []
+            OrderRec[] inner = new[]
             {
                 new OrderRec{ orderID = 45321, custID = 98022, total = 50 },
                 new OrderRec{ orderID = 97865, custID = 32103, total = 25 }
@@ -110,18 +110,18 @@ namespace System.Linq.Tests
         [Fact]
         public void CustomComparer()
         {
-            CustomerRec[] outer = new []
+            CustomerRec[] outer = new[]
             {
                 new CustomerRec{ name = "Tim", custID = 1234 },
                 new CustomerRec{ name = "Bob", custID = 9865 },
                 new CustomerRec{ name = "Robert", custID = 9895 }
             };
-            AnagramRec[] inner = new []
+            AnagramRec[] inner = new[]
             {
                 new AnagramRec{ name = "Robert", orderID = 93483, total = 19 },
                 new AnagramRec{ name = "miT", orderID = 93489, total = 45 }
             };
-            JoinRec[] expected = new []
+            JoinRec[] expected = new[]
             {
                 new JoinRec{ name = "Tim", orderID = new int?[]{ 93489 }, total = new int?[]{ 45 } },
                 new JoinRec{ name = "Bob", orderID = new int?[]{ }, total = new int?[]{ } },
@@ -147,7 +147,7 @@ namespace System.Linq.Tests
         [Fact]
         public void InnerNull()
         {
-            CustomerRec[] outer = new []
+            CustomerRec[] outer = new[]
             {
                 new CustomerRec{ name = "Tim", custID = 1234 },
                 new CustomerRec{ name = "Bob", custID = 9865 },
@@ -306,13 +306,13 @@ namespace System.Linq.Tests
         [Fact]
         public void OuterNonEmptyInnerEmpty()
         {
-            CustomerRec[] outer = new []
+            CustomerRec[] outer = new[]
             {
                 new CustomerRec{ name = "Tim", custID = 43434 },
                 new CustomerRec{ name = "Bob", custID = 34093 }
             };
             OrderRec[] inner = { };
-            JoinRec[] expected = new []
+            JoinRec[] expected = new[]
             {
                 new JoinRec{ name = "Tim", orderID = new int?[]{ }, total = new int?[]{ } },
                 new JoinRec{ name = "Bob", orderID = new int?[]{ }, total = new int?[]{ } }
@@ -324,9 +324,9 @@ namespace System.Linq.Tests
         [Fact]
         public void SingleElementEachAndMatches()
         {
-            CustomerRec[] outer = new [] { new CustomerRec{ name = "Tim", custID = 43434 } };
-            OrderRec[] inner = new [] { new OrderRec{ orderID = 97865, custID = 43434, total = 25 } };
-            JoinRec[] expected = new [] { new JoinRec{ name = "Tim", orderID = new int?[]{ 97865 }, total = new int?[]{ 25 } } };
+            CustomerRec[] outer = new[] { new CustomerRec { name = "Tim", custID = 43434 } };
+            OrderRec[] inner = new[] { new OrderRec { orderID = 97865, custID = 43434, total = 25 } };
+            JoinRec[] expected = new[] { new JoinRec { name = "Tim", orderID = new int?[] { 97865 }, total = new int?[] { 25 } } };
 
             Assert.Equal(expected, outer.GroupJoin(inner, e => e.custID, e => e.custID, createJoinRec));
         }
@@ -334,9 +334,9 @@ namespace System.Linq.Tests
         [Fact]
         public void SingleElementEachAndDoesntMatch()
         {
-            CustomerRec[] outer = new [] { new CustomerRec{ name = "Tim", custID = 43434 } };
-            OrderRec[] inner = new [] { new OrderRec{ orderID = 97865, custID = 49434, total = 25 } };
-            JoinRec[] expected = new JoinRec[] { new JoinRec{ name = "Tim", orderID = new int?[]{ }, total = new int?[]{ } } };
+            CustomerRec[] outer = new[] { new CustomerRec { name = "Tim", custID = 43434 } };
+            OrderRec[] inner = new[] { new OrderRec { orderID = 97865, custID = 49434, total = 25 } };
+            JoinRec[] expected = new JoinRec[] { new JoinRec { name = "Tim", orderID = new int?[] { }, total = new int?[] { } } };
 
             Assert.Equal(expected, outer.GroupJoin(inner, e => e.custID, e => e.custID, createJoinRec));
         }
@@ -344,17 +344,17 @@ namespace System.Linq.Tests
         [Fact]
         public void SelectorsReturnNull()
         {
-            CustomerRec[] outer = new []
+            CustomerRec[] outer = new[]
             {
                 new CustomerRec{ name = "Tim", custID = null },
                 new CustomerRec{ name = "Bob", custID = null }
             };
-            OrderRec[] inner = new []
+            OrderRec[] inner = new[]
             {
                 new OrderRec{ orderID = 97865, custID = null, total = 25 },
                 new OrderRec{ orderID = 34390, custID = null, total = 19 }
             };
-            JoinRec[] expected = new []
+            JoinRec[] expected = new[]
             {
                 new JoinRec{ name = "Tim", orderID = new int?[]{ }, total = new int?[]{ } },
                 new JoinRec{ name = "Bob", orderID = new int?[]{ }, total = new int?[]{ } }
@@ -412,18 +412,18 @@ namespace System.Linq.Tests
         [Fact]
         public void OuterSameKeyMoreThanOneElementAndMatches()
         {
-            CustomerRec[] outer = new []
+            CustomerRec[] outer = new[]
             {
                 new CustomerRec{ name = "Tim", custID = 1234 },
                 new CustomerRec{ name = "Bob", custID = 9865 },
                 new CustomerRec{ name = "Robert", custID = 9865 }
             };
-            OrderRec[] inner = new []
+            OrderRec[] inner = new[]
             {
                 new OrderRec{ orderID = 97865, custID = 1234, total = 25 },
                 new OrderRec{ orderID = 34390, custID = 9865, total = 19 }
             };
-            JoinRec[] expected = new []
+            JoinRec[] expected = new[]
             {
                 new JoinRec { name = "Tim", orderID = new int?[]{ 97865 }, total = new int?[]{ 25 } },
                 new JoinRec { name = "Bob", orderID = new int?[]{ 34390 }, total = new int?[]{ 19 } },
@@ -436,18 +436,18 @@ namespace System.Linq.Tests
         [Fact]
         public void NoMatches()
         {
-            CustomerRec[] outer = new []
+            CustomerRec[] outer = new[]
             {
                 new CustomerRec{ name = "Tim", custID = 1234 },
                 new CustomerRec{ name = "Bob", custID = 9865 },
                 new CustomerRec{ name = "Robert", custID = 9895 }
             };
-            OrderRec[] inner = new []
+            OrderRec[] inner = new[]
             {
                 new OrderRec{ orderID = 97865, custID = 2334, total = 25 },
                 new OrderRec{ orderID = 34390, custID = 9065, total = 19 }
             };
-            JoinRec[] expected = new []
+            JoinRec[] expected = new[]
             {
                 new JoinRec{ name = "Tim", orderID = new int?[]{ }, total = new int?[]{ } },
                 new JoinRec{ name = "Bob", orderID = new int?[]{ }, total = new int?[]{ } },

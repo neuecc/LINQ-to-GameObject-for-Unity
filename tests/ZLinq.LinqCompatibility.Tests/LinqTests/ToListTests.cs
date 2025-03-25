@@ -41,7 +41,7 @@ namespace System.Linq.Tests
                 resultList =>
                 {
                     Assert.NotNull(resultList);
-                    Assert.Equal(0, resultList.Count);
+                    Assert.Empty(resultList);
                 });
         }
 
@@ -184,8 +184,8 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsFromWhereOnStringQuery()
         {
             var q = from x in new[] { "!@#$%^", "C", "AAA", "", "Calling Twice", "SoS", string.Empty }
-                        where !string.IsNullOrEmpty(x)
-                        select x;
+                    where !string.IsNullOrEmpty(x)
+                    select x;
 
             Assert.Equal(q.ToList(), q.ToList());
         }

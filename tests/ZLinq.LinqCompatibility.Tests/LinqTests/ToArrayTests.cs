@@ -64,7 +64,7 @@ namespace System.Linq.Tests
                 resultArray =>
                 {
                     Assert.NotNull(resultArray);
-                    Assert.Equal(0, resultArray.Length);
+                    Assert.Empty(resultArray);
                 });
         }
 
@@ -92,9 +92,9 @@ namespace System.Linq.Tests
         [Fact]
         public void RunOnce()
         {
-            Assert.Equal(new int[] {1, 2, 3, 4, 5, 6, 7}, Enumerable.Range(1, 7).RunOnce().ToArray());
+            Assert.Equal(new int[] { 1, 2, 3, 4, 5, 6, 7 }, Enumerable.Range(1, 7).RunOnce().ToArray());
             Assert.Equal(
-                new string[] {"1", "2", "3", "4", "5", "6", "7", "8"},
+                new string[] { "1", "2", "3", "4", "5", "6", "7", "8" },
                 Enumerable.Range(1, 8).Select(i => i.ToString()).RunOnce().ToArray());
         }
 
@@ -190,8 +190,8 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsFromWhereOnStringQuery()
         {
             var q = from x in new[] { "!@#$%^", "C", "AAA", "", "Calling Twice", "SoS", string.Empty }
-                        where !string.IsNullOrEmpty(x)
-                        select x;
+                    where !string.IsNullOrEmpty(x)
+                    select x;
 
             Assert.Equal(q.ToArray(), q.ToArray());
         }
@@ -200,12 +200,12 @@ namespace System.Linq.Tests
         public void SameResultsButNotSameObject()
         {
             var qInt = from x in new[] { 9999, 0, 888, -1, 66, -777, 1, 2, -12345 }
-                    where x > int.MinValue
-                    select x;
+                       where x > int.MinValue
+                       select x;
 
             var qString = from x in new[] { "!@#$%^", "C", "AAA", "", "Calling Twice", "SoS", string.Empty }
-                        where !string.IsNullOrEmpty(x)
-                        select x;
+                          where !string.IsNullOrEmpty(x)
+                          select x;
 
             Assert.NotSame(qInt.ToArray(), qInt.ToArray());
             Assert.NotSame(qString.ToArray(), qString.ToArray());

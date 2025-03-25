@@ -13,8 +13,8 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsIntQuery()
         {
             var q = from x1 in new int[] { 1, 6, 0, -1, 3 }
-                             from x2 in new int[] { 55, 49, 9, -100, 24, 25 }
-                             select new { a1 = x1, a2 = x2 };
+                    from x2 in new int[] { 55, 49, 9, -100, 24, 25 }
+                    select new { a1 = x1, a2 = x2 };
 
             Assert.Equal(
                 q.OrderByDescending(e => e.a1).ThenBy(f => f.a2),
@@ -26,9 +26,9 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsStringQuery()
         {
             var q = from x1 in new[] { 55, 49, 9, -100, 24, 25, -1, 0 }
-                             from x2 in new[] { "!@#$%^", "C", "AAA", "", null, "Calling Twice", "SoS", string.Empty }
-                             where !string.IsNullOrEmpty(x2)
-                             select new { a1 = x1, a2 = x2 };
+                    from x2 in new[] { "!@#$%^", "C", "AAA", "", null, "Calling Twice", "SoS", string.Empty }
+                    where !string.IsNullOrEmpty(x2)
+                    select new { a1 = x1, a2 = x2 };
 
             Assert.Equal(
                 q.OrderBy(e => e.a2).ThenBy(f => f.a1),
@@ -90,7 +90,7 @@ namespace System.Linq.Tests
         [Fact]
         public void SecondKeyRepeatAcrossDifferentPrimary()
         {
-            var source = new []
+            var source = new[]
             {
                 new { Name = "Jim", City = "Minneapolis", Country = "USA" },
                 new { Name = "Tim", City = "Seattle", Country = "USA" },
@@ -98,7 +98,7 @@ namespace System.Linq.Tests
                 new { Name = "Chris", City = "Minneapolis", Country = "USA" },
                 new { Name = "Rob", City = "Seattle", Country = "USA" }
             };
-            var expected = new []
+            var expected = new[]
             {
                 new { Name = "Chris", City = "Minneapolis", Country = "USA" },
                 new { Name = "Jim", City = "Minneapolis", Country = "USA" },

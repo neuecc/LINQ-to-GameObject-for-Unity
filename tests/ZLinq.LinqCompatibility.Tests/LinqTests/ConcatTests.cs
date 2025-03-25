@@ -369,7 +369,7 @@ namespace System.Linq.Tests
                 concatChain = concatChain.Concat(Array.Empty<int>());
             }
 
-            Assert.Equal(0, concatChain.Count()); // should not throw a StackOverflowException
+            Assert.Empty(concatChain); // should not throw a StackOverflowException
             // ToArray needs the count as well, and the process of copying all of the collections
             // to the array should also not be recursive.
             Assert.Equal(new int[] { }, concatChain.ToArray());
@@ -402,7 +402,7 @@ namespace System.Linq.Tests
                 concatChain = concatChain.Concat(Array.Empty<int>());
             }
 
-            Assert.Equal(0, concatChain.Count());
+            Assert.Empty(concatChain);
             // ToArray/ToList do not attempt to preallocate a result of the correct
             // size- if there's just 1 lazy enumerable in the chain, it's impossible
             // to get the count to preallocate without iterating through that, and then

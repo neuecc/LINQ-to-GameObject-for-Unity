@@ -172,7 +172,7 @@ namespace System.Linq.Tests
 
         public static IEnumerable<object[]> NonEnumeratedCount_SupportedEnumerables()
         {
-            yield return WrapArgs(4, new int[]{ 1, 2, 3, 4 });
+            yield return WrapArgs(4, new int[] { 1, 2, 3, 4 });
             yield return WrapArgs(4, new List<int>(new int[] { 1, 2, 3, 4 }));
             yield return WrapArgs(4, new Stack<int>(new int[] { 1, 2, 3, 4 }));
 
@@ -205,7 +205,7 @@ namespace System.Linq.Tests
                 yield return WrapArgs(Enumerable.Range(1, 100));
                 yield return WrapArgs(Enumerable.Repeat(1, 80));
                 yield return WrapArgs(Enumerable.Range(1, 50).Select(x => x + 1));
-                yield return WrapArgs(new int[] { 1, 2, 3, 4 }.Select(x => x + 1));            
+                yield return WrapArgs(new int[] { 1, 2, 3, 4 }.Select(x => x + 1));
                 yield return WrapArgs(Enumerable.Range(1, 50).Select(x => x + 1).Select(x => x - 1));
                 yield return WrapArgs(Enumerable.Range(1, 20).Reverse());
                 yield return WrapArgs(Enumerable.Range(1, 20).OrderBy(x => -x));

@@ -64,7 +64,7 @@ namespace System.Linq.Tests
                 source: Enumerable.Empty<int>(),
                 keySelector: x => x,
                 comparer: null,
-                expected: Enumerable.Empty<KeyValuePair<int,int>>());
+                expected: Enumerable.Empty<KeyValuePair<int, int>>());
 
             Validate(
                 source: Enumerable.Range(0, 10),

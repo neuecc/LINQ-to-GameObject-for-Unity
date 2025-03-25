@@ -13,8 +13,8 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsIntQuery()
         {
             var q = from x1 in new int[] { 1, 6, 0, -1, 3 }
-                             from x2 in new int[] { 55, 49, 9, -100, 24, 25 }
-                             select new { a1 = x1, a2 = x2 };
+                    from x2 in new int[] { 55, 49, 9, -100, 24, 25 }
+                    select new { a1 = x1, a2 = x2 };
 
             Assert.Equal(
                 q.OrderByDescending(e => e.a2).ThenByDescending(f => f.a1),
@@ -26,9 +26,9 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsStringQuery()
         {
             var q = from x1 in new[] { 55, 49, 9, -100, 24, 25, -1, 0 }
-                             from x2 in new[] { "!@#$%^", "C", "AAA", "", null, "Calling Twice", "SoS", string.Empty }
-                             where !string.IsNullOrEmpty(x2)
-                             select new { a1 = x1, a2 = x2 };
+                    from x2 in new[] { "!@#$%^", "C", "AAA", "", null, "Calling Twice", "SoS", string.Empty }
+                    where !string.IsNullOrEmpty(x2)
+                    select new { a1 = x1, a2 = x2 };
 
             Assert.Equal(
                 q.OrderBy(e => e.a1).ThenByDescending(f => f.a2),
@@ -77,7 +77,7 @@ namespace System.Linq.Tests
                 new { Name = "Chris", City = "London", Country = "UK" },
                 new { Name = "Rob", City = "Kent", Country = "UK" }
             };
-            var expected = new []
+            var expected = new[]
             {
                 new { Name = "Tim", City = "Seattle", Country = "USA" },
                 new { Name = "Philip", City = "Orlando", Country = "USA" },
@@ -95,8 +95,8 @@ namespace System.Linq.Tests
             var source = @"Because I could not stop for Death -
 He kindly stopped for me -
 The Carriage held but just Ourselves -
-And Immortality.".Split(new []{ ' ', '\n', '\r', '-' }, StringSplitOptions.RemoveEmptyEntries);
-            var expected = new []
+And Immortality.".Split(new[] { ' ', '\n', '\r', '-' }, StringSplitOptions.RemoveEmptyEntries);
+            var expected = new[]
             {
                 "stopped", "kindly", "could", "stop", "held", "just", "not", "for", "for", "but", "me",
                 "Immortality.", "Ourselves", "Carriage", "Because", "Death", "The", "And", "He", "I"

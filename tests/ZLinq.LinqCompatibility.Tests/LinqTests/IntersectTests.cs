@@ -50,7 +50,7 @@ namespace System.Linq.Tests
         {
             IEqualityComparer<string> defaultComparer = EqualityComparer<string>.Default;
             yield return new object[] { new string[1], new string[0], defaultComparer, new string[0] };
-            yield return new object[] { new string[] { null, null, string.Empty }, new string[2], defaultComparer,  new string[] { null } };
+            yield return new object[] { new string[] { null, null, string.Empty }, new string[2], defaultComparer, new string[] { null } };
             yield return new object[] { new string[2], new string[0], defaultComparer, new string[0] };
 
             yield return new object[] { new string[] { "Tim", "Bob", "Mike", "Robert" }, new string[] { "ekiM", "bBo" }, null, new string[0] };

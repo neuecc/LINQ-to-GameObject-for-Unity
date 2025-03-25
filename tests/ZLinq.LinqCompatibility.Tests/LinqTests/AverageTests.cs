@@ -71,7 +71,7 @@ namespace System.Linq.Tests
         [Fact]
         public void NullableFloat_WithSelector()
         {
-            var source = new []
+            var source = new[]
             {
                 new { name = "Tim", num = (float?)5.5f },
                 new { name = "John", num = (float?)15.5f },
@@ -153,7 +153,7 @@ namespace System.Linq.Tests
         [Fact]
         public void Int_WithSelector()
         {
-            var source = new []
+            var source = new[]
             {
                 new { name="Tim", num = 10 },
                 new { name="John", num = -10 },
@@ -202,7 +202,7 @@ namespace System.Linq.Tests
         [Fact]
         public void NullableInt_WithSelector()
         {
-            var source = new []
+            var source = new[]
             {
                 new { name = "Tim", num  = (int?)10 },
                 new { name = "John", num =  default(int?) },
@@ -274,7 +274,7 @@ namespace System.Linq.Tests
         [Fact]
         public void Long_FromSelector()
         {
-            var source = new []
+            var source = new[]
             {
                 new { name = "Tim", num = 40L },
                 new { name = "John", num = 50L },
@@ -331,7 +331,7 @@ namespace System.Linq.Tests
         [Fact]
         public void NullableLong_WithSelector()
         {
-            var source = new []
+            var source = new[]
             {
                 new { name = "Tim", num = (long?)40L },
                 new { name = "John", num = default(long?) },
@@ -404,7 +404,7 @@ namespace System.Linq.Tests
         [Fact]
         public void Double_WithSelector()
         {
-            var source = new []
+            var source = new[]
             {
                 new { name = "Tim", num = 5.5},
                 new { name = "John", num = 15.5},

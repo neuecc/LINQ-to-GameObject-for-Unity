@@ -28,7 +28,7 @@ namespace System.Linq.Tests
         private void TestEmptyEmpty<T>()
         {
             Assert.Equal(new T[0], Enumerable.Empty<T>());
-            Assert.Equal(0, Enumerable.Empty<T>().Count());
+            Assert.Empty(Enumerable.Empty<T>());
             Assert.Same(Enumerable.Empty<T>().GetEnumerator(), Enumerable.Empty<T>().GetEnumerator());
         }
 
@@ -57,8 +57,8 @@ namespace System.Linq.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => roList[0]);
 
             Assert.True(list.IsReadOnly);
-            Assert.Equal(0, list.Count);
-            Assert.Equal(0, roList.Count);
+            Assert.Empty(list);
+            Assert.Empty(roList);
 
             Assert.False(list.Contains(42));
             Assert.Equal(-1, list.IndexOf(42));

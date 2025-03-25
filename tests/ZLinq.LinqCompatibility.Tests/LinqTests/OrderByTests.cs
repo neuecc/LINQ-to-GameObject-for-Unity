@@ -31,8 +31,8 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsIntQuery()
         {
             var q = from x1 in new int[] { 1, 6, 0, -1, 3 }
-                             from x2 in new int[] { 55, 49, 9, -100, 24, 25 }
-                             select new { a1 = x1, a2 = x2 };
+                    from x2 in new int[] { 55, 49, 9, -100, 24, 25 }
+                    select new { a1 = x1, a2 = x2 };
 
             Assert.Equal(q.OrderBy(e => e.a1).ThenBy(f => f.a2), q.OrderBy(e => e.a1).ThenBy(f => f.a2));
         }
@@ -41,9 +41,9 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsStringQuery()
         {
             var q = from x1 in new[] { 55, 49, 9, -100, 24, 25, -1, 0 }
-                             from x2 in new[] { "!@#$%^", "C", "AAA", "", null, "Calling Twice", "SoS", string.Empty }
-                             where !string.IsNullOrEmpty(x2)
-                             select new { a1 = x1, a2 = x2 };
+                    from x2 in new[] { "!@#$%^", "C", "AAA", "", null, "Calling Twice", "SoS", string.Empty }
+                    where !string.IsNullOrEmpty(x2)
+                    select new { a1 = x1, a2 = x2 };
 
             Assert.Equal(q.OrderBy(e => e.a1), q.OrderBy(e => e.a1));
         }
@@ -173,7 +173,7 @@ namespace System.Linq.Tests
         [Fact]
         public void OrderedToArray()
         {
-            var source = new []
+            var source = new[]
             {
                 new { Name = "Tim", Score = 90 },
                 new { Name = "Robert", Score = 90 },
@@ -182,7 +182,7 @@ namespace System.Linq.Tests
                 new { Name = "John", Score = 90 },
                 new { Name = "Albert", Score = 90 },
             };
-            var expected = new []
+            var expected = new[]
             {
                 new { Name = "Tim", Score = 90 },
                 new { Name = "Robert", Score = 90 },
@@ -373,7 +373,7 @@ namespace System.Linq.Tests
         [Fact]
         public void LastOnOrderedMatchingCases()
         {
-            object[] boxedInts = new object[] {0, 1, 2, 9, 1, 2, 3, 9, 4, 5, 7, 8, 9, 0, 1};
+            object[] boxedInts = new object[] { 0, 1, 2, 9, 1, 2, 3, 9, 4, 5, 7, 8, 9, 0, 1 };
             Assert.Same(boxedInts[12], boxedInts.OrderBy(o => (int)o).Last());
             Assert.Same(boxedInts[12], boxedInts.OrderBy(o => (int)o).LastOrDefault());
             Assert.Same(boxedInts[12], boxedInts.OrderBy(o => (int)o).Last(o => (int)o % 2 == 1));
@@ -543,7 +543,7 @@ namespace System.Linq.Tests
 
             using (new ThreadCultureChange(dk)) // "dk" whilst GetEnumerator
             {
-                IEnumerator<string> s = source.OrderBy(x => x).GetEnumerator(); 
+                IEnumerator<string> s = source.OrderBy(x => x).GetEnumerator();
                 using (new ThreadCultureChange(au)) // but "au" whilst accessing...
                 {
                     int idx = 0;
@@ -557,12 +557,12 @@ namespace System.Linq.Tests
             using (new ThreadCultureChange(au))
             {
                 // "au" whilst GetEnumerator
-                IEnumerator<string> s = source.OrderBy(x => x).GetEnumerator(); 
-                
-                using (new ThreadCultureChange(dk)) 
+                IEnumerator<string> s = source.OrderBy(x => x).GetEnumerator();
+
+                using (new ThreadCultureChange(dk))
                 {
                     // but "dk" on first MoveNext
-                    bool moveNext = s.MoveNext(); 
+                    bool moveNext = s.MoveNext();
                     Assert.True(moveNext);
 
                     // ensure changing culture after MoveNext doesn't affect sort

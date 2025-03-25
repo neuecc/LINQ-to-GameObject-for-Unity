@@ -102,7 +102,7 @@ namespace System.Linq.Tests
                 seedSelector: x => 0,
                 func: (x, y) => x + y,
                 comparer: null,
-                expected: Enumerable.Empty<KeyValuePair<int,int>>());
+                expected: Enumerable.Empty<KeyValuePair<int, int>>());
 
             Validate(
                 source: Enumerable.Range(0, 10),
@@ -233,19 +233,19 @@ namespace System.Linq.Tests
             KeyValuePair<bool, List<int>> oddsItem = e.Current;
             Assert.False(oddsItem.Key);
             List<int> odds = oddsItem.Value;
-            Assert.True(odds.Contains(1));
-            Assert.True(odds.Contains(3));
-            Assert.False(odds.Contains(2));
-            Assert.False(odds.Contains(4));
+            Assert.Contains(1, odds);
+            Assert.Contains(3, odds);
+            Assert.DoesNotContain(2, odds);
+            Assert.DoesNotContain(4, odds);
 
             Assert.True(e.MoveNext());
             KeyValuePair<bool, List<int>> evensItem = e.Current;
             Assert.True(evensItem.Key);
             List<int> evens = evensItem.Value;
-            Assert.True(evens.Contains(2));
-            Assert.True(evens.Contains(4));
-            Assert.False(evens.Contains(1));
-            Assert.False(evens.Contains(3));
+            Assert.Contains(2, evens);
+            Assert.Contains(4, evens);
+            Assert.DoesNotContain(1, evens);
+            Assert.DoesNotContain(3, evens);
         }
 
         [Fact]

@@ -51,7 +51,7 @@ namespace System.Linq.Tests
 
         public static IEnumerable<object[]> String_TestData()
         {
-            IEqualityComparer <string> defaultComparer = EqualityComparer<string>.Default;
+            IEqualityComparer<string> defaultComparer = EqualityComparer<string>.Default;
             yield return new object[] { new string[1], new string[0], defaultComparer, new string[1] };
             yield return new object[] { new string[] { null, null, string.Empty }, new string[1], defaultComparer, new string[] { string.Empty } };
             yield return new object[] { new string[2], new string[0], defaultComparer, new string[1] };

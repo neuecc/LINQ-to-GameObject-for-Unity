@@ -25,7 +25,7 @@ namespace System.Linq.Tests
         [InlineData(-1)]
         public void ThrowsWhenSizeIsNonPositive(int size)
         {
-            int[] source = {1};
+            int[] source = { 1 };
             AssertExtensions.Throws<ArgumentOutOfRangeException>("size", () => source.Chunk(size));
         }
 
@@ -34,12 +34,12 @@ namespace System.Linq.Tests
         {
             using IEnumerator<int[]> chunks = new FastInfiniteEnumerator<int>().Chunk(5).GetEnumerator();
             chunks.MoveNext();
-            Assert.Equal(new[] {0, 0, 0, 0, 0}, chunks.Current);
+            Assert.Equal(new[] { 0, 0, 0, 0, 0 }, chunks.Current);
             Assert.True(chunks.MoveNext());
         }
 
         [Theory]
-        [InlineData(new[] {9999, 0, 888, -1, 66, -777, 1, 2, -12345})]
+        [InlineData(new[] { 9999, 0, 888, -1, 66, -777, 1, 2, -12345 })]
         public void ChunkSourceRepeatCalls(int[] array)
         {
             Assert.All(IdentityTransforms<int>(), t =>
@@ -51,7 +51,7 @@ namespace System.Linq.Tests
         }
 
         [Theory]
-        [InlineData(new[] {9999, 0, 888, -1, 66, -777, 1, 2, -12345})]
+        [InlineData(new[] { 9999, 0, 888, -1, 66, -777, 1, 2, -12345 })]
         public void ChunkSourceEvenly(int[] array)
         {
             Assert.All(IdentityTransforms<int>(), t =>
@@ -70,7 +70,7 @@ namespace System.Linq.Tests
         }
 
         [Theory]
-        [InlineData(new[] {9999, 0, 888, -1, 66, -777, 1, 2})]
+        [InlineData(new[] { 9999, 0, 888, -1, 66, -777, 1, 2 })]
         public void ChunkSourceUnevenly(int[] array)
         {
             Assert.All(IdentityTransforms<int>(), t =>
@@ -89,7 +89,7 @@ namespace System.Linq.Tests
         }
 
         [Theory]
-        [InlineData(new[] {9999, 0})]
+        [InlineData(new[] { 9999, 0 })]
         public void ChunkSourceSmallerThanMaxSize(int[] array)
         {
             Assert.All(IdentityTransforms<int>(), t =>
@@ -126,7 +126,7 @@ namespace System.Linq.Tests
             IEnumerable<int[]> chunks = list.Chunk(3);
             list.Remove(66);
 
-            Assert.Equal(new[] {new[] {9999, 0, 888}, new[] {-1, -777, 1}, new[] {2, -12345}}, chunks);
+            Assert.Equal(new[] { new[] { 9999, 0, 888 }, new[] { -1, -777, 1 }, new[] { 2, -12345 } }, chunks);
         }
 
         [Fact]
@@ -139,7 +139,7 @@ namespace System.Linq.Tests
             IEnumerable<int[]> chunks = list.Chunk(3);
             list.Add(10);
 
-            Assert.Equal(new[] {new[] {9999, 0, 888}, new[] {-1, 66, -777}, new[] {1, 2, -12345}, new[] {10}}, chunks);
+            Assert.Equal(new[] { new[] { 9999, 0, 888 }, new[] { -1, 66, -777 }, new[] { 1, 2, -12345 }, new[] { 10 } }, chunks);
         }
 
         // reproduces https://github.com/dotnet/runtime/issues/67132

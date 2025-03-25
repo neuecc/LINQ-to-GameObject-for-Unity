@@ -117,8 +117,8 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsIntQuery()
         {
             var q = GuaranteeNotIList(from x in new[] { 9999, 0, 888, -1, 66, -777, 1, 2, -12345 }
-                    where x > int.MinValue
-                    select x);
+                                      where x > int.MinValue
+                                      select x);
 
             Assert.Equal(q.Skip(0), q.Skip(0));
         }
@@ -127,8 +127,8 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsIntQueryIList()
         {
             var q = (from x in new[] { 9999, 0, 888, -1, 66, -777, 1, 2, -12345 }
-                    where x > Int32.MinValue
-                    select x).ToList();
+                     where x > Int32.MinValue
+                     select x).ToList();
 
             Assert.Equal(q.Skip(0), q.Skip(0));
         }
@@ -137,8 +137,8 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsStringQuery()
         {
             var q = GuaranteeNotIList(from x in new[] { "!@#$%^", "C", "AAA", "", "Calling Twice", "SoS", string.Empty }
-                    where !string.IsNullOrEmpty(x)
-                    select x);
+                                      where !string.IsNullOrEmpty(x)
+                                      select x);
 
             Assert.Equal(q.Skip(0), q.Skip(0));
         }
@@ -147,8 +147,8 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsStringQueryIList()
         {
             var q = (from x in new[] { "!@#$%^", "C", "AAA", "", "Calling Twice", "SoS", String.Empty }
-                    where !String.IsNullOrEmpty(x)
-                    select x).ToList();
+                     where !String.IsNullOrEmpty(x)
+                     select x).ToList();
 
             Assert.Equal(q.Skip(0), q.Skip(0));
         }
@@ -469,7 +469,7 @@ namespace System.Linq.Tests
             var range = NumberRangeGuaranteedNotCollectionType(1, 100);
             var skipped = range.Skip(50).Skip(int.MaxValue); // Could cause an integer overflow.
             Assert.Empty(skipped);
-            Assert.Equal(0, skipped.Count());
+            Assert.Empty(skipped);
             Assert.Empty(skipped.ToArray());
             Assert.Empty(skipped.ToList());
         }

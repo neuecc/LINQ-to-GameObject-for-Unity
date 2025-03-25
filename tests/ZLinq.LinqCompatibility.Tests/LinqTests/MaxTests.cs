@@ -17,7 +17,8 @@ namespace System.Linq.Tests
                 yield return new object[] { Shuffler.Shuffle(Enumerable.Range(length, length).Select(i => (byte)i).ToArray()), (byte)(length + length - 1) };
 
                 // Unit Tests does +T.One so we should generate data up to one value below sbyte.MaxValue
-                if ((length + length) < sbyte.MaxValue) {
+                if ((length + length) < sbyte.MaxValue)
+                {
                     yield return new object[] { Shuffler.Shuffle(Enumerable.Range(length, length).Select(i => (sbyte)i)), (sbyte)(length + length - 1) };
                     yield return new object[] { Shuffler.Shuffle(Enumerable.Range(length, length).Select(i => (sbyte)i).ToArray()), (sbyte)(length + length - 1) };
                 }
@@ -832,7 +833,7 @@ namespace System.Linq.Tests
         [Fact]
         public void Max_NullableDouble_WithSelectorAccessingProperty()
         {
-            var source = new []
+            var source = new[]
             {
                 new { name = "Tim", num = (double?)40.5},
                 new { name = "John", num = default(double?)},
@@ -914,7 +915,7 @@ namespace System.Linq.Tests
         {
             Assert.Throws<InvalidOperationException>(() => Enumerable.Empty<int>().Max());
             Assert.Throws<InvalidOperationException>(() => Enumerable.Empty<int>().Max(comparer: null));
-            Assert.Throws<InvalidOperationException>(() => Enumerable.Empty<int>().Max(Comparer<int>.Create((_,_) => 0)));
+            Assert.Throws<InvalidOperationException>(() => Enumerable.Empty<int>().Max(Comparer<int>.Create((_, _) => 0)));
         }
 
         [Theory]
@@ -940,7 +941,7 @@ namespace System.Linq.Tests
 
             yield return WrapArgs(
                 source: Enumerable.Empty<int?>(),
-                comparer: Comparer<int?>.Create((_,_) => 0),
+                comparer: Comparer<int?>.Create((_, _) => 0),
                 expected: null);
 
             yield return WrapArgs(
@@ -955,7 +956,7 @@ namespace System.Linq.Tests
 
             yield return WrapArgs(
                 source: Enumerable.Range(0, 10),
-                comparer: Comparer<int>.Create((x,y) => 0),
+                comparer: Comparer<int>.Create((x, y) => 0),
                 expected: 0);
 
             yield return WrapArgs(
@@ -1100,7 +1101,7 @@ namespace System.Linq.Tests
                 expected: "Aardvark");
 
             yield return WrapArgs(
-                source: new (string Name, int Age) [] { ("Tom", 43), ("Dick", 55), ("Harry", 20) },
+                source: new (string Name, int Age)[] { ("Tom", 43), ("Dick", 55), ("Harry", 20) },
                 keySelector: x => x.Age,
                 comparer: null,
                 expected: (Name: "Dick", Age: 55));

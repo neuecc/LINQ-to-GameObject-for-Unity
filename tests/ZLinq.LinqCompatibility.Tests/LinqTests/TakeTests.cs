@@ -295,23 +295,23 @@ namespace System.Linq.Tests
         {
             Assert.Equal(2, NumberRangeGuaranteedNotCollectionType(0, 3).Take(2).Count());
             Assert.Equal(2, new[] { 1, 2, 3 }.Take(2).Count());
-            Assert.Equal(0, NumberRangeGuaranteedNotCollectionType(0, 3).Take(0).Count());
+            Assert.Empty(NumberRangeGuaranteedNotCollectionType(0, 3).Take(0));
 
             Assert.Equal(2, NumberRangeGuaranteedNotCollectionType(0, 3).Take(0..2).Count());
             Assert.Equal(2, new[] { 1, 2, 3 }.Take(0..2).Count());
-            Assert.Equal(0, NumberRangeGuaranteedNotCollectionType(0, 3).Take(0..0).Count());
+            Assert.Empty(NumberRangeGuaranteedNotCollectionType(0, 3).Take(0..0));
 
             Assert.Equal(2, NumberRangeGuaranteedNotCollectionType(0, 3).Take(^3..2).Count());
             Assert.Equal(2, new[] { 1, 2, 3 }.Take(^3..2).Count());
-            Assert.Equal(0, NumberRangeGuaranteedNotCollectionType(0, 3).Take(^3..0).Count());
+            Assert.Empty(NumberRangeGuaranteedNotCollectionType(0, 3).Take(^3..0));
 
             Assert.Equal(2, NumberRangeGuaranteedNotCollectionType(0, 3).Take(0..^1).Count());
             Assert.Equal(2, new[] { 1, 2, 3 }.Take(0..^1).Count());
-            Assert.Equal(0, NumberRangeGuaranteedNotCollectionType(0, 3).Take(0..^3).Count());
+            Assert.Empty(NumberRangeGuaranteedNotCollectionType(0, 3).Take(0..^3));
 
             Assert.Equal(2, NumberRangeGuaranteedNotCollectionType(0, 3).Take(^3..^1).Count());
             Assert.Equal(2, new[] { 1, 2, 3 }.Take(^3..^1).Count());
-            Assert.Equal(0, NumberRangeGuaranteedNotCollectionType(0, 3).Take(^3..^3).Count());
+            Assert.Empty(NumberRangeGuaranteedNotCollectionType(0, 3).Take(^3..^3));
         }
 
         [Fact]

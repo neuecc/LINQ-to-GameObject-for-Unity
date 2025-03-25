@@ -17,7 +17,8 @@ namespace System.Linq.Tests
                 yield return new object[] { Shuffler.Shuffle(Enumerable.Range(length, length).Select(i => (byte)i).ToArray()), (byte)length };
 
                 // Unit Tests does +T.One so we should generate data up to one value below sbyte.MaxValue, otherwise the type overflows
-                if ((length + length) < sbyte.MaxValue) {
+                if ((length + length) < sbyte.MaxValue)
+                {
                     yield return new object[] { Shuffler.Shuffle(Enumerable.Range(length, length).Select(i => (sbyte)i)), (sbyte)length };
                     yield return new object[] { Shuffler.Shuffle(Enumerable.Range(length, length).Select(i => (sbyte)i).ToArray()), (sbyte)length };
                 }

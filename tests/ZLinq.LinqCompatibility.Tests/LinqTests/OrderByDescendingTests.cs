@@ -13,8 +13,8 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsIntQuery()
         {
             var q = from x1 in new int[] { 1, 6, 0, -1, 3 }
-                             from x2 in new int[] { 55, 49, 9, -100, 24, 25 }
-                             select new { a1 = x1, a2 = x2 };
+                    from x2 in new int[] { 55, 49, 9, -100, 24, 25 }
+                    select new { a1 = x1, a2 = x2 };
 
             Assert.Equal(q.OrderByDescending(e => e.a1), q.OrderByDescending(e => e.a1));
         }
@@ -23,9 +23,9 @@ namespace System.Linq.Tests
         public void SameResultsRepeatCallsStringQuery()
         {
             var q = from x1 in new[] { 55, 49, 9, -100, 24, 25, -1, 0 }
-                             from x2 in new[] { "!@#$%^", "C", "AAA", "", null, "Calling Twice", "SoS", string.Empty }
-                             where !string.IsNullOrEmpty(x2)
-                             select new { a1 = x1, a2 = x2 };
+                    from x2 in new[] { "!@#$%^", "C", "AAA", "", null, "Calling Twice", "SoS", string.Empty }
+                    where !string.IsNullOrEmpty(x2)
+                    select new { a1 = x1, a2 = x2 };
 
             Assert.Equal(q.OrderByDescending(e => e.a1).ThenBy(f => f.a2), q.OrderByDescending(e => e.a1).ThenBy(f => f.a2));
         }

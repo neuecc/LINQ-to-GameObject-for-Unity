@@ -225,7 +225,7 @@ namespace System.Linq.Tests
                 }
 
                 public T Current => _enumerator.Current;
-                
+
                 object IEnumerator.Current => ((IEnumerator)_enumerator).Current;
 
                 public bool MoveNext() => _enumerator.MoveNext();
