@@ -1,142 +1,144 @@
-﻿#pragma warning disable CS9074
-#nullable enable
+﻿// TODO:currently release CI is failed so tempolary comment out this file.
 
-using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
-using ZLinq.Internal;
+//#pragma warning disable CS9074
+//#nullable enable
 
-namespace ZLinq
-{
-    public static class NativeArrayExtensions
-    {
-        public static ValueEnumerable<FromNativeArray<T>, T> AsValueEnumerable<T>(this NativeArray<T> source)
-            where T : struct
-        {
-            return new(new(source.AsReadOnly()));
-        }
+//using System;
+//using System.ComponentModel;
+//using System.Runtime.CompilerServices;
+//using System.Runtime.InteropServices;
+//using Unity.Collections;
+//using Unity.Collections.LowLevel.Unsafe;
+//using ZLinq.Internal;
 
-        public static ValueEnumerable<FromNativeArray<T>, T> AsValueEnumerable<T>(this NativeArray<T>.ReadOnly source)
-            where T : struct
-        {
-            return new(new(source));
-        }
+//namespace ZLinq
+//{
+//    public static class NativeArrayExtensions
+//    {
+//        public static ValueEnumerable<FromNativeArray<T>, T> AsValueEnumerable<T>(this NativeArray<T> source)
+//            where T : struct
+//        {
+//            return new(new(source.AsReadOnly()));
+//        }
 
-        public static ValueEnumerable<FromNativeSlice<T>, T> AsValueEnumerable<T>(this NativeSlice<T> source)
-            where T : struct
-        {
-            return new(new(source));
-        }
-    }
+//        public static ValueEnumerable<FromNativeArray<T>, T> AsValueEnumerable<T>(this NativeArray<T>.ReadOnly source)
+//            where T : struct
+//        {
+//            return new(new(source));
+//        }
 
-    [StructLayout(LayoutKind.Auto)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromNativeArray<T> : IValueEnumerator<T>
-        where T : struct
-    {
-        public FromNativeArray(NativeArray<T>.ReadOnly source)
-        {
-            this.source = source;
-            this.index = 0;
-        }
+//        public static ValueEnumerable<FromNativeSlice<T>, T> AsValueEnumerable<T>(this NativeSlice<T> source)
+//            where T : struct
+//        {
+//            return new(new(source));
+//        }
+//    }
 
-        NativeArray<T>.ReadOnly source;
-        int index;
+//    [StructLayout(LayoutKind.Auto)]
+//    [EditorBrowsable(EditorBrowsableState.Never)]
+//    public struct FromNativeArray<T> : IValueEnumerator<T>
+//        where T : struct
+//    {
+//        public FromNativeArray(NativeArray<T>.ReadOnly source)
+//        {
+//            this.source = source;
+//            this.index = 0;
+//        }
 
-        public void Dispose()
-        {
-        }
+//        NativeArray<T>.ReadOnly source;
+//        int index;
 
-        public bool TryCopyTo(Span<T> destination, Index offset)
-        {
-            if (EnumeratorHelper.TryGetSlice<T>(source, offset, destination.Length, out var slice))
-            {
-                slice.CopyTo(destination);
-                return true;
-            }
-            return false;
-        }
+//        public void Dispose()
+//        {
+//        }
 
-        public bool TryGetNext(out T current)
-        {
-            if (index < source.Length)
-            {
-                current = source[index++];
-                return true;
-            }
+//        public bool TryCopyTo(Span<T> destination, Index offset)
+//        {
+//            if (EnumeratorHelper.TryGetSlice<T>(source, offset, destination.Length, out var slice))
+//            {
+//                slice.CopyTo(destination);
+//                return true;
+//            }
+//            return false;
+//        }
 
-            current = default!;
-            return false;
-        }
+//        public bool TryGetNext(out T current)
+//        {
+//            if (index < source.Length)
+//            {
+//                current = source[index++];
+//                return true;
+//            }
 
-        public bool TryGetNonEnumeratedCount(out int count)
-        {
-            count = source.Length;
-            return true;
-        }
+//            current = default!;
+//            return false;
+//        }
 
-        public bool TryGetSpan(out ReadOnlySpan<T> span)
-        {
-            span = source;
-            return true;
-        }
-    }
+//        public bool TryGetNonEnumeratedCount(out int count)
+//        {
+//            count = source.Length;
+//            return true;
+//        }
 
-    [StructLayout(LayoutKind.Auto)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromNativeSlice<T> : IValueEnumerator<T>
-        where T : struct
-    {
-        NativeSlice<T> source;
-        int index;
+//        public bool TryGetSpan(out ReadOnlySpan<T> span)
+//        {
+//            span = source;
+//            return true;
+//        }
+//    }
 
-        public FromNativeSlice(NativeSlice<T> source)
-        {
-            this.source = source;
-            this.index = 0;
-        }
+//    [StructLayout(LayoutKind.Auto)]
+//    [EditorBrowsable(EditorBrowsableState.Never)]
+//    public struct FromNativeSlice<T> : IValueEnumerator<T>
+//        where T : struct
+//    {
+//        NativeSlice<T> source;
+//        int index;
 
-        public void Dispose()
-        {
-        }
+//        public FromNativeSlice(NativeSlice<T> source)
+//        {
+//            this.source = source;
+//            this.index = 0;
+//        }
 
-        public unsafe bool TryCopyTo(Span<T> destination, Index offset)
-        {
-            if (EnumeratorHelper.TryGetSlice(new ReadOnlySpan<T>(source.GetUnsafePtr(), source.Length), offset, destination.Length, out var slice))
-            {
-                slice.CopyTo(destination);
-                return true;
-            }
-            return false;
-        }
+//        public void Dispose()
+//        {
+//        }
 
-        public bool TryGetNext(out T current)
-        {
-            if (index < source.Length)
-            {
-                current = source[index++];
-                return true;
-            }
+//        public unsafe bool TryCopyTo(Span<T> destination, Index offset)
+//        {
+//            if (EnumeratorHelper.TryGetSlice(new ReadOnlySpan<T>(source.GetUnsafePtr(), source.Length), offset, destination.Length, out var slice))
+//            {
+//                slice.CopyTo(destination);
+//                return true;
+//            }
+//            return false;
+//        }
 
-            current = default!;
-            return false;
-        }
+//        public bool TryGetNext(out T current)
+//        {
+//            if (index < source.Length)
+//            {
+//                current = source[index++];
+//                return true;
+//            }
 
-        public bool TryGetNonEnumeratedCount(out int count)
-        {
-            count = source.Length;
-            return true;
-        }
+//            current = default!;
+//            return false;
+//        }
 
-        public unsafe bool TryGetSpan(out ReadOnlySpan<T> span)
-        {
-            span = new ReadOnlySpan<T>(source.GetUnsafePtr(), source.Length);
-            return true;
-        }
-    }
-}
+//        public bool TryGetNonEnumeratedCount(out int count)
+//        {
+//            count = source.Length;
+//            return true;
+//        }
 
-#pragma warning restore CS9074
+//        public unsafe bool TryGetSpan(out ReadOnlySpan<T> span)
+//        {
+//            span = new ReadOnlySpan<T>(source.GetUnsafePtr(), source.Length);
+//            return true;
+//        }
+//    }
+//}
+
+//#pragma warning restore CS9074
