@@ -32,9 +32,11 @@ using ZLinq.Traversables;
 
 int[] source = [1, 2, 3, 4, 5];
 
-// System.Linq
-source.Take(int.MaxValue..^int.MaxValue).ToArray();
-source.AsValueEnumerable().Take(int.MaxValue..^int.MaxValue).ToArray();
+
+// var expected1 = ((IEnumerable<int>)null).Concat(Enumerable.Range(0, 0));
+var expected2 = ((IEnumerable<int>)null).AsValueEnumerable().Concat(null);
+
+
 
 
 static IEnumerable<T> ForceNotCollection<T>(IEnumerable<T> source)
