@@ -23,24 +23,38 @@ internal static partial class ZLinqDropInExtensions
     public static Boolean Any<TSource>(this List<TSource> source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Any();
     public static Boolean Any<TSource>(this List<TSource> source, Func<TSource, Boolean> predicate) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Any(predicate);
     public static ValueEnumerable<Append<FromList<TSource>, TSource>, TSource> Append<TSource>(this List<TSource> source, TSource element) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Append(element);
-    public static Double Average<TSource, TResult>(this List<TSource> source, Func<TSource, TResult> selector)
-        where TResult : struct
-#if NET8_0_OR_GREATER
-        , INumber<TResult>
-#endif
- => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average(selector);
-    public static Nullable<Double> Average<TSource>(this List<Nullable<TSource>> source)
-        where TSource : struct
-#if NET8_0_OR_GREATER
-        , INumber<TSource>
-#endif
- => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average();
+    public static Single Average(this List<Single> source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average();
+    public static Nullable<Single> Average(this List<Nullable<Single>> source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average();
+    public static Single Average<TSource>(this List<TSource> source, Func<TSource, Single> selector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average(selector);
+    public static Nullable<Single> Average<TSource>(this List<TSource> source, Func<TSource, Nullable<Single>> selector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average(selector);
+    public static Decimal Average(this List<Decimal> source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average();
+    public static Nullable<Decimal> Average(this List<Nullable<Decimal>> source) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average();
+    public static Decimal Average<TSource>(this List<TSource> source, Func<TSource, Decimal> selector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average(selector);
+    public static Nullable<Decimal> Average<TSource>(this List<TSource> source, Func<TSource, Nullable<Decimal>> selector) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average(selector);
     public static Double Average<TSource>(this List<TSource> source)
         where TSource : struct
 #if NET8_0_OR_GREATER
         , INumber<TSource>
 #endif
  => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average();
+    public static Nullable<Double> Average<TSource>(this List<Nullable<TSource>> source)
+        where TSource : struct
+#if NET8_0_OR_GREATER
+        , INumber<TSource>
+#endif
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average();
+    public static Double Average<TSource, TResult>(this List<TSource> source, Func<TSource, TResult> selector)
+        where TResult : struct
+#if NET8_0_OR_GREATER
+        , INumber<TResult>
+#endif
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average(selector);
+    public static Nullable<Double> Average<TSource, TResult>(this List<TSource> source, Func<TSource, Nullable<TResult>> selector)
+        where TResult : struct
+#if NET8_0_OR_GREATER
+        , INumber<TResult>
+#endif
+ => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Average(selector);
     public static ValueEnumerable<Chunk<FromList<TSource>, TSource>, TSource[]> Chunk<TSource>(this List<TSource> source, Int32 size) => (source ?? throw new ArgumentNullException("source")).AsValueEnumerable().Chunk(size);
     public static ValueEnumerable<Concat<FromList<TSource>, TEnumerator2, TSource>, TSource> Concat<TEnumerator2, TSource>(this List<TSource> source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>

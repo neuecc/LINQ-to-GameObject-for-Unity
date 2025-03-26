@@ -113,7 +113,7 @@ internal static partial class ZLinqDropInExtensions
         }
 
         // debugging stop condition
-        // if (methodInfo.Name is not "Select") continue;
+        // if (methodInfo.Name is not "Average") return null;
 
         var returnType = BuildType(methodInfo, methodInfo.ReturnType, dropInType.Replacement) + IsNullableReturnParameter(methodInfo);
         var name = methodInfo.Name;
@@ -130,7 +130,8 @@ internal static partial class ZLinqDropInExtensions
             source = "(source ?? throw new ArgumentNullException(\"source\"))";
         }
 
-        var signature = $"    public static {returnType} {name}<{genericsTypes}>(this {sourceType} source{parameters}){constraints} => {source}.AsValueEnumerable().{name}({parameterNames});";
+        genericsTypes = string.IsNullOrEmpty(genericsTypes) ? "" : "<" + genericsTypes + ">";
+        var signature = $"    public static {returnType} {name}{genericsTypes}(this {sourceType} source{parameters}){constraints} => {source}.AsValueEnumerable().{name}({parameterNames});";
 
         // quick fix
         if (signature.Contains("RightJoin"))
@@ -215,6 +216,13 @@ internal static partial class ZLinqDropInExtensions
     string BuildType(MethodInfo methodInfo, Type type, string replacement)
     {
         var sourceGenericTypeName = methodInfo.GetGenericArguments().FirstOrDefault(x => !x.Name.Contains("Enumerator"))?.Name;
+        if (sourceGenericTypeName == null)
+        {
+            var t = methodInfo.GetParameters()[0].ParameterType.GetGenericArguments()[1]; // ValueEnumerable<TEnumerable **T**>
+            sourceGenericTypeName = (t.Name.Contains("Nullable"))
+                ? t.GetGenericArguments()[0].Name
+                : t.Name;
+        }
         replacement = $"{replacement}<{sourceGenericTypeName}>";
 
         var sb = new StringBuilder();
@@ -298,9 +306,16 @@ internal static partial class ZLinqDropInExtensions
 
     string BuildSourceType(MethodInfo methodInfo, string replacement, bool isArray)
     {
-        var sourceGenericTypeName = methodInfo.GetGenericArguments().First(x => !x.Name.Contains("Enumerator")).Name;
+        var sourceGenericTypeName = methodInfo.GetGenericArguments().FirstOrDefault(x => !x.Name.Contains("Enumerator"))?.Name;
+        if (sourceGenericTypeName == null)
+        {
+            var t = methodInfo.GetParameters()[0].ParameterType.GetGenericArguments()[1]; // ValueEnumerable<TEnumerable **T**>
+            sourceGenericTypeName = (t.Name.Contains("Nullable"))
+                ? t.GetGenericArguments()[0].Name
+                : t.Name;
+        }
 
-        if (methodInfo.Name is "Average" && methodInfo.ReturnType.Name.StartsWith("Nullable"))
+        if (methodInfo.Name is "Average" && methodInfo.ReturnType.Name.StartsWith("Nullable") && methodInfo.GetParameters().Length != 2)
         {
             sourceGenericTypeName = "Nullable<" + sourceGenericTypeName + ">";
         }
@@ -329,8 +344,13 @@ internal static partial class ZLinqDropInExtensions
 
         if (methodInfo.Name is "Average" or "Sum" or "SumUnchecked")
         {
-            if (methodInfo.GetParameters().Length == 2) // func
+            if (methodInfo.GetParameters().Length == 2) // func overload
             {
+                if (!methodInfo.GetGenericArguments().Any(x => x.Name is "TResult"))
+                {
+                    return "";
+                }
+
                 return """
 
         where TResult : struct
@@ -342,6 +362,11 @@ internal static partial class ZLinqDropInExtensions
             }
             else
             {
+                if (!methodInfo.GetGenericArguments().Any(x => x.Name is "TSource"))
+                {
+                    return "";
+                }
+
                 return """
 
         where TSource : struct
