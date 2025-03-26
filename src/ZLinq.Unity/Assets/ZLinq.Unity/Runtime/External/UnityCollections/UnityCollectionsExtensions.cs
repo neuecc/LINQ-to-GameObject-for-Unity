@@ -1,4 +1,6 @@
-﻿#pragma warning disable CS9074
+﻿#if ZLINQ_UNITY_COLLECTIONS_SUPPORT
+
+#pragma warning disable CS9074
 #nullable enable
 
 using System;
@@ -13,7 +15,6 @@ namespace ZLinq
 {
     public static class UnityCollectionsExtensions
     {
-#if ZLINQ_UNITY_COLLECTIONS_SUPPORT
         public static ValueEnumerable<FromNativeList<T>, T> AsValueEnumerable<T>(this NativeList<T> source)
             where T : unmanaged
         {
@@ -116,10 +117,8 @@ namespace ZLinq
         {
             return new(new(source));
         }
-#endif
     }
 
-#if ZLINQ_UNITY_COLLECTIONS_SUPPORT
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public struct FromNativeList<T> : IValueEnumerator<T>
@@ -775,7 +774,7 @@ namespace ZLinq
             return false;
         }
     }
-#endif
 }
 
 #pragma warning restore CS9074
+#endif

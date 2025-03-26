@@ -127,7 +127,7 @@ public class ConcatTest
         // Act & Assert
         Should.Throw<ArgumentNullException>(() =>
         {
-            first.AsValueEnumerable().Concat(second).ToArray();
+            first.AsValueEnumerable().Concat(second!).ToArray();
         });
     }
 

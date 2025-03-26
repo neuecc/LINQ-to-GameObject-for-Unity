@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\ZLinq.Unity\Assets\ZLinq.Unity\Runtime\**\*.cs"  />
+    <Compile Include="..\ZLinq.Unity\Assets\ZLinq.Unity\Runtime\**\*.cs" Exclude="**\NativeArrayExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>
