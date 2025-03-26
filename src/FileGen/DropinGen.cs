@@ -214,7 +214,7 @@ internal static partial class ZLinqDropInExtensions
 
     string BuildType(MethodInfo methodInfo, Type type, string replacement)
     {
-        var sourceGenericTypeName = methodInfo.GetGenericArguments().First(x => !x.Name.Contains("Enumerator")).Name;
+        var sourceGenericTypeName = methodInfo.GetGenericArguments().FirstOrDefault(x => !x.Name.Contains("Enumerator"))?.Name;
         replacement = $"{replacement}<{sourceGenericTypeName}>";
 
         var sb = new StringBuilder();

@@ -30,12 +30,10 @@ using ZLinq.Traversables;
 //var ok = string.Join(',', tako);
 
 
-int[] source = [1, 2, 3, 4, 5];
+int?[] source = [1, 2, 3, 4, 5];
 
-
-// var expected1 = ((IEnumerable<int>)null).Concat(Enumerable.Range(0, 0));
-var expected2 = ((IEnumerable<int>)null).AsValueEnumerable().Concat(null);
-
+source.Average(x => x);
+source.AsValueEnumerable().Average(x => x);
 
 
 
