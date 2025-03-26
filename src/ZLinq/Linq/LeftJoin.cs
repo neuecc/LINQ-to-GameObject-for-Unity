@@ -145,7 +145,10 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
-            inner.Dispose();
+            if (innerLookup == null)
+            {
+                inner.Dispose();
+            }
             source.Dispose();
         }
     }

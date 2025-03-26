@@ -141,8 +141,11 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
+            if (outerLookup == null) // source is outer
+            {
+                source.Dispose();
+            }
             inner.Dispose();
-            source.Dispose();
         }
     }
 }

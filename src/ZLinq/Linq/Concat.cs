@@ -103,7 +103,10 @@ namespace ZLinq.Linq
 
         public void Dispose()
         {
-            first.Dispose();
+            if (!firstCompleted)
+            {
+                first.Dispose();
+            }
             second.Dispose();
         }
     }
