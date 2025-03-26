@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>ZLinq.Tests</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TargetFrameworks>net9.0</TargetFrameworks>
+    <LangVersion>13</LangVersion>
+    <IsPackable>false</IsPackable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- Use custom root namespace -->
+    <RootNamespace>ZLinq.Tests</RootNamespace>
+
+    <!-- Microsoft.Testing.Platform Support -->
+    <OutputType>Exe</OutputType>
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="ZLinq.LinqCompatibility.Tests.slnx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" Version="2.0.0" />
+    <PackageReference Include="Shouldly" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Shouldly" />
+    <Using Include="ZLinq" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
+  </ItemGroup>
+
+  <!-- Enable ZLinq.DropInGenerator -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ZLinq.DropInGenerator\ZLinq.DropInGenerator.csproj">
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+
+    <AssemblyAttribute Include="ZLinq.ZLinqDropInAttribute">
+      <_Parameter1></_Parameter1>
+      <_Parameter2>ZLinq.DropInGenerateTypes.Everything</_Parameter2>
+      <_Parameter2_IsLiteral>true</_Parameter2_IsLiteral>
+      <_Parameter2_TypeName>ZLinq.DropInGenerateTypes</_Parameter2_TypeName>
+    </AssemblyAttribute>
+  </ItemGroup>
+</Project>
