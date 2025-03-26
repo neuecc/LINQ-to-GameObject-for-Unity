@@ -1,15 +1,25 @@
 {
     "name": "ZLinq.Unity",
     "rootNamespace": "ZLinq",
-    "references": [],
+    "references": [
+        "GUID:e0cd26848372d4e5c891c569017e11f1"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
-        "ZLinq.dll"
+        "ZLinq.dll",
+        "System.Runtime.CompilerServices.Unsafe.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.collections",
+            "expression": "",
+            "define": "ZLINQ_UNITY_COLLECTIONS_SUPPORT"
+        }
+    ],
     "noEngineReferences": false
 }
