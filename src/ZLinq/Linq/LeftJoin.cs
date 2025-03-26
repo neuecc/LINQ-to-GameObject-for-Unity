@@ -1,4 +1,6 @@
-﻿namespace ZLinq
+﻿using System.Linq;
+
+namespace ZLinq
 {
     partial class ValueEnumerableExtensions
     {
@@ -91,6 +93,9 @@ namespace ZLinq.Linq
             {
                 try
                 {
+                    // CreateForJoin excludes null.
+                    // If we want to accept null keys, we should create a lookup with null keys and join them.
+                    // However, this behavior matches the official dotnet implementation.
                     innerLookup = Lookup.CreateForJoin(ref inner, innerKeySelector, comparer);
                 }
                 finally

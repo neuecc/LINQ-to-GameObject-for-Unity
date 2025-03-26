@@ -89,6 +89,9 @@ namespace ZLinq.Linq
             {
                 try
                 {
+                    // CreateForJoin excludes null.
+                    // If we want to accept null keys, we should create a lookup with null keys and join them.
+                    // However, this behavior matches the official dotnet implementation.
                     outerLookup = Lookup.CreateForJoin(ref source, outerKeySelector, comparer);
                 }
                 finally
