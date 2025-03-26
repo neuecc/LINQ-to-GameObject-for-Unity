@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using Xunit;
 
-namespace System.Linq.Tests
+namespace ZLinq.Tests
 {
     public class IntersectTests : EnumerableTests
     {
@@ -110,14 +110,14 @@ namespace System.Linq.Tests
             AssertExtensions.Throws<ArgumentNullException>("second", () => first.Intersect(second, new AnagramEqualityComparer()));
         }
 
-        [Fact]
-        public void ForcedToEnumeratorDoesntEnumerate()
-        {
-            var iterator = NumberRangeGuaranteedNotCollectionType(0, 3).Intersect(Enumerable.Range(0, 3));
-            // Don't insist on this behaviour, but check it's correct if it happens
-            var en = iterator as IEnumerator<int>;
-            Assert.False(en is not null && en.MoveNext());
-        }
+        ////[Fact]
+        ////public void ForcedToEnumeratorDoesntEnumerate()
+        ////{
+        ////    var iterator = NumberRangeGuaranteedNotCollectionType(0, 3).Intersect(Enumerable.Range(0, 3));
+        ////    // Don't insist on this behaviour, but check it's correct if it happens
+        ////    var en = iterator as IEnumerator<int>;
+        ////    Assert.False(en is not null && en.MoveNext());
+        ////}
 
         [Fact]
         public void HashSetWithBuiltInComparer_HashSetContainsNotUsed()

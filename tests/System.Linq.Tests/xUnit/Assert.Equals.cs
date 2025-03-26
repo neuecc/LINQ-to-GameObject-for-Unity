@@ -6,24 +6,10 @@ namespace ZLinq.Tests;
 
 public static partial class Assert
 {
-    ////    internal static void Equal<TEnumerator, T>(
-    ////        ValueEnumerable<TEnumerator, T> expected,
-    ////        ValueEnumerable<TEnumerator, T> actual)
-    ////        where TEnumerator : struct, IValueEnumerator<T>
-    ////#if NET9_0_OR_GREATER
-    ////        , allows ref struct
-    ////#endif
-    ////    {
-    ////        Xunit.Assert.Equal(expected.ToArray(), actual.ToArray());
-    ////    }
-
     internal static void Equal<TEnumerator, T>(
         IEnumerable<T> expected,
         ValueEnumerable<TEnumerator, T> actual)
         where TEnumerator : struct, IValueEnumerator<T>
-#if NET9_0_OR_GREATER
-        , allows ref struct
-#endif
     {
         var results = actual.ToArray();
         Xunit.Assert.Equal(expected, results);
@@ -51,7 +37,6 @@ public static partial class Assert
     {
         Xunit.Assert.Equal(expected.ToArray(), actual);
     }
-
 
     internal static void Equal<T>(
         ValueEnumerable<Reverse<FromEnumerable<T>, T>, T> expected,
@@ -192,11 +177,38 @@ public static partial class Assert
         Xunit.Assert.Equal(expected.ToArray(), actual.ToArray());
     }
 
-
     internal static void Equal<T>(
         ValueEnumerable<Chunk<FromEnumerable<T>, T>, T[]> expected,
         ValueEnumerable<Chunk<FromEnumerable<T>, T>, T[]> actual)
     {
         Xunit.Assert.Equal(expected.ToArray(), actual.ToArray());
+    }
+
+    internal static void Equal<T>(
+        ValueEnumerable<Intersect<Select<FromArray<T>, T, T>, Select<FromArray<T>, T, T>, T>, T> expected,
+        ValueEnumerable<Intersect<Select<FromArray<T>, T, T>, Select<FromArray<T>, T, T>, T>, T> actual)
+    {
+        Xunit.Assert.Equal(expected.ToArray(), actual.ToArray());
+    }
+
+    internal static void Equal<T>(
+        IEnumerable<T> expected,
+        ValueEnumerable<IntersectBy<FromEnumerable<T>, FromEnumerable<T>, T, T>, T> actual)
+    {
+        Xunit.Assert.Equal(expected.ToArray(), actual.ToArray());
+    }
+
+    internal static void Equal<TSource, TKey>(
+        IEnumerable<TSource> expected,
+        ValueEnumerable<IntersectBy<FromEnumerable<TSource>, FromEnumerable<TKey>, TSource, TKey>, TSource> actual)
+    {
+        Xunit.Assert.Equal(expected, actual.ToArray());
+    }
+
+    internal static void Equal<T>(
+        IEnumerable<T> expected,
+        ValueEnumerable<Intersect<FromEnumerable<T>, FromEnumerable<T>, T>, T> actual)
+    {
+        Xunit.Assert.Equal(expected, actual.ToArray());
     }
 }

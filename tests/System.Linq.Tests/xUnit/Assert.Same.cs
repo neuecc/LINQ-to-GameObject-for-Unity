@@ -4,15 +4,16 @@ using ZLinq.Linq;
 
 namespace ZLinq.Tests;
 
+
+/// <summary>
+/// Assert.Same/NotSame rerating test is not supported.
+/// </summary>
 public static partial class Assert
 {
     internal static void Same<TEnumerator, T>(
         ValueEnumerable<TEnumerator, T> expected,
         ValueEnumerable<TEnumerator, T> actual)
         where TEnumerator : struct, IValueEnumerator<T>
-#if NET9_0_OR_GREATER
-, allows ref struct
-#endif
     {
         throw new NotSupportedException();
     }
@@ -21,9 +22,6 @@ public static partial class Assert
         IEnumerable<T> expected,
         ValueEnumerable<TEnumerator, T> actual)
         where TEnumerator : struct, IValueEnumerator<T>
-#if NET9_0_OR_GREATER
-    , allows ref struct
-#endif
     {
         throw new NotSupportedException();
     }

@@ -4,15 +4,15 @@ using ZLinq.Linq;
 
 namespace ZLinq.Tests;
 
+/// <summary>
+/// Assert.Same/NotSame rerating test is not supported.
+/// </summary>
 public static partial class Assert
 {
     internal static void NotSame<TEnumerator, T>(
-      ValueEnumerable<TEnumerator, T> expected,
-      ValueEnumerable<TEnumerator, T> actual)
-      where TEnumerator : struct, IValueEnumerator<T>
-#if NET9_0_OR_GREATER
-, allows ref struct
-#endif
+        ValueEnumerable<TEnumerator, T> expected,
+        ValueEnumerable<TEnumerator, T> actual)
+        where TEnumerator : struct, IValueEnumerator<T>
     {
         throw new NotSupportedException();
     }
@@ -21,9 +21,13 @@ public static partial class Assert
         IEnumerable<T> expected,
         ValueEnumerable<TEnumerator, T> actual)
         where TEnumerator : struct, IValueEnumerator<T>
-#if NET9_0_OR_GREATER
-    , allows ref struct
-#endif
+    {
+        throw new NotSupportedException();
+    }
+
+    internal static void NotSame<T>(
+        ValueEnumerable<Select<FromEnumerable<T>, T, T>, T> expected,
+        ValueEnumerable<OfType<Select<FromEnumerable<T>, T, T>, T, T>, T> actual)
     {
         throw new NotSupportedException();
     }
@@ -32,9 +36,6 @@ public static partial class Assert
         ValueEnumerable<Select<TEnumerator, TRange, TSelect>, TSelect> expected,
         ValueEnumerable<OfType<Select<TEnumerator, TRange, TSelect>, TSelect, TOfType>, TOfType> actual)
             where TEnumerator : struct, IValueEnumerator<TRange>
-#if NET9_0_OR_GREATER
-    , allows ref struct
-#endif
     {
         throw new NotSupportedException();
     }

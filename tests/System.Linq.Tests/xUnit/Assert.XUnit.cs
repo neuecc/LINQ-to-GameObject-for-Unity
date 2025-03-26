@@ -95,10 +95,11 @@ public static partial class Assert
     internal static void Equal(decimal? expected, double? actual)
         => throw new NotSupportedException("See: https://github.com/Cysharp/ZLinq/issues/74");
 
-
+    // Assert.Same/NotSame rerating test is not supported.
     public static void Same(object? expected, object? actual)
         => throw new NotSupportedException();
 
+    // Assert.Same/NotSame rerating test is not supported.
     public static void Same<T>(IEnumerable<T> expected, IEnumerable<T> actual)
         => throw new NotSupportedException();
 }
