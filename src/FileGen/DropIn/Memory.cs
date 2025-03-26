@@ -23,24 +23,38 @@ internal static partial class ZLinqDropInExtensions
     public static Boolean Any<TSource>(this Memory<TSource> source) => source.AsValueEnumerable().Any();
     public static Boolean Any<TSource>(this Memory<TSource> source, Func<TSource, Boolean> predicate) => source.AsValueEnumerable().Any(predicate);
     public static ValueEnumerable<Append<FromMemory<TSource>, TSource>, TSource> Append<TSource>(this Memory<TSource> source, TSource element) => source.AsValueEnumerable().Append(element);
-    public static Double Average<TSource, TResult>(this Memory<TSource> source, Func<TSource, TResult> selector)
-        where TResult : struct
-#if NET8_0_OR_GREATER
-        , INumber<TResult>
-#endif
- => source.AsValueEnumerable().Average(selector);
-    public static Nullable<Double> Average<TSource>(this Memory<Nullable<TSource>> source)
-        where TSource : struct
-#if NET8_0_OR_GREATER
-        , INumber<TSource>
-#endif
- => source.AsValueEnumerable().Average();
+    public static Single Average(this Memory<Single> source) => source.AsValueEnumerable().Average();
+    public static Nullable<Single> Average(this Memory<Nullable<Single>> source) => source.AsValueEnumerable().Average();
+    public static Single Average<TSource>(this Memory<TSource> source, Func<TSource, Single> selector) => source.AsValueEnumerable().Average(selector);
+    public static Nullable<Single> Average<TSource>(this Memory<TSource> source, Func<TSource, Nullable<Single>> selector) => source.AsValueEnumerable().Average(selector);
+    public static Decimal Average(this Memory<Decimal> source) => source.AsValueEnumerable().Average();
+    public static Nullable<Decimal> Average(this Memory<Nullable<Decimal>> source) => source.AsValueEnumerable().Average();
+    public static Decimal Average<TSource>(this Memory<TSource> source, Func<TSource, Decimal> selector) => source.AsValueEnumerable().Average(selector);
+    public static Nullable<Decimal> Average<TSource>(this Memory<TSource> source, Func<TSource, Nullable<Decimal>> selector) => source.AsValueEnumerable().Average(selector);
     public static Double Average<TSource>(this Memory<TSource> source)
         where TSource : struct
 #if NET8_0_OR_GREATER
         , INumber<TSource>
 #endif
  => source.AsValueEnumerable().Average();
+    public static Nullable<Double> Average<TSource>(this Memory<Nullable<TSource>> source)
+        where TSource : struct
+#if NET8_0_OR_GREATER
+        , INumber<TSource>
+#endif
+ => source.AsValueEnumerable().Average();
+    public static Double Average<TSource, TResult>(this Memory<TSource> source, Func<TSource, TResult> selector)
+        where TResult : struct
+#if NET8_0_OR_GREATER
+        , INumber<TResult>
+#endif
+ => source.AsValueEnumerable().Average(selector);
+    public static Nullable<Double> Average<TSource, TResult>(this Memory<TSource> source, Func<TSource, Nullable<TResult>> selector)
+        where TResult : struct
+#if NET8_0_OR_GREATER
+        , INumber<TResult>
+#endif
+ => source.AsValueEnumerable().Average(selector);
     public static ValueEnumerable<Chunk<FromMemory<TSource>, TSource>, TSource[]> Chunk<TSource>(this Memory<TSource> source, Int32 size) => source.AsValueEnumerable().Chunk(size);
     public static ValueEnumerable<Concat<FromMemory<TSource>, TEnumerator2, TSource>, TSource> Concat<TEnumerator2, TSource>(this Memory<TSource> source, ValueEnumerable<TEnumerator2, TSource> second)
         where TEnumerator2 : struct, IValueEnumerator<TSource>

@@ -1,108 +1,204 @@
-﻿namespace ZLinq.Tests.Linq;
+﻿using System;
+using System.Linq;
+using Shouldly;
+using Xunit;
+
+namespace ZLinq.Tests.Linq;
 
 public class AverageTest
 {
-    // Tests for empty collections - should throw NoElements exception
+    #region Basic Tests - Non-Nullable
+
     [Fact]
-    public void EmptySequenceThrows()
+    public void EmptySequence_ThrowsInvalidOperationException()
     {
-        var emptyInts = Array.Empty<int>();
-        var emptyDoubles = Array.Empty<double>();
-        var emptyDecimals = Array.Empty<decimal>();
+        // Arrange
+        var empty = Array.Empty<int>();
 
-        TestUtil.Throws<InvalidOperationException>(
-            () => emptyInts.Average(),
-            () => emptyInts.AsValueEnumerable().Average());
-
-        TestUtil.Throws<InvalidOperationException>(
-            () => emptyDoubles.Average(),
-            () => emptyDoubles.AsValueEnumerable().Average());
-
-        TestUtil.Throws<InvalidOperationException>(
-            () => emptyDecimals.Average(),
-            () => emptyDecimals.AsValueEnumerable().Average());
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(() => empty.AsValueEnumerable().Average());
+        Assert.Throws<InvalidOperationException>(() => empty.ToValueEnumerable().Average());
     }
 
-    // Tests for various numeric types
     [Fact]
-    public void IntegerAverage()
+    public void IntSequence_CalculatesCorrectAverage()
     {
-        // Test with regular integers
+        // Arrange
         var ints = new[] { 2, 4, 6, 8, 10 };
-        ints.AsValueEnumerable().Average().ShouldBe(ints.Average());
-        ints.ToValueEnumerable().Average().ShouldBe(ints.Average());
+        var expected = ints.Average();
 
-        // Test with bytes
-        var bytes = new byte[] { 1, 2, 3, 4, 5 };
-        bytes.AsValueEnumerable().Average().ShouldBe((byte)bytes.Select(x => (int)x).Average());
-        bytes.ToValueEnumerable().Average().ShouldBe((byte)bytes.Select(x => (int)x).Average());
-
-        // Test with shorts
-        var shorts = new short[] { 1, 2, 3, 4, 5 };
-        shorts.AsValueEnumerable().Average().ShouldBe((short)shorts.Select(x => (int)x).Average());
-        shorts.ToValueEnumerable().Average().ShouldBe((short)shorts.Select(x => (int)x).Average());
-
-        // Test with longs
-        var longs = new long[] { 10, 20, 30, 40, 50 };
-        longs.AsValueEnumerable().Average().ShouldBe(longs.Average());
-        longs.ToValueEnumerable().Average().ShouldBe(longs.Average());
+        // Act & Assert
+        ints.AsValueEnumerable().Average().ShouldBe(expected);
+        ints.ToValueEnumerable().Average().ShouldBe(expected);
     }
 
     [Fact]
-    public void FloatingPointAverage()
+    public void FloatSequence_CalculatesCorrectAverage()
     {
-        // Test with doubles
-        var doubles = new[] { 1.5, 2.5, 3.5, 4.5, 5.5 };
-        var a = doubles.AsValueEnumerable().Average();
-        var b = doubles.Average();
-        a.ShouldBe(b);
+        // Arrange
+        var floats = new[] { 1.5f, 2.5f, 3.5f, 4.5f };
+        var expected = floats.Average();
 
-        var c = doubles.ToValueEnumerable().Average();
-        c.ShouldBe(b);
+        // Act & Assert
+        floats.AsValueEnumerable().Average().ShouldBe(expected);
+        floats.ToValueEnumerable().Average().ShouldBe(expected);
+    }
 
-        // Test with decimals
+    [Fact]
+    public void DecimalSequence_CalculatesCorrectAverage()
+    {
+        // Arrange
         var decimals = new[] { 1.1m, 2.2m, 3.3m, 4.4m, 5.5m };
-        decimals.AsValueEnumerable().Average().ShouldBe((double)decimals.Average());
-        decimals.ToValueEnumerable().Average().ShouldBe((double)decimals.Average());
+        var expected = decimals.Average();
+
+        // Act & Assert
+        decimals.AsValueEnumerable().Average().ShouldBe(expected);
+        decimals.ToValueEnumerable().Average().ShouldBe(expected);
     }
 
-    // Edge case: single element collection
     [Fact]
-    public void SingleElementAverage()
+    public void DoubleSequence_CalculatesCorrectAverage()
     {
-        var singleInt = new[] { 42 };
-        singleInt.AsValueEnumerable().Average().ShouldBe(42.0);
-        singleInt.ToValueEnumerable().Average().ShouldBe(42.0);
+        // Arrange
+        var doubles = new[] { 1.5, 2.5, 3.5, 4.5, 5.5 };
+        var expected = doubles.Average();
 
-        var singleDouble = new[] { 42.5 };
-        singleDouble.AsValueEnumerable().Average().ShouldBe(42.5);
-        singleDouble.ToValueEnumerable().Average().ShouldBe(42.5);
+        // Act & Assert
+        doubles.AsValueEnumerable().Average().ShouldBe(expected);
+        doubles.ToValueEnumerable().Average().ShouldBe(expected);
     }
 
-    // Test with negative and positive numbers
+    #endregion
+
+    #region Nullable Type Tests
+
     [Fact]
-    public void MixedSignAverage()
+    public void EmptyNullableSequence_ReturnsNull()
     {
-        var ints = new[] { -5, -3, -1, 0, 2, 4, 6 };
-        var expected = ints.Average();
-
-        ints.AsValueEnumerable().Average().ShouldBe(expected);
-        ints.ToValueEnumerable().Average().ShouldBe(expected);
+        // Arrange
+        var empty = Array.Empty<int?>();
+        
+        // Act & Assert
+        empty.AsValueEnumerable().Average().ShouldBeNull();
+        empty.ToValueEnumerable().Average().ShouldBeNull();
     }
 
-    // Test large collections (to potentially test SIMD path)
     [Fact]
-    public void LargeCollectionAverage()
+    public void NullableSequenceWithOnlyNulls_ReturnsNull()
     {
-        // Large enough to test SIMD path on supported platforms
-        var ints = Enumerable.Range(1, 1000).ToArray();
-        var expected = ints.Average();
-
-        ints.AsValueEnumerable().Average().ShouldBe(expected);
-
-        // Also test with non-span path
-        ints.ToValueEnumerable().Average().ShouldBe(expected);
+        // Arrange
+        var onlyNulls = new int?[] { null, null, null };
+        
+        // Act & Assert
+        onlyNulls.AsValueEnumerable().Average().ShouldBeNull();
+        onlyNulls.ToValueEnumerable().Average().ShouldBeNull();
     }
+
+    [Fact]
+    public void NullableIntSequenceWithMixedValues_IgnoresNulls()
+    {
+        // Arrange
+        var mixed = new int?[] { 2, 4, null, 6, null, 8 };
+        var expected = mixed.Average();
+
+        // Act & Assert
+        mixed.AsValueEnumerable().Average().ShouldBe(expected);
+        mixed.ToValueEnumerable().Average().ShouldBe(expected);
+    }
+
+    [Fact]
+    public void NullableFloatSequenceWithMixedValues_IgnoresNulls()
+    {
+        // Arrange
+        var mixed = new float?[] { 1.5f, null, 2.5f, 3.5f, null, 4.5f };
+        var expected = mixed.Average();
+
+        // Act & Assert
+        mixed.AsValueEnumerable().Average().ShouldBe(expected);
+        mixed.ToValueEnumerable().Average().ShouldBe(expected);
+    }
+
+    [Fact]
+    public void NullableDecimalSequenceWithMixedValues_IgnoresNulls()
+    {
+        // Arrange
+        var mixed = new decimal?[] { 1.1m, null, 2.2m, null, 3.3m, 4.4m };
+        var expected = mixed.Average();
+
+        // Act & Assert
+        mixed.AsValueEnumerable().Average().ShouldBe(expected);
+        mixed.ToValueEnumerable().Average().ShouldBe(expected);
+    }
+
+    #endregion
+
+    #region Selector Function Tests
+
+    [Fact]
+    public void Selector_WithIntItems_CalculatesCorrectAverage()
+    {
+        // Arrange
+        var items = new[] { 1, 2, 3, 4, 5 };
+        var expected = items.Average(x => x * 2);
+
+        // Act & Assert
+        items.AsValueEnumerable().Average(x => x * 2).ShouldBe(expected);
+        items.ToValueEnumerable().Average(x => x * 2).ShouldBe(expected);
+    }
+
+    [Fact]
+    public void Selector_WithFloatResults_CalculatesCorrectAverage()
+    {
+        // Arrange
+        var items = new[] { 1, 2, 3, 4, 5 };
+        var expected = items.Average(x => x * 1.5f);
+
+        // Act & Assert
+        items.AsValueEnumerable().Average(x => x * 1.5f).ShouldBe(expected);
+        items.ToValueEnumerable().Average(x => x * 1.5f).ShouldBe(expected);
+    }
+
+    [Fact]
+    public void Selector_WithDecimalResults_CalculatesCorrectAverage()
+    {
+        // Arrange
+        var items = new[] { 1, 2, 3, 4, 5 };
+        var expected = items.Average(x => x * 1.5m);
+
+        // Act & Assert
+        items.AsValueEnumerable().Average(x => x * 1.5m).ShouldBe(expected);
+        items.ToValueEnumerable().Average(x => x * 1.5m).ShouldBe(expected);
+    }
+
+    [Fact]
+    public void NullableSelector_WithMixedNullResults_CalculatesCorrectAverage()
+    {
+        // Arrange
+        var items = new[] { 1, 2, 3, 4, 5 };
+        Func<int, int?> selector = x => x % 2 == 0 ? x * 2 : null;
+        var expected = items.Select(selector).Average();
+
+        // Act & Assert
+        items.AsValueEnumerable().Average(selector).ShouldBe(expected);
+        items.ToValueEnumerable().Average(selector).ShouldBe(expected);
+    }
+
+    [Fact]
+    public void NullableFloatSelector_WithMixedNullResults_CalculatesCorrectAverage()
+    {
+        // Arrange
+        var items = new[] { 1, 2, 3, 4, 5 };
+        Func<int, float?> selector = x => x % 2 == 0 ? x * 1.5f : null;
+        var expected = items.Select(selector).Average();
+
+        // Act & Assert
+        items.AsValueEnumerable().Average(selector).ShouldBe(expected);
+        items.ToValueEnumerable().Average(selector).ShouldBe(expected);
+    }
+
+    #endregion
+
+    #region Edge Cases and Precision Tests
 
     // Test floating point precision issues
     [Fact]
@@ -115,6 +211,90 @@ public class AverageTest
         values.AsValueEnumerable().Average().ShouldBe(expected);
         values.ToValueEnumerable().Average().ShouldBe(expected);
     }
+
+    // Test with zero values (shouldn't affect average)
+    [Fact]
+    public void ZeroValuesAverage()
+    {
+        var withZeros = new[] { 5, 0, 10, 0, 15 };
+        var expected = withZeros.Average();
+
+        withZeros.AsValueEnumerable().Average().ShouldBe(expected);
+        withZeros.ToValueEnumerable().Average().ShouldBe(expected);
+    }
+
+    // Test with values that result in a fractional average
+    [Fact]
+    public void FractionalAverage()
+    {
+        var oddSumInts = new[] { 1, 2, 4 }; // Sum = 7, Count = 3, Average = 2.33333...
+        var expected = oddSumInts.Average();
+
+        oddSumInts.AsValueEnumerable().Average().ShouldBe(expected);
+        oddSumInts.ToValueEnumerable().Average().ShouldBe(expected);
+    }
+
+    // Test overflow protection
+    [Fact]
+    public void OverflowProtection()
+    {
+        // Values that would overflow if summed directly as the same type
+        var largeValues = new[] { int.MaxValue / 2, int.MaxValue / 2 };
+        var expected = largeValues.Average();
+
+        largeValues.AsValueEnumerable().Average().ShouldBe(expected);
+        largeValues.ToValueEnumerable().Average().ShouldBe(expected);
+    }
+
+    // Test with single item sequence
+    [Fact]
+    public void SingleItemSequence()
+    {
+        // Single item should just return that item converted to appropriate type
+        var singleInt = new[] { 42 };
+        var expected = singleInt.Average();
+
+        singleInt.AsValueEnumerable().Average().ShouldBe(expected);
+        singleInt.ToValueEnumerable().Average().ShouldBe(expected);
+    }
+
+    #endregion
+
+    #region Return Type Tests
+
+    // Test return type for float -> float
+    [Fact]
+    public void FloatAverage_ReturnsFloat()
+    {
+        var floats = new[] { 1.5f, 2.5f, 3.5f };
+        var result = floats.AsValueEnumerable().Average();
+        
+        result.GetType().ShouldBe(typeof(float));
+    }
+
+    // Test return type for decimal -> decimal
+    [Fact]
+    public void DecimalAverage_ReturnsDecimal()
+    {
+        var decimals = new[] { 1.5m, 2.5m, 3.5m };
+        var result = decimals.AsValueEnumerable().Average();
+        
+        result.GetType().ShouldBe(typeof(decimal));
+    }
+
+    // Test return type for int -> double
+    [Fact]
+    public void IntAverage_ReturnsDouble()
+    {
+        var ints = new[] { 1, 2, 3 };
+        var result = ints.AsValueEnumerable().Average();
+        
+        result.GetType().ShouldBe(typeof(double));
+    }
+
+    #endregion
+
+    #region .NET 8+ Specific Tests
 
 #if NET8_0_OR_GREATER
     // Test SIMD optimization for integers (NET 8+)
@@ -143,40 +323,40 @@ public class AverageTest
 
         values.AsValueEnumerable().Average().ShouldBe(expected);
     }
+
+    // Test SIMD performance with large arrays
+    [Fact]
+    public void LargeArray_UsesSimdOptimization()
+    {
+        var length = 10000;
+        var ints = new int[length];
+
+        for (int i = 0; i < length; i++)
+        {
+            ints[i] = i % 100; // Keep values small to avoid overflow
+        }
+
+        var expected = ints.Average();
+        ints.AsValueEnumerable().Average().ShouldBe(expected);
+    }
 #endif
 
-    // Test with zero values (shouldn't affect average)
-    [Fact]
-    public void ZeroValuesAverage()
-    {
-        var withZeros = new[] { 5, 0, 10, 0, 15 };
-        var expected = withZeros.Average();
+    #endregion
 
-        withZeros.AsValueEnumerable().Average().ShouldBe(expected);
-        withZeros.ToValueEnumerable().Average().ShouldBe(expected);
+    #region ArgumentNullException Tests
+
+    [Fact]
+    public void NullSelector_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var items = new[] { 1, 2, 3 };
+        Func<int, int> selector = null!;
+        Func<int, int?> nullableSelector = null!;
+        
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => items.AsValueEnumerable().Average(selector));
+        Assert.Throws<ArgumentNullException>(() => items.AsValueEnumerable().Average(nullableSelector));
     }
 
-    // Test with values that result in a fractional average
-    [Fact]
-    public void FractionalAverage()
-    {
-        var oddSumInts = new[] { 1, 2, 4 }; // Sum = 7, Count = 3, Average = 2.33333...
-        var expected = oddSumInts.Average();
-
-        oddSumInts.AsValueEnumerable().Average().ShouldBe(expected);
-        oddSumInts.ToValueEnumerable().Average().ShouldBe(expected);
-    }
-
-    // Test return type is always double regardless of input type
-    [Fact]
-    public void ReturnTypeIsDouble()
-    {
-        var ints = new[] { 2, 4, 6 };
-        var doubles = new[] { 2.0, 4.0, 6.0 };
-        var decimals = new[] { 2.0m, 4.0m, 6.0m };
-
-        ints.AsValueEnumerable().Average().GetType().ShouldBe(typeof(double));
-        doubles.AsValueEnumerable().Average().GetType().ShouldBe(typeof(double));
-        decimals.AsValueEnumerable().Average().GetType().ShouldBe(typeof(double));
-    }
+    #endregion
 }
