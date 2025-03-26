@@ -1,6 +1,7 @@
 ﻿namespace ZLinq.Internal;
 
-internal static class EnumeratorHelper
+// Intending to use internal, but making it public so it can be used as a helper when creating own operators.
+public static class EnumeratorHelper
 {
     public static bool TryGetSliceRange(int sourceLength, Index offset, int destinationLength, out int start, out int count)
     {

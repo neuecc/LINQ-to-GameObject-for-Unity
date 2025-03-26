@@ -1,7 +1,9 @@
 ﻿{
-    "name": "ZLinq.Unity",
+    "name": "ZLinq.Unity.UnityCollectoins",
     "rootNamespace": "ZLinq",
-    "references": [],
+    "references": [
+        "Unity.Collections"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,

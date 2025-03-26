@@ -1,4 +1,5 @@
 ﻿#pragma warning disable CS9074
+#nullable enable
 
 using System;
 using System.ComponentModel;
@@ -12,24 +13,6 @@ namespace ZLinq
 {
     public static class UnityCollectionsExtensions
     {
-        public static ValueEnumerable<FromNativeArray<T>, T> AsValueEnumerable<T>(this NativeArray<T> source)
-            where T : struct
-        {
-            return new(new(source.AsReadOnly()));
-        }
-
-        public static ValueEnumerable<FromNativeArray<T>, T> AsValueEnumerable<T>(this NativeArray<T>.ReadOnly source)
-            where T : struct
-        {
-            return new(new(source));
-        }
-
-        public static ValueEnumerable<FromNativeSlice<T>, T> AsValueEnumerable<T>(this NativeSlice<T> source)
-            where T : struct
-        {
-            return new(new(source));
-        }
-
 #if ZLINQ_UNITY_COLLECTIONS_SUPPORT
         public static ValueEnumerable<FromNativeList<T>, T> AsValueEnumerable<T>(this NativeList<T> source)
             where T : unmanaged
@@ -136,112 +119,6 @@ namespace ZLinq
 #endif
     }
 
-    [StructLayout(LayoutKind.Auto)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromNativeArray<T> : IValueEnumerator<T>
-        where T : struct
-    {
-        public FromNativeArray(NativeArray<T>.ReadOnly source)
-        {
-            this.source = source;
-            this.index = 0;
-        }
-
-        NativeArray<T>.ReadOnly source;
-        int index;
-
-        public void Dispose()
-        {
-        }
-
-        public bool TryCopyTo(Span<T> destination, Index offset)
-        {
-            if (EnumeratorHelper.TryGetSlice<T>(source, offset, destination.Length, out var slice))
-            {
-                slice.CopyTo(destination);
-                return true;
-            }
-            return false;
-        }
-
-        public bool TryGetNext(out T current)
-        {
-            if (index < source.Length)
-            {
-                current = source[index++];
-                return true;
-            }
-
-            Unsafe.SkipInit(out current);
-            return false;
-        }
-
-        public bool TryGetNonEnumeratedCount(out int count)
-        {
-            count = source.Length;
-            return true;
-        }
-
-        public bool TryGetSpan(out ReadOnlySpan<T> span)
-        {
-            span = source;
-            return true;
-        }
-    }
-
-    [StructLayout(LayoutKind.Auto)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct FromNativeSlice<T> : IValueEnumerator<T>
-        where T : struct
-    {
-        NativeSlice<T> source;
-        int index;
-
-        public FromNativeSlice(NativeSlice<T> source)
-        {
-            this.source = source;
-            this.index = 0;
-        }
-
-        public void Dispose()
-        {
-        }
-
-        public unsafe bool TryCopyTo(Span<T> destination, Index offset)
-        {
-            if (EnumeratorHelper.TryGetSlice(new ReadOnlySpan<T>(source.GetUnsafePtr(), source.Length), offset, destination.Length, out var slice))
-            {
-                slice.CopyTo(destination);
-                return true;
-            }
-            return false;
-        }
-
-        public bool TryGetNext(out T current)
-        {
-            if (index < source.Length)
-            {
-                current = source[index++];
-                return true;
-            }
-
-            Unsafe.SkipInit(out current);
-            return false;
-        }
-
-        public bool TryGetNonEnumeratedCount(out int count)
-        {
-            count = source.Length;
-            return true;
-        }
-
-        public unsafe bool TryGetSpan(out ReadOnlySpan<T> span)
-        {
-            span = new ReadOnlySpan<T>(source.GetUnsafePtr(), source.Length);
-            return true;
-        }
-    }
-
 #if ZLINQ_UNITY_COLLECTIONS_SUPPORT
     [StructLayout(LayoutKind.Auto)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -279,7 +156,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -324,7 +201,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -369,7 +246,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -415,7 +292,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -457,7 +334,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -500,7 +377,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -543,7 +420,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -586,7 +463,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -629,7 +506,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -672,7 +549,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -714,7 +591,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -756,7 +633,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -798,7 +675,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -840,7 +717,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
@@ -882,7 +759,7 @@ namespace ZLinq
                 return true;
             }
 
-            Unsafe.SkipInit(out current);
+            current = default!;
             return false;
         }
 
