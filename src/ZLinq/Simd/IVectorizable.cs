@@ -142,7 +142,7 @@ public ref struct Vectorizable<T>(ReadOnlySpan<T> span)
         ref var head = ref MemoryMarshal.GetReference(span);
 
         nuint elementOffset = 0;
-        if (Vector.IsHardwareAccelerated && span.Length >= Vector<T>.Count)
+        if (Vector.IsHardwareAccelerated && Vector<T>.IsSupported && span.Length >= Vector<T>.Count)
         {
             nuint oneVectorAwayFromEnd = (nuint)(span.Length - Vector<T>.Count);
             if (span.Length >= Vector<T>.Count)
@@ -178,7 +178,7 @@ public ref struct Vectorizable<T>(ReadOnlySpan<T> span)
         ref var head = ref MemoryMarshal.GetReference(span);
 
         nuint elementOffset = 0;
-        if (Vector.IsHardwareAccelerated && span.Length >= Vector<T>.Count)
+        if (Vector.IsHardwareAccelerated && Vector<T>.IsSupported && span.Length >= Vector<T>.Count)
         {
             nuint oneVectorAwayFromEnd = (nuint)(span.Length - Vector<T>.Count);
             if (span.Length >= Vector<T>.Count)
@@ -215,7 +215,7 @@ public ref struct Vectorizable<T>(ReadOnlySpan<T> span)
         ref var current = ref MemoryMarshal.GetReference(span);
         ref var end = ref Unsafe.Add(ref current, span.Length);
 
-        if (Vector.IsHardwareAccelerated && span.Length >= Vector<T>.Count)
+        if (Vector.IsHardwareAccelerated && Vector<T>.IsSupported && span.Length >= Vector<T>.Count)
         {
             ref var to = ref Unsafe.Subtract(ref end, Vector<T>.Count);
             do

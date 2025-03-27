@@ -30,11 +30,11 @@ using ZLinq.Traversables;
 //var ok = string.Join(',', tako);
 
 
-int?[] source = [1, 2, 3, 4, 5];
+Int128[] source = [1, 2, 3, 4, 5];
 
-source.Average(x => x);
-source.AsValueEnumerable().Average(x => x);
 
+var a = source.AsValueEnumerable().Max();
+Console.WriteLine(a);
 
 
 static IEnumerable<T> ForceNotCollection<T>(IEnumerable<T> source)

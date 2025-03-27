@@ -936,12 +936,11 @@ partial class ValueEnumerableExtensions
 
         ref var current = ref MemoryMarshal.GetReference(span);
         ref var end = ref Unsafe.Add(ref current, span.Length);
-        ref var to = ref Unsafe.Subtract(ref end, Vector<int>.Count);
-
         var sum = 0L;
 
-        if (Vector.IsHardwareAccelerated && span.Length >= Vector<int>.Count)
+        if (Vector.IsHardwareAccelerated && Vector<int>.IsSupported && span.Length >= Vector<int>.Count)
         {
+            ref var to = ref Unsafe.Subtract(ref end, Vector<int>.Count);
             var vectorSum = Vector<long>.Zero; // <0, 0, 0, 0> : Vector<long>
             do
             {

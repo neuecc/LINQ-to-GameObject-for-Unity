@@ -267,12 +267,12 @@ partial class ValueEnumerableExtensions
     {
         if (span.Length == 0) Throws.NoElements();
 
-        ref var current = ref MemoryMarshal.GetReference(span);
-        ref var end = ref Unsafe.Add(ref current, span.Length);
-        ref var to = ref Unsafe.Subtract(ref end, Vector<T>.Count);
-
-        if (Vector.IsHardwareAccelerated && span.Length >= Vector<T>.Count)
+        if (Vector.IsHardwareAccelerated && Vector<T>.IsSupported && span.Length >= Vector<T>.Count)
         {
+            ref var current = ref MemoryMarshal.GetReference(span);
+            ref var end = ref Unsafe.Add(ref current, span.Length);
+            ref var to = ref Unsafe.Subtract(ref end, Vector<T>.Count);
+
             var vectorResult = Vector.LoadUnsafe(ref current);
             current = ref Unsafe.Add(ref current, Vector<T>.Count);
             while (Unsafe.IsAddressLessThan(ref current, ref to)) // exclude last

@@ -77,6 +77,7 @@ namespace ZLinq.Linq
 
 #if NET8_0_OR_GREATER
             if (Vector.IsHardwareAccelerated
+                && Vector<int>.IsSupported
 #if NET8_0
                 && Vector<int>.Count <= 16
 #endif

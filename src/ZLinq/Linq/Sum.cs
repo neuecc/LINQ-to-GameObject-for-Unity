@@ -400,12 +400,13 @@ partial class ValueEnumerableExtensions
     {
         ref var current = ref MemoryMarshal.GetReference(span);
         ref var end = ref Unsafe.Add(ref current, span.Length);
-        ref var to = ref Unsafe.Subtract(ref end, Vector<T>.Count);
 
         var result = T.Zero;
 
-        if (Vector.IsHardwareAccelerated && span.Length >= Vector<T>.Count)
+        if (Vector.IsHardwareAccelerated && Vector<T>.IsSupported && span.Length >= Vector<T>.Count)
         {
+            ref var to = ref Unsafe.Subtract(ref end, Vector<T>.Count);
+
             var vectorSum = Vector<T>.Zero;
             var overflowTest = new Vector<T>(T.MinValue);
             do
@@ -450,12 +451,12 @@ partial class ValueEnumerableExtensions
     {
         ref var current = ref MemoryMarshal.GetReference(span);
         ref var end = ref Unsafe.Add(ref current, span.Length);
-        ref var to = ref Unsafe.Subtract(ref end, Vector<T>.Count);
 
         var result = T.Zero;
 
-        if (Vector.IsHardwareAccelerated && span.Length >= Vector<T>.Count)
+        if (Vector.IsHardwareAccelerated && Vector<T>.IsSupported && span.Length >= Vector<T>.Count)
         {
+            ref var to = ref Unsafe.Subtract(ref end, Vector<T>.Count);
             var vectorSum = Vector<T>.Zero;
             do
             {
@@ -496,12 +497,12 @@ partial class ValueEnumerableExtensions
     {
         ref var current = ref MemoryMarshal.GetReference(span);
         ref var end = ref Unsafe.Add(ref current, span.Length);
-        ref var to = ref Unsafe.Subtract(ref end, Vector<T>.Count);
 
         var result = T.Zero;
 
-        if (Vector.IsHardwareAccelerated && span.Length >= Vector<T>.Count)
+        if (Vector.IsHardwareAccelerated && Vector<T>.IsSupported && span.Length >= Vector<T>.Count)
         {
+            ref var to = ref Unsafe.Subtract(ref end, Vector<T>.Count);
             var vectorSum = Vector<T>.Zero;
             do
             {
