@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 
 namespace ZLinq
 {
@@ -339,7 +340,10 @@ namespace ZLinq.Linq
             var compareResult = comparer.Compare(keys[index1], keys[index2]);
             if (compareResult != 0)
             {
-                return descending ? -compareResult : compareResult;
+                // -int.MinValue does not get its sign flipped and remains as int.MinValue.
+                // Since only -1, 1 are needed for comparison, normalization is done here.
+                var sign = (compareResult > 0) ? 1 : -1;
+                return descending ? -sign : sign;
             }
 
             // same result => thenBy

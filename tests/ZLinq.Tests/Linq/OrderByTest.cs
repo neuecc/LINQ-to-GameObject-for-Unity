@@ -434,6 +434,30 @@ And Immortality.".Split([' ', '\n', '\r', '-'], StringSplitOptions.RemoveEmptyEn
         source2.First().ShouldBe(5);
         source2.Last().ShouldBe(1);
     }
+
+    // test from dotnet/runtime
+    [Fact]
+    public void OrderByExtremeComparer()
+    {
+        int[] outOfOrder = new[] { 7, 1, 0, 9, 3, 5, 4, 2, 8, 6 };
+
+        // The .NET Framework has a bug where the input is incorrectly ordered if the comparer 
+        // returns int.MaxValue or int.MinValue. See https://github.com/dotnet/corefx/pull/2240 
+        IEnumerable<int> ordered = outOfOrder.AsValueEnumerable().OrderDescending(new ExtremeComparer()).ToArray();
+        Assert.Equal(Enumerable.Range(0, 10).Reverse(), ordered);
+    }
+
+    private class ExtremeComparer : IComparer<int>
+    {
+        public int Compare(int x, int y)
+        {
+            if (x == y)
+                return 0;
+            if (x < y)
+                return int.MinValue;
+            return int.MaxValue;
+        }
+    }
 }
 
 public class Person
