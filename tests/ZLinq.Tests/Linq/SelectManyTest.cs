@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Shouldly;
@@ -395,4 +396,122 @@ public class SelectManyTest
     }
 
     #endregion
+
+
+    public static IEnumerable<object[]> DisposeAfterEnumerationData()
+    {
+        int[] lengths = { 1, 2, 3, 5, 8, 13, 21, 34 };
+
+        return lengths.SelectMany(l => lengths, (l1, l2) => new object[] { l1, l2 });
+    }
+
+    // test from dotnet/runtime
+    [Theory]
+    [MemberData(nameof(DisposeAfterEnumerationData))]
+    public void DisposeAfterEnumeration(int sourceLength, int subLength)
+    {
+        int sourceState = 0;
+        int subIndex = 0; // Index within the arrays the sub-collection is supposed to be at.
+        int[] subState = new int[sourceLength];
+
+        bool sourceDisposed = false;
+        bool[] subCollectionDisposed = new bool[sourceLength];
+
+        var source = new DelegateIterator<int>(
+            moveNext: () => ++sourceState <= sourceLength,
+            current: () => 0,
+            dispose: () => sourceDisposed = true);
+
+        var subCollection = new DelegateIterator<int>(
+            moveNext: () => ++subState[subIndex] <= subLength, // Return true `subLength` times.
+            current: () => subState[subIndex],
+            dispose: () => subCollectionDisposed[subIndex++] = true); // Record that Dispose was called, and move on to the next index.
+
+        var iterator = source.AsValueEnumerable().SelectMany(_ => subCollection); // AsValueEunmerable
+
+        int index = 0; // How much have we gone into the iterator?
+        //var e = iterator.GetEnumerator();
+
+        using (var e = iterator.GetEnumerator())
+        {
+            while (e.MoveNext())
+            {
+                int item = e.Current;
+
+                Assert.Equal(subState[subIndex], item); // Verify Current.
+                Assert.Equal(index / subLength, subIndex);
+
+                Assert.False(sourceDisposed); // Not yet.
+
+                // This represents whehter the sub-collection we're iterating thru right now
+                // has been disposed. Also not yet.
+                Assert.False(subCollectionDisposed[subIndex]);
+
+                // However, all of the sub-collections before us should have been disposed.
+                // Their indices should also be maxed out.
+                Assert.All(subState.Take(subIndex), s => Assert.Equal(subLength + 1, s));
+                Assert.All(subCollectionDisposed.Take(subIndex), t => Assert.True(t));
+
+                index++;
+            }
+            e.Dispose();
+
+            //// .NET Core fixes an oversight where we wouldn't properly dispose
+            //// the SelectMany iterator. See https://github.com/dotnet/corefx/pull/13942.
+            int expectedCurrent = 0;
+            Assert.Equal(expectedCurrent, e.Current);
+            Assert.False(e.MoveNext());
+            Assert.Equal(expectedCurrent, e.Current);
+        }
+
+        Assert.True(sourceDisposed);
+        Assert.Equal(sourceLength, subIndex);
+        Assert.All(subState, s => Assert.Equal(subLength + 1, s));
+        Assert.All(subCollectionDisposed, t => Assert.True(t));
+    }
+
+
+
+    sealed class DelegateIterator<TSource> : IEnumerable<TSource>, IEnumerator<TSource>
+    {
+        private readonly Func<IEnumerator<TSource>> _getEnumerator;
+        private readonly Func<bool> _moveNext;
+        private readonly Func<TSource> _current;
+        private readonly Func<IEnumerator> _explicitGetEnumerator;
+        private readonly Func<object> _explicitCurrent;
+        private readonly Action _reset;
+        private readonly Action _dispose;
+
+        public DelegateIterator(
+            Func<IEnumerator<TSource>> getEnumerator = null!,
+            Func<bool> moveNext = null!,
+            Func<TSource> current = null!,
+            Func<IEnumerator> explicitGetEnumerator = null!,
+            Func<object> explicitCurrent = null!,
+            Action reset = null!,
+            Action dispose = null!)
+        {
+            _getEnumerator = getEnumerator ?? (() => this);
+            _moveNext = moveNext ?? (() => { throw new NotImplementedException(); });
+            _current = current ?? (() => { throw new NotImplementedException(); });
+            _explicitGetEnumerator = explicitGetEnumerator ?? (() => { throw new NotImplementedException(); });
+            _explicitCurrent = explicitCurrent ?? (() => { throw new NotImplementedException(); });
+            _reset = reset ?? (() => { throw new NotImplementedException(); });
+            _dispose = dispose ?? (() => { throw new NotImplementedException(); });
+        }
+
+        public IEnumerator<TSource> GetEnumerator() => _getEnumerator();
+
+        public bool MoveNext() => _moveNext();
+
+        public TSource Current => _current();
+
+        IEnumerator IEnumerable.GetEnumerator() => _explicitGetEnumerator();
+
+        object IEnumerator.Current => _explicitCurrent();
+
+        void IEnumerator.Reset() => _reset();
+
+        void IDisposable.Dispose() => _dispose();
+    }
 }

@@ -76,7 +76,18 @@ struct ValueEnumerator<TEnumerator, T>(TEnumerator enumerator) : IDisposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool MoveNext() => enumerator.TryGetNext(out current);
+    public bool MoveNext()
+    {
+        if (enumerator.TryGetNext(out current))
+        {
+            return true;
+        }
+        else
+        {
+            current = default!;
+            return false;
+        }
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Dispose() => enumerator.Dispose();
