@@ -14,6 +14,7 @@ internal struct ArrayBuilder<T>
     public int Count => count;
     public ArraySegment<T> Array => array == null ? [] : new(array, 0, count);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(T value)
     {
         if (array == null)

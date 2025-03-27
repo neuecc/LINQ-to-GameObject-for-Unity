@@ -45,6 +45,9 @@ namespace ZLinq.Linq
     {
         TEnumerator source = source;
 
+        internal TEnumerator GetSource() => source;
+        internal Func<TSource, bool> Predicate => predicate;
+
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = default;

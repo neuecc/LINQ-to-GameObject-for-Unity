@@ -2,17 +2,31 @@
 
 internal static class SingleSpan
 {
-    internal static Span<T> Create<T>(ref T reference)
+    internal static Span<T> Create<T>(
+#if !NETSTANDARD2_0
+        ref T reference
+#endif
+    )
     {
 #if NETSTANDARD2_0
-        unsafe
+        var array = SingleArray<T>.Array;
+        if (array == null)
         {
-            return new Span<T>(Unsafe.AsPointer(ref reference), 1);
+            array = SingleArray<T>.Array = new T[1];
         }
+        return array.AsSpan(); // no reference...
 #elif NETSTANDARD2_1
         return MemoryMarshal.CreateSpan(ref reference, 1);
 #else // NET8_0_OR_GREATER
         return new Span<T>(ref reference);
 #endif
     }
+
+#if NETSTANDARD2_0
+    internal static class SingleArray<T>
+    {
+        [ThreadStatic]
+        public static T[]? Array;
+    }
+#endif
 }

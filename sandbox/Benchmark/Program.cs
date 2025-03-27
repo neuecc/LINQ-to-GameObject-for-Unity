@@ -1,4 +1,4 @@
-#pragma warning disable
+﻿#pragma warning disable
 
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;

@@ -127,11 +127,20 @@
         {
 
             var current = default(TSource)!;
+#if NETSTANDARD2_0
+            var span = SingleSpan.Create<TSource>();
+            if (source.TryCopyTo(span, ^1))
+            {
+                value = span[0];
+                return true;
+            }
+#else
             if (source.TryCopyTo(SingleSpan.Create(ref current), ^1))
             {
                 value = current;
                 return true;
             }
+#endif
             else if (EnumeratorHelper.TryConsumeGetAt<TEnumerator, TSource>(ref source, ^1, out current))
             {
                 value = current!;
