@@ -22,10 +22,6 @@ internal static class Program
 #if DEBUG
         // BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
 
-        var bench = new Benchmark.CastOfType();
-        var a = bench.LinqCastToArray();
-        var b = bench.ZLinqCastToArray();
-
         var i = 0;
         foreach (var item in typeof(Enumerable).GetMethods().GroupBy(x => x.Name))
         {

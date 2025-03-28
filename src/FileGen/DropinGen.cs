@@ -97,12 +97,14 @@ internal static partial class ZLinqDropInExtensions
             return null;
         }
 
-        if (methodInfo.Name is "Where" && methodInfo.ReturnType.GetGenericArguments().Any(x => x.Name.Contains("SelectWhere")))
+        // ignore some optimzie chain
+
+        if (methodInfo.Name is "Where" && methodInfo.ReturnType.GetGenericArguments().Any(x => x.Name.Contains("SelectWhere") || x.Name.Contains("WhereArray")))
         {
             return null;
         }
 
-        if (methodInfo.Name is "Select" && methodInfo.ReturnType.GetGenericArguments().Any(x => x.Name.Contains("WhereSelect")))
+        if (methodInfo.Name is "Select" && methodInfo.ReturnType.GetGenericArguments().Any(x => x.Name.Contains("WhereSelect") || x.Name.Contains("WhereArraySelect")))
         {
             return null;
         }
@@ -110,6 +112,15 @@ internal static partial class ZLinqDropInExtensions
         if (methodInfo.Name is "Contains" && !methodInfo.GetGenericArguments().Any(x => x.Name == "TEnumerator"))
         {
             return null;
+        }
+
+        if (methodInfo.Name is "ToArray")
+        {
+            var firstParameter = methodInfo.GetParameters()[0].ParameterType.ToString();
+            if (firstParameter.Contains("Where") || firstParameter.Contains("OfType"))
+            {
+                return null;
+            }
         }
 
         // debugging stop condition
@@ -141,6 +152,10 @@ internal static partial class ZLinqDropInExtensions
         else if (signature.Contains("LeftJoin"))
         {
             signature = signature.Replace("Func<TOuter, TInner, TResult> resultSelector", "Func<TOuter, TInner?, TResult> resultSelector");
+        }
+        else if (signature.Contains("Where<FromArray<TSource>, TSource>"))
+        {
+            signature = signature.Replace("Where<FromArray<TSource>, TSource>", "WhereArray<TSource>");
         }
         else if (methodInfo.Name == "SumUnchecked")
         {
