@@ -315,7 +315,8 @@ namespace ZLinq.Linq
         }
     }
 
-    internal sealed class Lookup<TKey, TElement> : ILookup<TKey, TElement>
+    // .NET ILookup implements ICollection
+    internal sealed class Lookup<TKey, TElement> : ILookup<TKey, TElement>, ICollection<IGrouping<TKey, TElement>>, IReadOnlyCollection<IGrouping<TKey, TElement>>
     {
         internal static readonly Lookup<TKey, TElement> Empty = new Lookup<TKey, TElement>();
 
@@ -428,6 +429,46 @@ namespace ZLinq.Linq
         {
             // allows null.
             return (uint)((key is null) ? 0 : comparer.GetHashCode(key) & 0x7FFFFFFF);
+        }
+
+        // ICollection
+
+        bool ICollection<IGrouping<TKey, TElement>>.IsReadOnly => true;
+
+        void ICollection<IGrouping<TKey, TElement>>.Add(IGrouping<TKey, TElement> item) => throw new NotSupportedException();
+        bool ICollection<IGrouping<TKey, TElement>>.Remove(IGrouping<TKey, TElement> item) => throw new NotSupportedException();
+        void ICollection<IGrouping<TKey, TElement>>.Clear() => throw new NotSupportedException();
+
+        bool ICollection<IGrouping<TKey, TElement>>.Contains(IGrouping<TKey, TElement> item)
+        {
+            var group = GetGroup(item.Key);
+            if (group != null && group == item)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        void ICollection<IGrouping<TKey, TElement>>.CopyTo(IGrouping<TKey, TElement>[] array, int arrayIndex)
+        {
+            ArgumentNullException.ThrowIfNull(array);
+            if (arrayIndex < 0) throw new ArgumentOutOfRangeException(nameof(arrayIndex), "Non-negative number required.");
+            if (arrayIndex > array.Length) throw new ArgumentOutOfRangeException(nameof(arrayIndex), "Index was out of range. Must be non-negative and less than the size of the collection.");
+            if (array.Length - arrayIndex < Count)  throw new ArgumentOutOfRangeException(nameof(arrayIndex), "Destination array is not long enough to copy all the items in the collection. Check array index and length.");
+
+            if (last is null) return;
+
+            var group = last.NextGroupInAddOrder; // as first.
+            if (group is null) return;
+
+            var first = group;
+            do
+            {
+                array[arrayIndex] = group;
+                ++arrayIndex;
+
+                group = group.NextGroupInAddOrder;
+            } while (group != null && group != first);
         }
     }
 

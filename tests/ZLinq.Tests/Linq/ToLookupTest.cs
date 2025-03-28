@@ -174,4 +174,91 @@ public class ToLookupTest
         lookup[3].ShouldBe(new[] { "CCC" });
         lookup[4].ShouldBe(new[] { "DDDD" });
     }
+
+    [Fact]
+    public void ICollectionContains()
+    {
+        var xs = new[] { 1, 2, 3, 4, 5 };
+        var lookup = xs.AsValueEnumerable().ToLookup(x => x);
+
+        // Cast to ICollection to test the explicit interface implementation
+        var collection = (ICollection<IGrouping<int, int>>)lookup;
+
+        // Contains should return true only when the exact same grouping instance is passed
+        foreach (var group in collection)
+        {
+            collection.Contains(group).ShouldBeTrue();
+        }
+
+        // A different grouping with the same key should return false
+        var otherLookup = xs.AsValueEnumerable().ToLookup(x => x);
+        foreach (var group in otherLookup)
+        {
+            collection.Contains(group).ShouldBeFalse();
+        }
+    }
+
+    [Fact]
+    public void ICollectionCopyTo()
+    {
+        var xs = new[] { 1, 2, 3, 4, 5 };
+        var lookup = xs.AsValueEnumerable().ToLookup(x => x);
+
+        // Cast to ICollection to test the explicit interface implementation
+        var collection = (ICollection<IGrouping<int, int>>)lookup;
+
+        // Create array to copy to
+        var array = new IGrouping<int, int>[collection.Count];
+        collection.CopyTo(array, 0);
+
+        // Verify that all elements were copied
+        var i = 0;
+        foreach (var group in lookup)
+        {
+            array[i++].ShouldBe(group);
+        }
+
+        // Test with offset
+        var largerArray = new IGrouping<int, int>[collection.Count + 2];
+        collection.CopyTo(largerArray, 1);
+
+        largerArray[0].ShouldBeNull();
+        i = 0;
+        foreach (var group in lookup)
+        {
+            largerArray[i + 1].ShouldBe(group);
+            i++;
+        }
+        largerArray[collection.Count + 1].ShouldBeNull();
+    }
+
+    [Fact]
+    public void ICollectionCopyToExceptions()
+    {
+        var xs = new[] { 1, 2, 3, 4, 5 };
+        var lookup = xs.AsValueEnumerable().ToLookup(x => x);
+
+        // Cast to ICollection to test the explicit interface implementation
+        var collection = (ICollection<IGrouping<int, int>>)lookup;
+
+        // Should throw when array is null
+        Should.Throw<ArgumentNullException>(() => collection.CopyTo(null!, 0));
+
+        // Should throw when index is negative
+        Should.Throw<ArgumentOutOfRangeException>(() =>
+            collection.CopyTo(new IGrouping<int, int>[collection.Count], -1));
+
+        // Should throw when index is greater than array length
+        Should.Throw<ArgumentOutOfRangeException>(() =>
+            collection.CopyTo(new IGrouping<int, int>[collection.Count], collection.Count + 1));
+
+        // Should throw when array is too small
+        Should.Throw<ArgumentOutOfRangeException>(() =>
+            collection.CopyTo(new IGrouping<int, int>[collection.Count - 1], 0));
+
+        // Should throw when array with offset is too small
+        Should.Throw<ArgumentOutOfRangeException>(() =>
+            collection.CopyTo(new IGrouping<int, int>[collection.Count], 1));
+    }
+
 }
