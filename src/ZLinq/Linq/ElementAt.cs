@@ -95,6 +95,7 @@ namespace ZLinq
             if (source.TryCopyTo(span, index))
             {
                 value = span[0];
+                span.Clear();
                 return true;
             }
 #else

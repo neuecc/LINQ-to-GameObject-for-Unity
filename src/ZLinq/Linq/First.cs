@@ -133,6 +133,7 @@ namespace ZLinq
             if (source.TryCopyTo(span, 0))
             {
                 value = span[0];
+                span.Clear();
                 return true;
             }
 #else

@@ -132,6 +132,7 @@
             if (source.TryCopyTo(span, ^1))
             {
                 value = span[0];
+                span.Clear();
                 return true;
             }
 #else

@@ -14,7 +14,7 @@ internal static class SingleSpan
         {
             array = SingleArray<T>.Array = new T[1];
         }
-        return array.AsSpan(); // no reference...
+        return array.AsSpan(); // need to Clear after used to prevent memory leak
 #elif NETSTANDARD2_1
         return MemoryMarshal.CreateSpan(ref reference, 1);
 #else // NET8_0_OR_GREATER

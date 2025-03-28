@@ -34,11 +34,14 @@ partial class ValueEnumerableExtensions
         }
         else
         {
+#if NETSTANDARD2_0
+            Span<TSource> initialBufferSpan = default;
+#elif NET8_0_OR_GREATER
             var initialBuffer = default(InlineArray16<TSource>);
-#if NET8_0_OR_GREATER
             Span<TSource> initialBufferSpan = initialBuffer;
 #else
-            Span<TSource> initialBufferSpan = InlineArrayMarshal.AsSpan<InlineArray16<TSource>, TSource>(ref initialBuffer, 16);
+            var initialBuffer = default(InlineArray16<TSource>);
+            Span<TSource> initialBufferSpan = initialBuffer.AsSpan();
 #endif
             var arrayBuilder = new SegmentedArrayBuilder<TSource>(initialBufferSpan);
             var span = arrayBuilder.GetSpan();
@@ -80,11 +83,14 @@ partial class ValueEnumerableExtensions
         var predicate = whereEnumerator.Predicate;
         using var enumerator = whereEnumerator.GetSource(); // using only where source enumerator
 
+#if NETSTANDARD2_0
+        Span<TSource> initialBufferSpan = default;
+#elif NET8_0_OR_GREATER
         var initialBuffer = default(InlineArray16<TSource>);
-#if NET8_0_OR_GREATER
         Span<TSource> initialBufferSpan = initialBuffer;
 #else
-        Span<TSource> initialBufferSpan = InlineArrayMarshal.AsSpan<InlineArray16<TSource>, TSource>(ref initialBuffer, 16);
+        var initialBuffer = default(InlineArray16<TSource>);
+        Span<TSource> initialBufferSpan = initialBuffer.AsSpan();
 #endif
         var arrayBuilder = new SegmentedArrayBuilder<TSource>(initialBufferSpan);
         var span = arrayBuilder.GetSpan();
@@ -144,11 +150,14 @@ partial class ValueEnumerableExtensions
         var predicate = whereEnumerator.Predicate;
         var sourceSpan = whereEnumerator.GetSource().AsSpan();
 
+#if NETSTANDARD2_0
+        Span<TSource> initialBufferSpan = default;
+#elif NET8_0_OR_GREATER
         var initialBuffer = default(InlineArray16<TSource>);
-#if NET8_0_OR_GREATER
         Span<TSource> initialBufferSpan = initialBuffer;
 #else
-        Span<TSource> initialBufferSpan = InlineArrayMarshal.AsSpan<InlineArray16<TSource>, TSource>(ref initialBuffer, 16);
+        var initialBuffer = default(InlineArray16<TSource>);
+        Span<TSource> initialBufferSpan = initialBuffer.AsSpan();
 #endif
         var arrayBuilder = new SegmentedArrayBuilder<TSource>(initialBufferSpan);
         var span = arrayBuilder.GetSpan();
@@ -189,11 +198,14 @@ partial class ValueEnumerableExtensions
         var ofTypeEnumerator = source.Enumerator; // no needs dispose(using)
         using var enumerator = ofTypeEnumerator.GetSource(); // using only ofType source enumerator
 
+#if NETSTANDARD2_0
+        Span<TResult> initialBufferSpan = default;
+#elif NET8_0_OR_GREATER
         var initialBuffer = default(InlineArray16<TResult>);
-#if NET8_0_OR_GREATER
         Span<TResult> initialBufferSpan = initialBuffer;
 #else
-        Span<TResult> initialBufferSpan = InlineArrayMarshal.AsSpan<InlineArray16<TResult>, TResult>(ref initialBuffer, 16);
+        var initialBuffer = default(InlineArray16<TResult>);
+        Span<TResult> initialBufferSpan = initialBuffer.AsSpan();
 #endif
         var arrayBuilder = new SegmentedArrayBuilder<TResult>(initialBufferSpan);
         var span = arrayBuilder.GetSpan();

@@ -28,6 +28,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="PolySharp" Version="1.15.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Shouldly" Version="4.3.0" />
   </ItemGroup>
 
@@ -36,11 +40,11 @@
     <ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
   </ItemGroup>
 
-
   <ItemGroup>
     <!-- Test internal type(without InternalVisibleTo) -->
     <Compile Include="..\..\src\ZLinq\Internal\HashSetSlim.cs" LinkBase="InternalInclude" />
     <Compile Include="..\..\src\ZLinq\Internal\DictionarySlim.cs" LinkBase="InternalInclude" />
+    <Compile Include="..\..\src\ZLinq\Internal\SegmentedArrayBuilder.cs" LinkBase="InternalInclude" />
     <Compile Include="..\..\src\ZLinq\Internal\Polyfill\BitOperations.cs" LinkBase="InternalInclude" />
   </ItemGroup>
 

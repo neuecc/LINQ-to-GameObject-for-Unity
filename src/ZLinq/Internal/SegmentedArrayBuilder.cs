@@ -84,7 +84,7 @@ internal ref struct SegmentedArrayBuilder<T>
 #if NET8_0_OR_GREATER
                 ReadOnlySpan<T[]> segmentSpan = ((ReadOnlySpan<T[]>)segments).Slice(0, segmentIndex);
 #else
-                ReadOnlySpan<T[]> segmentSpan = InlineArrayMarshal.AsSpan<InlineArray27<T[]>, T[]>(ref segments, segmentIndex);
+                ReadOnlySpan<T[]> segmentSpan = segments.AsSpan().Slice(0, segmentIndex);
 #endif
                 foreach (var array in segmentSpan)
                 {
@@ -96,14 +96,13 @@ internal ref struct SegmentedArrayBuilder<T>
                     // return to pool
                     ArrayPool<T>.Shared.Return(array, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
                 }
+#if NETSTANDARD2_0
+                segments.Clear();
+#endif
             }
 
             // copy current(last) buffer
-#if NET8_0_OR_GREATER
             var lastSegment = segments[segmentIndex];
-#else
-            var lastSegment = InlineArrayMarshal.ElementRef<InlineArray27<T[]>, T[]>(ref segments, segmentIndex);
-#endif
             lastSegment.AsSpan(0, countInCurrentSegment).CopyTo(destination);
             ArrayPool<T>.Shared.Return(lastSegment, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
         }
@@ -125,6 +124,8 @@ internal struct InlineArray16<T>
 
 #else
 
+#if! NETSTANDARD2_0
+
 [StructLayout(LayoutKind.Sequential)]
 internal struct InlineArray16<T>
 {
@@ -144,7 +145,17 @@ internal struct InlineArray16<T>
     T item13;
     T item14;
     T item15;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [UnscopedRef]
+    internal Span<T> AsSpan()
+    {
+        return InlineArrayMarshal.AsSpan<InlineArray16<T>, T>(ref this, 16);
+    }
+
 }
+
+#endif
 
 #endif
 
@@ -188,6 +199,80 @@ internal struct InlineArray27<T>
     T item23;
     T item24;
     T item25;
+    T item26;
+
+    public ref T this[int index]
+    {
+        [UnscopedRef]
+        get => ref InlineArrayMarshal.ElementRef<InlineArray27<T>, T>(ref this, index);
+    }
+
+#if! NETSTANDARD2_0
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [UnscopedRef]
+    internal Span<T> AsSpan()
+    {
+        return InlineArrayMarshal.AsSpan<InlineArray27<T>, T>(ref this, 27);
+    }
+
+#else
+
+    // NetStandard2.0 version is not intended to performance, just for compatibility of implementation.
+
+    [ThreadStatic]
+    static T[]? threadStaticArray;
+
+    // be careful, need to call Clear after use.
+    public Span<T> AsSpan()
+    {
+        var array = threadStaticArray;
+        if (array == null)
+        {
+            array = threadStaticArray = new T[27];
+        }
+
+        array[0] = item0;
+        array[1] = item1;
+        array[2] = item2;
+        array[3] = item3;
+        array[4] = item4;
+        array[5] = item5;
+        array[6] = item6;
+        array[7] = item7;
+        array[8] = item8;
+        array[9] = item9;
+        array[10] = item10;
+        array[11] = item11;
+        array[12] = item12;
+        array[13] = item13;
+        array[14] = item14;
+        array[15] = item15;
+        array[16] = item16;
+        array[17] = item17;
+        array[18] = item18;
+        array[19] = item19;
+        array[20] = item20;
+        array[21] = item21;
+        array[22] = item22;
+        array[23] = item23;
+        array[24] = item24;
+        array[25] = item25;
+        array[26] = item26;
+
+        return threadStaticArray.AsSpan();
+    }
+
+    public void Clear()
+    {
+        var array = threadStaticArray;
+        if (array != null)
+        {
+            Array.Clear(array, 0, array.Length);
+        }
+    }
+
+#endif
 }
 
 #endif
@@ -197,19 +282,13 @@ internal struct InlineArray27<T>
 
 internal static class InlineArrayMarshal
 {
+#if !NETSTANDARD2_0
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static Span<TElement> AsSpan<TBuffer, TElement>(ref TBuffer buffer, int length)
     {
-#if !NETSTANDARD2_0
         return MemoryMarshal.CreateSpan(ref Unsafe.As<TBuffer, TElement>(ref buffer), length);
-#else
-        unsafe
-        {
-            // TODO: how implement?
-            throw new NotImplementedException();
-        }
-#endif
     }
+#endif
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static ref TElement FirstElementRef<TBuffer, TElement>(ref TBuffer buffer)

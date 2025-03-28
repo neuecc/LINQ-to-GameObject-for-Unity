@@ -32,11 +32,14 @@ partial class ValueEnumerableExtensions
         }
         else
         {
+#if NETSTANDARD2_0
+            Span<TSource> initialBufferSpan = default;
+#elif NET8_0_OR_GREATER
             var initialBuffer = default(InlineArray16<TSource>);
-#if NET8_0_OR_GREATER
             Span<TSource> initialBufferSpan = initialBuffer;
 #else
-            Span<TSource> initialBufferSpan = InlineArrayMarshal.AsSpan<InlineArray16<TSource>, TSource>(ref initialBuffer, 16);
+            var initialBuffer = default(InlineArray16<TSource>);
+            Span<TSource> initialBufferSpan = initialBuffer.AsSpan();
 #endif
             var arrayBuilder = new SegmentedArrayBuilder<TSource>(initialBufferSpan);
             var span = arrayBuilder.GetSpan();
