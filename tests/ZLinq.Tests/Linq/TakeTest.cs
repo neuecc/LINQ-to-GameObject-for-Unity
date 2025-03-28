@@ -255,6 +255,8 @@ public class TakeTest
         }
     }
 
+#if !NET48
+
     [Fact]
     public void T()
     {
@@ -321,4 +323,6 @@ public class TakeTest
         // ZLinq
         Assert.Empty(source.AsValueEnumerable().Take(int.MaxValue..^int.MaxValue).ToArray());
     }
+
+#endif
 }

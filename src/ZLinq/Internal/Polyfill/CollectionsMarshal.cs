@@ -9,17 +9,37 @@ namespace System.Runtime.InteropServices
 {
     internal static class CollectionsMarshal
     {
+        internal static readonly int ListSize;
+
+        static CollectionsMarshal()
+        {
+            try
+            {
+                ListSize = typeof(List<>).GetFields(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Length;
+            }
+            catch
+            {
+                ListSize = 3;
+            }
+        }
+
         internal static Span<T> AsSpan<T>(this List<T>? list)
         {
             Span<T> span = default;
             if (list is not null)
             {
-                var view = Unsafe.As<ListView<T>>(list);
-
-                int size = view._size;
-                T[] items = view._items;
-
-                span = items.AsSpan(0, size);
+                if (ListSize == 3)
+                {
+                    var view = Unsafe.As<ListViewA<T>>(list);
+                    T[] items = view._items;
+                    span = items.AsSpan(0, list.Count);
+                }
+                else if (ListSize == 4)
+                {
+                    var view = Unsafe.As<ListViewB<T>>(list);
+                    T[] items = view._items;
+                    span = items.AsSpan(0, list.Count);
+                }
             }
 
             return span;
@@ -32,27 +52,33 @@ namespace System.Runtime.InteropServices
         {
             if (list is not null)
             {
-                var view = Unsafe.As<ListView<T>>(list);
-                view._size = count;
+                if (ListSize == 3)
+                {
+                    var view = Unsafe.As<ListViewA<T>>(list);
+                    view._size = count;
+                }
+                else if (ListSize == 4)
+                {
+                    var view = Unsafe.As<ListViewB<T>>(list);
+                    view._size = count;
+                }
             }
-        }
-
-        internal static Span<T> UnsafeAsRawSpan<T>(this List<T>? list)
-        {
-            if (list is not null)
-            {
-                var view = Unsafe.As<ListView<T>>(list);
-                return view._items.AsSpan();
-            }
-            return default;
         }
     }
 
-    internal class ListView<T>
+    internal class ListViewA<T>
     {
         public T[] _items;
         public int _size;
         public int _version;
+    }
+
+    internal class ListViewB<T>
+    {
+        public T[] _items;
+        public int _size;
+        public int _version;
+        private Object _syncRoot; // in .NET Framework
     }
 }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace ZLinq
 {
@@ -24,6 +25,12 @@ namespace ZLinq
             , allows ref struct
 #endif
             => new(source.Enumerator.Select(Throws.IfNull(selector)));
+
+        public static ValueEnumerable<WhereArray<TSource>, TSource> Where<TSource>(this ValueEnumerable<FromArray<TSource>, TSource> source, Func<TSource, Boolean> predicate)
+            => new(new(source.Enumerator, Throws.IfNull(predicate)));
+
+        public static ValueEnumerable<WhereArraySelect<TSource, TResult>, TResult> Select<TSource, TResult>(this ValueEnumerable<WhereArray<TSource>, TSource> source, Func<TSource, TResult> selector)
+            => new(source.Enumerator.Select(Throws.IfNull(selector)));
     }
 }
 
@@ -44,6 +51,9 @@ namespace ZLinq.Linq
 #endif
     {
         TEnumerator source = source;
+
+        internal TEnumerator GetSource() => source;
+        internal Func<TSource, bool> Predicate => predicate;
 
         public bool TryGetNonEnumeratedCount(out int count)
         {
@@ -184,6 +194,101 @@ namespace ZLinq.Linq
         public void Dispose()
         {
             source.Dispose();
+        }
+    }
+
+    [StructLayout(LayoutKind.Auto)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public struct WhereArray<TSource>(FromArray<TSource> source, Func<TSource, Boolean> predicate) : IValueEnumerator<TSource>
+    {
+        internal TSource[] source = source.GetSource();
+        internal TSource[] GetSource() => source;
+        internal Func<TSource, bool> Predicate => predicate;
+        int index;
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            count = default;
+            return false;
+        }
+
+        public bool TryGetSpan(out ReadOnlySpan<TSource> span)
+        {
+            span = default;
+            return false;
+        }
+
+        public bool TryCopyTo(Span<TSource> destination, Index offset) => false;
+
+        public bool TryGetNext(out TSource current)
+        {
+            while (index < source.Length)
+            {
+                var value = source[index++];
+                if (predicate(value))
+                {
+                    current = value;
+                    return true;
+                }
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
+        }
+
+        public void Dispose()
+        {
+        }
+
+        // Optimize for common pattern: Where().Select()
+        public WhereArraySelect<TSource, TResult> Select<TResult>(Func<TSource, TResult> selector)
+            => new(source, predicate, selector);
+    }
+
+    [StructLayout(LayoutKind.Auto)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+#if NET9_0_OR_GREATER
+    public ref
+#else
+    public
+#endif
+    struct WhereArraySelect<TSource, TResult>(TSource[] source, Func<TSource, Boolean> predicate, Func<TSource, TResult> selector)
+        : IValueEnumerator<TResult>
+    {
+        int index;
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            count = default;
+            return false;
+        }
+
+        public bool TryGetSpan(out ReadOnlySpan<TResult> span)
+        {
+            span = default;
+            return false;
+        }
+
+        public bool TryCopyTo(Span<TResult> destination, Index offset) => false;
+
+        public bool TryGetNext(out TResult current)
+        {
+            while (index < source.Length)
+            {
+                var value = source[index++];
+                if (predicate(value))
+                {
+                    current = selector(value);
+                    return true;
+                }
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

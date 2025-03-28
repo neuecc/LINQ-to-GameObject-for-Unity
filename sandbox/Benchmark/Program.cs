@@ -1,4 +1,4 @@
-#pragma warning disable
+﻿#pragma warning disable
 
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
@@ -10,6 +10,7 @@ using Perfolizer.Horology;
 using SpanLinq;
 using System.Diagnostics;
 using ZLinq;
+using ZLinq.Internal;
 
 namespace Benchmark;
 
@@ -20,11 +21,6 @@ internal static class Program
     {
 #if DEBUG
         // BenchmarkRunner.Run<IterateBenchmark>(DefaultConfig.Instance.WithSummaryStyle(SummaryStyle.Default.WithTimeUnit(TimeUnit.Millisecond)), args);
-
-        var bench = new LinqPerfBenchmarks.Order00();
-        bench.Setup();
-        bench.Linq_OrderByDescending_Count_ElementAt();
-        bench.ZLinq_OrderByDescending_Count_ElementAt();
 
         var i = 0;
         foreach (var item in typeof(Enumerable).GetMethods().GroupBy(x => x.Name))

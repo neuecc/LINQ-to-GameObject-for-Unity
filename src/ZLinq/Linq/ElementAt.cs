@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 
 namespace ZLinq
 {
@@ -89,11 +90,21 @@ namespace ZLinq
 #endif
         {
             var current = default(TSource)!;
+#if NETSTANDARD2_0
+            var span = SingleSpan.Create<TSource>();
+            if (source.TryCopyTo(span, index))
+            {
+                value = span[0];
+                span.Clear();
+                return true;
+            }
+#else
             if (source.TryCopyTo(SingleSpan.Create(ref current), index))
             {
                 value = current;
                 return true;
             }
+#endif
             else if (EnumeratorHelper.TryConsumeGetAt<TEnumerator, TSource>(ref source, index, out current))
             {
                 value = current!;

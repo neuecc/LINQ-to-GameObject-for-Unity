@@ -1,231 +1,306 @@
 ﻿using System.Buffers;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace ZLinq.Internal;
 
-// TODO: unittest
+// similar as IBufferWriter style to avoid Add frequently.
 [StructLayout(LayoutKind.Auto)]
-internal ref struct SegmentedArrayBuilder<T> : IDisposable
+internal ref struct SegmentedArrayBuilder<T>
 {
-    // Array.MaxLength = 2147483591
-    T[]? array0;  // 16              total:16
-    T[]? array1;  // 32              total:48
-    T[]? array2;  // 64              total:112
-    T[]? array3;  // 128             total:240
-    T[]? array4;  // 256             total:496
-    T[]? array5;  // 512             total:1008
-    T[]? array6;  // 1024            total:2032
-    T[]? array7;  // 2048            total:4080
-    T[]? array8;  // 4096            total:8176
-    T[]? array9;  // 8192            total:16368
-    T[]? array10; // 16384           total:32752
-    T[]? array11; // 32768           total:65520
-    T[]? array12; // 65536           total:131056
-    T[]? array13; // 131072          total:262128
-    T[]? array14; // 262144          total:524272
-    T[]? array15; // 524288          total:1048560
-    T[]? array16; // 1048576         total:2097136
-    T[]? array17; // 2097152         total:4194288
-    T[]? array18; // 4194304         total:8388592
-    T[]? array19; // 8388608         total:16777200
-    T[]? array20; // 16777216        total:33554416
-    T[]? array21; // 33554432        total:67108848
-    T[]? array22; // 67108864        total:134217712
-    T[]? array23; // 134217728       total:268435440
-    T[]? array24; // 268435456       total:536870896
-    T[]? array25; // 536870912       total:1073741808
-    T[]? array26; // 1073741824      total:2147483632 (over)
+    const int ArrayMaxLength = 0X7FFFFFC7;
 
-    T[]? currentSegment;
-    int indexInSegment;
-    int segmentIndex;
-    int count;
+    Span<T> currentSegment;
+    int countInCurrentSegment;
 
-    public int Count => count;
+    Span<T> initialBuffer;
+    InlineArray27<T[]> segments; // rented buffers
+    int segmentsCount;
+    int countInFinishedSegments;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Add(T value)
+    public int Count => checked(countInFinishedSegments + countInCurrentSegment);
+
+    public SegmentedArrayBuilder(Span<T> initialBuffer)
     {
-        ref var segment = ref currentSegment;
-
-        if (segment == null)
-        {
-            Init(value);
-            return;
-        }
-        else if (segment.Length == indexInSegment)
-        {
-            SlowAdd(value);
-            return;
-        }
-
-        segment[indexInSegment++] = value;
-        count++;
+        this.initialBuffer = this.currentSegment = initialBuffer;
     }
 
-    void Init(T value)
+    public Span<T> GetSpan()
     {
-        ref var segment = ref array0;
-        segment = ArrayPool<T>.Shared.Rent(16);
-        currentSegment = segment;
-
-        segment[indexInSegment++] = value;
-        count++;
-    }
-
-    void SlowAdd(T value)
-    {
-        ref var segment = ref currentSegment;
-        segmentIndex++;
-
-        switch (segmentIndex)
+        var span = currentSegment;
+        var index = countInCurrentSegment;
+        if ((uint)index < (uint)span.Length)
         {
-            case 0: { segment = ref array0; break; }
-            case 1: { segment = ref array1; break; }
-            case 2: { segment = ref array2; break; }
-            case 3: { segment = ref array3; break; }
-            case 4: { segment = ref array4; break; }
-            case 5: { segment = ref array5; break; }
-            case 6: { segment = ref array6; break; }
-            case 7: { segment = ref array7; break; }
-            case 8: { segment = ref array8; break; }
-            case 9: { segment = ref array9; break; }
-            case 10: { segment = ref array10; break; }
-            case 11: { segment = ref array11; break; }
-            case 12: { segment = ref array12; break; }
-            case 13: { segment = ref array13; break; }
-            case 14: { segment = ref array14; break; }
-            case 15: { segment = ref array15; break; }
-            case 16: { segment = ref array16; break; }
-            case 17: { segment = ref array17; break; }
-            case 18: { segment = ref array18; break; }
-            case 19: { segment = ref array19; break; }
-            case 20: { segment = ref array20; break; }
-            case 21: { segment = ref array21; break; }
-            case 22: { segment = ref array22; break; }
-            case 23: { segment = ref array23; break; }
-            case 24: { segment = ref array24; break; }
-            case 25: { segment = ref array25; break; }
-            case 26: { segment = ref array26; break; }
-            default: break;
+            return span.Slice(index);
         }
-
-        segment = ArrayPool<T>.Shared.Rent(indexInSegment * 2);
-        indexInSegment = 0;
-        currentSegment = segment;
-
-        segment[indexInSegment++] = value;
-        count++;
-    }
-
-    public void CopyTo(Span<T> dest)
-    {
-        if (count == 0) return;
-
-        for (int i = 0; i <= segmentIndex; i++)
+        else
         {
-            T[] segment = default!;
-            switch (i)
-            {
-                case 0: { segment = array0!; break; }
-                case 1: { segment = array1!; break; }
-                case 2: { segment = array2!; break; }
-                case 3: { segment = array3!; break; }
-                case 4: { segment = array4!; break; }
-                case 5: { segment = array5!; break; }
-                case 6: { segment = array6!; break; }
-                case 7: { segment = array7!; break; }
-                case 8: { segment = array8!; break; }
-                case 9: { segment = array9!; break; }
-                case 10: { segment = array10!; break; }
-                case 11: { segment = array11!; break; }
-                case 12: { segment = array12!; break; }
-                case 13: { segment = array13!; break; }
-                case 14: { segment = array14!; break; }
-                case 15: { segment = array15!; break; }
-                case 16: { segment = array16!; break; }
-                case 17: { segment = array17!; break; }
-                case 18: { segment = array18!; break; }
-                case 19: { segment = array19!; break; }
-                case 20: { segment = array20!; break; }
-                case 21: { segment = array21!; break; }
-                case 22: { segment = array22!; break; }
-                case 23: { segment = array23!; break; }
-                case 24: { segment = array24!; break; }
-                case 25: { segment = array25!; break; }
-                case 26: { segment = array26!; break; }
-                default: break;
-            }
-
-            if (segmentIndex != i)
-            {
-                // copy full
-                segment.AsSpan().CopyTo(dest);
-                dest = dest.Slice(segment.Length);
-            }
-            else
-            {
-                // last
-                segment.AsSpan(0, indexInSegment).CopyTo(dest);
-            }
+            Expand();
+            return currentSegment;
         }
     }
 
-    public T[] ToArray()
+    public void Advance(int count)
     {
-        if (count == 0) return Array.Empty<T>();
-
-        var array = GC.AllocateUninitializedArray<T>(count);
-        CopyTo(array);
-        return array;
+        countInCurrentSegment += count;
     }
 
-    public void Dispose()
+    void Expand()
     {
-        if (currentSegment == null) return;
+        var currentSegmentLength = currentSegment.Length;
+        checked { countInFinishedSegments += currentSegmentLength; }
 
-        for (int i = 0; i <= segmentIndex; i++)
+        if (countInFinishedSegments > ArrayMaxLength)
         {
-            ref T[]? segment = ref currentSegment;
-            switch (segmentIndex)
-            {
-                case 0: { segment = ref array0; break; }
-                case 1: { segment = ref array1; break; }
-                case 2: { segment = ref array2; break; }
-                case 3: { segment = ref array3; break; }
-                case 4: { segment = ref array4; break; }
-                case 5: { segment = ref array5; break; }
-                case 6: { segment = ref array6; break; }
-                case 7: { segment = ref array7; break; }
-                case 8: { segment = ref array8; break; }
-                case 9: { segment = ref array9; break; }
-                case 10: { segment = ref array10; break; }
-                case 11: { segment = ref array11; break; }
-                case 12: { segment = ref array12; break; }
-                case 13: { segment = ref array13; break; }
-                case 14: { segment = ref array14; break; }
-                case 15: { segment = ref array15; break; }
-                case 16: { segment = ref array16; break; }
-                case 17: { segment = ref array17; break; }
-                case 18: { segment = ref array18; break; }
-                case 19: { segment = ref array19; break; }
-                case 20: { segment = ref array20; break; }
-                case 21: { segment = ref array21; break; }
-                case 22: { segment = ref array22; break; }
-                case 23: { segment = ref array23; break; }
-                case 24: { segment = ref array24; break; }
-                case 25: { segment = ref array25; break; }
-                case 26: { segment = ref array26; break; }
-                default: break;
-            }
-
-            if (segment != null)
-            {
-                ArrayPool<T>.Shared.Return(segment!, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
-                segment = null;
-            }
+            throw new OutOfMemoryException();
         }
 
-        currentSegment = null;
-        indexInSegment = segmentIndex = count = 0;
+        var newSegmentLength = (int)Math.Min(Math.Max(16, currentSegmentLength) * 2L, ArrayMaxLength);
+        currentSegment =
+#if NET8_0_OR_GREATER
+            segments[segmentsCount]
+#else
+            InlineArrayMarshal.ElementRef<InlineArray27<T[]>, T[]>(ref segments, segmentsCount)
+#endif
+            = ArrayPool<T>.Shared.Rent(newSegmentLength);
+        countInCurrentSegment = 0;
+        segmentsCount++;
+    }
+
+    public void CopyToAndClear(Span<T> destination)
+    {
+        int segmentIndex = segmentsCount;
+        if (segmentIndex != 0)
+        {
+            var first = initialBuffer;
+            first.CopyTo(destination);
+            destination = destination.Slice(first.Length);
+
+            segmentIndex--;
+            if (segmentIndex != 0) // skip for last
+            {
+#if NET8_0_OR_GREATER
+                ReadOnlySpan<T[]> segmentSpan = ((ReadOnlySpan<T[]>)segments).Slice(0, segmentIndex);
+#else
+                ReadOnlySpan<T[]> segmentSpan = segments.AsSpan().Slice(0, segmentIndex);
+#endif
+                foreach (var array in segmentSpan)
+                {
+                    // copy full segments
+                    var segment = array.AsSpan();
+                    segment.CopyTo(destination);
+                    destination = destination.Slice(segment.Length);
+
+                    // return to pool
+                    ArrayPool<T>.Shared.Return(array, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
+                }
+#if NETSTANDARD2_0
+                segments.Clear();
+#endif
+            }
+
+            // copy current(last) buffer
+            var lastSegment = segments[segmentIndex];
+            lastSegment.AsSpan(0, countInCurrentSegment).CopyTo(destination);
+            ArrayPool<T>.Shared.Return(lastSegment, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<T>());
+        }
+        else
+        {
+            // only copy initial buffer
+            currentSegment.Slice(0, countInCurrentSegment).CopyTo(destination);
+        }
     }
 }
+
+#if NET8_0_OR_GREATER
+
+[InlineArray(16)]
+internal struct InlineArray16<T>
+{
+    T item;
+}
+
+#else
+
+#if! NETSTANDARD2_0
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct InlineArray16<T>
+{
+    T item0;
+    T item1;
+    T item2;
+    T item3;
+    T item4;
+    T item5;
+    T item6;
+    T item7;
+    T item8;
+    T item9;
+    T item10;
+    T item11;
+    T item12;
+    T item13;
+    T item14;
+    T item15;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [UnscopedRef]
+    internal Span<T> AsSpan()
+    {
+        return InlineArrayMarshal.AsSpan<InlineArray16<T>, T>(ref this, 16);
+    }
+
+}
+
+#endif
+
+#endif
+
+
+#if NET8_0_OR_GREATER
+
+[InlineArray(27)]
+internal struct InlineArray27<T>
+{
+    T item;
+}
+
+#else
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct InlineArray27<T>
+{
+    T item0;
+    T item1;
+    T item2;
+    T item3;
+    T item4;
+    T item5;
+    T item6;
+    T item7;
+    T item8;
+    T item9;
+    T item10;
+    T item11;
+    T item12;
+    T item13;
+    T item14;
+    T item15;
+    T item16;
+    T item17;
+    T item18;
+    T item19;
+    T item20;
+    T item21;
+    T item22;
+    T item23;
+    T item24;
+    T item25;
+    T item26;
+
+    public ref T this[int index]
+    {
+        [UnscopedRef]
+        get => ref InlineArrayMarshal.ElementRef<InlineArray27<T>, T>(ref this, index);
+    }
+
+#if !NETSTANDARD2_0
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [UnscopedRef]
+    internal Span<T> AsSpan()
+    {
+        return InlineArrayMarshal.AsSpan<InlineArray27<T>, T>(ref this, 27);
+    }
+
+#else
+
+    // NetStandard2.0 version is not intended to performance, just for compatibility of implementation.
+
+    [ThreadStatic]
+    static T[]? threadStaticArray;
+
+    // be careful, need to call Clear after use.
+    public Span<T> AsSpan()
+    {
+        var array = threadStaticArray;
+        if (array == null)
+        {
+            array = threadStaticArray = new T[27];
+        }
+
+        array[0] = item0;
+        array[1] = item1;
+        array[2] = item2;
+        array[3] = item3;
+        array[4] = item4;
+        array[5] = item5;
+        array[6] = item6;
+        array[7] = item7;
+        array[8] = item8;
+        array[9] = item9;
+        array[10] = item10;
+        array[11] = item11;
+        array[12] = item12;
+        array[13] = item13;
+        array[14] = item14;
+        array[15] = item15;
+        array[16] = item16;
+        array[17] = item17;
+        array[18] = item18;
+        array[19] = item19;
+        array[20] = item20;
+        array[21] = item21;
+        array[22] = item22;
+        array[23] = item23;
+        array[24] = item24;
+        array[25] = item25;
+        array[26] = item26;
+
+        return threadStaticArray.AsSpan();
+    }
+
+    public void Clear()
+    {
+        var array = threadStaticArray;
+        if (array != null)
+        {
+            Array.Clear(array, 0, array.Length);
+        }
+    }
+
+#endif
+}
+
+#endif
+
+
+#if !NET8_0_OR_GREATER
+
+    internal static class InlineArrayMarshal
+{
+#if !NETSTANDARD2_0
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static Span<TElement> AsSpan<TBuffer, TElement>(ref TBuffer buffer, int length)
+    {
+        return MemoryMarshal.CreateSpan(ref Unsafe.As<TBuffer, TElement>(ref buffer), length);
+    }
+#endif
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static ref TElement FirstElementRef<TBuffer, TElement>(ref TBuffer buffer)
+    {
+        return ref Unsafe.As<TBuffer, TElement>(ref buffer);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static ref TElement ElementRef<TBuffer, TElement>(ref TBuffer buffer, int index)
+    {
+        return ref Unsafe.Add(ref Unsafe.As<TBuffer, TElement>(ref buffer), index);
+    }
+}
+
+#endif

@@ -33,6 +33,8 @@ using ZLinq.Traversables;
 Int128[] source = [1, 2, 3, 4, 5];
 
 
+source.AsValueEnumerable().Where(x => x % 2 == 0).Select(x => x * x);
+
 var a = source.AsValueEnumerable().Max();
 Console.WriteLine(a);
 

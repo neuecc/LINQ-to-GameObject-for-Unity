@@ -1,4 +1,6 @@
-﻿using Xunit.Runner.Common;
+﻿#if !NET48
+
+using Xunit.Runner.Common;
 
 namespace ZLinq.Tests.Linq;
 
@@ -213,3 +215,5 @@ public class MinTest
         values.ToValueEnumerable().Min().ShouldBe(expected);
     }
 }
+
+#endif

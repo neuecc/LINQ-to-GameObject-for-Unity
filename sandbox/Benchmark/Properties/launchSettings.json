@@ -1,8 +1,8 @@
-{
+﻿{
   "profiles": {
     "Default": {
       "commandName": "Project",
-      "commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.Count00.* -- Default",
+      "commandLineArgs": "--filter Benchmark.CastOfType.* -- Default",
 
       // Available config
       // 1. Default
@@ -13,17 +13,17 @@
       // 6. NuGetVersions
       //
       // Available benchmarks:
-      // "commandLineArgs": "--filter Benchmark.IterateBenchmark.*",
-      //"commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.AggregateBy00.*",
+      // "commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.AggregateBy00.*",
       // "commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.Count00.*",
       // "commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.CountBy00.*",
       // "commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.GroupBy00.*",
       // "commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.Order00.*",
       // "commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.Where00.*",
       // "commandLineArgs": "--filter Benchmark.LinqPerfBenchmarks.Where01.*",
-      //"commandLineArgs": "--filter Benchmark.Select4_Consume.*",
-      //"commandLineArgs": "--filter Benchmark.Select4.*",
-      //"commandLineArgs": "--filter Benchmark.DistinctBattle.*",
+      // "commandLineArgs": "--filter Benchmark.IterateBenchmark.*",
+      // "commandLineArgs": "--filter Benchmark.Select4_Consume.*",
+      // "commandLineArgs": "--filter Benchmark.Select4.*",
+      // "commandLineArgs": "--filter Benchmark.DistinctBattle.*",
       // "commandLineArgs": "--filter Benchmark.SimdRange.*",
       // "commandLineArgs": "--filter Benchmark.SimdSelect.*",
       // "commandLineArgs": "--filter Benchmark.LookupBattle.*",
@@ -35,6 +35,7 @@
       // "commandLineArgs": "--filter Benchmark.SimdSelect.*",
       // "commandLineArgs": "--filter Benchmark.SimdSum.*",
       // "commandLineArgs": "--filter Benchmark.SimdSumUnsigned.*",
+      // "commandLineArgs": "--filter Benchmark.CastOfType.*",
 
       "workingDirectory": "."
     },
