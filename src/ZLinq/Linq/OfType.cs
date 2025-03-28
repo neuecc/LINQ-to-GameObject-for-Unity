@@ -31,6 +31,8 @@ namespace ZLinq.Linq
     {
         TEnumerator source = source;
 
+        internal TEnumerator GetSource() => source;
+
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = 0;

@@ -1,6 +1,4 @@
-﻿using System.Buffers;
-
-namespace ZLinq;
+﻿namespace ZLinq;
 
 partial class ValueEnumerableExtensions
 {
@@ -36,58 +34,18 @@ partial class ValueEnumerableExtensions
         }
         else
         {
-            using var arrayBuilder = new SegmentedArrayBuilder<TSource>();
-
-            while (enumerator.TryGetNext(out var item))
-            {
-                arrayBuilder.Add(item);
-            }
-
-            return arrayBuilder.ToArray();
-        }
-    }
-
-
-    public static TSource[] ToArray2<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
-       where TEnumerator : struct, IValueEnumerator<TSource>
-#if NET9_0_OR_GREATER
-        , allows ref struct
-#endif
-    {
-        using var enumerator = source.Enumerator;
-
-        if (enumerator.TryGetNonEnumeratedCount(out var count))
-        {
-            if (count == 0)
-            {
-                return Array.Empty<TSource>();
-            }
-
-            var array = GC.AllocateUninitializedArray<TSource>(count);
-
-            if (enumerator.TryCopyTo(array.AsSpan(), 0))
-            {
-                return array;
-            }
-
-            var i = 0;
-            while (enumerator.TryGetNext(out var item))
-            {
-                array[i++] = item;
-            }
-
-            return array;
-        }
-        else
-        {
             var initialBuffer = default(InlineArray16<TSource>);
-            var arrayBuilder = new SegmentedArrayBuilder2<TSource>(InlineArrayMarshal.AsSpan<InlineArray16<TSource>, TSource>(ref initialBuffer, 16));
+#if NET8_0_OR_GREATER
+            Span<TSource> initialBufferSpan = initialBuffer;
+#else
+            Span<TSource> initialBufferSpan = InlineArrayMarshal.AsSpan<InlineArray16<TSource>, TSource>(ref initialBuffer, 16);
+#endif
+            var arrayBuilder = new SegmentedArrayBuilder<TSource>(initialBufferSpan);
             var span = arrayBuilder.GetSpan();
-
             var i = 0;
             while (enumerator.TryGetNext(out var item))
             {
-                if (i >= span.Length)
+                if (i == span.Length)
                 {
                     arrayBuilder.Advance(i);
                     span = arrayBuilder.GetSpan();
@@ -98,160 +56,21 @@ partial class ValueEnumerableExtensions
             }
             arrayBuilder.Advance(i);
 
-            var array = GC.AllocateUninitializedArray<TSource>(arrayBuilder.Count);
+            count = arrayBuilder.Count;
+            if (count == 0)
+            {
+                return Array.Empty<TSource>();
+            }
+
+            var array = GC.AllocateUninitializedArray<TSource>(count);
             arrayBuilder.CopyToAndClear(array);
             return array;
         }
     }
 
+    // filtering(Where/ToArray) -> ToArray is frequently case so optimize it.
 
-#if NET9_0_OR_GREATER
-
-
-    public static TSource[] ToArray3<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
-       where TEnumerator : struct, IValueEnumerator<TSource>
-        , allows ref struct
-    {
-        var enumerator = source.Enumerator;
-        try
-        {
-            if (enumerator.TryGetNonEnumeratedCount(out var count))
-            {
-                if (count == 0)
-                {
-                    return Array.Empty<TSource>();
-                }
-
-                var array = GC.AllocateUninitializedArray<TSource>(count);
-
-                if (enumerator.TryCopyTo(array.AsSpan(), 0))
-                {
-                    return array;
-                }
-
-                var i = 0;
-                while (enumerator.TryGetNext(out var item))
-                {
-                    array[i++] = item;
-                }
-
-                return array;
-            }
-            else
-            {
-                var initialBuffer = default(TrueInlineArray16<TSource>);
-                var arrayBuilder = new SegmentedArrayBuilder3<TSource>(initialBuffer);
-
-                arrayBuilder.AddRange(enumerator);
-
-                var array = GC.AllocateUninitializedArray<TSource>(arrayBuilder.Count);
-                arrayBuilder.CopyToAndClear(array);
-                return array;
-            }
-        }
-        finally
-        {
-            enumerator.Dispose();
-        }
-    }
-
-    public static TSource[] ToArray4<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
-       where TEnumerator : struct, IValueEnumerator<TSource>
-        , allows ref struct
-    {
-        using var enumerator = source.Enumerator;
-
-        if (enumerator.TryGetNonEnumeratedCount(out var count))
-        {
-            if (count == 0)
-            {
-                return Array.Empty<TSource>();
-            }
-
-            var array = GC.AllocateUninitializedArray<TSource>(count);
-
-            if (enumerator.TryCopyTo(array.AsSpan(), 0))
-            {
-                return array;
-            }
-
-            var i = 0;
-            while (enumerator.TryGetNext(out var item))
-            {
-                array[i++] = item;
-            }
-
-            return array;
-        }
-        else
-        {
-            var array = ArrayPool<TSource>.Shared.Rent(16);
-            var span = array.AsSpan();
-            var i = 0;
-            while (enumerator.TryGetNext(out var item))
-            {
-                span[i++] = item;
-            }
-
-            var result = span.Slice(0, i).ToArray();
-            ArrayPool<TSource>.Shared.Return(array, clearArray: RuntimeHelpers.IsReferenceOrContainsReferences<TSource>());
-            return result;
-        }
-    }
-
-
-    public static TSource[] ToArray5<TEnumerator, TSource>(this ValueEnumerable<TEnumerator, TSource> source)
-       where TEnumerator : struct, IValueEnumerator<TSource>
-        , allows ref struct
-    {
-        using var enumerator = source.Enumerator;
-
-        if (enumerator.TryGetNonEnumeratedCount(out var count))
-        {
-            if (count == 0)
-            {
-                return Array.Empty<TSource>();
-            }
-
-            var array = GC.AllocateUninitializedArray<TSource>(count);
-
-            if (enumerator.TryCopyTo(array.AsSpan(), 0))
-            {
-                return array;
-            }
-
-            var i = 0;
-            while (enumerator.TryGetNext(out var item))
-            {
-                array[i++] = item;
-            }
-
-            return array;
-        }
-        else
-        {
-            DotNetSegmentedArrayBuilder<TSource>.ScratchBuffer scratch = default;
-            DotNetSegmentedArrayBuilder<TSource> builder = new(scratch);
-
-            builder.AddNonICollectionRangeInlined(source);
-            //while (enumerator.TryGetNext(out var item))
-            //{
-            //    builder.Add(item);
-            //}
-
-
-
-            TSource[] result = builder.ToArray();
-
-            builder.Dispose();
-            return result;
-        }
-    }
-
-
-
-    // Where->.ToArray is frequently case so optimize it.
-    public static TSource[] ToArray6<TEnumerator, TSource>(this ValueEnumerable<Where<TEnumerator, TSource>, TSource> source)
+    public static TSource[] ToArray<TEnumerator, TSource>(this ValueEnumerable<Where<TEnumerator, TSource>, TSource> source)
        where TEnumerator : struct, IValueEnumerator<TSource>
 #if NET9_0_OR_GREATER
         , allows ref struct
@@ -261,19 +80,33 @@ partial class ValueEnumerableExtensions
         var predicate = whereEnumerator.Predicate;
         using var enumerator = whereEnumerator.GetSource(); // using only where source enumerator
 
-        using var arrayBuilder = new SegmentedArrayBuilder<TSource>();
+        var initialBuffer = default(InlineArray16<TSource>);
+#if NET8_0_OR_GREATER
+        Span<TSource> initialBufferSpan = initialBuffer;
+#else
+        Span<TSource> initialBufferSpan = InlineArrayMarshal.AsSpan<InlineArray16<TSource>, TSource>(ref initialBuffer, 16);
+#endif
+        var arrayBuilder = new SegmentedArrayBuilder<TSource>(initialBufferSpan);
+        var span = arrayBuilder.GetSpan();
+        var i = 0;
 
-        if (enumerator.TryGetSpan(out var span))
+        if (enumerator.TryGetSpan(out var sourceSpan))
         {
-            foreach (var item in span)
+            foreach (var item in sourceSpan)
             {
                 if (predicate(item))
                 {
-                    arrayBuilder.Add(item);
+                    if (i == span.Length)
+                    {
+                        arrayBuilder.Advance(i);
+                        span = arrayBuilder.GetSpan();
+                        i = 0;
+                    }
+
+                    span[i++] = item;
                 }
             }
-
-            return arrayBuilder.ToArray();
+            arrayBuilder.Advance(i);
         }
         else
         {
@@ -281,12 +114,136 @@ partial class ValueEnumerableExtensions
             {
                 if (predicate(item))
                 {
-                    arrayBuilder.Add(item);
+                    if (i == span.Length)
+                    {
+                        arrayBuilder.Advance(i);
+                        span = arrayBuilder.GetSpan();
+                        i = 0;
+                    }
+
+                    span[i++] = item;
                 }
             }
-
-            return arrayBuilder.ToArray();
+            arrayBuilder.Advance(i);
         }
+
+        var count = arrayBuilder.Count;
+        if (count == 0)
+        {
+            return Array.Empty<TSource>();
+        }
+
+        var array = GC.AllocateUninitializedArray<TSource>(count);
+        arrayBuilder.CopyToAndClear(array);
+        return array;
     }
+
+    public static TSource[] ToArray<TSource>(this ValueEnumerable<WhereArray<TSource>, TSource> source)
+    {
+        var whereEnumerator = source.Enumerator; // no needs dispose(using)
+        var predicate = whereEnumerator.Predicate;
+        var sourceSpan = whereEnumerator.GetSource().AsSpan();
+
+        var initialBuffer = default(InlineArray16<TSource>);
+#if NET8_0_OR_GREATER
+        Span<TSource> initialBufferSpan = initialBuffer;
+#else
+        Span<TSource> initialBufferSpan = InlineArrayMarshal.AsSpan<InlineArray16<TSource>, TSource>(ref initialBuffer, 16);
 #endif
+        var arrayBuilder = new SegmentedArrayBuilder<TSource>(initialBufferSpan);
+        var span = arrayBuilder.GetSpan();
+        var i = 0;
+        foreach (ref var item in sourceSpan)
+        {
+            if (predicate(item))
+            {
+                if (i == span.Length)
+                {
+                    arrayBuilder.Advance(i);
+                    span = arrayBuilder.GetSpan();
+                    i = 0;
+                }
+
+                span[i++] = item;
+            }
+        }
+        arrayBuilder.Advance(i);
+
+        var count = arrayBuilder.Count;
+        if (count == 0)
+        {
+            return Array.Empty<TSource>();
+        }
+
+        var array = GC.AllocateUninitializedArray<TSource>(count);
+        arrayBuilder.CopyToAndClear(array);
+        return array;
+    }
+
+    public static TResult[] ToArray<TEnumerator, TSource, TResult>(this ValueEnumerable<OfType<TEnumerator, TSource, TResult>, TResult> source)
+       where TEnumerator : struct, IValueEnumerator<TSource>
+#if NET9_0_OR_GREATER
+        , allows ref struct
+#endif
+    {
+        var ofTypeEnumerator = source.Enumerator; // no needs dispose(using)
+        using var enumerator = ofTypeEnumerator.GetSource(); // using only ofType source enumerator
+
+        var initialBuffer = default(InlineArray16<TResult>);
+#if NET8_0_OR_GREATER
+        Span<TResult> initialBufferSpan = initialBuffer;
+#else
+        Span<TResult> initialBufferSpan = InlineArrayMarshal.AsSpan<InlineArray16<TResult>, TResult>(ref initialBuffer, 16);
+#endif
+        var arrayBuilder = new SegmentedArrayBuilder<TResult>(initialBufferSpan);
+        var span = arrayBuilder.GetSpan();
+        var i = 0;
+
+        if (enumerator.TryGetSpan(out var sourceSpan))
+        {
+            foreach (var value in sourceSpan)
+            {
+                if (value is TResult item)
+                {
+                    if (i == span.Length)
+                    {
+                        arrayBuilder.Advance(i);
+                        span = arrayBuilder.GetSpan();
+                        i = 0;
+                    }
+
+                    span[i++] = item;
+                }
+            }
+            arrayBuilder.Advance(i);
+        }
+        else
+        {
+            while (enumerator.TryGetNext(out var value))
+            {
+                if (value is TResult item)
+                {
+                    if (i == span.Length)
+                    {
+                        arrayBuilder.Advance(i);
+                        span = arrayBuilder.GetSpan();
+                        i = 0;
+                    }
+
+                    span[i++] = item;
+                }
+            }
+            arrayBuilder.Advance(i);
+        }
+
+        var count = arrayBuilder.Count;
+        if (count == 0)
+        {
+            return Array.Empty<TResult>();
+        }
+
+        var array = GC.AllocateUninitializedArray<TResult>(count);
+        arrayBuilder.CopyToAndClear(array);
+        return array;
+    }
 }

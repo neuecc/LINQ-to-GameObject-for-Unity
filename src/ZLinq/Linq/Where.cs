@@ -24,6 +24,9 @@ namespace ZLinq
             , allows ref struct
 #endif
             => new(source.Enumerator.Select(Throws.IfNull(selector)));
+
+        public static ValueEnumerable<WhereArray<TSource>, TSource> Where<TSource>(this ValueEnumerable<FromArray<TSource>, TSource> source, Func<TSource, Boolean> predicate)
+            => new(new(source.Enumerator, Throws.IfNull(predicate)));
     }
 }
 
@@ -187,6 +190,50 @@ namespace ZLinq.Linq
         public void Dispose()
         {
             source.Dispose();
+        }
+    }
+
+    [StructLayout(LayoutKind.Auto)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public struct WhereArray<TSource>(FromArray<TSource> source, Func<TSource, Boolean> predicate) : IValueEnumerator<TSource>
+    {
+        internal TSource[] source = source.GetSource();
+        internal TSource[] GetSource() => source;
+        internal Func<TSource, bool> Predicate => predicate;
+        int index;
+
+        public bool TryGetNonEnumeratedCount(out int count)
+        {
+            count = default;
+            return false;
+        }
+
+        public bool TryGetSpan(out ReadOnlySpan<TSource> span)
+        {
+            span = default;
+            return false;
+        }
+
+        public bool TryCopyTo(Span<TSource> destination, Index offset) => false;
+
+        public bool TryGetNext(out TSource current)
+        {
+            while (index < source.Length)
+            {
+                var value = source[index++];
+                if (predicate(value))
+                {
+                    current = value;
+                    return true;
+                }
+            }
+
+            Unsafe.SkipInit(out current);
+            return false;
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

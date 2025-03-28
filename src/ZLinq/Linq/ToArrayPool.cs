@@ -14,11 +14,7 @@ partial class ValueEnumerableExtensions
 
         if (enumerator.TryGetNonEnumeratedCount(out var count))
         {
-            if (count == 0)
-            {
-                return (Array.Empty<TSource>(), 0);
-            }
-
+            // when count == 0 but always return rental array
             var array = ArrayPool<TSource>.Shared.Rent(count);
 
             if (enumerator.TryCopyTo(array.AsSpan(0, count), 0))
@@ -36,14 +32,30 @@ partial class ValueEnumerableExtensions
         }
         else
         {
-            using var arrayBuilder = new SegmentedArrayBuilder<TSource>();
+            var initialBuffer = default(InlineArray16<TSource>);
+#if NET8_0_OR_GREATER
+            Span<TSource> initialBufferSpan = initialBuffer;
+#else
+            Span<TSource> initialBufferSpan = InlineArrayMarshal.AsSpan<InlineArray16<TSource>, TSource>(ref initialBuffer, 16);
+#endif
+            var arrayBuilder = new SegmentedArrayBuilder<TSource>(initialBufferSpan);
+            var span = arrayBuilder.GetSpan();
+            var i = 0;
             while (enumerator.TryGetNext(out var item))
             {
-                arrayBuilder.Add(item);
+                if (i == span.Length)
+                {
+                    arrayBuilder.Advance(i);
+                    span = arrayBuilder.GetSpan();
+                    i = 0;
+                }
+
+                span[i++] = item;
             }
+            arrayBuilder.Advance(i);
 
             var array = ArrayPool<TSource>.Shared.Rent(arrayBuilder.Count);
-            arrayBuilder.CopyTo(array);
+            arrayBuilder.CopyToAndClear(array);
             return (array, arrayBuilder.Count);
 
         }

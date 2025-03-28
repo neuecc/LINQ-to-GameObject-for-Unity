@@ -196,6 +196,8 @@ namespace ZLinq.Linq
     {
         int index;
 
+        internal T[] GetSource() => source;
+
         public bool TryGetNonEnumeratedCount(out int count)
         {
             count = source.Length;

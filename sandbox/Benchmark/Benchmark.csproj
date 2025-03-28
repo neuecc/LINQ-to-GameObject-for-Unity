@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net9.0;net8.0</TargetFrameworks>
+    <LangVersion>13</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -34,6 +35,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\src\ZLinq\Internal\SegmentedArrayBuilder.cs" Link="InternalImport\SegmentedArrayBuilder.cs" />
+    <Compile Include="..\..\src\ZLinq\Internal\ArrayBuilder.cs" Link="InternalImport\ArrayBuilder.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AndanteSoft.SpanLinq" Version="1.0.1" />
     <PackageReference Include="LinqAF" Version="3.0.0" />
     <PackageReference Include="LinqGen" Version="0.3.1" />
@@ -44,7 +50,7 @@
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
     <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.BenchmarkDotNetDiagnosers" Version="17.13.35606.1" />
-    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.UserMarks"                 Version="17.13.35606.1" />
+    <PackageReference Include="Microsoft.VisualStudio.DiagnosticsHub.UserMarks" Version="17.13.35606.1" />
     <PackageReference Include="Kokuban" Version="0.2.0" />
   </ItemGroup>
 
@@ -56,11 +62,12 @@
   <ItemGroup Condition="'$(UseZLinqNuGetPackage)' == 'true'">
     <PackageReference Include="ZLinq" Version="$(TargetZLinqVersions.Split(';')[0])" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="InternalImport\" />
+  </ItemGroup>
 
   <!-- Custom target to cleanup `BenchmarkDotNet.Artifacts` directory-->
-  <Target Name="CleanBenchmarkDotNetArtifacts"
-          BeforeTargets="Clean"
-          Condition="Exists('BenchmarkDotNet.Artifacts')">
+  <Target Name="CleanBenchmarkDotNetArtifacts" BeforeTargets="Clean" Condition="Exists('BenchmarkDotNet.Artifacts')">
     <RemoveDir Directories="BenchmarkDotNet.Artifacts" />
   </Target>
 </Project>

@@ -32,12 +32,28 @@
             else
             {
                 // list.Add is slow, avoid it.
-
-                using var arrayBuilder = new SegmentedArrayBuilder<TSource>();
+                var initialBuffer = default(InlineArray16<TSource>);
+#if NET8_0_OR_GREATER
+                Span<TSource> initialBufferSpan = initialBuffer;
+#else
+                Span<TSource> initialBufferSpan = InlineArrayMarshal.AsSpan<InlineArray16<TSource>, TSource>(ref initialBuffer, 16);
+#endif
+                var arrayBuilder = new SegmentedArrayBuilder<TSource>(initialBufferSpan);
+                var span = arrayBuilder.GetSpan();
+                var i = 0;
                 while (enumerator.TryGetNext(out var item))
                 {
-                    arrayBuilder.Add(item);
+                    if (i == span.Length)
+                    {
+                        arrayBuilder.Advance(i);
+                        span = arrayBuilder.GetSpan();
+                        i = 0;
+                    }
+
+                    span[i++] = item;
                 }
+                arrayBuilder.Advance(i);
+
                 count = arrayBuilder.Count;
 
                 var list = new List<TSource>(count);
@@ -47,8 +63,8 @@
                 CollectionsMarshal.UnsafeSetCount(list, count);
 #endif
 
-                var span = CollectionsMarshal.AsSpan(list);
-                arrayBuilder.CopyTo(span);
+                var listSpan = CollectionsMarshal.AsSpan(list);
+                arrayBuilder.CopyToAndClear(listSpan);
                 return list;
             }
         }
