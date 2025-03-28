@@ -1,4 +1,6 @@
-﻿namespace ZLinq.Tests.Linq;
+﻿#if !NET48
+
+namespace ZLinq.Tests.Linq;
 
 public class ChunkTest
 {
@@ -165,3 +167,5 @@ public class ChunkTest
 
 #endif
 }
+
+#endif

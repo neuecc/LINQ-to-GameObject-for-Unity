@@ -1,4 +1,6 @@
-﻿#pragma warning disable
+﻿#if !NET48
+
+#pragma warning disable
 namespace ZLinq.Tests.Linq;
 
 public class MaxByTest
@@ -191,3 +193,5 @@ public class MaxByTest
         }
     }
 }
+
+#endif

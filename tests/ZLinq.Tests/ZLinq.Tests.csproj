@@ -14,6 +14,11 @@
     <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
   </PropertyGroup>
 
+  <!-- Add .NET Framework test -->
+  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)'">
+    <TargetFrameworks>$(TargetFrameworks);net48</TargetFrameworks>
+  </PropertyGroup>
+  
   <!-- Add .NET 10 support when running build inside Visual Studio Preview-->
   <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != '' AND $(VisualStudioDir.Contains('Preview'))">
     <TargetFrameworks>$(TargetFrameworks);net10.0</TargetFrameworks>
@@ -27,6 +32,11 @@
     <PackageReference Include="xunit.v3" Version="2.0.0" />
   </ItemGroup>
 
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
+  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="PolySharp" Version="1.15.0">
       <PrivateAssets>all</PrivateAssets>
@@ -36,7 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\ZLinq.__Unity\ZLinq.__Unity.csproj" />
     <ProjectReference Include="..\..\src\ZLinq\ZLinq.csproj" />
   </ItemGroup>
 
@@ -44,7 +53,7 @@
     <!-- Test internal type(without InternalVisibleTo) -->
     <Compile Include="..\..\src\ZLinq\Internal\HashSetSlim.cs" LinkBase="InternalInclude" />
     <Compile Include="..\..\src\ZLinq\Internal\DictionarySlim.cs" LinkBase="InternalInclude" />
-    <Compile Include="..\..\src\ZLinq\Internal\SegmentedArrayBuilder.cs" LinkBase="InternalInclude" />
+    <Compile Include="..\..\src\ZLinq\Internal\SegmentedArrayBuilder.cs" LinkBase="InternalInclude" Condition="'$(TargetFramework)' != 'net48'" />
     <Compile Include="..\..\src\ZLinq\Internal\Polyfill\BitOperations.cs" LinkBase="InternalInclude" />
   </ItemGroup>
 

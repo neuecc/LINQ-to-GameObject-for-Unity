@@ -57,7 +57,7 @@ internal ref struct SegmentedArrayBuilder<T>
             throw new OutOfMemoryException();
         }
 
-        var newSegmentLength = (int)Math.Min(currentSegmentLength * 2L, ArrayMaxLength);
+        var newSegmentLength = (int)Math.Min(Math.Max(16, currentSegmentLength) * 2L, ArrayMaxLength);
         currentSegment =
 #if NET8_0_OR_GREATER
             segments[segmentsCount]
@@ -207,7 +207,7 @@ internal struct InlineArray27<T>
         get => ref InlineArrayMarshal.ElementRef<InlineArray27<T>, T>(ref this, index);
     }
 
-#if! NETSTANDARD2_0
+#if !NETSTANDARD2_0
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [UnscopedRef]
@@ -280,7 +280,7 @@ internal struct InlineArray27<T>
 
 #if !NET8_0_OR_GREATER
 
-internal static class InlineArrayMarshal
+    internal static class InlineArrayMarshal
 {
 #if !NETSTANDARD2_0
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

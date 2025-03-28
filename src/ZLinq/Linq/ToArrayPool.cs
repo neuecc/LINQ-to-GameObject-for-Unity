@@ -17,6 +17,11 @@ partial class ValueEnumerableExtensions
             // when count == 0 but always return rental array
             var array = ArrayPool<TSource>.Shared.Rent(count);
 
+            if (array.Length == 0)
+            {
+                return (array, count);
+            }
+
             if (enumerator.TryCopyTo(array.AsSpan(0, count), 0))
             {
                 return (array, count);

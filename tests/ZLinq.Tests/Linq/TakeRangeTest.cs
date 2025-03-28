@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !NET48
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -244,6 +246,8 @@ public class TakeRangeTest(ITestOutputHelper testOutputHelper)
         destination.ToArray().ShouldBe(new[] { -1, -1, -1, -1, -1 }); // Destination unchanged
     }
 
+#if !NET48
+
 
     void TestRange(int[] sequence, Range range, string description)
     {
@@ -262,4 +266,8 @@ public class TakeRangeTest(ITestOutputHelper testOutputHelper)
             throw;
         }
     }
+
+#endif
 }
+
+#endif

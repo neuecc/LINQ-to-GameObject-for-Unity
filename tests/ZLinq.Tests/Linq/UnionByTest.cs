@@ -1,4 +1,6 @@
-﻿#pragma warning disable
+﻿#if !NET48
+
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -586,3 +588,5 @@ namespace ZLinq.Tests.Linq
         }
     }
 }
+
+#endif

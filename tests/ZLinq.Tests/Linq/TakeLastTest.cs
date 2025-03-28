@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !NET48
+
+using System;
 using System.Linq;
 
 namespace ZLinq.Tests.Linq;
@@ -270,3 +272,5 @@ public class TakeLastTest
         }
     }
 }
+
+#endif

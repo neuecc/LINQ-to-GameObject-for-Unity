@@ -51,6 +51,8 @@ public class ElementAtOrDefaultTest
         Enumerable.Range(0, 1000).AsValueEnumerable().ElementAtOrDefault(^100).ShouldBe(900);
     }
 
+#if !NET48
+
     [Fact]
     public void ElementAtOrDefault_Last0()
     {
@@ -65,4 +67,6 @@ public class ElementAtOrDefaultTest
 
         Assert.Equal(expected, actual);
     }
+
+#endif
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if! NET48
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Shouldly;
@@ -439,3 +441,5 @@ namespace ZLinq.Tests.Linq
         }
     }
 }
+
+#endif

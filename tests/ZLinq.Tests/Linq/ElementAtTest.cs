@@ -36,6 +36,17 @@ public class ElementAtTest
         Should.Throw<ArgumentOutOfRangeException>(() => xs.AsValueEnumerable().ElementAt(-1));
         Should.Throw<ArgumentOutOfRangeException>(() => xs.ToValueEnumerable().ElementAt(-1));
     }
+    [Fact]
+    public void FromBegin()
+    {
+        var xs = new int[] { 1, 2, 3, 4, 5 };
+        xs.AsValueEnumerable().ElementAt(0).ShouldBe(1);
+        xs.ToValueEnumerable().ElementAt(0).ShouldBe(1);
+        xs.AsValueEnumerable().ElementAt(1).ShouldBe(2);
+        xs.ToValueEnumerable().ElementAt(1).ShouldBe(2);
+        xs.AsValueEnumerable().ElementAt(2).ShouldBe(3);
+        xs.ToValueEnumerable().ElementAt(2).ShouldBe(3);
+    }
 
     [Fact]
     public void FromEnd()

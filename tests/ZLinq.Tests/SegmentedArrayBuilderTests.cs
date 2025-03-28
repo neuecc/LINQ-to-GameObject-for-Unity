@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !NET48
+
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using ZLinq.Internal;
@@ -214,3 +216,5 @@ public class SegmentedArrayBuilderTest
         }
     }
 }
+
+#endif
