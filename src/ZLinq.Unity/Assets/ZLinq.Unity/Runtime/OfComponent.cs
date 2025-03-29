@@ -11,7 +11,7 @@ namespace ZLinq
         where TEnumerable : struct, IValueEnumerator<Transform>
         where TComponent : Component
     {
-        readonly TEnumerable source;
+        TEnumerable source;
 
         internal OfComponentT(TEnumerable source)
         {
@@ -62,7 +62,7 @@ namespace ZLinq
         where TEnumerable : struct, IValueEnumerator<GameObject>
         where TComponent : Component
     {
-        readonly TEnumerable source;
+        TEnumerable source;
 
         internal OfComponentG(TEnumerable source)
         {

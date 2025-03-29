@@ -12,25 +12,39 @@ public class NewBehaviourScript : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("Ancestors--------------");  // Container, Root
-        foreach (var item in Origin.Ancestors()) Debug.Log(item.name);
+        //Debug.Log("Ancestors--------------");  // Container, Root
+        //foreach (var item in Origin.Ancestors()) Debug.Log(item.name);
 
-        Debug.Log("Children--------------"); // Sphere_A, Sphere_B, Group, Sphere_A, Sphere_B
-        foreach (var item in Origin.Children()) Debug.Log(item.name);
+        //Debug.Log("Children--------------"); // Sphere_A, Sphere_B, Group, Sphere_A, Sphere_B
+        //foreach (var item in Origin.Children()) Debug.Log(item.name);
 
-        Debug.Log("Descendants--------------"); // Sphere_A, Sphere_B, Group, P1, Group, Sphere_B, P2, Sphere_A, Sphere_B
-        foreach (var item in Origin.Descendants()) Debug.Log(item.name);
+        //Debug.Log("Descendants--------------"); // Sphere_A, Sphere_B, Group, P1, Group, Sphere_B, P2, Sphere_A, Sphere_B
+        //foreach (var item in Origin.Descendants()) Debug.Log(item.name);
 
-        Debug.Log("BeforeSelf--------------"); // C1, C2
-        foreach (var item in Origin.BeforeSelf()) Debug.Log(item.name);
+        //Debug.Log("BeforeSelf--------------"); // C1, C2
+        //foreach (var item in Origin.BeforeSelf()) Debug.Log(item.name);
 
-        Debug.Log("AfterSelf--------------");  // C3, C4
-        foreach (var item in Origin.AfterSelf()) Debug.Log(item.name);
+        //Debug.Log("AfterSelf--------------");  // C3, C4
+        //foreach (var item in Origin.AfterSelf()) Debug.Log(item.name);
 
         // Origin.Ancestors().OfComponent<UnityEngine.TrailRenderer>();
 
-        Test();
-        Test2();
+
+        Debug.Log("OfComponent GO");
+        var i = 0;
+        foreach (var item in Origin.Descendants().OfComponent<Transform>())
+        {
+            Debug.Log("OfComponent");
+            Debug.Log(item.name);
+            if (i++ == 100)
+            {
+                Debug.Log("BREAK END");
+                break;
+            }
+        }
+
+        //Test();
+        //Test2();
     }
 
     public static void Test()
@@ -54,7 +68,7 @@ public class NewBehaviourScript : MonoBehaviour
             .Append(10000)
             .Chunk(99)
             .Distinct();
-            
+
         foreach (var item in w)
         {
             Debug.Log(item);
