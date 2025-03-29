@@ -1,4 +1,6 @@
-﻿namespace ZLinq.Tests.Linq;
+﻿using Shouldly;
+
+namespace ZLinq.Tests.Linq;
 
 public class ToLookupTest
 {
@@ -259,6 +261,53 @@ public class ToLookupTest
         // Should throw when array with offset is too small
         Should.Throw<ArgumentOutOfRangeException>(() =>
             collection.CopyTo(new IGrouping<int, int>[collection.Count], 1));
+    }
+
+    [Fact]
+    public void ApplyResultSelector()
+    {
+        // Arrange
+        var xs = new[] { 1, 2, 3, 4, 5, 1, 2, 3 };
+        var lookup = (ZLinq.Linq.Lookup<int, int>)xs.AsValueEnumerable().ToLookup(x => x % 3);
+        var expectedLookup = (System.Linq.Lookup<int, int>)xs.ToLookup(x => x % 3);
+
+        // Act - transform each group to a string representation
+        var results = lookup.ApplyResultSelector((key, elements) => $"Key: {key}, Count: {elements.Count()}, Sum: {elements.Sum()}").ToList();
+        var expectedResults = expectedLookup.ApplyResultSelector((key, elements) => $"Key: {key}, Count: {elements.Count()}, Sum: {elements.Sum()}").ToList();
+
+        // Assert
+        results.Count.ShouldBe(expectedResults.Count);
+        results[0].ShouldBe(expectedResults[0]);    
+        results[1].ShouldBe(expectedResults[1]);    
+        results[2].ShouldBe(expectedResults[2]);
+    }
+
+    [Fact]
+    public void ApplyResultSelectorNullSelector()
+    {
+        // Arrange
+        var xs = new[] { 1, 2, 3 };
+        var lookup = (ZLinq.Linq.Lookup<int, int>)xs.AsValueEnumerable().ToLookup(x => x);
+
+        // Act & Assert
+        Should.Throw<ArgumentNullException>(() =>
+        {
+            var result = lookup.ApplyResultSelector<string>(null!).ToList();
+        });
+    }
+
+    [Fact]
+    public void ApplyResultSelectorOnEmptyLookup()
+    {
+        // Arrange
+        var xs = Array.Empty<int>();
+        var lookup = (ZLinq.Linq.Lookup<int, int>)xs.AsValueEnumerable().ToLookup(x => x);
+
+        // Act
+        var results = lookup.ApplyResultSelector((key, elements) => $"Key: {key}, Count: {elements.Count()}").ToList();
+
+        // Assert
+        results.Count.ShouldBe(0);
     }
 
 }

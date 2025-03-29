@@ -315,8 +315,8 @@ namespace ZLinq.Linq
         }
     }
 
-    // .NET ILookup implements ICollection
-    internal sealed class Lookup<TKey, TElement> : ILookup<TKey, TElement>, ICollection<IGrouping<TKey, TElement>>, IReadOnlyCollection<IGrouping<TKey, TElement>>
+    // .NET ILookup implements ICollection and it is public
+    public sealed class Lookup<TKey, TElement> : ILookup<TKey, TElement>, ICollection<IGrouping<TKey, TElement>>, IReadOnlyCollection<IGrouping<TKey, TElement>>
     {
         internal static readonly Lookup<TKey, TElement> Empty = new Lookup<TKey, TElement>();
 
@@ -325,7 +325,7 @@ namespace ZLinq.Linq
         readonly int count;
         readonly IEqualityComparer<TKey> comparer;
 
-        public Lookup() // for empty
+        Lookup() // for empty
         {
             this.groups = null;
             this.last = null;
@@ -333,7 +333,7 @@ namespace ZLinq.Linq
             this.comparer = null!;
         }
 
-        public Lookup(Grouping<TKey, TElement>[]? groupings, Grouping<TKey, TElement>? last, int count, IEqualityComparer<TKey> comparer)
+        internal Lookup(Grouping<TKey, TElement>[]? groupings, Grouping<TKey, TElement>? last, int count, IEqualityComparer<TKey> comparer)
         {
             if (groupings == null)
             {
@@ -367,6 +367,24 @@ namespace ZLinq.Linq
         }
 
         public int Count => count;
+
+        // Lookup method
+
+        public IEnumerable<TResult> ApplyResultSelector<TResult>(Func<TKey, IEnumerable<TElement>, TResult> resultSelector)
+        {
+            ArgumentNullException.ThrowIfNull(resultSelector);
+
+            if (last is null) yield break;
+            var group = last.NextGroupInAddOrder; // as first.
+            if (group is null) yield break;
+
+            var first = group;
+            do
+            {
+                yield return resultSelector(group.Key, group);
+                group = group.NextGroupInAddOrder;
+            } while (group != null && group != first);
+        }
 
         public bool Contains(TKey key)
         {
