@@ -324,5 +324,47 @@ public class TakeTest
         Assert.Empty(source.AsValueEnumerable().Take(int.MaxValue..^int.MaxValue).ToArray());
     }
 
+    [Fact]
+    public void DisposeSource_StartIndexFromEnd_ShouldDisposeOnFirstElement()
+    {
+        const int count = 5;
+        int state = 0;
+        var source = new DelegateIterator<int>(
+            moveNext: () => ++state <= count,
+            current: () => state,
+            dispose: () => state = -1);
+
+        using var e = source.Take(^3..).GetEnumerator();
+        Assert.True(e.MoveNext());
+        Assert.Equal(3, e.Current);
+
+        Assert.Equal(-1, state);
+        Assert.True(e.MoveNext());
+    }
+
+    [Fact]
+    public void DisposeSource_EndIndexFromEnd_ShouldDisposeOnCompletedEnumeration()
+    {
+        const int count = 5;
+        int state = 0;
+        var source = new DelegateIterator<int>(
+            moveNext: () => ++state <= count,
+            current: () => state,
+            dispose: () => state = -1);
+
+        using var e = source.Take(..^3).GetEnumerator();
+
+        Assert.True(e.MoveNext());
+        Assert.Equal(4, state);
+        Assert.Equal(1, e.Current);
+
+        Assert.True(e.MoveNext());
+        Assert.Equal(5, state);
+        Assert.Equal(2, e.Current);
+
+        Assert.False(e.MoveNext());
+        Assert.Equal(-1, state);
+    }
+
 #endif
 }
