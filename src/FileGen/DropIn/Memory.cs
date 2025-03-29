@@ -332,6 +332,8 @@ internal static partial class ZLinqDropInExtensions
     public static (TSource[] Array, int Size) ToArrayPool<TSource>(this Memory<TSource> source) => source.AsValueEnumerable().ToArrayPool();
     public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this Memory<KeyValuePair<TKey, TValue>> source) where TKey : notnull => source.AsValueEnumerable().ToDictionary();
     public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this Memory<KeyValuePair<TKey, TValue>> source, IEqualityComparer<TKey>? comparer) where TKey : notnull => source.AsValueEnumerable().ToDictionary(comparer);
+    public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this Memory<(TKey Key, TValue Value)> source) where TKey : notnull => source.AsValueEnumerable().ToDictionary();
+    public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this Memory<(TKey Key, TValue Value)> source, IEqualityComparer<TKey>? comparer) where TKey : notnull => source.AsValueEnumerable().ToDictionary(comparer);
     public static Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this Memory<TSource> source, Func<TSource, TKey> keySelector) where TKey : notnull => source.AsValueEnumerable().ToDictionary(keySelector);
     public static Dictionary<TKey, TSource> ToDictionary<TSource, TKey>(this Memory<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer) where TKey : notnull => source.AsValueEnumerable().ToDictionary(keySelector, comparer);
     public static Dictionary<TKey, TElement> ToDictionary<TSource, TKey, TElement>(this Memory<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector) where TKey : notnull => source.AsValueEnumerable().ToDictionary(keySelector, elementSelector);

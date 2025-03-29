@@ -30,13 +30,18 @@ using ZLinq.Traversables;
 //var ok = string.Join(',', tako);
 
 
-Int128[] source = [1, 2, 3, 4, 5];
+var items = new int[] { 1, 2, 3, 4, 5 };
+var tuples = items.Select(x => (x, x)).ToArray();
+
+// System.Linq
+var a = tuples.ToDictionary();
+
+// ZLinq
+var b = tuples.AsValueEnumerable().ToDictionary(); // No Build error.
 
 
-source.AsValueEnumerable().Where(x => x % 2 == 0).Select(x => x * x);
-
-var a = source.AsValueEnumerable().Max();
 Console.WriteLine(a);
+Console.WriteLine(b);
 
 
 static IEnumerable<T> ForceNotCollection<T>(IEnumerable<T> source)

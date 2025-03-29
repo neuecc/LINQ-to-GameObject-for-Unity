@@ -342,6 +342,10 @@ internal static partial class ZLinqDropInExtensions
         {
             sourceGenericTypeName = "KeyValuePair<TKey, TValue>";
         }
+        else if (methodInfo.Name is "ToDictionary" && methodInfo.ToString()!.Contains("ValueTuple"))
+        {
+            sourceGenericTypeName = "(TKey Key, TValue Value)";
+        }
 
         if (isArray)
         {
