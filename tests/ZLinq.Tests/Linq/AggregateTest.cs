@@ -10,8 +10,9 @@ public class AggregateTest
 
         // Both implementations should throw when the source is empty
         TestUtil.Throws<InvalidOperationException>(
-            () => xs.Aggregate((x, y) => x + y),
-            () => xs.AsValueEnumerable().Aggregate((x, y) => x + y)
+            () => xs.Aggregate((x, y) => x + y)
+            ,
+             () => xs.AsValueEnumerable().Aggregate((x, y) => x + y)
         );
 
         TestUtil.Throws<InvalidOperationException>(

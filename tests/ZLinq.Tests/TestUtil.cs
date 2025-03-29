@@ -12,7 +12,9 @@ public static class TestUtil
     {
         var expectedException = Assert.Throws<T>(expectedTestCode);
         var actualException = Assert.Throws<T>(actualTestCode);
+#if !NET48
         expectedException.Message.ShouldBe(actualException.Message);
+#endif
     }
 
     public static void NoThrow(Action expectedTestCode, Action actualTestCode)

@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <!-- Add .NET Framework test -->
-  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != ''">
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
     <TargetFrameworks>$(TargetFrameworks);net48</TargetFrameworks>
   </PropertyGroup>
   
